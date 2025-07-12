@@ -1,103 +1,342 @@
+"use client";
+
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import Link from "next/link";
+import Section from "@/components/Section";
+import TestimonialCard from "@/components/TestimonialCard";
 import Image from "next/image";
+import Button from "@/components/Button";
+import CircleIcon from "@/components/CircleIcon";
+import AnimatedCheckbox from "@/components/AnimatedCheckbox";
+import LottieAnimation from "@/components/LottieAnimation";
+import ProfileImage from "@/components/ProfileImage";
+import TherapyCard from "@/components/TherapyCard";
+import HowItWorksStep from "@/components/HowItWorksStep";
+import { tiredAnimation } from "@/data/animations";
+import {
+  socialProofIcons,
+  testimonials,
+  checklistItems,
+  therapyCards,
+  meetYourTherapist,
+  howItWorksSteps,
+} from "@/data/pageData";
+import ContactForm from "@/components/ContactForm";
+import LeadMagnet from "@/components/LeadMagnet";
 
-export default function Home() {
+// Animation variants
+const heroContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07 },
+  },
+};
+
+const heroItemVariants = {
+  hidden: { y: 50, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.4, ease: "easeInOut" },
+  },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
+};
+
+export default function HomePage() {
+  const howItWorksRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: howItWorksRef,
+    offset: ["start end", "end end"],
+  });
+
+  const handleScroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const contactForm = document.getElementById("contact-form");
+    if (contactForm) {
+      contactForm.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main>
+      <Section className="pb-32" minHeight="100vh">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center min-h-500"
+          variants={heroContainerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            className="flex flex-col gap-4"
+            variants={heroContainerVariants}
+          >
+            <motion.h1
+              className="text-5xl lg:text-6xl font-extrabold leading-tight"
+              variants={heroItemVariants}
+            >
+              For the deep feelers, drained hearts, and healing seekers.
+            </motion.h1>
+            <motion.p className="text-lg" variants={heroItemVariants}>
+              You’ve carried too much for too long. It’s time to finally care
+              for you.
+            </motion.p>
+            <motion.div
+              className="flex flex-wrap gap-4 pt-4"
+              variants={heroItemVariants}
+            >
+              <Button onClick={handleScroll} className="bg-tst-yellow">
+                Book a call
+              </Button>
+              <Button className="bg-white">Download Free Therapy Guide</Button>
+            </motion.div>
+            <motion.div
+              className="pt-6 flex items-center gap-4"
+              variants={heroItemVariants}
+            >
+              <div className="flex">
+                {socialProofIcons.map((icon, index) => (
+                  <CircleIcon
+                    key={index}
+                    size="sm"
+                    bgColor={icon.bgColor}
+                    iconUrl={icon.iconUrl}
+                    altText={icon.altText}
+                    wrapperClassName={icon.className}
+                  />
+                ))}
+              </div>
+              <p className="text-sm font-medium">
+                <strong>More than 200+ people</strong> have taken the first
+                step.
+                <br />
+                You’re not alone.
+              </p>
+            </motion.div>
+          </motion.div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.div
+            className="min-h-500 min-w-500"
+            variants={heroItemVariants}
           >
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/assets/hero-image.png"
+              alt="Therapy illustration with a lucky cat"
+              width={500}
+              height={500}
+              className="mx-auto"
+              priority
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-8 mt-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div key={index} variants={itemVariants}>
+              <TestimonialCard
+                quote={testimonial.quote}
+                iconUrl={testimonial.iconUrl}
+                bgColor={testimonial.bgColor}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+        <motion.p
+          className="text-center italic mt-16 max-w-2xl mx-auto"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          Each reflection is based on real things clients have shared,
+          thoughtfully paraphrased to honor both their meaning and their
+          privacy.
+        </motion.p>
+      </Section>
+
+      <motion.div
+        className="border-t-2 border-black"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <Section className="bg-tst-yellow" minHeight="750px">
+          <div className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="flex flex-col gap-6">
+                <h2 className="text-4xl md:text-5xl font-extrabold">
+                  Check all that sound like you.
+                </h2>
+                <div className="flex flex-col gap-4">
+                  {checklistItems.map((item, index) => (
+                    <AnimatedCheckbox key={index} label={item} />
+                  ))}
+                </div>
+                <div className="pt-4">
+                  <Button onClick={handleScroll} className="bg-tst-purple">
+                    Get Started
+                  </Button>
+                </div>
+              </div>
+
+              <div className="hidden md:block max-w-sm mx-auto aspect-square min-h-400">
+                <LottieAnimation animationData={tiredAnimation} />
+              </div>
+            </div>
+          </div>
+        </Section>
+      </motion.div>
+
+      <div className="border-t-2 border-black">
+        <LeadMagnet />
+      </div>
+
+      <motion.div
+        className="border-t-2 border-black"
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <Section className="bg-tst-purple" minHeight="1000px">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-extrabold">
+              Therapy that actually gets you
+            </h2>
+          </div>
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-575"
+            variants={containerVariants}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            {therapyCards.map((card, index) => (
+              <motion.div key={index} variants={itemVariants}>
+                <TherapyCard
+                  title={card.title}
+                  description={card.description}
+                  animationData={card.animationData}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        </Section>
+      </motion.div>
+
+      <motion.div
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <Section minHeight="400px">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400">
+            <div className="flex justify-center">
+              <ProfileImage />
+            </div>
+
+            <motion.div
+              className="flex flex-col gap-4"
+              variants={containerVariants}
+            >
+              <motion.h2
+                className="text-5xl font-extrabold"
+                variants={itemVariants}
+              >
+                {meetYourTherapist.title}
+              </motion.h2>
+              {meetYourTherapist.paragraphs.map((text, index) => (
+                <motion.p
+                  key={index}
+                  className="text-lg"
+                  variants={itemVariants}
+                >
+                  {text}
+                </motion.p>
+              ))}
+               <motion.div variants={itemVariants} className="pt-4">
+                  <Link href="/about" className="group inline-flex items-center gap-2 font-bold text-lg text-tst-purple hover:underline">
+                    <span>Read my full bio</span>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="transition-transform duration-200 ease-in-out group-hover:translate-x-1"
+                    >
+                      <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </Link>
+              </motion.div>
+            </motion.div>
+          </div>
+        </Section>
+      </motion.div>
+
+      <div ref={howItWorksRef}>
+        <Section minHeight="1000px">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-6xl font-extrabold">
+              What working together looks like
+            </h2>
+          </motion.div>
+          <div className="flex flex-col min-h-1000">
+            {howItWorksSteps.map((step, index) => (
+              <HowItWorksStep
+                key={index}
+                step={step}
+                index={index}
+                isLastStep={step.isLastStep}
+              />
+            ))}
+          </div>
+        </Section>
+      </div>
+
+      <Section>
+        <ContactForm />
+      </Section>
+    </main>
   );
 }
