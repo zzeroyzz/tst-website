@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import Section from "@/components/Section";
@@ -70,10 +70,6 @@ const sectionVariants = {
 
 export default function HomePage() {
   const howItWorksRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: howItWorksRef,
-    offset: ["start end", "end end"],
-  });
 
   const handleScroll = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

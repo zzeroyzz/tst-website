@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, useInView, MotionValue } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import styles from "./HowItWorksStep.module.css";
 import cardStyles from "./HowItWorksStep.module.css";
