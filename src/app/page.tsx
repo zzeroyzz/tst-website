@@ -105,8 +105,11 @@ export default function HomePage() {
               You’ve carried too much for too long. It’s time to finally care
               for you.
             </motion.p>
+
+            {/* ----- CORRECTED BUTTONS ----- */}
             <motion.div
-              className="flex flex-wrap gap-4 pt-4"
+              // On mobile: flex-col (stacked). On desktop (md and up): flex-row
+              className="flex flex-col md:flex-row flex-wrap gap-4 pt-4"
               variants={heroItemVariants}
             >
               <Button onClick={handleScroll} className="bg-tst-yellow">
@@ -114,11 +117,16 @@ export default function HomePage() {
               </Button>
               <Button className="bg-white">Download Free Therapy Guide</Button>
             </motion.div>
+            {/* ----- END OF CORRECTION ----- */}
+
+            {/* ----- CORRECTED SOCIAL PROOF ----- */}
             <motion.div
-              className="pt-6 flex items-center gap-4"
+              // On mobile: items-center. On desktop: items-start
+              // On mobile: text-center. On desktop: text-left
+              className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
             >
-              <div className="flex">
+              <div className="flex flex-shrink-0">
                 {socialProofIcons.map((icon, index) => (
                   <CircleIcon
                     key={index}
@@ -137,10 +145,11 @@ export default function HomePage() {
                 You’re not alone.
               </p>
             </motion.div>
+            {/* ----- END OF CORRECTION ----- */}
           </motion.div>
 
           <motion.div
-            className="min-h-500 min-w-500"
+            className="flex items-center justify-center"
             variants={heroItemVariants}
           >
             <Image
@@ -148,7 +157,7 @@ export default function HomePage() {
               alt="Therapy illustration with a lucky cat"
               width={500}
               height={500}
-              className="mx-auto"
+              className="w-full h-auto max-w-md mx-auto"
               priority
             />
           </motion.div>
