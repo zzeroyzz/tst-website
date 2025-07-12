@@ -4,10 +4,11 @@ import styles from "./Button.module.css";
 
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
   type?: "button" | "submit" | "reset";
-  wrapperClassName?: string; // Add this new prop
+  wrapperClassName?: string;
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -15,16 +16,17 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   className = "",
   type = "button",
-  wrapperClassName = "", // Add this
+  wrapperClassName = "",
+  disabled = false,
 }) => {
   return (
-    // Apply the new wrapperClassName here
     <div className={clsx(styles.wrapper, wrapperClassName)}>
       <div className={styles.shadow} />
       <button
         type={type}
         onClick={onClick}
         className={clsx(styles.button, className)}
+        disabled={disabled}
       >
         {children}
       </button>
