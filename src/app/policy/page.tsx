@@ -4,10 +4,21 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import Section from '@/components/Section';
-import { privacyPolicy, practicePolicies } from '@/data/policyData'; // Import the new data file
+import { privacyPolicy, practicePolicies } from '@/data/policyData';
 
-// Reusable component to render policy content
-const PolicyContent = ({ title, effectiveDate, welcome, content }) => (
+// Define the types for the props
+interface PolicyContentProps {
+  title: string;
+  effectiveDate?: string; // Optional string
+  welcome?: string;      // Optional string
+  content: {
+    heading: string;
+    body: string;
+  }[];
+}
+
+// Apply the types to the component
+const PolicyContent: React.FC<PolicyContentProps> = ({ title, effectiveDate, welcome, content }) => (
     <>
         <h1 className="text-4xl font-extrabold mb-4">{title}</h1>
         {effectiveDate && <p className="font-bold mb-6">Effective Date: {effectiveDate}</p>}
@@ -16,6 +27,7 @@ const PolicyContent = ({ title, effectiveDate, welcome, content }) => (
             {content.map(section => (
                 <div key={section.heading}>
                     <h3 className="text-xl font-bold">{section.heading}</h3>
+                    {/* Using dangerouslySetInnerHTML to render the links in the policy text */}
                     <p dangerouslySetInnerHTML={{ __html: section.body }} />
                 </div>
             ))}
