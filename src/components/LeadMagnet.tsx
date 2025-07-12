@@ -6,7 +6,21 @@ import styles from "./GuideCard.module.css";
 import clsx from "clsx";
 import { guides } from "@/data/leadData"; // Import data from the new file
 
-const GuideCard = ({ guide }) => (
+// Define the type for a single guide object
+interface Guide {
+  title: string;
+  description: string;
+  iconUrl: string;
+  tags: string[];
+  bgColor: string;
+}
+
+// Define the props for the GuideCard component
+interface GuideCardProps {
+  guide: Guide;
+}
+
+const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
   <Link href="/resources" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
