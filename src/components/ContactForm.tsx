@@ -23,7 +23,7 @@ const useWindowSize = () => {
 
 const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] =useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { width, height } = useWindowSize();
@@ -49,8 +49,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       }
 
       setIsSubmitted(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) { // <-- FIX IS HERE: Changed 'any' to 'unknown'
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +108,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
                 <div className={styles.input_wrapper}>
                   <label htmlFor="phone" className="sr-only">Phone number</label>
                   <div className={styles.shadow} />
-                  {/* Added the required attribute to the phone input */}
                   <input type="tel" id="phone" name="phone" placeholder="Phone number" className={styles.input} value={formData.phone} onChange={handleChange} required />
                 </div>
                 <div className={styles.input_wrapper}>
