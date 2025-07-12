@@ -39,7 +39,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
               initial={{ height: 0, opacity: 0, marginTop: 0 }}
               animate={{ height: "auto", opacity: 1, marginTop: "16px" }}
               exit={{ height: 0, opacity: 0, marginTop: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
               <p className="pb-4 px-6 text-left">{answer}</p>
