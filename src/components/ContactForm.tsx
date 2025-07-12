@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
-import FAQ from "./FAQ"; // Keep FAQ for the default case
+import FAQ from "./FAQ";
 import styles from "./ContactForm.module.css";
 import Confetti from "react-confetti";
 
 interface ContactFormProps {
-  isContactPage?: boolean; // The new conditional prop
+  isContactPage?: boolean;
 }
 
 const useWindowSize = () => {
@@ -22,17 +22,46 @@ const useWindowSize = () => {
 };
 
 const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] =useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { width, height } = useWindowSize();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Something went wrong. Please try again.');
+      }
+
+      setIsSubmitted(true);
+    } catch (err: unknown) { // <-- FIX IS HERE: Changed 'any' to 'unknown'
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderPostSubmitContent = () => {
     if (isContactPage) {
-      // If on the contact page, show "What to expect next"
       return (
         <div className="text-center max-w-2xl mx-auto">
            <h2 className="text-4xl font-extrabold mb-6">Thank You!</h2>
@@ -45,7 +74,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         </div>
       );
     }
-    // Otherwise, show the FAQ (default behavior for the homepage)
     return <FAQ />;
   };
 
@@ -74,25 +102,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
               <div className={styles.input_wrapper}>
                 <label htmlFor="name" className="sr-only">Your name</label>
                 <div className={styles.shadow} />
-                <input type="text" id="name" name="name" placeholder="Your name" className={styles.input} />
+                <input type="text" id="name" name="name" placeholder="Your name" className={styles.input} value={formData.name} onChange={handleChange} required />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className={styles.input_wrapper}>
                   <label htmlFor="phone" className="sr-only">Phone number</label>
                   <div className={styles.shadow} />
-                  <input type="tel" id="phone" name="phone" placeholder="Phone number" className={styles.input} />
+                  <input type="tel" id="phone" name="phone" placeholder="Phone number" className={styles.input} value={formData.phone} onChange={handleChange} required />
                 </div>
                 <div className={styles.input_wrapper}>
                   <label htmlFor="email" className="sr-only">Your email</label>
                   <div className={styles.shadow} />
-                  <input type="email" id="email" name="email" placeholder="Your email" className={styles.input} />
+                  <input type="email" id="email" name="email" placeholder="Your email" className={styles.input} value={formData.email} onChange={handleChange} required />
                 </div>
               </div>
               <div className="mt-2">
-                <Button type="submit" className="bg-tst-yellow" wrapperClassName="w-full">
-                  Submit
+                <Button type="submit" className="bg-tst-yellow" wrapperClassName="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>
+              {error && <p className="text-red-500 mt-4">{error}</p>}
             </div>
           </form>
         </div>
