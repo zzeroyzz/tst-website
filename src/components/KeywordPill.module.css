@@ -1,0 +1,40 @@
+/* src/components/KeywordPill.module.css */
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 8px; /* Corresponds to rounded-lg */
+  transform: translate(4px, 4px);
+  transition: transform 150ms ease-in-out;
+}
+
+.pill {
+  position: relative;
+  background-color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem; /* 8px 16px */
+  border-radius: 8px; /* Corresponds to rounded-lg */
+  border: 2px solid black;
+  cursor: default; /* It's not a link, so default cursor */
+  transition: transform 150ms ease-in-out;
+}
+
+.wrapper:hover .pill {
+  transform: translate(2px, 2px);
+}
+.wrapper:hover .shadow {
+  transform: translate(2px, 2px);
+}
+
+.wrapper:active .pill,
+.wrapper:active .shadow {
+    transform: translate(0, 0);
+}

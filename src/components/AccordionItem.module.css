@@ -1,0 +1,46 @@
+.wrapper {
+  position: relative;
+  display: block;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 12px;
+  transform: translate(8px, 8px);
+  /* The transition is removed from the shadow to make it static on hover */
+}
+
+.item {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  border: 2px solid black;
+  border-radius: 12px;
+  background-color: white;
+  transition: transform 150ms ease-in-out;
+}
+
+/* On hover, only the item moves to align with the shadow */
+.wrapper:hover .item {
+  transform: translate(8px, 8px);
+}
+
+/* On active/click, the item moves back to its original position */
+.wrapper:active .item {
+  transform: translate(0, 0);
+}
+
+.button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1.5rem;
+  gap: 1rem;
+  cursor: pointer;
+}

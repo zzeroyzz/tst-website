@@ -1,0 +1,26 @@
+/* src/components/AnimatedCheckbox.module.css */
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 4px;
+  transform: translate(3px, 3px);
+}
+.checkbox {
+  position: relative;
+
+  border: 2px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 150ms ease-in-out;
+}
+.wrapper:hover .checkbox {
+  transform: translate(3px, 3px);
+}

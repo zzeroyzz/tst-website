@@ -1,0 +1,57 @@
+/* src/components/WallOfLoveCard.module.css */
+.wrapper {
+  position: relative;
+  display: block;
+  height: 100%; /* Make wrapper fill the flex item height */
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 12px;
+  transform: translate(8px, 8px);
+  z-index: -1;
+}
+
+.card {
+  position: relative;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%; /* Make card fill the wrapper */
+}
+
+.quote {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  border-radius: 9999px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.role {
+  font-size: 0.875rem;
+  color: #4b5563;
+}

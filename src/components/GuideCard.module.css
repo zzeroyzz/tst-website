@@ -1,0 +1,46 @@
+/* src/components/GuideCard.module.css */
+
+.wrapper {
+  position: relative;
+  display: block;
+  height: 100%;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 12px;
+  transform: translate(8px, 8px);
+  transition: transform 150ms ease-in-out;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 2px solid black;
+  border-radius: 12px;
+  padding: 1.5rem; /* 24px */
+  display: flex;
+  flex-direction: column;
+  transition: transform 150ms ease-in-out;
+}
+
+/* The "push in" animation */
+.wrapper:hover .card {
+  transform: translate(4px, 4px);
+}
+.wrapper:hover .shadow {
+  transform: translate(4px, 4px);
+}
+
+.wrapper:active .card {
+  transform: translate(0, 0);
+}
+.wrapper:active .shadow {
+  transform: translate(0, 0);
+}

@@ -1,0 +1,22 @@
+.scroller {
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+  mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+  padding-bottom: 10px; /* Add space for the shadow */
+}
+
+.scroller_inner {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 350px;
+  gap: 1rem;
+  width: max-content;
+  animation: scroll 40s linear infinite;
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}

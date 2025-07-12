@@ -1,0 +1,43 @@
+/* src/components/ContactForm.module.css */
+
+.input_wrapper {
+  position: relative;
+  display: block;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 8px;
+  transform: translate(8px, 8px);
+  z-index: -1;
+}
+
+.input {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  font-weight: 500;
+  border: 2px solid black;
+  border-radius: 8px;
+  background-color: white;
+  transition: transform 150ms ease-in-out;
+}
+
+.input::placeholder {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* The hover animation */
+.input_wrapper:hover .input {
+  transform: translate(8px, 8px);
+}
+
+.input_wrapper:active .input {
+  transform: translate(0, 0);
+}
