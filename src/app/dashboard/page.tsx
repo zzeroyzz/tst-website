@@ -11,9 +11,7 @@ import {
   Newspaper,
   Users,
   LogOut,
-  PlusCircle,
 } from "lucide-react";
-import Button from "@/components/Button";
 import KanbanBoard from "@/components/KanbanBoard";
 import LeadsView from "@/components/LeadsView";
 import NewsletterView from "@/components/NewsletterView";
