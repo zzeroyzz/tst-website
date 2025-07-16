@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
-import Link from "next/link";
 import Section from "@/components/Section";
 import TestimonialCard from "@/components/TestimonialCard";
 import Image from "next/image";

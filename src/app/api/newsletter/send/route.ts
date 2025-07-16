@@ -77,6 +77,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: 'Campaign sent successfully!', campaignId: campaign.id });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('API Error:', error.response?.body || error.message);
     const errorMessage = error.response?.body?.detail || error.message || 'An unexpected error occurred.';

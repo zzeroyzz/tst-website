@@ -151,7 +151,7 @@ const KanbanBoard = () => {
     const channel = supabase
       .channel('realtime-tasks')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' },
-        (payload) => {
+        () => {
             fetchTasks();
         }
       )

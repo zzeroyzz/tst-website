@@ -127,7 +127,7 @@ const LeadsView = () => {
     const channel = supabase
       .channel("realtime-leads")
       .on("postgres_changes", { event: "*", schema: "public", table: "contacts" },
-        (payload) => {
+        () => {
           fetchLeads();
         }
       )

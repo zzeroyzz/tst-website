@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/dashboard/page.tsx
 "use client";
 
@@ -23,17 +24,7 @@ const DashboardView = () => (
     <p>Welcome to your dashboard! Statistics and summaries will go here.</p>
   </div>
 );
-const BlogView = () => (
-  <div>
-    <div className="flex justify-between items-center mb-4">
-      <h2 className="text-3xl font-bold">Blog Posts</h2>
-      <Button className="bg-tst-purple">
-        <PlusCircle className="mr-2 h-4 w-4" /> Create Post
-      </Button>
-    </div>
-    <p>A full CRUD interface for blog posts will be implemented here.</p>
-  </div>
-);
+
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/email-template.ts
 
 // Helper function to build the HTML for a single archive post
