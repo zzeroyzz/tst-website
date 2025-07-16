@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ServiceOfferingCard.module.css";
-import AnimatedImage from "./AnimatedImage"; // Import the new component
+import ServiceOfferingAnimatedImage from "./ServiceOfferingAnimatedImage"; // Import the new component
 
 interface ServiceOfferingCardProps {
   service: {
@@ -12,13 +12,12 @@ interface ServiceOfferingCardProps {
   };
 }
 
-const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) => {
+const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ 'data-testid': dataTestId, service }) => {
   return (
-    <div className={styles.wrapper}>
+    <div data-testid={dataTestId} className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Left Side: Content */}
           <div className="flex flex-col gap-4">
             <h3 className="text-3xl font-bold">{service.title}</h3>
             <p>{service.description}</p>
@@ -28,7 +27,7 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
                 {service.tags.map((tag) => (
                   <div
                     key={tag}
-                    className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black"
+                    className="bg-tst-yellow text-sm font-medium px-3 py-1 rounded-full border-2 border-black"
                   >
                     {tag}
                   </div>
@@ -36,9 +35,8 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
               </div>
             </div>
           </div>
-           {/* Right Side: Use the new AnimatedImage component */}
           <div className="hidden md:block">
-            <AnimatedImage animationData={service.animationData} />
+            <ServiceOfferingAnimatedImage animationData={service.animationData} />
           </div>
         </div>
       </div>

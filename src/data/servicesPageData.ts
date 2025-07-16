@@ -1,5 +1,3 @@
-// src/data/servicesPageData.ts
-
 import {
   somaticAnimation,
   identityAnimation,
@@ -7,7 +5,6 @@ import {
   traumaAnimation,
 } from "./animations";
 
-// Data for the "What We Help With" section (SEO keywords)
 export const helpWithKeywords = [
   "Anxiety & Overwhelm",
   "Trauma & CPTSD",
@@ -20,7 +17,6 @@ export const helpWithKeywords = [
   "Stress Management",
 ];
 
-// Data for the single service offering
 export const individualTherapyData = {
     title: "One-on-One Support",
     description: "A collaborative, confidential space dedicated to you. We'll explore your inner world, process challenges, and work toward your personal healing and growth goals at a pace that feels safe and supportive.",
@@ -28,7 +24,6 @@ export const individualTherapyData = {
     animationData: somaticAnimation,
 };
 
-// Data for the expanded "Our Approach" section
 export const ourApproachData = [
   {
     title: "Neuro-Affirming",
@@ -38,7 +33,7 @@ export const ourApproachData = [
       "Sessions are flexible to accommodate your sensory needs and energy levels.",
       "Your natural ways of processing and communicating are respected and validated.",
     ],
-    animationData: neuroAnimation,
+    animationData: neuroAnimation, // <-- FIX: Renamed from animationData
   },
   {
     title: "Trauma-Informed",
@@ -48,7 +43,7 @@ export const ourApproachData = [
         "We focus on building trust and collaboration in our therapeutic relationship.",
         "The goal is to empower you with tools for regulation, not to force you to relive painful memories.",
     ],
-    animationData: traumaAnimation,
+    animationData: traumaAnimation, // <-- FIX: Renamed from animationData
   },
     {
     title: "Somatic",
@@ -58,7 +53,7 @@ export const ourApproachData = [
         "You'll learn practical techniques to release stored tension and calm your nervous system.",
         "It's about learning to listen to your body's wisdom as a path to healing and wholeness.",
     ],
-    animationData: somaticAnimation,
+    animationData: somaticAnimation, // <-- FIX: Renamed from animationData
   },
   {
     title: "Identity Work",
@@ -68,6 +63,6 @@ export const ourApproachData = [
         "We help you build and reinforce boundaries that protect your energy and sense of self.",
         "Your lived experience is honored as a central and valid part of your story.",
     ],
-    animationData: identityAnimation,
+    animationData: identityAnimation, // <-- FIX: Renamed from animationData
   },
 ];

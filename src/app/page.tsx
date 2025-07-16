@@ -13,6 +13,7 @@ import LottieAnimation from "@/components/LottieAnimation";
 import ProfileImage from "@/components/ProfileImage";
 import TherapyCard from "@/components/TherapyCard";
 import HowItWorksStep from "@/components/HowItWorksStep";
+import HoverLink from '@/components/HoverLink';
 import { tiredAnimation } from "@/data/animations";
 import {
   socialProofIcons,
@@ -106,9 +107,7 @@ export default function HomePage() {
               for you.
             </motion.p>
 
-            {/* ----- CORRECTED BUTTONS ----- */}
             <motion.div
-              // On mobile: flex-col (stacked). On desktop (md and up): flex-row
               className="flex flex-col md:flex-row flex-wrap gap-4 pt-4"
               variants={heroItemVariants}
             >
@@ -117,12 +116,8 @@ export default function HomePage() {
               </Button>
               <Button className="bg-white">Download Free Therapy Guide</Button>
             </motion.div>
-            {/* ----- END OF CORRECTION ----- */}
 
-            {/* ----- CORRECTED SOCIAL PROOF ----- */}
             <motion.div
-              // On mobile: items-center. On desktop: items-start
-              // On mobile: text-center. On desktop: text-left
               className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
             >
@@ -200,31 +195,36 @@ export default function HomePage() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        <Section className="bg-tst-yellow" minHeight="750px">
-          <div className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="flex flex-col gap-6">
-                <h2 className="text-4xl md:text-5xl font-extrabold">
-                  Check all that sound like you.
-                </h2>
-                <div className="flex flex-col gap-4">
-                  {checklistItems.map((item, index) => (
-                    <AnimatedCheckbox key={index} label={item} />
-                  ))}
-                </div>
-                <div className="pt-4">
-                  <Button onClick={handleScroll} className="bg-tst-purple">
-                    Get Started
-                  </Button>
-                </div>
-              </div>
+      <Section className="bg-tst-yellow" minHeight="750px">
+  <div className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12">
+    <div className="grid md:grid-cols-2 gap-8 items-center">
+      <div className="flex flex-col gap-6">
+        <h2 className="text-4xl md:text-5xl font-extrabold">
+          Check all that sound like you.
+        </h2>
+        {/* MODIFIED animation below */}
+        <div className="block md:hidden w-56 mx-auto aspect-square">
+          <LottieAnimation animationData={tiredAnimation} />
+        </div>
+        <div className="flex flex-col gap-4">
+          {checklistItems.map((item, index) => (
+            <AnimatedCheckbox key={index} label={item} />
+          ))}
+        </div>
+        <div className="pt-4">
+          <Button onClick={handleScroll} className="bg-tst-purple">
+            Get Started
+          </Button>
+        </div>
+      </div>
 
-              <div className="hidden md:block max-w-sm mx-auto aspect-square min-h-400">
-                <LottieAnimation animationData={tiredAnimation} />
-              </div>
-            </div>
-          </div>
-        </Section>
+      {/* This is the existing animation that ONLY shows on desktop */}
+      <div className="hidden md:block max-w-sm mx-auto aspect-square">
+        <LottieAnimation animationData={tiredAnimation} />
+      </div>
+    </div>
+  </div>
+</Section>
       </motion.div>
 
       <div className="border-t-2 border-black">
@@ -292,21 +292,11 @@ export default function HomePage() {
                   {text}
                 </motion.p>
               ))}
-               <motion.div variants={itemVariants} className="pt-4">
-                  <Link href="/about" className="group inline-flex items-center gap-2 font-bold text-lg text-tst-purple hover:underline">
+               <motion.div variants={itemVariants} className="flex justify-end">
+                  <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
                     <span>Read my full bio</span>
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="transition-transform duration-200 ease-in-out group-hover:translate-x-1"
-                    >
-                      <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </Link>
+
+                  </HoverLink>
               </motion.div>
             </motion.div>
           </div>

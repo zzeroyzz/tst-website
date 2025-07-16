@@ -3,6 +3,7 @@ import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { Toaster } from "react-hot-toast"; // Import Toaster
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body
         className={`${workSans.variable} font-sans bg-tst-cream text-black antialiased`}
       >
+        <Toaster position="top-center" reverseOrder={false} />
         <Nav />
         <main>{children}</main>
         <Footer />

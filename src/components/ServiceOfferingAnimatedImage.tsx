@@ -2,15 +2,14 @@ import React from 'react';
 import LottieAnimation from './LottieAnimation';
 import styles from './AnimatedImage.module.css';
 
-interface AnimatedImageProps {
+interface ServiceOfferingAnimatedImage {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   animationData: any;
 }
 
-const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData,  'data-testid': dataTestId,  }) => {
+const ServiceOfferingAnimatedImage: React.FC<AnimatedImageProps> = ({ animationData }) => {
   return (
-    <div data-testid={dataTestId} className={styles.wrapper}>
-      <div className={styles.shadow} />
+    <div className={styles.wrapper}>
       <div className={styles.card}>
         <LottieAnimation animationData={animationData} />
       </div>
@@ -18,4 +17,4 @@ const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData,  'data-tes
   );
 };
 
-export default AnimatedImage;
+export default ServiceOfferingAnimatedImage;
