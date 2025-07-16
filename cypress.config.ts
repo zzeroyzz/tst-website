@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
