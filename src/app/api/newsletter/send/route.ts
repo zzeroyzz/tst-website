@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const finalHtml = getEmailHtml(emailData);
 
     // 4. Create and send Mailchimp campaign
-    const campaign = await mailchimp.campaigns.create({
+    const campaignResponse = await mailchimp.campaigns.create({
       type: 'regular',
       recipients: { list_id: process.env.MAILCHIMP_NEWSLETTER_AUDIENCE_ID! },
       settings: {
@@ -71,6 +71,13 @@ export async function POST(request: Request) {
         reply_to: 'care@toastedsesametherapy.com',
       },
     });
+
+    // Type guard to check if the response has an id property
+    if (!campaignResponse || typeof campaignResponse !== 'object' || !('id' in campaignResponse)) {
+      throw new Error('Failed to create campaign: Invalid response from Mailchimp');
+    }
+
+    const campaign = campaignResponse as { id: string };
 
     await mailchimp.campaigns.setContent(campaign.id, { html: finalHtml });
     await mailchimp.campaigns.send(campaign.id);

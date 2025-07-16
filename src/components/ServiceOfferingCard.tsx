@@ -12,9 +12,9 @@ interface ServiceOfferingCardProps {
   };
 }
 
-const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ 'data-testid': dataTestId, service }) => {
+const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) => {
   return (
-    <div data-testid={dataTestId} className={styles.wrapper}>
+    <div className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
         <div className="grid md:grid-cols-2 gap-8 items-center">

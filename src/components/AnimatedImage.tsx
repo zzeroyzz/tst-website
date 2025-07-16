@@ -7,9 +7,9 @@ interface AnimatedImageProps {
   animationData: any;
 }
 
-const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData,  'data-testid': dataTestId,  }) => {
+const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
   return (
-    <div data-testid={dataTestId} className={styles.wrapper}>
+    <div className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
         <LottieAnimation animationData={animationData} />

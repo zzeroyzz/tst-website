@@ -5,7 +5,7 @@ import React,  { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useParams } from "next/navigation";
 import NewsletterEditor from "@/components/NewsletterEditor";
-import { Post } from "@/types"; // We will create this type definition next
+import { Post } from "@/types"; 
 
 const NewsletterPostPage = () => {
     const { id } = useParams();

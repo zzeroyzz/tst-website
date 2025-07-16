@@ -2,9 +2,9 @@ import React from 'react';
 import styles from './FallingPills.module.css';
 import { helpWithKeywords } from '@/data/servicesPageData';
 
-const FallingPills = ({'data-testid': dataTestId,}) => {
+const FallingPills = () => {
     return (
-        <div data-testid={dataTestId} className={styles.container}>
+        <div className={styles.container}>
             <h2 className={styles.title}>What We Help With</h2>
             <div className={styles.pills_wrapper}>
                 {helpWithKeywords.map((keyword, index) => (

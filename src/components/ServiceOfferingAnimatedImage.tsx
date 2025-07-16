@@ -2,7 +2,7 @@ import React from 'react';
 import LottieAnimation from './LottieAnimation';
 import styles from './AnimatedImage.module.css';
 
-interface ServiceOfferingAnimatedImage {
+interface AnimatedImageProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   animationData: any;
 }

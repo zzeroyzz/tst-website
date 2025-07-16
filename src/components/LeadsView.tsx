@@ -6,6 +6,16 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format, differenceInDays } from "date-fns";
 import { X } from "lucide-react";
 
+type Lead = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  status: string;
+  notes?: string;
+  created_at: string;
+};
+
 // --- Lead Detail Modal Component ---
 const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
   const [status, setStatus] = useState(lead.status);
@@ -56,7 +66,7 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        rows="10"
+                        rows={10}
                         className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
                         placeholder="Add notes about your interactions with this lead..."
                     />
@@ -72,7 +82,7 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
                     <h3 className="font-bold text-lg mb-2">Set a Reminder</h3>
                     <p className="text-sm text-gray-500 mb-2">Reminder functionality coming soon!</p>
                     <input type="datetime-local" disabled className="w-full p-2 border-2 border-gray-300 rounded-md bg-gray-200 cursor-not-allowed" />
-                    <textarea rows="2" disabled className="mt-2 w-full p-2 border-2 border-gray-300 rounded-md bg-gray-200 cursor-not-allowed" placeholder="Reminder note..."></textarea>
+                    <textarea rows={2} disabled className="mt-2 w-full p-2 border-2 border-gray-300 rounded-md bg-gray-200 cursor-not-allowed" placeholder="Reminder note..."></textarea>
                  </div>
             </div>
         </div>
@@ -93,8 +103,8 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
 
 // --- Main Leads View Component ---
 const LeadsView = () => {
-  const [leads, setLeads] = useState([]);
-  const [selectedLead, setSelectedLead] = useState(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
 

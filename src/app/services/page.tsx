@@ -47,7 +47,7 @@ const ServicesPage = () => {
     }
   };
   return (
-    <main data-testid="services-page">
+    <main>
       {/* 1. Hero Section (Reverted to single-column layout) */}
       <Section>
         <motion.div
@@ -55,24 +55,22 @@ const ServicesPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            data-testid="hero-section"
         >
           {/* Top part of the hero */}
           <motion.div
             className="text-center max-w-4xl mx-auto flex flex-col gap-6 items-center"
             variants={itemVariants}
            >
-            <h1 className="text-5xl lg:text-6xl font-extrabold" data-testid="hero-title">
+            <h1 className="text-5xl lg:text-6xl font-extrabold">
               Therapy That Fits You, As You Are.
             </h1>
-            <p className="text-lg" data-testid="hero-description">
+            <p className="text-lg">
               Explore our therapeutic approach and find the support that meets
               your unique needs.
             </p>
             <Button
               onClick={handleClick}
               className="bg-tst-yellow"
-              data-testid="consultation-button"
             >
               Book a Free Consultation
             </Button>
@@ -81,9 +79,8 @@ const ServicesPage = () => {
           <motion.div
             className="w-full max-w-5xl mx-auto mt-16"
             variants={itemVariants}
-            data-testid="falling-pills-container"
           >
-            <FallingPills data-testid="falling-pills" />
+            <FallingPills/>
           </motion.div>
         </motion.div>
       </Section>
@@ -93,18 +90,16 @@ const ServicesPage = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        data-testid="individual-therapy-section"
       >
         <Section>
            <div className="text-center mb-12">
-            <h2 className="text-5xl font-extrabold" data-testid="individual-therapy-title">
+            <h2 className="text-5xl font-extrabold">
               Individual Therapy
             </h2>
           </div>
           <div className="max-w-4xl mx-auto">
              <ServiceOfferingCard
                service={individualTherapyData}
-               data-testid="service-offering-card"
              />
           </div>
         </Section>
@@ -113,7 +108,6 @@ const ServicesPage = () => {
       {/* 3. Our Approach Section */}
        <Section
          className="bg-tst-purple border-t-2 border-black"
-         data-testid="our-approach-section"
        >
         <motion.div
           className="text-center mb-16"
@@ -122,7 +116,7 @@ const ServicesPage = () => {
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-5xl font-extrabold" data-testid="our-approach-title">
+          <h2 className="text-5xl font-extrabold">
             A Closer Look at Our Approach
           </h2>
         </motion.div>
@@ -132,41 +126,32 @@ const ServicesPage = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            data-testid="approach-items-container"
         >
           {ourApproachData.map((item, index) => (
             <motion.div
               key={item.title}
               className="grid md:grid-cols-2 gap-12 items-center"
               variants={itemVariants}
-              data-testid={`approach-item-${index}`}
             >
               <div className={`w-full ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
                  <AnimatedImage
                    animationData={item.animationData}
-                   data-testid={`animated-image-${index}`}
                  />
               </div>
               <div className={`flex flex-col gap-4 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
-                <h3 className="text-3xl font-bold" data-testid={`approach-title-${index}`}>
+                <h3 className="text-3xl font-bold">
                   {item.title}
                 </h3>
-                <p data-testid={`approach-description-${index}`}>
+                <p>
                   {item.description}
                 </p>
                 <div className="mt-2">
-                    <h4 className="font-bold mb-2" data-testid={`benefits-title-${index}`}>
+                    <h4 className="font-bold mb-2">
                       What this means for you:
                     </h4>
-                    <ul
-                      className="list-disc list-inside flex flex-col gap-1"
-                      data-testid={`benefits-list-${index}`}
-                    >
-                        {item.benefits.map((benefit, benefitIndex) => (
-                          <li
-                            key={benefit}
-                            data-testid={`benefit-item-${index}-${benefitIndex}`}
-                          >
+                    <ul className="list-disc list-inside flex flex-col gap-1">
+                        {item.benefits.map((benefit) => (
+                          <li key={benefit}>
                             {benefit}
                           </li>
                         ))}
@@ -185,11 +170,10 @@ const ServicesPage = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        data-testid="faq-section-wrapper"
       >
         <div id="faq-section" className="border-t-2 border-black">
-          <Section className="bg-tst-teal" data-testid="faq-section-content">
-            <FAQ data-testid="faq-component" />
+          <Section className="bg-tst-teal">
+            <FAQ/>
           </Section>
         </div>
       </motion.div>

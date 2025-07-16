@@ -1,7 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/KanbanBoard.tsx
+
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+
+type Column = { name: string; items: any[] };
+type ColumnsMap = Record<string, Column>;
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { PlusCircle, X } from "lucide-react";
@@ -46,7 +51,7 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows="4"
+              rows={4}
               className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
               placeholder="Add a more detailed description..."
             />
@@ -100,7 +105,7 @@ const AddTaskForm = ({ columnId, onAddTask, onCancel }) => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add a description... (optional)"
-                rows="2"
+                rows={2}
                 className="w-full p-2 border-none rounded focus:outline-none text-sm"
             />
             <div className="flex items-center justify-end">
@@ -118,8 +123,8 @@ const AddTaskForm = ({ columnId, onAddTask, onCancel }) => {
 
 // --- Main Kanban Board Component ---
 const KanbanBoard = () => {
-  const [columns, setColumns] = useState(null);
-  const [addingToColumn, setAddingToColumn] = useState(null);
+  const [columns, setColumns] = useState<ColumnsMap | null>(null);
+  const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const supabase = createClientComponentClient();
 
@@ -164,6 +169,7 @@ const KanbanBoard = () => {
 
   const handleAddTask = async (columnId, title, description) => {
     setAddingToColumn(null);
+    if (!columns) return;
     const column = columns[columnId];
     const newPosition = column.items.length;
 

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { faqData } from "@/data/faqData";
 import AccordionItem from "./AccordionItem";
 
-const FAQ = ({'data-testid': dataTestId}) => {
+const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleToggle = (index: number) => {
@@ -12,7 +12,7 @@ const FAQ = ({'data-testid': dataTestId}) => {
   };
 
   return (
-    <div data-testid={dataTestId} className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto">
       <h2 className="text-5xl font-extrabold text-center mb-8">
         Answers to common questions
       </h2>

@@ -17,6 +17,8 @@ interface NewsletterEditorProps {
     post: Post | null;
 }
 
+type ArchivePost = Pick<Post, 'id' | 'title'>;
+
 const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }) => {
     const [post, setPost] = useState<Post | null>(initialPost);
     const [title, setTitle] = useState(initialPost?.title || '');
@@ -27,7 +29,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     const [archivePosts, setArchivePosts] = useState<string[]>(initialPost?.archive_posts || []);
     const [tags, setTags] = useState<string[]>(initialPost?.tags || []); // State for tags
 
-    const [allPosts, setAllPosts] = useState<Post[]>([]);
+    const [allPosts, setAllPosts] = useState<ArchivePost[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPreviewing, setIsPreviewing] = useState(false);
     const [previewHtml, setPreviewHtml] = useState('');
@@ -45,7 +47,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
         if (error) {
             console.error('Error fetching posts for archive:', error);
         } else {
-            setAllPosts(data.filter(p => p.id !== post?.id));
+            setAllPosts((data as ArchivePost[]).filter(p => p.id !== post?.id));
         }
     }, [supabase, post?.id]);
 
