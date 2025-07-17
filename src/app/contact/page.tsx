@@ -16,6 +16,7 @@ const itemVariants = {
     transition: { duration: 0.5 },
   },
 };
+
 const ContactPage = () => {
   return (
     <main>
@@ -31,12 +32,11 @@ const ContactPage = () => {
           <h1 className="text-5xl font-extrabold text-center max-w-3xl mx-auto">
             Taking the first step is the hardest part.
           </h1>
-      <p className="text-lg mt-8">
-                You&apos;re in the right place. Fill out the form, and I’ll get back to you personally to schedule our free, no-pressure consultation.
-              </p>
+          <p className="text-lg mt-8">
+            You&apos;re in the right place. Fill out the form, and I&rsquo;ll get back to you personally to schedule our free, no-pressure consultation.
+          </p>
           {/* Two-column grid below the headline */}
           <div className="grid lg:grid-cols-2 gap-16 items-start w-full max-w-6xl mx-auto mt-16">
-
             {/* Left Column: Image and Subheader */}
             <div className="flex flex-col gap-8 items-center lg:items-start text-center lg:text-left">
               <div className="relative w-full max-w-md">
@@ -50,7 +50,6 @@ const ContactPage = () => {
                 />
               </div>
               {/* Added top margin here for better spacing */}
-
             </div>
 
             {/* Right Column: The Contact Form */}

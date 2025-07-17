@@ -94,7 +94,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         renderPostSubmitContent()
       ) : (
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-extrabold mb-8">
+          <h2 className="text-6xl font-extrabold mb-8">
             Reach out to start therapy.
           </h2>
           <form onSubmit={handleSubmit}>

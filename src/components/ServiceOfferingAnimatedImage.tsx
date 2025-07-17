@@ -7,10 +7,9 @@ interface AnimatedImageProps {
   animationData: any;
 }
 
-const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
+const ServiceOfferingAnimatedImage: React.FC<AnimatedImageProps> = ({ animationData }) => {
   return (
     <div className={styles.wrapper}>
-      <div className={styles.shadow} />
       <div className={styles.card}>
         <LottieAnimation animationData={animationData} />
       </div>
@@ -18,4 +17,4 @@ const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
   );
 };
 
-export default AnimatedImage;
+export default ServiceOfferingAnimatedImage;
