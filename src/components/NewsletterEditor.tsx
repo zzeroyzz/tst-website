@@ -36,7 +36,6 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     const router = useRouter();
     const supabase = createClientComponentClient();
 
-    // (fetchAllPosts and handleArchiveSelection hooks remain the same)
     const fetchAllPosts = useCallback(async () => {
         const { data, error } = await supabase
             .from('posts')
@@ -67,25 +66,43 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     };
 
     const handleTagSelection = (tag: string) => {
-        setTags(prev =>
-            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-        );
+        console.log(`Tag clicked: ${tag}`);
+        console.log('Tags before update:', tags);
+        setTags(prev => {
+            const newTags = prev.includes(tag)
+                ? prev.filter(t => t !== tag)
+                : [...prev, tag];
+            console.log('Tags after update:', newTags);
+            return newTags;
+        });
     };
+
+    const slugify = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w-]+/g, '')       // Remove all non-word chars
+            .replace(/--+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+    }
 
     const handleSaveForLater = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         const postData = {
-            id: post?.id,
             title,
             subject,
             body,
             image_url: imageUrl,
             toasty_take: toastyTake,
             archive_posts: archivePosts,
-            tags: tags, // Include tags
+            tags: tags,
             status: 'draft',
+            slug: slugify(title),
+            ...(post?.id && { id: post.id }),
         };
 
         const { error } = await supabase.from('posts').upsert(postData);
@@ -111,7 +128,8 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             image_url: imageUrl,
             toasty_take: toastyTake,
             archive_posts: archivePosts,
-            tags: tags, // Include tags
+            tags: tags,
+            slug: slugify(title),
         };
 
         try {
@@ -141,15 +159,16 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
         const loadingToast = toast.loading('Sending newsletter...');
 
         const postData = {
-            id: post?.id,
-            created_at: post?.created_at,
             title,
             subject,
             body,
             image_url: imageUrl,
             toasty_take: toastyTake,
             archive_posts: archivePosts,
-            tags: tags, // Include tags
+            tags: tags,
+            slug: slugify(title),
+            ...(post?.id && { id: post.id }),
+            ...(post?.created_at && { created_at: post.created_at }),
         };
 
         try {
@@ -181,7 +200,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             <form onSubmit={handleSaveForLater} className="space-y-8 max-w-4xl mx-auto">
                 <h1 className="text-4xl font-extrabold">{post ? 'Edit Newsletter' : 'Create New Newsletter'}</h1>
 
-                {/* Main Content Section (no changes) */}
+                {/* Main Content Section */}
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Main Content</h2>
                     <div className="space-y-4">
@@ -197,7 +216,12 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     <h2 className="text-2xl font-bold mb-4">Core Tags</h2>
                     <div className="flex flex-wrap gap-2">
                         {coreTags.map(tag => (
-                            <label key={tag} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg border-2 border-black has-[:checked]:bg-tst-purple">
+                            <label
+                                key={tag}
+                                className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg border-2 border-black transition-colors ${
+                                    tags.includes(tag) ? 'bg-tst-purple text-black' : 'bg-white hover:bg-gray-100'
+                                }`}
+                            >
                                 <input
                                     type="checkbox"
                                     className="hidden"
@@ -205,19 +229,19 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                                     checked={tags.includes(tag)}
                                     onChange={() => handleTagSelection(tag)}
                                 />
-                                <span className="font-bold text-sm">{tag}</span>
+                                <span className="font-bold text-sm select-none">{tag}</span>
                             </label>
                         ))}
                     </div>
                 </div>
 
-                {/* Toasty Take Section (no changes) */}
+                {/* Toasty Take Section */}
                 <div className="p-6 bg-tst-green border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Toasty Take</h2>
                     <textarea placeholder="Your weekly tip or reflection..." value={toastyTake} onChange={(e) => setToastyTake(e.target.value)} className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple" rows={5} />
                 </div>
 
-                {/* Archive Selection Section (no changes) */}
+                {/* Archive Selection Section */}
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Select 3 Archived Posts</h2>
                     <p className="mb-4 text-sm text-gray-600">You have selected {archivePosts.length} of 3 posts.</p>
@@ -231,7 +255,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     </div>
                 </div>
 
-                {/* Buttons (no changes) */}
+                {/* Buttons */}
                 <div className="flex justify-end items-center gap-4">
                     <Button type="submit" className="bg-tst-purple" disabled={isSubmitting}>
                         {isSubmitting ? 'Saving...' : 'Save for Later'}

@@ -25,7 +25,7 @@ const NewsletterArchivePage = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title, created_at, sent_at, image_url, tags")
+        .select("id, title, created_at, sent_at, image_url, tags, slug")
         .eq("status", "published")
         .order("sent_at", { ascending: false });
 
@@ -126,7 +126,7 @@ const NewsletterArchivePage = () => {
                     authorImageUrl: "/assets/profile-3.svg",
                     imageUrl: post.image_url || "/assets/profile-3.svg",
                     tags: post.tags,
-                    href: `/posts/${post.id}`,
+                    href: `/posts/${post.slug}`,
                   }}
                 />
               </div>

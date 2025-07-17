@@ -49,7 +49,7 @@ const NewsletterView = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Newsletter Posts</h2>
-        <Button className="bg-tst-purple" onClick={() => router.push('/dashboard/newsletter/create')}>
+        <Button className="bg-tst-purple flex items-center" onClick={() => router.push('/dashboard/newsletter/create')}>
           <PlusCircle className="mr-2 h-4 w-4" /> Create Post
         </Button>
       </div>

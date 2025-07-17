@@ -15,18 +15,11 @@ import {
 import KanbanBoard from "@/components/KanbanBoard";
 import LeadsView from "@/components/LeadsView";
 import NewsletterView from "@/components/NewsletterView";
-
-const DashboardView = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-4">Dashboard</h2>
-    <p>Welcome to your dashboard! Statistics and summaries will go here.</p>
-  </div>
-);
-
+import DashboardView from "@/components/DashboardView"; // Import the new component
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
-  const [activeView, setActiveView] = useState("Tasks"); // Default to Tasks view
+  const [activeView, setActiveView] = useState("Dashboard"); // Default to Dashboard view
   const supabase = createClientComponentClient();
   const router = useRouter();
 
