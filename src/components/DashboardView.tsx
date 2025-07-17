@@ -14,11 +14,10 @@ import {
   isToday,
   addMonths,
   subMonths,
-  isSameDay,
   parseISO,
   subDays,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, BarChart2, CheckSquare, Users, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BarChart2, Users, Clock } from 'lucide-react';
 
 // Define the type for a reminder
 type Reminder = {
@@ -151,7 +150,7 @@ const DashboardView = () => {
 
         const { data: allContacts, error: totalError } = await supabase
             .from('contacts')
-            .select('status');
+            .select('status, created_at');
 
         if (totalError) {
             console.error('Error fetching contacts for stats:', totalError);
