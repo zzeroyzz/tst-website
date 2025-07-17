@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/Button";
 import MobileMenu from "@/components/MobileMenu";
 import HoverLink from './HoverLink';
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { User } from "@supabase/supabase-js";
 
 const MenuToggle = ({
   isOpen,
@@ -52,8 +54,20 @@ const MenuToggle = ({
 
 const Nav: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const handleGetStartedClick = () => {
     if (pathname === "/") {
@@ -65,6 +79,8 @@ const Nav: React.FC = () => {
       router.push("/#contact-form");
     }
   };
+
+  const isDashboardPage = pathname.startsWith('/dashboard');
 
   return (
     <nav className="relative w-full max-w-7xl mx-auto min-h-110 p-1">
@@ -81,20 +97,30 @@ const Nav: React.FC = () => {
           </Link>
         </div>
 
-        {/* Reverted to original desktop links */}
         <div className="hidden md:flex items-center space-x-8">
           <ul className="flex items-center space-x-8 font-bold">
-            <li>
-              <HoverLink href="/resources">
-                Download Free Therapy Guides
-              </HoverLink>
-            </li>
+            {!isDashboardPage && (
+              <li>
+                <HoverLink href="/resources">
+                  Download Free Therapy Guides
+                </HoverLink>
+              </li>
+            )}
+            {user && (
+              <li>
+                <HoverLink href="/dashboard">
+                  Dashboard
+                </HoverLink>
+              </li>
+            )}
           </ul>
-          <div>
-            <Button onClick={handleGetStartedClick} className="bg-tst-purple">
-              Get Started
-            </Button>
-          </div>
+          {!isDashboardPage && (
+            <div>
+              <Button onClick={handleGetStartedClick} className="bg-tst-purple">
+                Get Started
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="md:hidden">
