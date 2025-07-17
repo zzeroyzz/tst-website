@@ -21,7 +21,7 @@ type Lead = {
   reminder_message?: string;
 };
 
-// FIX: Replaced statusColors object with a function to be more Tailwind-friendly
+// Replaced statusColors object with a function to be more Tailwind-friendly
 const getStatusClasses = (status: string) => {
   switch (status) {
     case "New":
@@ -229,7 +229,7 @@ const LeadsView = () => {
   }, [supabase, fetchLeads]);
 
   const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
-    // FIX: Implement optimistic UI update correctly
+    // Implement optimistic UI update correctly
     const originalLeads = [...leads];
 
     const newLeads = leads.map(lead =>
@@ -269,7 +269,9 @@ const LeadsView = () => {
             <tbody>
               {leads.map((lead) => {
                 const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-                const isWarm = daysOld <= 7;
+                // FIX: A lead is only "warm" if it's recent AND requires action.
+                const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
+                const isWarm = daysOld <= 7 && isActionableStatus;
 
                 return (
                   <tr
