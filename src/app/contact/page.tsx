@@ -6,7 +6,6 @@ import Section from "@/components/Section";
 import ContactForm from "@/components/ContactForm";
 import FAQ from "@/components/FAQ";
 import CircleIcon from "@/components/CircleIcon";
-import Button from "@/components/Button";
 import styles from "@/components/TherapyCard.module.css";
 
 import {

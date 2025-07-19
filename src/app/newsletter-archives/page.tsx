@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/newsletter-archives/page.tsx
 "use client";
 
