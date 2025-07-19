@@ -21,7 +21,7 @@ const TherapyCard: React.FC<TherapyCardProps> = ({
     <Link href="/services" className={styles.wrapper}>
       <div className={styles.shadow}></div>
       <div className={styles.card}>
-        <div className="w-full bg-tst-teal aspect-video min-h-340 overflow-hidden">
+        <div className="w-full bg-white aspect-video min-h-340 overflow-hidden">
           <LottieAnimation animationData={animationData} />
         </div>
         <div className="p-6 flex-grow flex flex-col">

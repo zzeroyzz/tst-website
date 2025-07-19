@@ -7,54 +7,55 @@ import {
 
 export const socialProofIcons = [
   {
-    bgColor: "bg-tst-teal",
-    iconUrl: "/assets/profile-3.svg",
+    bgColor: "bg-tst-purple",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg",
     altText: "Icon 1",
     className: "",
   },
   {
     bgColor: "bg-tst-teal",
-    iconUrl: "/assets/profile-3.svg",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cloud-blue-icon.svg",
     altText: "Icon 2",
     className: "",
   },
   {
-    bgColor: "bg-tst-teal",
-    iconUrl: "/assets/profile-3.svg",
+    bgColor: "bg-tst-red",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-8.svg",
     altText: "Icon 3",
     className: "",
   },
   {
-    bgColor: "bg-tst-teal",
-    iconUrl: "/assets/profile-3.svg",
+    bgColor: "bg-tst-yellow",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cloud-yellow-icon.png",
     altText: "Icon 4",
     className: "",
   },
   {
-    bgColor: "bg-tst-teal",
-    iconUrl: "/assets/profile-3.svg",
+    bgColor: "bg-tst-green",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/green-plus-icon.svg",
     altText: "More icon",
     className: "",
   },
+
 ];
 
 export const testimonials = [
   {
     quote:
       "I felt safe bringing in my real emotions. Messy, complicated, unfiltered. I didn't have to explain or justify them.",
-    iconUrl: "/assets/profile-3.svg",
-    bgColor: "bg-tst-teal",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-10.svg",
+    bgColor: "bg-tst-yellow",
   },
   {
     quote:
       "The way things were reflected back helped me feel compassion instead of shame. I started to believe I wasn't broken. Just human.",
-    iconUrl: "/assets/profile-3.svg",
-    bgColor: "bg-tst-teal",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-7.svg",
+    bgColor: "bg-tst-green",
   },
   {
     quote:
       "Therapy helped me reconnect with parts of myself I hadn't felt in years. I feel more grounded, more real, more me.",
-    iconUrl: "/assets/profile-3.svg",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-6.svg",
     bgColor: "bg-tst-teal",
   },
 ];
@@ -107,7 +108,7 @@ export const howItWorksSteps = [
     number: "01",
     title: "Submit the contact form",
     description: "Just enter your name and contact info. I’ll follow up by email.",
-    imageUrl: "/assets/step_1.png",
+    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_1.png",
     imageAlt: "Illustration of a cloud holding a phone",
     isLastStep:false,
   },
@@ -115,7 +116,7 @@ export const howItWorksSteps = [
     number: "02",
     title: "Schedule a free consultation",
     description: "We’ll meet for 15 to 20 minutes to see if it feels like a good fit. No pressure to decide on the spot.",
-    imageUrl: "/assets/step_2.png",
+    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_2.png",
     imageAlt: "Illustration of a calendar",
     isLastStep:false,
   },
@@ -123,7 +124,7 @@ export const howItWorksSteps = [
     number: "03",
     title: "Book your first session",
     description: "If it feels right, we’ll begin at your pace and shape care around what you need most.",
-    imageUrl: "/assets/step_3.png",
+    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_3.png",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:false,
   },
@@ -131,8 +132,30 @@ export const howItWorksSteps = [
     number: "04",
     title: "Start feeling more supported",
     description: "This is space to feel steadier, more connected, and more like yourself again.",
-    imageUrl: "/assets/step_4.png",
+    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_4.png",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:true,
+  },
+];
+
+
+export const trustIndicators = [
+  {
+    id: 1,
+    text: "Phone and Video",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "Checkmark",
+  },
+  {
+    id: 2,
+    text: "No Waitlist",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "Checkmark",
+  },
+  {
+    id: 3,
+    text: "11 A.M. to 5 P.M.",
+    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "Checkmark",
   },
 ];

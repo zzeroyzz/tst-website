@@ -32,15 +32,3 @@
   color: #6b7280;
   font-weight: 500;
 }
-
-/* This now correctly only moves the input, not the shadow */
-.wrapper:hover .input {
-  transform: translate(8px, 8px);
-}
-
-.wrapper:active .input {
-  transform: translate(0, 0);
-}
-.wrapper:active .shadow {
-  transform: translate(0, 0);
-}

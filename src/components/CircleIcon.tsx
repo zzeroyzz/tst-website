@@ -7,7 +7,7 @@ interface CircleIconProps {
   bgColor: string;
   iconUrl: string;
   altText: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   wrapperClassName?: string;
 }
 
@@ -19,15 +19,17 @@ const CircleIcon: React.FC<CircleIconProps> = ({
   wrapperClassName = "",
 }) => {
   const sizeClasses = {
+    xs: "w-6 h-6",
     sm: "w-12 h-12",
     md: "w-16 h-16",
     lg: "w-20 h-20",
   };
 
   const imageSizes = {
-    sm: 40,
-    md: 50,
-    lg: 64,
+    xs: 24,
+    sm: 48,
+    md: 68,
+    lg: 78,
   };
 
   return (
@@ -44,6 +46,9 @@ const CircleIcon: React.FC<CircleIconProps> = ({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%',
           }}
         />
       </div>

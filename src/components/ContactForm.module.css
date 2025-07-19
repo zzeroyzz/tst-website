@@ -1,6 +1,5 @@
-/* src/components/ContactForm.module.css */
-
-.input_wrapper {
+/* src/components/Input.module.css */
+.wrapper {
   position: relative;
   display: block;
 }
@@ -14,6 +13,7 @@
   background-color: black;
   border-radius: 8px;
   transform: translate(8px, 8px);
+  transition: transform 150ms ease-in-out;
   z-index: -1;
 }
 
@@ -33,11 +33,10 @@
   font-weight: 500;
 }
 
-/* The hover animation */
-.input_wrapper:hover .input {
-  transform: translate(8px, 8px);
-}
 
-.input_wrapper:active .input {
+.wrapper:active .input {
+  transform: translate(0, 0);
+}
+.wrapper:active .shadow {
   transform: translate(0, 0);
 }
