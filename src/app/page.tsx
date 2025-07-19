@@ -3,18 +3,16 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Section from "@/components/Section";
 import TestimonialCard from "@/components/TestimonialCard";
 import Image from "next/image";
 import Button from "@/components/Button";
 import CircleIcon from "@/components/CircleIcon";
 import AnimatedCheckbox from "@/components/AnimatedCheckbox";
-import LottieAnimation from "@/components/LottieAnimation";
 import ProfileImage from "@/components/ProfileImage";
-import TherapyCard from "@/components/TherapyCard";
-import HowItWorksStep from "@/components/HowItWorksStep";
 import HoverLink from '@/components/HoverLink';
-import { tiredAnimation } from "@/data/animations";
+import { useAnimationData, loadTiredAnimation } from "@/hooks/useAnimationData";
 import {
   socialProofIcons,
   testimonials,
@@ -25,7 +23,34 @@ import {
   trustIndicators,
 } from "@/data/pageData";
 import ContactForm from "@/components/ContactForm";
-import LeadMagnet from "@/components/LeadMagnet";
+
+// Lazy load heavy components that aren't immediately visible
+const LottieAnimation = dynamic(() => import("@/components/LottieAnimation"), {
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64"></div>
+    </div>
+  ),
+  ssr: false,
+});
+
+const TherapyCard = dynamic(() => import("@/components/TherapyCard"), {
+  loading: () => (
+    <div className="animate-pulse bg-gray-200 rounded-lg h-64 border-2 border-black"></div>
+  ),
+});
+
+const HowItWorksStep = dynamic(() => import("@/components/HowItWorksStep"), {
+  loading: () => (
+    <div className="animate-pulse bg-gray-200 rounded-lg h-48 border-2 border-black"></div>
+  ),
+});
+
+const LeadMagnet = dynamic(() => import("@/components/LeadMagnet"), {
+  loading: () => (
+    <div className="animate-pulse bg-gray-200 rounded-lg h-96 border-2 border-black"></div>
+  ),
+});
 
 // Animation variants
 const heroContainerVariants = {
@@ -70,10 +95,29 @@ const sectionVariants = {
   },
 };
 
+// Component for the tired animation section
+const TiredAnimationSection = () => {
+  const { animationData, loading } = useAnimationData(loadTiredAnimation);
+
+  if (loading) {
+    return (
+      <div className="w-full h-full">
+        <div className="animate-pulse bg-gray-200 rounded-lg w-full h-full"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full">
+      <LottieAnimation animationData={animationData} lazy={true} />
+    </div>
+  );
+};
+
 export default function HomePage() {
   const howItWorksRef = useRef(null);
 
-  // Create individual refs for each step (assuming you have 4 steps based on the image)
+  // Create individual refs for each step
   const step0Ref = useRef<HTMLDivElement>(null);
   const step1Ref = useRef<HTMLDivElement>(null);
   const step2Ref = useRef<HTMLDivElement>(null);
@@ -101,11 +145,13 @@ export default function HomePage() {
       });
     }
   };
-const router = useRouter();
 
-const handleResourcesClick = () => {
-  router.push('/resources');
-};
+  const router = useRouter();
+
+  const handleResourcesClick = () => {
+    router.push('/resources');
+  };
+
   return (
     <main>
       <Section className="pb-32" minHeight="100vh">
@@ -137,22 +183,25 @@ const handleResourcesClick = () => {
               <Button onClick={handleScroll} className="bg-tst-yellow">
                 Book a call
               </Button>
-          <Button  onClick={handleResourcesClick} className="bg-white">Download Free Therapy Guide</Button>
-    </motion.div>
+              <Button onClick={handleResourcesClick} className="bg-white">
+                Download Free Therapy Guide
+              </Button>
+            </motion.div>
 
-           <div className="flex flex-row gap-4 flex-wrap justify-center md:justify-start">
-  {trustIndicators.map((indicator) => (
-    <div key={indicator.id} className="flex items-center gap-3">
-      <CircleIcon
-        size="xs"
-        bgColor="bg-green-100"
-        iconUrl={indicator.iconUrl}
-        altText={indicator.altText}
-      />
-      <span className="font-bold">{indicator.text}</span>
-    </div>
-  ))}
-</div>
+            <div className="flex flex-row gap-4 flex-wrap justify-center md:justify-start">
+              {trustIndicators.map((indicator) => (
+                <div key={indicator.id} className="flex items-center gap-3">
+                  <CircleIcon
+                    size="xs"
+                    bgColor="bg-green-100"
+                    iconUrl={indicator.iconUrl}
+                    altText={indicator.altText}
+                  />
+                  <span className="font-bold">{indicator.text}</span>
+                </div>
+              ))}
+            </div>
+
             <motion.div
               className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
@@ -233,29 +282,34 @@ const handleResourcesClick = () => {
             viewport={{ once: true, amount: 0.2 }}
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="flex flex-col gap-6">
-                <h2 className="text-4xl md:text-5xl font-extrabold">
-                  Check all that sound like you.
-                </h2>
-                <div className="block md:hidden w-56 mx-auto aspect-square">
-                  <LottieAnimation animationData={tiredAnimation} />
-                </div>
-                <div className="flex flex-col gap-4">
-                  {checklistItems.map((item, index) => (
-                    <AnimatedCheckbox key={index} label={item} />
-                  ))}
-                </div>
-                <div className="pt-4">
-                  <Button onClick={handleScroll} className="bg-tst-purple">
-                    Get Started
-                  </Button>
-                </div>
-              </div>
+  <div className="flex flex-col gap-6">
+    <h2 className="text-4xl md:text-5xl font-extrabold">
+      Check all that sound like you.
+    </h2>
 
-              <div className="hidden md:block max-w-sm mx-auto aspect-square">
-                <LottieAnimation animationData={tiredAnimation} />
-              </div>
-            </div>
+    {/* Show animation on mobile - ABOVE the checklist */}
+    <div className="block md:hidden w-56 mx-auto aspect-square">
+      <TiredAnimationSection />
+    </div>
+
+    <div className="flex flex-col gap-4">
+      {checklistItems.map((item, index) => (
+        <AnimatedCheckbox key={index} label={item} />
+      ))}
+    </div>
+    <div className="pt-4">
+      <Button onClick={handleScroll} className="bg-tst-purple">
+        Get Started
+      </Button>
+    </div>
+  </div>
+
+  {/* Show animation on desktop - on the right side */}
+  <div className="hidden md:block max-w-sm mx-auto aspect-square">
+    <TiredAnimationSection />
+  </div>
+</div>
+
           </motion.div>
         </Section>
       </div>
@@ -329,11 +383,10 @@ const handleResourcesClick = () => {
                   {text}
                 </motion.p>
               ))}
-               <motion.div variants={itemVariants} className="flex justify-end">
-                  <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
-                    <span>Read my full bio</span>
-
-                  </HoverLink>
+              <motion.div variants={itemVariants} className="flex justify-end">
+                <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
+                  <span>Read my full bio</span>
+                </HoverLink>
               </motion.div>
             </motion.div>
           </motion.div>

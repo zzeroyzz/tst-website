@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import dynamic from 'next/dynamic';
 import Section from "@/components/Section";
 import Button from "@/components/Button";
 import FAQ from "@/components/FAQ";
@@ -9,10 +10,21 @@ import ServiceOfferingCard from "@/components/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage";
 import { usePathname, useRouter } from "next/navigation";
+import { useAnimationData } from "@/hooks/useAnimationData";
 import {
     individualTherapyData,
     ourApproachData
 } from "@/data/servicesPageData";
+
+// Lazy load the LottieAnimation component
+const LottieAnimation = dynamic(() => import("@/components/LottieAnimation"), {
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64"></div>
+    </div>
+  ),
+  ssr: false,
+});
 
 // Animation variants for Framer Motion
 const containerVariants = {
@@ -32,11 +44,30 @@ const itemVariants = {
   },
 };
 
+// Optimized AnimatedImage component using the hook
+const OptimizedAnimatedImage = ({ animationLoader }) => {
+  const { animationData, loading } = useAnimationData(animationLoader);
+
+  if (loading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <div className="animate-pulse bg-gray-200 rounded-lg w-full h-full"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-64">
+      <LottieAnimation animationData={animationData} lazy={true} />
+    </div>
+  );
+};
 
 const ServicesPage = () => {
   const pathname = usePathname();
   const router = useRouter();
- const handleClick = () => {
+
+  const handleClick = () => {
     if (pathname === "/") {
       const contactForm = document.getElementById("contact-form");
       if (contactForm) {
@@ -46,9 +77,10 @@ const ServicesPage = () => {
       router.push("/#contact-form");
     }
   };
+
   return (
     <main>
-      {/* 1. Hero Section (Reverted to single-column layout) */}
+      {/* 1. Hero Section */}
       <Section>
         <motion.div
             className="flex flex-col items-center gap-8"
@@ -56,7 +88,6 @@ const ServicesPage = () => {
             initial="hidden"
             animate="visible"
         >
-          {/* Top part of the hero */}
           <motion.div
             className="text-center max-w-4xl mx-auto flex flex-col gap-6 items-center"
             variants={itemVariants}
@@ -85,27 +116,21 @@ const ServicesPage = () => {
         </motion.div>
       </Section>
 
-      <motion.div
-        variants={itemVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
-        <Section>
-           <div className="text-center mb-12">
-            <h2 className="text-5xl font-extrabold">
-              Individual Therapy
-            </h2>
-          </div>
-          <div className="max-w-4xl mx-auto">
-             <ServiceOfferingCard
-               service={individualTherapyData}
-             />
-          </div>
-        </Section>
-      </motion.div>
+      {/* 2. Individual Therapy Section */}
+      <Section>
+         <div className="text-center mb-12">
+          <h2 className="text-5xl font-extrabold">
+            Individual Therapy
+          </h2>
+        </div>
+        <div className="max-w-4xl mx-auto">
+           <ServiceOfferingCard
+             service={individualTherapyData}
+           />
+        </div>
+      </Section>
 
-      {/* 3. Our Approach Section */}
+      {/* 3. Our Approach Section - OPTIMIZED */}
        <Section
          className="bg-tst-purple border-t-2 border-black"
        >
@@ -134,9 +159,8 @@ const ServicesPage = () => {
               variants={itemVariants}
             >
               <div className={`w-full ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
-                 <AnimatedImage
-                   animationData={item.animationData}
-                 />
+                {/* Use existing AnimatedImage component for now */}
+                <AnimatedImage animationData={item.animationData} />
               </div>
               <div className={`flex flex-col gap-4 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
                 <h3 className="text-3xl font-bold">
@@ -163,20 +187,12 @@ const ServicesPage = () => {
         </motion.div>
       </Section>
 
-
       {/* 4. FAQ Section */}
-      <motion.div
-        variants={itemVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
-        <div id="faq-section" className="border-t-2 border-black">
-          <Section className="bg-tst-teal">
-            <FAQ/>
-          </Section>
-        </div>
-      </motion.div>
+      <div id="faq-section" className="border-t-2 border-black">
+        <Section className="bg-tst-teal">
+          <FAQ/>
+        </Section>
+      </div>
     </main>
   );
 };

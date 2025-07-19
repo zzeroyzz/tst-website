@@ -1,12 +1,14 @@
+// src/app/contact/page.tsx
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Section from "@/components/Section";
 import ContactForm from "@/components/ContactForm";
 import FAQ from "@/components/FAQ";
 import CircleIcon from "@/components/CircleIcon";
-import styles from "@/components/TherapyCard.module.css";
+import therapyCardStyles from "@/components/TherapyCard.module.css"; // Renamed for clarity
+import contactPageStyles from "@/components/ContactPage.module.css"; // Renamed for clarity
 
 import {
   trustIndicators,
@@ -16,7 +18,7 @@ import {
 } from "@/data/contactData";
 
 // Animation variants for Framer Motion
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -24,18 +26,17 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" },
   },
 };
 
 const ContactPage = () => {
   return (
-    <main className="lg:grid lg:grid-cols-2  border-t-2 border-black">
+    <main className={`lg:grid lg:grid-cols-2 border-t-2 border-black ${contactPageStyles.animatedItem}`}>
       {/* --- Left Scrolling Column --- */}
       <div className="lg:overflow-y-auto lg:h-screen">
         {/* Hero Section */}
@@ -119,9 +120,9 @@ const ContactPage = () => {
             </motion.p>
             <div className="grid md:grid-cols-3 gap-8">
               {benefitCards.map((card) => (
-                <motion.div key={card.id} variants={itemVariants} className={styles.wrapper}>
-                  <div className={styles.shadow}></div>
-                  <div className={`${styles.card} p-8`}>
+                <motion.div key={card.id} variants={itemVariants} className={therapyCardStyles.wrapper}>
+                  <div className={therapyCardStyles.shadow}></div>
+                  <div className={`${therapyCardStyles.card} p-8`}>
                     <div className={`${card.bgColor} p-6 rounded-xl w-20 h-20 mx-auto mb-6 flex items-center justify-center border-2 border-black shadow-brutalistMd`}>
                       <span className="text-3xl">{card.iconEmoji}</span>
                     </div>
@@ -133,8 +134,6 @@ const ContactPage = () => {
             </div>
           </motion.div>
         </Section>
-
-
 
         {/* FAQ Section */}
         <Section className="bg-tst-teal">
