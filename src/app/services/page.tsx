@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import dynamic from 'next/dynamic';
 import Section from "@/components/Section";
 import Button from "@/components/Button";
 import FAQ from "@/components/FAQ";
@@ -10,21 +9,10 @@ import ServiceOfferingCard from "@/components/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage";
 import { usePathname, useRouter } from "next/navigation";
-import { useAnimationData } from "@/hooks/useAnimationData";
 import {
     individualTherapyData,
     ourApproachData
 } from "@/data/servicesPageData";
-
-// Lazy load the LottieAnimation component
-const LottieAnimation = dynamic(() => import("@/components/LottieAnimation"), {
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64"></div>
-    </div>
-  ),
-  ssr: false,
-});
 
 // Animation variants for Framer Motion
 const containerVariants = {
@@ -42,25 +30,6 @@ const itemVariants = {
     opacity: 1,
     transition: { duration: 0.5 },
   },
-};
-
-// Optimized AnimatedImage component using the hook
-const OptimizedAnimatedImage = ({ animationLoader }) => {
-  const { animationData, loading } = useAnimationData(animationLoader);
-
-  if (loading) {
-    return (
-      <div className="w-full h-64 flex items-center justify-center">
-        <div className="animate-pulse bg-gray-200 rounded-lg w-full h-full"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full h-64">
-      <LottieAnimation animationData={animationData} lazy={true} />
-    </div>
-  );
 };
 
 const ServicesPage = () => {
@@ -159,12 +128,8 @@ const ServicesPage = () => {
               variants={itemVariants}
             >
               <div className={`w-full ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
-                {/* Handle both old and new data structures */}
-                {item.animationLoader ? (
-                  <OptimizedAnimatedImage animationLoader={item.animationLoader} />
-                ) : (
-                  <AnimatedImage animationData={item.animationData} />
-                )}
+                {/* Use existing AnimatedImage component with current data structure */}
+                <AnimatedImage animationData={item.animationData} />
               </div>
               <div className={`flex flex-col gap-4 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
                 <h3 className="text-3xl font-bold">
