@@ -1,3 +1,7 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -17,7 +21,26 @@ const nextConfig = {
       },
     ],
   },
+  // Add performance optimizations
+  experimental: {
+    optimizeCss: true,
+  },
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Webpack optimizations
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Reduce bundle size
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
+  },
 };
 
-// Use module.exports to ensure the config is loaded correctly
-module.exports = nextConfig;
+// Use module.exports with bundle analyzer wrapper
+module.exports = withBundleAnalyzer(nextConfig);
