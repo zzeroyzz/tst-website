@@ -36,7 +36,7 @@ const LoginPage = () => {
     <Section>
       <div className="max-w-md mx-auto text-center">
         <Image
-          src="/assets/TST_Logo.svg"
+          src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg"
           alt="TST logo"
           width={200}
           height={100}

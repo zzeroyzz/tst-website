@@ -17,6 +17,8 @@ const NewsletterArchivePage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<"new-to-old" | "old-to-new">("new-to-old");
+  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const supabase = createClientComponentClient();
   const { isModalOpen, setIsModalOpen } = useSubscribeModalTrigger();
 
@@ -44,6 +46,10 @@ const NewsletterArchivePage = () => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
+  };
+
+  const clearAllTags = () => {
+    setSelectedTags([]);
   };
 
   const filteredAndSortedPosts = useMemo(() => {
@@ -76,53 +82,176 @@ const NewsletterArchivePage = () => {
         </div>
 
         {/* Filtering and Sorting Controls */}
-        <div
-          className="bg-white p-6 rounded-lg border-2 border-black shadow-brutalistLg mb-12">
-          <div className="grid md:grid-cols-3 gap-6 items-center">
-            <div className="md:col-span-2">
+        <div className="bg-white p-6 rounded-lg border-2 border-black shadow-brutalistLg mb-12">
+          <div className="grid md:grid-cols-2 gap-6 items-start">
+
+            {/* Tag Filter Dropdown */}
+            <div className="relative">
               <h3 className="font-bold mb-2">Filter by Tag:</h3>
-              <div className="flex flex-wrap gap-2">
-                {coreTags.map(tag => (
+
+              {/* Selected Tags Display */}
+              {selectedTags.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {selectedTags.map(tag => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 bg-tst-purple text-white px-3 py-1 text-sm font-bold rounded-full border-2 border-black"
+                    >
+                      {tag}
+                      <button
+                        onClick={() => handleTagToggle(tag)}
+                        className="ml-1 text-white hover:text-gray-200"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
                   <button
-                    key={tag}
-                    onClick={() => handleTagToggle(tag)}
-                    className={`px-3 py-1 text-sm font-bold rounded-full border-2 border-black transition-colors ${
-                      selectedTags.includes(tag) ? 'bg-tst-purple' : 'bg-gray-100 hover:bg-gray-200'
+                    onClick={clearAllTags}
+                    className="text-sm text-gray-600 hover:text-gray-800 underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
+              {/* Dropdown Button */}
+              <button
+                onClick={() => {
+                  setIsTagDropdownOpen(!isTagDropdownOpen);
+                  setIsSortDropdownOpen(false); // Close sort dropdown
+                }}
+                className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
+              >
+                <span className="text-gray-700">
+                  {selectedTags.length > 0
+                    ? `${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''} selected`
+                    : 'Select tags to filter...'
+                  }
+                </span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${isTagDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {isTagDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg max-h-60 overflow-y-auto" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                  {coreTags.map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => handleTagToggle(tag)}
+                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors ${
+                        selectedTags.includes(tag) ? 'bg-tst-purple text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{tag}</span>
+                        {selectedTags.includes(tag) && (
+                          <span className="text-sm">✓</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <h3 className="font-bold mb-2">Sort by Date:</h3>
+
+              {/* Sort Dropdown Button */}
+              <button
+                onClick={() => {
+                  setIsSortDropdownOpen(!isSortDropdownOpen);
+                  setIsTagDropdownOpen(false); // Close tag dropdown
+                }}
+                className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
+              >
+                <span className="text-gray-700">
+                  {sortOrder === "new-to-old" ? "Newest to Oldest" : "Oldest to Newest"}
+                </span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Sort Dropdown Menu */}
+              {isSortDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                  <button
+                    onClick={() => {
+                      setSortOrder("new-to-old");
+                      setIsSortDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 transition-colors ${
+                      sortOrder === "new-to-old" ? 'bg-tst-purple text-white' : 'text-gray-900'
                     }`}
                   >
-                    {tag}
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Newest to Oldest</span>
+                      {sortOrder === "new-to-old" && (
+                        <span className="text-sm">✓</span>
+                      )}
+                    </div>
                   </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="font-bold mb-2">Sort by Date:</h3>
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as any)}
-                className="w-full p-2 rounded-lg border-2 border-black bg-white focus:outline-none focus:ring-2 focus:ring-tst-purple"
-              >
-                <option value="new-to-old">Newest to Oldest</option>
-                <option value="old-to-new">Oldest to Newest</option>
-              </select>
+                  <button
+                    onClick={() => {
+                      setSortOrder("old-to-new");
+                      setIsSortDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                      sortOrder === "old-to-new" ? 'bg-tst-purple text-white' : 'text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Oldest to Newest</span>
+                      {sortOrder === "old-to-new" && (
+                        <span className="text-sm">✓</span>
+                      )}
+                    </div>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Results Count */}
+        {!loading && (
+          <div className="mb-6 text-center">
+            <p className="text-gray-600">
+              Showing {filteredAndSortedPosts.length} of {allPosts.length} posts
+              {selectedTags.length > 0 && (
+                <span> filtered by: {selectedTags.join(', ')}</span>
+              )}
+            </p>
+          </div>
+        )}
 
         {/* Post Grid */}
         {loading ? (
           <p className="text-center">Loading posts...</p>
         ) : (
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAndSortedPosts.map((post) => (
               <div key={post.id}>
                 <ResourceCard
                   card={{
                     title: post.title,
                     date: post.sent_at ? format(new Date(post.sent_at), "PPP") : format(new Date(post.created_at), "PPP"),
-                    author: "Kay Hernandez",
+                    author: "Kay",
                     authorImageUrl: "/assets/profile-3.svg",
                     imageUrl: post.image_url || "/assets/profile-3.svg",
                     tags: post.tags,
@@ -135,11 +264,19 @@ const NewsletterArchivePage = () => {
         )}
 
         {filteredAndSortedPosts.length === 0 && !loading && (
-          <p
-            className="text-center text-lg col-span-full"
-          >
-            No posts match the selected filters.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-600 mb-4">
+              No posts match the selected filters.
+            </p>
+            {selectedTags.length > 0 && (
+              <button
+                onClick={clearAllTags}
+                className="bg-tst-yellow text-black px-6 py-3 rounded-lg font-bold border-2 border-black hover:bg-yellow-400 transition-colors"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         )}
       </Section>
     </>

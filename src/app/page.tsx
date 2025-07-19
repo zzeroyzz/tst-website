@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useRouter } from 'next/navigation';
 import Section from "@/components/Section";
 import TestimonialCard from "@/components/TestimonialCard";
 import Image from "next/image";
@@ -21,6 +22,7 @@ import {
   therapyCards,
   meetYourTherapist,
   howItWorksSteps,
+  trustIndicators,
 } from "@/data/pageData";
 import ContactForm from "@/components/ContactForm";
 import LeadMagnet from "@/components/LeadMagnet";
@@ -71,6 +73,24 @@ const sectionVariants = {
 export default function HomePage() {
   const howItWorksRef = useRef(null);
 
+  // Create individual refs for each step (assuming you have 4 steps based on the image)
+  const step0Ref = useRef<HTMLDivElement>(null);
+  const step1Ref = useRef<HTMLDivElement>(null);
+  const step2Ref = useRef<HTMLDivElement>(null);
+  const step3Ref = useRef<HTMLDivElement>(null);
+
+  // Track which steps are in view using individual refs
+  const step0InView = useInView(step0Ref, { once: true, amount: 0.5 });
+  const step1InView = useInView(step1Ref, { once: true, amount: 0.5 });
+  const step2InView = useInView(step2Ref, { once: true, amount: 0.5 });
+  const step3InView = useInView(step3Ref, { once: true, amount: 0.5 });
+
+  // Create array of step visibility states
+  const stepInViewStates = [step0InView, step1InView, step2InView, step3InView];
+
+  // Create array of refs for easy access in the map
+  const stepRefs = [step0Ref, step1Ref, step2Ref, step3Ref];
+
   const handleScroll = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const contactForm = document.getElementById("contact-form");
@@ -81,7 +101,11 @@ export default function HomePage() {
       });
     }
   };
+const router = useRouter();
 
+const handleResourcesClick = () => {
+  router.push('/resources');
+};
   return (
     <main>
       <Section className="pb-32" minHeight="100vh">
@@ -102,7 +126,7 @@ export default function HomePage() {
               For the deep feelers, drained hearts, and healing seekers.
             </motion.h1>
             <motion.p className="text-lg" variants={heroItemVariants}>
-              You’ve carried too much for too long. It’s time to finally care
+              You&apos;ve carried too much for too long. It&apos;s time to finally care
               for you.
             </motion.p>
 
@@ -113,9 +137,22 @@ export default function HomePage() {
               <Button onClick={handleScroll} className="bg-tst-yellow">
                 Book a call
               </Button>
-              <Button className="bg-white">Download Free Therapy Guide</Button>
-            </motion.div>
+          <Button  onClick={handleResourcesClick} className="bg-white">Download Free Therapy Guide</Button>
+    </motion.div>
 
+           <div className="flex flex-row gap-4 flex-wrap justify-center md:justify-start">
+  {trustIndicators.map((indicator) => (
+    <div key={indicator.id} className="flex items-center gap-3">
+      <CircleIcon
+        size="xs"
+        bgColor="bg-green-100"
+        iconUrl={indicator.iconUrl}
+        altText={indicator.altText}
+      />
+      <span className="font-bold">{indicator.text}</span>
+    </div>
+  ))}
+</div>
             <motion.div
               className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
@@ -136,10 +173,9 @@ export default function HomePage() {
                 <strong>More than 200+ people</strong> have taken the first
                 step.
                 <br />
-                You’re not alone.
+                You&apos;re not alone.
               </p>
             </motion.div>
-            {/* ----- END OF CORRECTION ----- */}
           </motion.div>
 
           <motion.div
@@ -147,8 +183,8 @@ export default function HomePage() {
             variants={heroItemVariants}
           >
             <Image
-              src="/assets/hero-image.png"
-              alt="Therapy illustration with a lucky cat"
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png"
+              alt="Therapy illustration"
               width={500}
               height={500}
               className="w-full h-auto max-w-md mx-auto"
@@ -187,65 +223,66 @@ export default function HomePage() {
         </motion.p>
       </Section>
 
-      <motion.div
-        className="border-t-2 border-black"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
-      <Section className="bg-tst-yellow" minHeight="750px">
-  <div className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12">
-    <div className="grid md:grid-cols-2 gap-8 items-center">
-      <div className="flex flex-col gap-6">
-        <h2 className="text-4xl md:text-5xl font-extrabold">
-          Check all that sound like you.
-        </h2>
-        {/* MODIFIED animation below */}
-        <div className="block md:hidden w-56 mx-auto aspect-square">
-          <LottieAnimation animationData={tiredAnimation} />
-        </div>
-        <div className="flex flex-col gap-4">
-          {checklistItems.map((item, index) => (
-            <AnimatedCheckbox key={index} label={item} />
-          ))}
-        </div>
-        <div className="pt-4">
-          <Button onClick={handleScroll} className="bg-tst-purple">
-            Get Started
-          </Button>
-        </div>
-      </div>
+      <div className="border-t-2 border-black">
+        <Section className="bg-tst-yellow" minHeight="750px">
+          <motion.div
+            className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12"
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="flex flex-col gap-6">
+                <h2 className="text-4xl md:text-5xl font-extrabold">
+                  Check all that sound like you.
+                </h2>
+                <div className="block md:hidden w-56 mx-auto aspect-square">
+                  <LottieAnimation animationData={tiredAnimation} />
+                </div>
+                <div className="flex flex-col gap-4">
+                  {checklistItems.map((item, index) => (
+                    <AnimatedCheckbox key={index} label={item} />
+                  ))}
+                </div>
+                <div className="pt-4">
+                  <Button onClick={handleScroll} className="bg-tst-purple">
+                    Get Started
+                  </Button>
+                </div>
+              </div>
 
-      {/* This is the existing animation that ONLY shows on desktop */}
-      <div className="hidden md:block max-w-sm mx-auto aspect-square">
-        <LottieAnimation animationData={tiredAnimation} />
+              <div className="hidden md:block max-w-sm mx-auto aspect-square">
+                <LottieAnimation animationData={tiredAnimation} />
+              </div>
+            </div>
+          </motion.div>
+        </Section>
       </div>
-    </div>
-  </div>
-</Section>
-      </motion.div>
 
       <div className="border-t-2 border-black">
         <LeadMagnet />
       </div>
 
-      <motion.div
-        className="border-t-2 border-black"
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <div className="border-t-2 border-black">
         <Section className="bg-tst-purple" minHeight="1000px">
-          <div className="text-center mb-12">
+          <motion.div
+            className="text-center mb-12"
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
             <h2 className="text-5xl font-extrabold">
               Therapy that actually gets you
             </h2>
-          </div>
+          </motion.div>
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-575"
             variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
           >
             {therapyCards.map((card, index) => (
               <motion.div key={index} variants={itemVariants}>
@@ -258,16 +295,17 @@ export default function HomePage() {
             ))}
           </motion.div>
         </Section>
-      </motion.div>
+      </div>
 
-      <motion.div
-        variants={sectionVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <div>
         <Section minHeight="400px">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400">
+          <motion.div
+            className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400"
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
             <div className="flex justify-center">
               <ProfileImage />
             </div>
@@ -298,9 +336,9 @@ export default function HomePage() {
                   </HoverLink>
               </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
         </Section>
-      </motion.div>
+      </div>
 
       <div ref={howItWorksRef}>
         <Section minHeight="1000px">
@@ -316,14 +354,24 @@ export default function HomePage() {
             </h2>
           </motion.div>
           <div className="flex flex-col min-h-1000">
-            {howItWorksSteps.map((step, index) => (
-              <HowItWorksStep
-                key={index}
-                step={step}
-                index={index}
-                isLastStep={step.isLastStep}
-              />
-            ))}
+            {howItWorksSteps.map((step, index) => {
+              // Get the appropriate ref for this step
+              const currentRef = stepRefs[index];
+
+              // Check if the NEXT step is in view (for line animation)
+              const nextStepInView = index < howItWorksSteps.length - 1 ? stepInViewStates[index + 1] : false;
+
+              return (
+                <div key={index} ref={currentRef}>
+                  <HowItWorksStep
+                    step={step}
+                    index={index}
+                    isLastStep={step.isLastStep}
+                    nextStepInView={nextStepInView}
+                  />
+                </div>
+              );
+            })}
           </div>
         </Section>
       </div>
