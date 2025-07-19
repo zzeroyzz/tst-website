@@ -1,10 +1,11 @@
+// src/components/ContactForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import FAQ from "./FAQ";
-import styles from "./ContactForm.module.css";
 import Confetti from "react-confetti";
+import Input from "./Input";
 
 interface ContactFormProps {
   isContactPage?: boolean;
@@ -23,7 +24,7 @@ const useWindowSize = () => {
 
 const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
-  const [isSubmitting, setIsSubmitting] =useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { width, height } = useWindowSize();
@@ -49,7 +50,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       }
 
       setIsSubmitted(true);
-    } catch (err: unknown) { // <-- FIX IS HERE: Changed 'any' to 'unknown'
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -61,24 +62,29 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   };
 
   const renderPostSubmitContent = () => {
-    if (isContactPage) {
-      return (
+    return (
+      <div className="space-y-16">
         <div className="text-center max-w-2xl mx-auto">
-           <h2 className="text-4xl font-extrabold mb-6">Thank You!</h2>
-            <h3 className="text-3xl font-bold mb-4">Here&apos;s what to expect next:</h3>
-            <ul className="list-disc list-inside space-y-3 text-lg text-left">
-              <li>You’ll receive a personal email from me within 1-2 business days.</li>
-              <li>In the email, I’ll provide a link to schedule your free 15-minute video consultation.</li>
-              <li>We’ll use that time to chat, see if it’s a good fit, and answer any questions you have.</li>
-            </ul>
+          <h2 className="text-4xl font-extrabold mb-6">Thank You!</h2>
+          <h3 className="text-3xl font-bold mb-4">Here's what to expect next:</h3>
+          <ul className="list-disc list-inside space-y-3 text-lg text-left">
+            <li>You’ll receive a personal email from me within 1-2 business days.</li>
+            <li>In the email, I’ll provide a link to schedule your free 15-minute video consultation.</li>
+            <li>We’ll use that time to chat, see if it’s a good fit, and answer any questions you have.</li>
+          </ul>
         </div>
-      );
-    }
-    return <FAQ />;
+
+        {!isContactPage && (
+          <div className="mt-16">
+            <FAQ />
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <div id="contact-form" className="relative">
+    <div id="contact-form" className="relative bg-white p-12 rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
       {isSubmitted && (
         <Confetti
           width={width}
@@ -94,30 +100,45 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         renderPostSubmitContent()
       ) : (
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-6xl font-extrabold mb-8">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-10">
             Reach out to start therapy.
           </h2>
           <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className={styles.input_wrapper}>
-                <label htmlFor="name" className="sr-only">Your name</label>
-                <div className={styles.shadow} />
-                <input type="text" id="name" name="name" placeholder="Your name" className={styles.input} value={formData.name} onChange={handleChange} required />
+            <div className="flex flex-col gap-8">
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="py-5"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="Phone number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  className="py-5"
+                />
+                <Input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="py-5"
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className={styles.input_wrapper}>
-                  <label htmlFor="phone" className="sr-only">Phone number</label>
-                  <div className={styles.shadow} />
-                  <input type="tel" id="phone" name="phone" placeholder="Phone number" className={styles.input} value={formData.phone} onChange={handleChange} required />
-                </div>
-                <div className={styles.input_wrapper}>
-                  <label htmlFor="email" className="sr-only">Your email</label>
-                  <div className={styles.shadow} />
-                  <input type="email" id="email" name="email" placeholder="Your email" className={styles.input} value={formData.email} onChange={handleChange} required />
-                </div>
-              </div>
-              <div className="mt-2">
-                <Button type="submit" className="bg-tst-yellow" wrapperClassName="w-full" disabled={isSubmitting}>
+              <div className="mt-4">
+                <Button type="submit" className="bg-tst-yellow py-3" wrapperClassName="w-full" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>

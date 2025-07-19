@@ -88,7 +88,7 @@ const Nav: React.FC = () => {
         <div className="flex-shrink-0">
           <Link href="/" className="font-extrabold text-3xl">
             <Image
-              src="/assets/v1_tst_logo_small.png"
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg"
               alt="TST logo"
               width={100}
               height={10}
