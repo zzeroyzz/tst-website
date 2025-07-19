@@ -6,7 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Input from './Input';
 import Button from './Button';
+import LottieAnimation from './LottieAnimation';
 import toast from 'react-hot-toast';
+import { toastyTidbitsAnimation } from '@/data/animations';
 
 interface SubscribeModalProps {
   isOpen: boolean;
@@ -81,13 +83,19 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <div className="mt-12">
-                <Image
-                  src="/assets/hero-image.png"
-                  alt="Newsletter illustration"
-                  width={150}
-                  height={150}
-                  className="mx-auto mb-4"
-                />
+                <div className="flex flex-col items-center justify-center mb-6">
+                  <div className="w-24 h-24">
+                    <LottieAnimation animationData={toastyTidbitsAnimation} />
+                  </div>
+                  <div className="w-32 -mt-2">
+                    <Image
+                      src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/toasty-tidbits-logo-letters.svg"
+                      alt="Newsletter illustration"
+                      width={128}
+                      height={128}
+                    />
+                  </div>
+                </div>
                 <h2 className="text-3xl font-extrabold mb-4">Enjoying the content?</h2>
                 <p className="text-lg mb-6">
                   Get our latest posts, free guides, and reflections sent straight to your inbox.
@@ -104,6 +112,15 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                     {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                   </Button>
                 </form>
+                <p className="text-xs text-gray-600 mt-4">
+                  By submitting this form, you&apos;ll be signed up to my free
+                  newsletter. You can opt-out at any time. For more information,
+                  see our{" "}
+                  <a href="/policy" className="underline">
+                    privacy policy
+                  </a>
+                  .
+                </p>
               </div>
             )}
           </motion.div>

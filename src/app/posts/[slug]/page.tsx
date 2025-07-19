@@ -11,16 +11,21 @@ import { marked } from 'marked';
 import Section from '@/components/Section';
 import ResourceCard from '@/components/ResourceCard';
 import Link from 'next/link';
+import CircleIcon from "@/components/CircleIcon";
 import SubscribeModal from '@/components/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 
 const SinglePostPage = () => {
-  const { slug } = useParams(); // Changed from id to slug
+  const { slug } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [suggestedPosts, setSuggestedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [supabase] = useState(() => createClientComponentClient());
   const { isModalOpen, setIsModalOpen } = useSubscribeModalTrigger();
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, [slug]);
 
   useEffect(() => {
     const fetchPostAndSuggestions = async () => {
@@ -31,7 +36,7 @@ const SinglePostPage = () => {
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug')
-        .eq('slug', slug as string) // Changed from 'id' to 'slug'
+        .eq('slug', slug as string)
         .single();
 
       if (postError) {
@@ -45,7 +50,7 @@ const SinglePostPage = () => {
           .from('posts')
           .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug')
           .eq('status', 'published')
-          .neq('id', postData.id) // Exclude current post by ID
+          .neq('id', postData.id)
           .order('sent_at', { ascending: false })
           .limit(3);
 
@@ -59,7 +64,7 @@ const SinglePostPage = () => {
     };
 
     fetchPostAndSuggestions();
-  }, [slug, supabase]); // Dependency array updated to slug
+  }, [slug, supabase]);
 
   if (loading) {
     return <Section><p className="text-center">Loading post...</p></Section>;
@@ -72,110 +77,171 @@ const SinglePostPage = () => {
   const parsedBody = typeof post.body === 'string' ? marked.parse(post.body) : '';
 
   return (
-    <main>
-            <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    <main className="bg-white">
+      <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      <Section className="pt-8">
-        <div className="max-w-4xl mx-auto">
+      {/* Article Section */}
+      <Section className="pt-12 pb-16">
+        <div className="max-w-3xl mx-auto px-6">
           {/* Breadcrumb */}
-          <nav className="text-sm text-gray-600 mb-6">
-            <Link href="/resources" className="hover:underline">Resources</Link>
-            <span className="mx-2">›</span>
-            <Link href="/newsletter-archives" className="hover:underline">Archives</Link>
-            <span className="mx-2">›</span>
-            <span className="text-gray-900 font-medium truncate">{post.title}</span>
+          <nav className="text-sm text-gray-500 mb-8 font-medium">
+            <Link href="/resources" className="hover:text-gray-700 transition-colors">
+              Resources
+            </Link>
+            <span className="mx-3 text-gray-300">›</span>
+            <Link href="/newsletter-archives" className="hover:text-gray-700 transition-colors">
+              Archives
+            </Link>
+            <span className="mx-3 text-gray-300">›</span>
+            <span className="text-gray-900 truncate">{post.title}</span>
           </nav>
 
           {/* Post Header */}
-          <header className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+          <header className="mb-12">
+            {/* Tags */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                {post.tags.map(tag => (
+                  <span
+                    key={tag}
+                    className="bg-tst-yellow text-xs font-bold px-3 py-2 rounded-full border-2 border-black shadow-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Title */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight text-gray-900">
               {post.title}
             </h1>
-            <p className="text-gray-600 text-lg mb-6">
-              Published on {format(new Date(post.sent_at || post.created_at), 'PPP')}
-            </p>
 
-            {/* Author Info */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-purple-200 flex items-center justify-center">
-                  <Image
-                    src="/assets/profile-3.svg"
-                    alt="Kay"
-                    width={48}
-                    height={48}
-                    className="rounded-full"
-                  />
-                </div>
+            {/* Author and Date Info */}
+            <div className="flex items-center gap-4 py-4">
+              <div className="flex items-center gap-3">
+                <CircleIcon
+                  size="md"
+                  bgColor="bg-tst-purple"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg"
+                  altText="Author Icon"
+                />
                 <div>
-                  <p className="font-semibold">Kay</p>
-                  <p className="text-sm text-gray-600">
-                    {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')}
+                  <p className="font-semibold text-gray-900">Kay Hernandez</p>
+                  <p className="text-sm text-gray-500">
+                    {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
                   </p>
                 </div>
               </div>
-
-               {post.tags && post.tags.length > 0 && (
-            <div className="mb-8 flex flex-wrap gap-2">
-              {post.tags.map(tag => (
-                <span key={tag} className="bg-tst-yellow text-xs font-bold px-3 py-1 rounded-full border-2 border-black">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
             </div>
           </header>
 
+          {/* Featured Image */}
           {post.image_url && (
-            <div className="mb-8 flex justify-center">
-              <div className="w-full max-w-4xl h-80 md:h-96 relative overflow-hidden rounded-lg">
+            <div className="mb-12">
+              <div className="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-lg">
                 <Image
                   src={post.image_url}
                   alt={post.title}
-                  width={500}
-                  height={600}
-                  className="mx-auto"
+                  fill
+                  className="object-cover"
                   priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 768px"
                 />
               </div>
             </div>
           )}
 
           {/* Post Content */}
-          <article>
+          <article className="mb-16">
             <div
-              className="prose prose-lg max-w-none font-sans prose-headings:font-bold prose-headings:text-black prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
+              className="prose prose-lg prose-gray max-w-none
+                prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-4 prose-headings:mt-8
+                prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
+                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-a:font-medium
+                prose-blockquote:border-l-4 prose-blockquote:border-gray-200 prose-blockquote:pl-6 prose-blockquote:italic
+                prose-ul:mb-6 prose-ol:mb-6 prose-li:mb-2
+                prose-strong:font-semibold prose-strong:text-gray-900
+                first-letter:text-6xl first-letter:font-bold first-letter:text-gray-900 first-letter:float-left first-letter:mr-3 first-letter:mt-1"
               dangerouslySetInnerHTML={{ __html: parsedBody }}
             />
           </article>
+
+          {/* Article Footer */}
+          <div className="border-t border-gray-200 pt-8 mb-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <CircleIcon
+                  size="md"
+                  bgColor="bg-tst-purple"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg"
+                  altText="Author Icon"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900">Kay Hernandez</p>
+                  <p className="text-sm text-gray-500">Therapist & Writer</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
+              >
+                Follow
+              </button>
+            </div>
+          </div>
         </div>
       </Section>
 
       {/* Suggested Posts Section */}
       {suggestedPosts.length > 0 && (
-        <Section className="bg-tst-green border-t-2 border-black">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-extrabold text-center mb-8">You might also like...</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {suggestedPosts.map((suggestion) => (
-                <ResourceCard
-                  key={suggestion.id}
-                  card={{
-                    title: suggestion.title,
-                    date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
-                    author: "Kay Hernandez",
-                    authorImageUrl: "/assets/profile-3.svg",
-                    imageUrl: suggestion.image_url || "/assets/profile-3.svg",
-                    tags: suggestion.tags,
-                    href: `/posts/${suggestion.slug}`,
-                  }}
-                />
-              ))}
+        <div className="bg-gray-50 border-t border-gray-200">
+          <Section className="py-20">
+            <div className="max-w-6xl mx-auto px-6">
+              {/* Section Header */}
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+                  More stories you might enjoy
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Continue your journey with these thoughtful reflections and insights.
+                </p>
+              </div>
+
+              {/* Posts Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                {suggestedPosts.map((suggestion) => (
+                  <div key={suggestion.id} className="group">
+                    <ResourceCard
+                      card={{
+                        title: suggestion.title,
+                        date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
+                        author: "Kay Hernandez",
+                        authorImageUrl: "/assets/profile-3.svg",
+                        imageUrl: suggestion.image_url || "/assets/profile-3.svg",
+                        tags: suggestion.tags,
+                        href: `/posts/${suggestion.slug}`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* View All Link */}
+              <div className="text-center mt-16">
+                <Link
+                  href="/newsletter-archives"
+                  className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-900 bg-white border-2 border-black rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                  View all stories
+                  <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
             </div>
-          </div>
-        </Section>
+          </Section>
+        </div>
       )}
     </main>
   );

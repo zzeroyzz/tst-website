@@ -18,11 +18,13 @@ interface HowItWorksStepProps {
   };
   index: number;
   isLastStep: boolean;
+  nextStepInView?: boolean; // New prop to control line animation
 }
 
 const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
   step,
   index,
+  nextStepInView = false, // Default to false
 }) => {
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
@@ -75,13 +77,15 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
             <motion.div
               className={styles.timeline_progress}
               style={{
-                height: isInView ? '100%' : '0%', // Fallback to simple animation
+                // CHANGED: Now uses nextStepInView instead of isInView
+                height: nextStepInView ? '100%' : '0%',
               }}
             />
           )}
           <div
             className={styles.timeline_dot}
             style={{
+              // Dot still appears when current step is in view
               transform: isInView
                 ? "translate(-50%, -50%) scale(1)"
                 : "translate(-50%, -50%) scale(0)",
