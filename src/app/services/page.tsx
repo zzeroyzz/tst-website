@@ -159,8 +159,12 @@ const ServicesPage = () => {
               variants={itemVariants}
             >
               <div className={`w-full ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
-                {/* Use existing AnimatedImage component for now */}
-                <AnimatedImage animationData={item.animationData} />
+                {/* Handle both old and new data structures */}
+                {item.animationLoader ? (
+                  <OptimizedAnimatedImage animationLoader={item.animationLoader} />
+                ) : (
+                  <AnimatedImage animationData={item.animationData} />
+                )}
               </div>
               <div className={`flex flex-col gap-4 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
                 <h3 className="text-3xl font-bold">
