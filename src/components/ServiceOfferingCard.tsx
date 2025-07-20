@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ServiceOfferingCard.module.css";
-import ServiceOfferingAnimatedImage from "./ServiceOfferingAnimatedImage"; // Import the new component
+import Image from "next/image";
 
 interface ServiceOfferingCardProps {
   service: {
@@ -36,7 +36,7 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
             </div>
           </div>
           <div className="hidden md:block">
-            <ServiceOfferingAnimatedImage animationData={service.animationData} />
+            <Image src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Services%20Page%20Asset.svg" alt="services" width={500} height={500} />
           </div>
         </div>
       </div>

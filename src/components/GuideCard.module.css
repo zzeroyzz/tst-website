@@ -24,7 +24,7 @@
   height: 100%;
   border: 2px solid black;
   border-radius: 12px;
-  padding: 1.5rem; /* 24px */
+  padding: 1rem; /* 24px */
   display: flex;
   flex-direction: column;
   transition: transform 150ms ease-in-out;

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./AccordionItem.module.css";
-import clsx from "clsx"; // Import clsx to combine classes
+import clsx from "clsx";
 
 interface AccordionItemProps {
   question: string;
@@ -23,7 +23,6 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
         <button
           className={clsx(
             styles.button,
-            // These classes replace the default outline with a custom one
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-tst-purple focus-visible:ring-offset-2 rounded-lg"
           )}
           onClick={onClick}
@@ -42,7 +41,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <p className="pb-4 px-6 text-left">{answer}</p>
+              {/* This change allows the component to render the <br> tags */}
+              <div
+                className="pb-4 px-6 text-left prose prose-lg"
+                dangerouslySetInnerHTML={{ __html: answer }}
+              />
             </motion.div>
           )}
         </AnimatePresence>

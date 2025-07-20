@@ -13,7 +13,6 @@ const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
     <div className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
-        {/* FIXED: Passed the correct prop */}
           <LottiePlayer
         file={animationData}
         width={400}

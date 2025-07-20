@@ -24,8 +24,8 @@ const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
   <Link href="/resources" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
-      <div className="mb-4">
-        <Image src={guide.iconUrl} alt={guide.title} width={48} height={48} />
+      <div className="mb-4 flex justify-center">
+        <Image src={guide.iconUrl} alt={guide.title} width={100} height={100} />
       </div>
       <h3 className="text-2xl font-bold mb-2">{guide.title}</h3>
       <p className="mb-4">{guide.description}</p>
