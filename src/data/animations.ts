@@ -1,16 +1,9 @@
-import tiredAnimation from "../../public/assets/Tired.json";
-import somaticAnimation from "../../public/assets/Somatic-Animation.json";
-import traumaAnimation from "../../public/assets/Trauma.json";
-import neuroAnimation from "../../public/assets/neuro.json";
-import identityAnimation from "../../public/assets/identity.json";
-import toastyTidbitsAnimation from "../../public/assets/TT-Animation.json";
+// src/data/animations.ts
 
-
-export {
-  tiredAnimation,
-  somaticAnimation,
-  traumaAnimation,
-  neuroAnimation,
-  identityAnimation,
-  toastyTidbitsAnimation
-};
+// This reverts the file to export the correct public paths.
+export const tiredAnimation = '/tired.lottie';
+export const somaticAnimation = '/somatic.lottie';
+export const traumaAnimation = '/trauma.lottie';
+export const neuroAnimation = '/neuro.lottie';
+export const identityAnimation = '/identity.lottie';
+export const toastyTidbitsAnimation = '/toasty-tidbits.lottie';

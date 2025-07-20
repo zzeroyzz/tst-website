@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Input from './Input';
 import Button from './Button';
-import LottieAnimation from './LottieAnimation';
+import { LottiePlayer } from './LottiePlayer';
 import toast from 'react-hot-toast';
 import { toastyTidbitsAnimation } from '@/data/animations';
 
@@ -85,7 +85,11 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
               <div className="mt-12">
                 <div className="flex flex-col items-center justify-center mb-6">
                   <div className="w-24 h-24">
-                    <LottieAnimation animationData={toastyTidbitsAnimation} />
+                   <LottiePlayer
+      file={toastyTidbitsAnimation}
+      width={100}
+      height={100}
+    />
                   </div>
                   <div className="w-32 -mt-2">
                     <Image
