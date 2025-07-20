@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 import Section from "@/components/Section";
 import Button from "@/components/Button";
 import FAQ from "@/components/FAQ";
-import ServiceOfferingCard from "@/components/ServiceOfferingCard";
+// import ServiceOfferingCard from "@/components/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage";
 import { usePathname, useRouter } from "next/navigation";
 import {
-    individualTherapyData,
+    // individualTherapyData,
     ourApproachData
 } from "@/data/servicesPageData";
 
@@ -93,9 +93,9 @@ const ServicesPage = () => {
           </h2>
         </div>
         <div className="max-w-4xl mx-auto">
-           <ServiceOfferingCard
+           {/* <ServiceOfferingCard
              service={individualTherapyData}
-           />
+           /> */}
         </div>
       </Section>
 

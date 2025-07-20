@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import LottieAnimation from './LottieAnimation';
+import { LottiePlayer } from './LottiePlayer';
 import styles from './AnimatedImage.module.css';
 
 interface AnimatedImageProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // FIXED: Changed prop name to animationPath
   animationData: any;
 }
 
@@ -12,7 +13,15 @@ const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
     <div className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
-        <LottieAnimation animationData={animationData} />
+        {/* FIXED: Passed the correct prop */}
+          <LottiePlayer
+        file={animationData}
+        width={400}
+        height={400}
+        loop={true}
+        autoplay={true}
+        speed={1}
+      />
       </div>
     </div>
   );

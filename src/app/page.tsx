@@ -12,31 +12,25 @@ import CircleIcon from "@/components/CircleIcon";
 import AnimatedCheckbox from "@/components/AnimatedCheckbox";
 import ProfileImage from "@/components/ProfileImage";
 import HoverLink from '@/components/HoverLink';
-import { useAnimationData, loadTiredAnimation } from "@/hooks/useAnimationData";
+import { LottiePlayer } from "@/components/LottiePlayer";
+import {tiredAnimation} from "@/data/animations";
 import {
   socialProofIcons,
   testimonials,
   checklistItems,
-  therapyCards,
   meetYourTherapist,
   howItWorksSteps,
   trustIndicators,
 } from "@/data/pageData";
 import ContactForm from "@/components/ContactForm";
 
-// Lazy load heavy components that aren't immediately visible
-const LottieAnimation = dynamic(() => import("@/components/LottieAnimation"), {
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-pulse bg-gray-200 rounded-lg w-full h-64"></div>
-    </div>
-  ),
-  ssr: false,
-});
-
 const TherapyCard = dynamic(() => import("@/components/TherapyCard"), {
   loading: () => (
-    <div className="animate-pulse bg-gray-200 rounded-lg h-64 border-2 border-black"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="animate-pulse bg-gray-200 rounded-lg h-64 border-2 border-black"></div>
+      ))}
+    </div>
   ),
 });
 
@@ -51,6 +45,7 @@ const LeadMagnet = dynamic(() => import("@/components/LeadMagnet"), {
     <div className="animate-pulse bg-gray-200 rounded-lg h-96 border-2 border-black"></div>
   ),
 });
+
 
 // Animation variants
 const heroContainerVariants = {
@@ -96,20 +91,17 @@ const sectionVariants = {
 };
 
 // Component for the tired animation section
-const TiredAnimationSection = () => {
-  const { animationData, loading } = useAnimationData(loadTiredAnimation);
-
-  if (loading) {
-    return (
-      <div className="w-full h-full">
-        <div className="animate-pulse bg-gray-200 rounded-lg w-full h-full"></div>
-      </div>
-    );
-  }
-
+const TiredAnimationSection = ({width, height}) => {
   return (
     <div className="w-full h-full">
-      <LottieAnimation animationData={animationData} lazy={true} />
+      <LottiePlayer
+        file={tiredAnimation}
+        width={width}
+        height={height}
+        loop={true}
+        autoplay={true}
+        speed={1}
+      />
     </div>
   );
 };
@@ -282,33 +274,31 @@ export default function HomePage() {
             viewport={{ once: true, amount: 0.2 }}
           >
             <div className="grid md:grid-cols-2 gap-8 items-center">
-  <div className="flex flex-col gap-6">
-    <h2 className="text-4xl md:text-5xl font-extrabold">
-      Check all that sound like you.
-    </h2>
+              <div className="flex flex-col gap-6">
+                <h2 className="text-4xl md:text-5xl font-extrabold">
+                  Check all that sound like you.
+                </h2>
 
-    {/* Show animation on mobile - ABOVE the checklist */}
-    <div className="block md:hidden w-56 mx-auto aspect-square">
-      <TiredAnimationSection />
-    </div>
+                <div className="block md:hidden w-56 mx-auto aspect-square">
+                  <TiredAnimationSection width={200} height={200}/>
+                </div>
 
-    <div className="flex flex-col gap-4">
-      {checklistItems.map((item, index) => (
-        <AnimatedCheckbox key={index} label={item} />
-      ))}
-    </div>
-    <div className="pt-4">
-      <Button onClick={handleScroll} className="bg-tst-purple">
-        Get Started
-      </Button>
-    </div>
-  </div>
+                <div className="flex flex-col gap-4">
+                  {checklistItems.map((item, index) => (
+                    <AnimatedCheckbox key={index} label={item} />
+                  ))}
+                </div>
+                <div className="pt-4">
+                  <Button onClick={handleScroll} className="bg-tst-purple">
+                    Get Started
+                  </Button>
+                </div>
+              </div>
 
-  {/* Show animation on desktop - on the right side */}
-  <div className="hidden md:block max-w-sm mx-auto aspect-square">
-    <TiredAnimationSection />
-  </div>
-</div>
+              <div className="hidden md:block max-w-sm mx-auto aspect-square">
+                <TiredAnimationSection width={400} height={400}/>
+              </div>
+            </div>
 
           </motion.div>
         </Section>
@@ -331,23 +321,8 @@ export default function HomePage() {
               Therapy that actually gets you
             </h2>
           </motion.div>
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-575"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {therapyCards.map((card, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <TherapyCard
-                  title={card.title}
-                  description={card.description}
-                  animationData={card.animationData}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
+          {/* This is the simplified, rebuilt component */}
+          <TherapyCard />
         </Section>
       </div>
 
@@ -408,10 +383,7 @@ export default function HomePage() {
           </motion.div>
           <div className="flex flex-col min-h-1000">
             {howItWorksSteps.map((step, index) => {
-              // Get the appropriate ref for this step
               const currentRef = stepRefs[index];
-
-              // Check if the NEXT step is in view (for line animation)
               const nextStepInView = index < howItWorksSteps.length - 1 ? stepInViewStates[index + 1] : false;
 
               return (

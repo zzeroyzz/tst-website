@@ -1,80 +1,49 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// Lazy load the Lottie component
-const Lottie = dynamic(() => import("lottie-react"), {
-  loading: () => (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-    </div>
-  ),
-  ssr: false, // Disable server-side rendering for Lottie
-});
+// Lazy load the Lottie component for better performance.
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 interface LottieAnimationProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  animationData: any;
+  // The component will now receive the path to the animation file.
+  animationPath: string;
   className?: string;
-  lazy?: boolean; // Option to enable intersection observer
 }
 
 const LottieAnimation: React.FC<LottieAnimationProps> = ({
-  animationData,
+  animationPath,
   className = "",
-  lazy = true,
 }) => {
-  const [shouldLoad, setShouldLoad] = useState(!lazy);
-  const [isVisible, setIsVisible] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [animationData, setAnimationData] = useState(null);
 
   useEffect(() => {
-    if (!lazy) return;
+    // Fetch the animation data from the public path.
+    fetch(animationPath)
+      .then((response) => response.json())
+      .then((data) => setAnimationData(data))
+      .catch((error) => console.error("Error fetching animation:", error));
+  }, [animationPath]);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          setShouldLoad(true);
-          observer.disconnect();
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '50px' // Start loading 50px before element comes into view
-      }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [lazy]);
-
-  if (!shouldLoad) {
+  // Display a placeholder while the animation is loading.
+  if (!animationData) {
     return (
-      <div
-        ref={containerRef}
-        className={`w-full h-full flex items-center justify-center ${className}`}
-        style={{ minHeight: '200px' }} // Prevent layout shift
-      >
+      <div className={`w-full h-full flex items-center justify-center ${className}`}>
         <div className="animate-pulse bg-gray-200 rounded-lg w-full h-full"></div>
       </div>
     );
   }
 
+  // Render the animation once the data has been fetched.
   return (
-    <div className={className} ref={containerRef}>
+    <div className={className}>
       <Lottie
         animationData={animationData}
         loop={true}
-        autoplay={isVisible || !lazy}
+        autoplay={true}
         rendererSettings={{
           preserveAspectRatio: 'xMidYMid slice',
-          progressiveLoad: true, // Load progressively
-          hideOnTransparent: true,
         }}
         style={{
           width: '100%',

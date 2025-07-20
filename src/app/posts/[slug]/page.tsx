@@ -18,14 +18,15 @@ import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 const SinglePostPage = () => {
   const { slug } = useParams();
   const [post, setPost] = useState<Post | null>(null);
+  const [parsedBody, setParsedBody] = useState<string>('');
   const [suggestedPosts, setSuggestedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [supabase] = useState(() => createClientComponentClient());
   const { isModalOpen, setIsModalOpen } = useSubscribeModalTrigger();
 
   useEffect(() => {
-  window.scrollTo(0, 0);
-}, [slug]);
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   useEffect(() => {
     const fetchPostAndSuggestions = async () => {
@@ -44,6 +45,17 @@ const SinglePostPage = () => {
         setPost(null);
       } else {
         setPost(postData);
+
+        // Parse the markdown body
+        if (postData.body && typeof postData.body === 'string') {
+          try {
+            const parsed = await marked.parse(postData.body);
+            setParsedBody(parsed);
+          } catch (error) {
+            console.error('Error parsing markdown:', error);
+            setParsedBody(postData.body);
+          }
+        }
 
         // Fetch suggestions, excluding the current post by its ID
         const { data: suggestionsData, error: suggestionsError } = await supabase
@@ -73,8 +85,6 @@ const SinglePostPage = () => {
   if (!post) {
     return <Section><p className="text-center">Post not found.</p></Section>;
   }
-
-  const parsedBody = typeof post.body === 'string' ? marked.parse(post.body) : '';
 
   return (
     <main className="bg-white">
@@ -227,7 +237,6 @@ const SinglePostPage = () => {
                 ))}
               </div>
 
-              {/* View All Link */}
               <div className="text-center mt-16">
                 <Link
                   href="/newsletter-archives"

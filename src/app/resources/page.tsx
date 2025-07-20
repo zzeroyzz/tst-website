@@ -12,7 +12,7 @@ import Button from "@/components/Button";
 import Highlight from "@/components/Highlight";
 import ResourceCard from "@/components/ResourceCard";
 import WallOfLove from "@/components/WallOfLove";
-import LottieAnimation from "@/components/LottieAnimation";
+import { LottiePlayer } from '@/components/LottiePlayer';
 import { Post } from "@/types";
 import { toastyTidbitsAnimation } from "@/data/animations";
 
@@ -49,19 +49,24 @@ const ResourcesPage = () => {
         <div className="flex flex-col items-center gap-16">
 
           <div className="grid md:grid-cols-2 gap-16 items-center w-full">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-full max-w-sm">
-                <LottieAnimation animationData={toastyTidbitsAnimation} />
-              </div>
-              <div className="w-full max-w-xs -mt-10">
-                <Image
-                  src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/toasty-tidbits-logo-letters.svg"
-                  alt="Newsletter illustration"
-                  width={400}
-                  height={400}
-                />
-              </div>
-            </div>
+           <div className="flex flex-col items-center justify-center">
+  <div className="w-full max-w-sm flex justify-center">
+    <LottiePlayer
+      file={toastyTidbitsAnimation}
+      width={300}
+      height={300}
+    />
+  </div>
+  <div className="w-full max-w-xs -mt-10 flex justify-center">
+    <Image
+      src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/toasty-tidbits-logo-letters.svg"
+      alt="Newsletter illustration"
+      width={400}
+      height={400}
+      className="mx-auto"
+    />
+  </div>
+</div>
             <div className="flex flex-col gap-6">
               <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
                 Free Guides & Reflections
