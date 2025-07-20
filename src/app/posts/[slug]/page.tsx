@@ -137,7 +137,7 @@ const SinglePostPage = () => {
                   altText="Author Icon"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Kay Hernandez</p>
+                  <p className="font-semibold text-gray-900">Kay</p>
                   <p className="text-sm text-gray-500">
                     {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
                   </p>
@@ -188,7 +188,7 @@ const SinglePostPage = () => {
                   altText="Author Icon"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Kay Hernandez</p>
+                  <p className="font-semibold text-gray-900">Kay</p>
                   <p className="text-sm text-gray-500">Therapist & Writer</p>
                 </div>
               </div>
@@ -226,7 +226,7 @@ const SinglePostPage = () => {
                       card={{
                         title: suggestion.title,
                         date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
-                        author: "Kay Hernandez",
+                        author: "Kay",
                         authorImageUrl: "/assets/profile-3.svg",
                         imageUrl: suggestion.image_url || "/assets/profile-3.svg",
                         tags: suggestion.tags,

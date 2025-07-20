@@ -6,7 +6,7 @@ const ProfileImage = () => {
 
     <div className="max-w-xs mx-auto">
       <Image
-        src="/assets/MYT.svg"
+        src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT.svg"
         alt="Kay, your therapist"
         width={400}
         height={450}
