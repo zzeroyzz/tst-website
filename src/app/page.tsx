@@ -412,7 +412,7 @@ export default function HomePage() {
       </div>
 
       <Section>
-        <ContactForm />
+        <ContactForm id="contact-form"/>
       </Section>
     </main>
   );
