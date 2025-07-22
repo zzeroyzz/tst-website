@@ -32,6 +32,14 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <HoverLink
+                  href="/contact"
+                  className="text-white/90 hover:text-white transition-colors font-medium"
+                >
+                  Get Started
+                </HoverLink>
+              </li>
+              <li>
+                <HoverLink
                   href="/about"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
@@ -43,7 +51,16 @@ const Footer = () => {
                   href="/resources"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
-                  Resources
+                  Grab Your Free Resources
+                </HoverLink>
+              </li>
+
+              <li>
+                <HoverLink
+                  href="/newsletter-archives"
+                  className="text-white/90 hover:text-white transition-colors font-medium"
+                >
+                  Newsletter Archive
                 </HoverLink>
               </li>
               <li>
@@ -51,15 +68,7 @@ const Footer = () => {
                   href="/contact"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
-                  Get Started
-                </HoverLink>
-              </li>
-              <li>
-                <HoverLink
-                  href="/newsletter-archives"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Newsletter Archive
+                  Contact
                 </HoverLink>
               </li>
             </ul>
@@ -96,6 +105,9 @@ const Footer = () => {
             {/* Copyright */}
             <p className="text-white/80 text-sm text-center md:text-left">
               &copy; {new Date().getFullYear()} Toasted Sesame Therapy. All rights reserved.
+            </p>
+            <p className="text-white/80 text-sm text-center md:text-left">
+               This site is not for crisis support
             </p>
           </div>
         </div>
