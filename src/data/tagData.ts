@@ -13,4 +13,8 @@ export const coreTags = [
   "Self-Care",
   "Relationships",
   "Mindfulness",
+  "Polyamory & Non-Monogamy",
+  "LGBTQ+ Affirming",
+  "Cultural Identity",
+  "BIPOC Affirming",
 ];
