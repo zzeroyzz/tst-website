@@ -1,7 +1,5 @@
 // app/not-found.tsx
-import Link from 'next/link';
 import Image from 'next/image';
-import Button from '@/components/Button';
 
 export default function NotFound() {
   return (
