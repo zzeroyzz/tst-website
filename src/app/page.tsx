@@ -157,14 +157,14 @@ export default function HomePage() {
             className="flex flex-col gap-4"
             variants={heroContainerVariants}
           >
-            <motion.div variants={heroContainerVariants}>
-              <Image
-              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
-              alt="Tst Logo"
-              width={600}
-              height={600}
-              />
-            </motion.div>
+           <motion.div variants={heroItemVariants}>
+  <Image
+    src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
+    alt="Tst Logo"
+    width={600}
+    height={600}
+  />
+</motion.div>
             <motion.h1
               className="text-5xl lg:text-6xl font-extrabold leading-tight"
               variants={heroItemVariants}
