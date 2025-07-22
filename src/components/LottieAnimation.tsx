@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// Lazy load the Lottie component for better performance.
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 interface LottieAnimationProps {
-  // The component will now receive the path to the animation file.
   animationPath: string;
   className?: string;
 }
@@ -19,14 +17,12 @@ const LottieAnimation: React.FC<LottieAnimationProps> = ({
   const [animationData, setAnimationData] = useState(null);
 
   useEffect(() => {
-    // Fetch the animation data from the public path.
     fetch(animationPath)
       .then((response) => response.json())
       .then((data) => setAnimationData(data))
       .catch((error) => console.error("Error fetching animation:", error));
   }, [animationPath]);
 
-  // Display a placeholder while the animation is loading.
   if (!animationData) {
     return (
       <div className={`w-full h-full flex items-center justify-center ${className}`}>
@@ -35,7 +31,6 @@ const LottieAnimation: React.FC<LottieAnimationProps> = ({
     );
   }
 
-  // Render the animation once the data has been fetched.
   return (
     <div className={className}>
       <Lottie
