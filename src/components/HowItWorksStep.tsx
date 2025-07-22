@@ -4,7 +4,6 @@ import React from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import styles from "./HowItWorksStep.module.css";
-import cardStyles from "./HowItWorksStep.module.css";
 import clsx from "clsx";
 
 interface HowItWorksStepProps {
@@ -18,13 +17,13 @@ interface HowItWorksStepProps {
   };
   index: number;
   isLastStep: boolean;
-  nextStepInView?: boolean; // New prop to control line animation
+  nextStepInView?: boolean;
 }
 
 const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
   step,
   index,
-  nextStepInView = false, // Default to false
+  nextStepInView = false,
 }) => {
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
@@ -34,15 +33,15 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
   const Card = () => (
     <div
       className={clsx(
-        cardStyles.content_item,
-        isInView && cardStyles.content_item_visible,
-        cardStyles.card_wrapper,
-        "w-full max-w-md"
+        styles.content_item,
+        isInView && styles.content_item_visible,
+        styles.card_wrapper
       )}
+      id={`step-${step.number}`} // Add step-specific ID
     >
-      <div className={cardStyles.card_shadow} />
-      <div className={cardStyles.card}>
-        <div className="text-6xl font-bold text-purple">{step.number}</div>
+      <div className={styles.card_shadow} />
+      <div className={styles.card}>
+        <div className={styles.number}>{step.number}</div>
         <h3 className="text-2xl font-bold mt-2">{step.title}</h3>
         <p className="mt-2">{step.description}</p>
       </div>
@@ -56,7 +55,25 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
         isInView && styles.content_item_visible
       )}
     >
-      <Image src={step.imageUrl} alt={step.imageAlt} width={350} height={350} />
+      <div className={styles.image_wrapper}>
+        <Image
+          src={step.imageUrl}
+          alt={step.imageAlt}
+          width={300}
+          height={300}
+          sizes="(max-width: 768px) 300px, 350px"
+          style={{
+            objectFit: "contain",
+            width: "100%",
+            height: "auto",
+            maxHeight: "300px"
+          }}
+          priority={index === 0}
+          // Add these for debugging
+          onLoad={() => console.log(`Image ${index} loaded successfully`)}
+          onError={(e) => console.error(`Image ${index} failed to load:`, e)}
+        />
+      </div>
     </div>
   );
 
@@ -67,8 +84,8 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
         <Card />
       </div>
 
-      <div className="hidden md:flex ">
-        <div className={clsx("flex-1 flex items-center justify-center gap-8")}>
+      <div className="hidden md:flex">
+        <div className="flex-1 flex items-center justify-center gap-8">
           {isEven ? <Img /> : <Card />}
         </div>
 
@@ -77,23 +94,19 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
             <motion.div
               className={styles.timeline_progress}
               style={{
-                // CHANGED: Now uses nextStepInView instead of isInView
                 height: nextStepInView ? '100%' : '0%',
               }}
             />
           )}
           <div
-            className={styles.timeline_dot}
-            style={{
-              // Dot still appears when current step is in view
-              transform: isInView
-                ? "translate(-50%, -50%) scale(1)"
-                : "translate(-50%, -50%) scale(0)",
-            }}
+            className={clsx(
+              styles.timeline_dot,
+              isInView && styles.timeline_dot_visible
+            )}
           />
         </div>
 
-        <div className={clsx("flex-1 flex items-center justify-center ")}>
+        <div className="flex-1 flex items-center justify-center">
           {isEven ? <Card /> : <Img />}
         </div>
       </div>
