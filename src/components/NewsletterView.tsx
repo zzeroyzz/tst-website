@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { PlusCircle } from "lucide-react";
 import Button from "@/components/Button";
 import { Post } from "@/types";
+import { NewsletterViewSkeleton } from "@/components/skeleton";
 
 const NewsletterView = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -43,7 +44,10 @@ const NewsletterView = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  if (loading) return <p>Loading posts...</p>;
+  // Show skeleton while loading
+  if (loading) {
+    return <NewsletterViewSkeleton rowCount={5} />;
+  }
 
   return (
     <div>
