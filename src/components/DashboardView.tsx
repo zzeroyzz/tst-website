@@ -18,6 +18,7 @@ import {
   subDays,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, BarChart2, Users, Clock } from 'lucide-react';
+import { DashboardViewSkeleton } from '@/components/skeleton';
 
 // Define the type for a reminder
 type Reminder = {
@@ -129,7 +130,6 @@ const ReminderCalendar = ({ reminders }) => {
   );
 };
 
-
 // --- Main Dashboard View ---
 const DashboardView = () => {
     const [stats, setStats] = useState({
@@ -203,8 +203,9 @@ const DashboardView = () => {
         };
       }, [supabase, fetchDashboardData]);
 
+    // Show skeleton while loading
     if (loading) {
-        return <p>Loading dashboard...</p>;
+        return <DashboardViewSkeleton />;
     }
 
   return (
