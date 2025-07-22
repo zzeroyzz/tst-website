@@ -24,15 +24,14 @@ const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
   <Link href="/resources" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
-      <div className="mb-4 flex justify-center">
-        <Image src={guide.iconUrl} alt={guide.title} width={100} height={100} />
+      <div className="mb-3 flex justify-center flex-shrink-0">
+        <Image src={guide.iconUrl} alt={guide.title} width={70} height={70} />
       </div>
-      <h3 className="text-2xl font-bold mb-2">{guide.title}</h3>
-      <p className="mb-4">{guide.description}</p>
-      <div className="flex-grow"></div>
-      <div className="flex justify-between items-end">
-        <div>
-          <h4 className="font-bold mb-2 text-left">Tags</h4>
+      <h3 className="text-lg font-bold mb-3 text-center leading-tight flex-shrink-0">{guide.title}</h3>
+      <p className="text-center text-md leading-relaxed flex-grow mb-3">{guide.description}</p>
+      <div className="flex justify-between items-end flex-shrink-0">
+        <div className="flex-1">
+          <h4 className="font-bold mb-2 text-left text-sm">Tags</h4>
           <div className="flex flex-wrap gap-2">
             {guide.tags.map((tag) => (
               <div
@@ -44,10 +43,10 @@ const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
             ))}
           </div>
         </div>
-        <div>
+        <div className="ml-3 flex-shrink-0">
           <svg
-            width="32"
-            height="32"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

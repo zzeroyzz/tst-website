@@ -11,13 +11,12 @@ interface ResourceCardProps {
     author: string;
     authorImageUrl: string;
     imageUrl: string;
-    tags?: string[]; // Changed from category to optional tags array
+    tags?: string[];
     href: string;
   };
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
-  // Define a color palette to cycle through for the tags
   const tagColors = ["bg-tst-purple", "bg-tst-teal", "bg-tst-yellow"];
 
   return (
@@ -36,16 +35,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
           <h3 className="text-xl font-bold mb-2">{card.title}</h3>
           <p className="text-sm text-gray-600 mb-4">{card.date}</p>
           <div className="flex-grow" />
-          {/* Display tags if they exist */}
           {card.tags && card.tags.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
-              {/* Show up to 2 tags for a clean look */}
               {card.tags.slice(0, 2).map((tag, index) => (
                 <div
                   key={tag}
                   className={clsx(
                     'inline-block text-xs font-bold px-3 py-1 rounded-full border-2 border-black',
-                    // Cycle through the defined colors
                     tagColors[index % tagColors.length]
                   )}
                 >
@@ -55,7 +51,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
             </div>
           )}
           <div className="flex items-center gap-3">
-            <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-black">
+            <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-black bg-tst-yellow">
               <Image
                 src={card.authorImageUrl}
                 alt={card.author}

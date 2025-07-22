@@ -10,6 +10,7 @@ import { Post } from "@/types";
 import { coreTags } from "@/data/tagData";
 import SubscribeModal from '@/components/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
+import { NewsletterArchiveSkeleton } from '@/components/skeleton';
 
 const NewsletterArchivePage = () => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
@@ -66,6 +67,19 @@ const NewsletterArchivePage = () => {
       return sortOrder === "new-to-old" ? dateB - dateA : dateA - dateB;
     });
   }, [allPosts, selectedTags, sortOrder]);
+
+  // Show skeleton while loading
+  if (loading) {
+    return (
+      <>
+        <SubscribeModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+        <NewsletterArchiveSkeleton cardCount={9} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -228,41 +242,35 @@ const NewsletterArchivePage = () => {
         </div>
 
         {/* Results Count */}
-        {!loading && (
-          <div className="mb-6 text-center">
-            <p className="text-gray-600">
-              Showing {filteredAndSortedPosts.length} of {allPosts.length} posts
-              {selectedTags.length > 0 && (
-                <span> filtered by: {selectedTags.join(', ')}</span>
-              )}
-            </p>
-          </div>
-        )}
+        <div className="mb-6 text-center">
+          <p className="text-gray-600">
+            Showing {filteredAndSortedPosts.length} of {allPosts.length} posts
+            {selectedTags.length > 0 && (
+              <span> filtered by: {selectedTags.join(', ')}</span>
+            )}
+          </p>
+        </div>
 
         {/* Post Grid */}
-        {loading ? (
-          <p className="text-center">Loading posts...</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredAndSortedPosts.map((post) => (
-              <div key={post.id}>
-                <ResourceCard
-                  card={{
-                    title: post.title,
-                    date: post.sent_at ? format(new Date(post.sent_at), "PPP") : format(new Date(post.created_at), "PPP"),
-                    author: "Kay",
-                    authorImageUrl: "/assets/profile-3.svg",
-                    imageUrl: post.image_url || "/assets/profile-3.svg",
-                    tags: post.tags,
-                    href: `/posts/${post.slug}`,
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredAndSortedPosts.map((post) => (
+            <div key={post.id}>
+              <ResourceCard
+                card={{
+                  title: post.title,
+                  date: post.sent_at ? format(new Date(post.sent_at), "PPP") : format(new Date(post.created_at), "PPP"),
+                  author: "Kay",
+                  authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
+                  imageUrl: post.image_url || "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
+                  tags: post.tags,
+                  href: `/posts/${post.slug}`,
+                }}
+              />
+            </div>
+          ))}
+        </div>
 
-        {filteredAndSortedPosts.length === 0 && !loading && (
+        {filteredAndSortedPosts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-gray-600 mb-4">
               No posts match the selected filters.

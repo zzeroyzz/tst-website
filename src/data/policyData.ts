@@ -44,8 +44,23 @@ export const practicePolicies = {
       body: "I provide individual therapy for adults via telehealth across Georgia. This page offers a general overview of my practice policies to help you get a sense of how I work. Full details are shared during intake."
     },
     {
+      heading: "Confidentiality",
+      body: "When engaging with any licensed mental health professional, please be aware there is an inherent power dynamic, and confidentiality always has limitations. I hold specific values regarding these dynamics and limits, which we will discuss in depth during intake to ensure your full understanding."
+    },
+    {
       heading: "Not a Crisis Service",
-      body: "I am not a crisis provider and cannot offer immediate or emergency support. If you’re experiencing a mental health emergency, please call 988 or go to your nearest emergency room."
+      body: `
+        This site is not for crisis support. I do not provide immediate or urgent emergency services.<br/><br/>
+        For immediate mental health crisis support, please connect with these affirming, community-based resources:<br/>
+        • Call <strong><a href="https://www.callblackline.com/" target="_blank" rel="noopener noreferrer">BlackLine</a></strong> at <strong><a href="tel:+18006045841">1 (800) 604-5841</a></strong><br/>
+        • Text <strong><a href="https://thrivelifeline.org/" target="_blank" rel="noopener noreferrer">Thrive Lifeline</a></strong> at <strong><a href="tel:+13136628209">1-313-662-8209</a></strong><br/>
+        • Call <strong><a href="https://translifeline.org/hotline/" target="_blank" rel="noopener noreferrer">The Trans Lifeline</a></strong> at <strong><a href="tel:+18775658860">877-565-8860</a></strong><br/>
+        • Visit <strong><a href="https://fireweedcollective.org/crisis-toolkit/" target="_blank" rel="noopener noreferrer">Fireweed Collective’s Crisis Toolkit</a></strong><br/><br/>
+        You can also find more extensive crisis services and information at: <strong>Inclusive Therapists Crisis Page</strong>.<br/><br/>
+        Some crisis lines (not listed) are mandated to report calls to police if they perceive immediate danger to self. If concerned, first ask about their reporting policies before sharing. Please use all resources with discretion.<br/><br/>
+        If considering 911 for immediate, life-threatening danger: be aware police lack mental health training and may pose risks to people with marginalized identities. If calling, we encourage involving trusted community members (friends, family, neighbors) for support.<br/><br/>
+        For Atlanta-based alternatives to police intervention, you can visit: <strong>Don't Call the Police</strong>.
+      `
     },
     {
       heading: "Who I Work With",
@@ -53,7 +68,7 @@ export const practicePolicies = {
     },
     {
       heading: "Fees & Payment",
-      body: "My current rate is on a sliding scale of $150 per session, and clients are welcome to choose what’s sustainable for them within that range. I also offer a limited number of reduced fee spots through Open Path Collective (please check my listing for availability), and participate in community therapy funds such as the Inclusive Therapists BIPOC Therapy Fund."
+      body: "My rate is $150 per session. Payment for your session will be processed the next morning. I participate in community therapy funds such as the Inclusive Therapists BIPOC Therapy Fund."
     },
     {
       heading: "Cancellations",
@@ -65,7 +80,7 @@ export const practicePolicies = {
     },
     {
       heading: "Client Portal",
-      body: `To schedule a consultation or access your client account, please visit the secure client portal: <a href="https://toastedsesametherapyllc.clientsecure.me" target="_blank" rel="noopener noreferrer" class="underline">toastedsesametherapyllc.clientsecure.me</a>`
+      body: `To schedule a consultation or access your secure, HIPAA-compliant client account, please visit the client portal: <a href="https://toastedsesametherapyllc.clientsecure.me" target="_blank" rel="noopener noreferrer" class="underline">toastedsesametherapyllc.clientsecure.me</a>`
     }
   ]
 };

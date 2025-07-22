@@ -14,6 +14,8 @@ import Link from 'next/link';
 import CircleIcon from "@/components/CircleIcon";
 import SubscribeModal from '@/components/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
+import Button from "@/components/Button";
+import { SinglePostSkeleton } from '@/components/skeleton';
 
 const SinglePostPage = () => {
   const { slug } = useParams();
@@ -78,8 +80,15 @@ const SinglePostPage = () => {
     fetchPostAndSuggestions();
   }, [slug, supabase]);
 
+  // Show skeleton while loading
   if (loading) {
-    return <Section><p className="text-center">Loading post...</p></Section>;
+    return (
+      <SinglePostSkeleton
+        showSuggestedPosts={true}
+        showImage={true}
+        contentParagraphs={6}
+      />
+    );
   }
 
   if (!post) {
@@ -87,7 +96,7 @@ const SinglePostPage = () => {
   }
 
   return (
-    <main className="bg-white">
+    <main className="bg-tst-cream">
       <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Article Section */}
@@ -133,7 +142,7 @@ const SinglePostPage = () => {
                 <CircleIcon
                   size="md"
                   bgColor="bg-tst-purple"
-                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
                   altText="Author Icon"
                 />
                 <div>
@@ -178,13 +187,13 @@ const SinglePostPage = () => {
           </article>
 
           {/* Article Footer */}
-          <div className="border-t border-gray-200 pt-8 mb-8">
+          <div className="border-t border-gray-400 pt-8 mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <CircleIcon
                   size="md"
                   bgColor="bg-tst-purple"
-                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
                   altText="Author Icon"
                 />
                 <div>
@@ -205,7 +214,7 @@ const SinglePostPage = () => {
 
       {/* Suggested Posts Section */}
       {suggestedPosts.length > 0 && (
-        <div className="bg-gray-50 border-t border-gray-200">
+        <div className="bg-gray-50 border-t border-gray-400">
           <Section className="py-20">
             <div className="max-w-6xl mx-auto px-6">
               {/* Section Header */}
@@ -227,8 +236,8 @@ const SinglePostPage = () => {
                         title: suggestion.title,
                         date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
                         author: "Kay",
-                        authorImageUrl: "/assets/profile-3.svg",
-                        imageUrl: suggestion.image_url || "/assets/profile-3.svg",
+                        authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
+                        imageUrl: suggestion.image_url || "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
                         tags: suggestion.tags,
                         href: `/posts/${suggestion.slug}`,
                       }}
@@ -237,15 +246,9 @@ const SinglePostPage = () => {
                 ))}
               </div>
 
-              <div className="text-center mt-16">
-                <Link
-                  href="/newsletter-archives"
-                  className="inline-flex items-center px-6 py-3 text-base font-medium text-gray-900 bg-white border-2 border-black rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
-                >
-                  View all stories
-                  <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+              <div className="mt-12 text-center">
+                <Link href="/newsletter-archives">
+                  <Button className="bg-tst-yellow">View all stories</Button>
                 </Link>
               </div>
             </div>

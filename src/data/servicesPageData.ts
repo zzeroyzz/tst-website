@@ -15,11 +15,15 @@ export const helpWithKeywords = [
   "Identity Exploration",
   "Neurodivergence Support",
   "Stress Management",
+  "Polyamory & Non-Monogamy",
+  "LGBTQ+ Affirming",
+  "Cultural Identity",
+  "BIPOC Affirming",
 ];
 
 export const individualTherapyData = {
     title: "One-on-One Support",
-    description: "A collaborative, confidential space dedicated to you. We'll explore your inner world, process challenges, and work toward your personal healing and growth goals at a pace that feels safe and supportive.",
+    description: "A supportive space to help you feel less alone in what you're holding. Together, we'll explore what’s been weighing on you, make sense of your experiences, and move at a pace that feels safe and manageable. This work is personalized and collaborative. It's guided by your needs, your voice, and your goals.",
     tags: ["50-minute sessions", "Virtual & Phone", "Personalized Approach"],
     animationData: somaticAnimation,
 };

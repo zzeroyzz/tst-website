@@ -107,7 +107,7 @@ export const howItWorksSteps = [
   {
     number: "01",
     title: "Submit the contact form",
-    description: "Just enter your name and contact info. I’ll follow up by email.",
+    description: "Starting something new can feel like a big step, and we're here to make it easy. Simply share your name and email on our contact form. Once you hit submit, we'll follow up by email to say hello and guide you to the next step. It's a gentle beginning to your journey with us.",
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_1.png",
     imageAlt: "Illustration of a cloud holding a phone",
     isLastStep:false,
@@ -115,7 +115,7 @@ export const howItWorksSteps = [
   {
     number: "02",
     title: "Schedule a free consultation",
-    description: "We’ll meet for 15 to 20 minutes to see if it feels like a good fit. No pressure to decide on the spot.",
+    description: "This is your chance to connect in a comfortable, no pressure space. We'll meet for about 15-20 minutes to see if we're a good fit for your needs. We'll introduce ourselves, and you'll have the opportunity to share a little about what brings you here at your comfort level. Afterwards, we'll explain our simple onboarding process. This call is all about clarity and comfort, ensuring you feel good about moving forward.",
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_2.png",
     imageAlt: "Illustration of a calendar",
     isLastStep:false,
@@ -123,7 +123,7 @@ export const howItWorksSteps = [
   {
     number: "03",
     title: "Book your first session",
-    description: "If it feels right, we’ll begin at your pace and shape care around what you need most.",
+    description: "Once you're ready, it's time to dive into your journey. Your first session is about setting the foundation for our work together. We'll gently go over intake documents, focusing on policies and confidentiality, then begin to shape a care plan around what you most need. At the end, we'll check in to see how you felt and if you'd like to schedule our next time together.",
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_3.png",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:false,
@@ -131,7 +131,7 @@ export const howItWorksSteps = [
   {
     number: "04",
     title: "Start feeling more supported",
-    description: "This is space to feel steadier, more connected, and more like yourself again.",
+    description: "This is why we're here. As we work together, you'll begin to experience a shift. It's good to feel stronger, more deeply connected to yourself and others, and truly more like the person you aspire to be again. This journey is about nurturing your inner landscape and building resilience, one step at a time.",
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_4.png",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:true,

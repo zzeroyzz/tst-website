@@ -10,6 +10,7 @@ type ColumnsMap = Record<string, Column>;
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { PlusCircle, X } from "lucide-react";
+import { KanbanBoardSkeleton } from "@/components/skeleton";
 
 // --- Task Detail Modal Component ---
 const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
@@ -76,7 +77,6 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
   );
 };
 
-
 // --- Add Task Form Component ---
 const AddTaskForm = ({ columnId, onAddTask, onCancel }) => {
     const [title, setTitle] = useState('');
@@ -120,12 +120,12 @@ const AddTaskForm = ({ columnId, onAddTask, onCancel }) => {
     );
 };
 
-
 // --- Main Kanban Board Component ---
 const KanbanBoard = () => {
   const [columns, setColumns] = useState<ColumnsMap | null>(null);
   const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
 
   const processTasks = useCallback((tasks) => {
@@ -143,13 +143,19 @@ const KanbanBoard = () => {
         initialColumns[columnId].items.sort((a, b) => a.position - b.position);
     }
     setColumns(initialColumns);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       const { data, error } = await supabase.from("tasks").select("*");
-      if (error) console.error("Error fetching tasks:", error);
-      else processTasks(data);
+      if (error) {
+        console.error("Error fetching tasks:", error);
+        setLoading(false);
+      } else {
+        processTasks(data);
+      }
     };
     fetchTasks();
 
@@ -243,7 +249,10 @@ const KanbanBoard = () => {
         .eq('id', draggableId);
   };
 
-  if (!columns) return <p>Loading tasks...</p>;
+  // Show skeleton while loading
+  if (loading || !columns) {
+    return <KanbanBoardSkeleton />;
+  }
 
   return (
     <div>

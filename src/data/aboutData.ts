@@ -14,29 +14,3 @@ export const aboutPageContent = {
   ],
 };
 
-export const floatingIcons = [
-    {
-        iconUrl: "/assets/step_1.png",
-        altText: "Somatic icon",
-        bgColor: "bg-tst-teal",
-        positionClasses: "top-10 left-10",
-    },
-    {
-        iconUrl: "/assets/step_4.png",
-        altText: "Neuro-Affirming icon",
-        bgColor: "bg-tst-yellow",
-        positionClasses: "top-20 right-10",
-    },
-    {
-        iconUrl: "/assets/step_2.png",
-        altText: "Identity Work icon",
-        bgColor: "bg-tst-purple",
-        positionClasses: "bottom-20 left-20",
-    },
-     {
-        iconUrl: "/assets/step_3.png",
-        altText: "Trauma-Informed icon",
-        bgColor: "bg-white",
-        positionClasses: "bottom-10 right-20",
-    },
-];

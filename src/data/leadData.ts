@@ -2,25 +2,25 @@
 
 export const guides = [
   {
-    title: "Navigating Your Feelings",
+    title: "Navigating Your Care with Confidence",
     description:
-      "A practical guide to understanding and processing your emotions in a healthy, constructive way.",
+      "You've carried too much for too long. It's time to feel truly heard. This guide empowers you with the tools and insights to confidently advocate for yourself in healthcare settings, ensuring your needs are understood and respected.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-1.svg", // Replace with your icons
     tags: ["Mindfulness", "Self-Awareness"],
     bgColor: "bg-tst-yellow",
   },
   {
-    title: "Building Better Boundaries",
+    title: "Communicate with Heart & Clarity",
     description:
-      "Learn how to set and maintain healthy boundaries to protect your energy and improve your relationships.",
+      "For the deep feelers seeking deeper connections. Learn practical, heartfelt strategies to express yourself authentically, strengthen your relationships, and bridge gaps with clear, compassionate communication.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-2.svg",
     tags: ["Relationships", "Self-Care"],
     bgColor: "bg-tst-purple",
   },
   {
-    title: "Intro to Somatics",
+    title: "Reconnect with yourself for Regulation",
     description:
-      "Explore how your body holds wisdom and learn simple exercises to release stored tension and stress.",
+      "A gentle invitation for healing seekers and drained hearts. Discover simple yet profound practices to quiet the noise, check in with your emotions, and realign with your true self, offering a moment of peace and clarity.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-3.svg",
     tags: ["Somatic", "Stress Relief"],
     bgColor: "bg-tst-teal",

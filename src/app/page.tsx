@@ -157,6 +157,14 @@ export default function HomePage() {
             className="flex flex-col gap-4"
             variants={heroContainerVariants}
           >
+            <motion.div variants={heroContainerVariants}>
+              <Image
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
+              alt="Tst Logo"
+              width={600}
+              height={600}
+              />
+            </motion.div>
             <motion.h1
               className="text-5xl lg:text-6xl font-extrabold leading-tight"
               variants={heroItemVariants}
@@ -179,21 +187,22 @@ export default function HomePage() {
                 Download Free Therapy Guide
               </Button>
             </motion.div>
-
-            <div className="flex flex-row gap-4 flex-wrap justify-center md:justify-start">
-              {trustIndicators.map((indicator) => (
-                <div key={indicator.id} className="flex items-center gap-3">
-                  <CircleIcon
-                    size="xs"
-                    bgColor="bg-green-100"
-                    iconUrl={indicator.iconUrl}
-                    altText={indicator.altText}
-                  />
-                  <span className="font-bold">{indicator.text}</span>
-                </div>
-              ))}
-            </div>
-
+<motion.div
+  className="flex flex-row gap-4 flex-wrap justify-center md:justify-start"
+  variants={heroItemVariants}
+>
+  {trustIndicators.map((indicator) => (
+    <div key={indicator.id} className="flex items-center gap-3">
+      <CircleIcon
+        size="xs"
+        bgColor="bg-green-100"
+        iconUrl={indicator.iconUrl}
+        altText={indicator.altText}
+      />
+      <span className="font-bold">{indicator.text}</span>
+    </div>
+  ))}
+</motion.div>
             <motion.div
               className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
@@ -321,7 +330,6 @@ export default function HomePage() {
               Therapy that actually gets you
             </h2>
           </motion.div>
-          {/* This is the simplified, rebuilt component */}
           <TherapyCard />
         </Section>
       </div>
@@ -358,11 +366,13 @@ export default function HomePage() {
                   {text}
                 </motion.p>
               ))}
-              <motion.div variants={itemVariants} className="flex justify-end">
-                <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
-                  <span>Read my full bio</span>
-                </HoverLink>
-              </motion.div>
+              <motion.div variants={itemVariants} className="relative">
+  <div className="absolute left-0" style={{ marginLeft: '-22px' }}>
+    <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
+      <span>Read my full bio</span>
+    </HoverLink>
+  </div>
+</motion.div>
             </motion.div>
           </motion.div>
         </Section>
@@ -402,7 +412,7 @@ export default function HomePage() {
       </div>
 
       <Section>
-        <ContactForm />
+        <ContactForm id="contact-form"/>
       </Section>
     </main>
   );

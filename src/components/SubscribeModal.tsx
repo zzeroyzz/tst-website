@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import Input from './Input';
 import Button from './Button';
 import { LottiePlayer } from './LottiePlayer';
@@ -92,22 +91,19 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
     />
                   </div>
                   <div className="w-32 -mt-2">
-                    <Image
-                      src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/toasty-tidbits-logo-letters.svg"
-                      alt="Newsletter illustration"
-                      width={128}
-                      height={128}
-                    />
+                     <h1 className="text-black font-black text-4xl md:text-4xl lg:text-5xl text-center leading-none -mt-2">
+                                        toasty<br/>tidbits
+                                    </h1>
                   </div>
                 </div>
-                <h2 className="text-3xl font-extrabold mb-4">Enjoying the content?</h2>
+                <h2 className="text-3xl font-extrabold mb-4">Wait, did you get your free tools?</h2>
                 <p className="text-lg mb-6">
-                  Get our latest posts, free guides, and reflections sent straight to your inbox.
+                  Grab our 3 free tools for instant support. You&apos;ll also be subscribed to our weekly newsletter and receive a new, bonus therapy resource in your inbox each month.
                 </p>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <Input
                     type="email"
-                    placeholder="Your best email"
+                    placeholder="Your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

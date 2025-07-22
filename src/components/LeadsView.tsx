@@ -7,7 +7,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format, differenceInDays, parseISO } from "date-fns";
 import { X, Send } from "lucide-react";
 import toast from "react-hot-toast";
-
+import { LeadsViewSkeleton } from "@/components/skeleton";
 
 type Lead = {
   id: number;
@@ -188,7 +188,6 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
   );
 };
 
-
 // --- Main Leads View Component ---
 const LeadsView = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -249,7 +248,10 @@ const LeadsView = () => {
     }
   };
 
-  if (loading) return <p>Loading leads...</p>;
+  // Show skeleton while loading
+  if (loading) {
+    return <LeadsViewSkeleton rowCount={5} />;
+  }
 
   return (
     <div>
