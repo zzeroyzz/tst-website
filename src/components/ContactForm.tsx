@@ -9,6 +9,7 @@ import Input from "./Input";
 
 interface ContactFormProps {
   isContactPage?: boolean;
+  id?: string;
 }
 
 const useWindowSize = () => {
