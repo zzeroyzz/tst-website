@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format } from "date-fns";
+import toast from "react-hot-toast"; // Import toast for notifications
 import Section from "@/components/Section";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -20,6 +21,10 @@ const ResourcesPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [supabase] = useState(() => createClientComponentClient());
+
+  // State for the newsletter form
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPublishedPosts = async () => {
@@ -43,6 +48,36 @@ const ResourcesPage = () => {
     fetchPublishedPosts();
   }, [supabase]);
 
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Please enter a valid email.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name: 'Newsletter Subscriber' }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong. Please try again.');
+      }
+
+      toast.success("You're subscribed! Check your inbox for your free guides.");
+      setEmail(''); // Clear the input
+
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Section>
@@ -50,31 +85,31 @@ const ResourcesPage = () => {
 
           <div className="grid md:grid-cols-2 gap-16 items-center w-full">
            <div className="flex flex-col items-center justify-center">
-  <div className="w-full max-w-sm flex justify-center hidden md:block lg:block">
-  <LottiePlayer
-    file={toastyTidbitsAnimation}
-    width={400}
-    height={400}
-  />
-</div>
-<div className="w-full max-w-sm flex justify-center md:hidden lg:hidden">
-  <LottiePlayer
-    file={toastyTidbitsAnimation}
-    width={200}
-    height={200}
-  />
-</div>
-<div className="w-full flex justify-center -mt-10">
-  <h1 className="text-black font-black text-6xl md:text-8xl lg:text-[10rem] text-center leading-tight">
-    {resourcesPageData.hero.title.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {line}
-        {index < resourcesPageData.hero.title.split('\n').length - 1 && <br />}
-      </React.Fragment>
-    ))}
-  </h1>
-</div>
-</div>
+              <div className="w-full max-w-sm flex justify-center hidden md:block lg:block">
+                <LottiePlayer
+                  file={toastyTidbitsAnimation}
+                  width={400}
+                  height={400}
+                />
+              </div>
+              <div className="w-full max-w-sm flex justify-center md:hidden lg:hidden">
+                <LottiePlayer
+                  file={toastyTidbitsAnimation}
+                  width={200}
+                  height={200}
+                />
+              </div>
+              <div className="w-full flex justify-center -mt-10">
+                <h1 className="text-black font-black text-6xl md:text-8xl lg:text-[10rem] text-center leading-tight">
+                  {resourcesPageData.hero.title.split('\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}
+                      {index < resourcesPageData.hero.title.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </h1>
+              </div>
+            </div>
             <div className="flex flex-col gap-6">
               <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
                 {resourcesPageData.hero.headline}
@@ -95,16 +130,18 @@ const ResourcesPage = () => {
                   {resourcesPageData.hero.description.additional}
                 </p>
               </div>
-              <form className="flex flex-col sm:flex-row gap-4 mt-4">
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 mt-4">
                 <Input
                   type="email"
                   placeholder={resourcesPageData.hero.emailPlaceholder}
                   name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   wrapperClassName="flex-grow"
                 />
-                <Button type="submit" className="bg-tst-purple">
-                  {resourcesPageData.hero.ctaButton}
+                <Button type="submit" className="bg-tst-purple" disabled={isSubmitting}>
+                  {isSubmitting ? 'Subscribing...' : resourcesPageData.hero.ctaButton}
                 </Button>
               </form>
               <p className="text-xs text-gray-600 mt-2">
@@ -126,11 +163,11 @@ const ResourcesPage = () => {
 
       <Section className="mt-16 bg-tst-green border-t-2 border-black">
         <div className="mb-12 text-center px-4">
-  <h2 className="text-5xl md:text-6xl font-extrabold">{resourcesPageData.postsSection.title}</h2>
-  <p className="text-lg mt-2 font-500">
-    {resourcesPageData.postsSection.subtitle}
-  </p>
-</div>
+          <h2 className="text-5xl md:text-6xl font-extrabold">{resourcesPageData.postsSection.title}</h2>
+          <p className="text-lg mt-2 font-500">
+            {resourcesPageData.postsSection.subtitle}
+          </p>
+        </div>
         {loading ? (
           <p className="text-center">{resourcesPageData.postsSection.loadingText}</p>
         ) : (

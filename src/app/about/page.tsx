@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast'; // Import toast
 import ProfileImage from '@/components/ProfileImage';
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -29,11 +30,45 @@ const itemVariants = {
 };
 
 const AboutPage = () => {
+  // State for the newsletter form
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Please enter a valid email.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name: 'Newsletter Subscriber' }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong. Please try again.');
+      }
+
+      toast.success("You're subscribed! Welcome to Toasty Tidbits.");
+      setEmail(''); // Clear the input
+
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main>
         <div className="grid lg:grid-cols-2 border-2 border-black">
 
-            {/* Image Column - This is now hidden on mobile and only appears on desktop */}
+            {/* Image Column */}
             <div className="hidden lg:flex items-center justify-center bg-tst-yellow p-8 h-screen sticky top-0">
                 <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
@@ -65,18 +100,19 @@ const AboutPage = () => {
                       {aboutPageContent.title}
                     </motion.h1>
 
-                    {/* Mobile-Only Image - Appears below the title and is hidden on desktop */}
+                    {/* Mobile-Only Image */}
                     <motion.div className="lg:hidden mb-12 flex flex-col justify-center items-center" variants={itemVariants}>
                         <Image
-                    src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long.svg"
-                    alt="Kay, your favorite therapist"
-                    width={400}
-                    height={400}
-                  />
+                          src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long.svg"
+                          alt="Kay, your favorite therapist"
+                          width={400}
+                          height={400}
+                        />
                         <ProfileImage />
                     </motion.div>
 
                     {/* Styled Paragraphs */}
+                    {/* ... (paragraph mapping code remains the same) ... */}
                     <div className="space-y-8">
                         {aboutPageContent.paragraphs.map((text, index) => (
                           <motion.div
@@ -159,7 +195,6 @@ const AboutPage = () => {
                                   {text}
                               </p>
 
-                              {/* Add CTA content ONLY to index 7 */}
                               {index === 7 && (
                                 <div className="mt-8 pt-6 border-t border-gray-200 text-center">
                                   <h3 className="text-2xl font-bold mb-4">Ready to start your journey?</h3>
@@ -189,9 +224,6 @@ const AboutPage = () => {
 
                         <div className="bg-white p-6 md:p-8 rounded-2xl border-2 border-black shadow-brutalistLg">
                             <div className="text-center mb-6">
-                                {/* <h3 className="text-3xl font-bold mb-4">Ready to start your journey?</h3> */}
-
-                                {/* Centered Animation and Text */}
                                 <div className="flex flex-col items-center justify-center mb-6">
                                     <div className="w-24 h-24 mb-2">
                                         <LottiePlayer
@@ -204,23 +236,24 @@ const AboutPage = () => {
                                         toasty<br/>tidbits
                                     </h1>
                                 </div>
-
                                 <p className="text-lg mb-6 max-w-2xl mx-auto">
                                     Join hundreds of readers who get my weekly newsletter, <strong>Toasty Tidbits</strong> —
                                     bite-sized insights on mental health, healing, and finding joy in the everyday mess of being human.
                                 </p>
                             </div>
 
-                            <form className="flex flex-col gap-4">
+                            <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-4">
                                 <Input
                                     type="email"
                                     placeholder="Your email address"
                                     name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                     wrapperClassName="w-full"
                                 />
-                                <Button type="submit" className="bg-tst-purple">
-                                    Subscribe to Toasty Tidbits
+                                <Button type="submit" className="bg-tst-purple" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Subscribing...' : 'Subscribe to Toasty Tidbits'}
                                 </Button>
                             </form>
 
@@ -228,12 +261,12 @@ const AboutPage = () => {
                                 Free weekly insights • No spam • Unsubscribe anytime
                             </p>
                              <p className="text-xs text-gray-600 mt-2">
-                {resourcesPageData.hero.privacyNotice.split('privacy policy')[0]}
-                <a href={resourcesPageData.routes.privacyPolicy} className="underline">
-                  privacy policy
-                </a>
-                {resourcesPageData.hero.privacyNotice.split('privacy policy')[1]}
-              </p>
+                              {resourcesPageData.hero.privacyNotice.split('privacy policy')[0]}
+                              <a href={resourcesPageData.routes.privacyPolicy} className="underline">
+                                privacy policy
+                              </a>
+                              {resourcesPageData.hero.privacyNotice.split('privacy policy')[1]}
+                            </p>
                         </div>
                     </motion.div>
                 </motion.div>

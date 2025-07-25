@@ -27,8 +27,8 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
     }
     setIsSubmitting(true);
     try {
-      // We can reuse the /api/contact endpoint
-      const response = await fetch('/api/contact', {
+      // **MODIFIED: Point to the new newsletter subscribe endpoint**
+      const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name: 'Newsletter Subscriber' }),
@@ -42,6 +42,9 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
       // Close the modal automatically after a short delay
       setTimeout(() => {
         onClose();
+        // Reset state for next time
+        setIsSubmitted(false);
+        setEmail('');
       }, 2500);
     } catch (err: any) {
       toast.error(err.message);
@@ -49,6 +52,8 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
       setIsSubmitting(false);
     }
   };
+
+  // ... (rest of the component remains the same)
 
   return (
     <AnimatePresence>
