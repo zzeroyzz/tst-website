@@ -88,6 +88,14 @@ const Footer = () => {
               </li>
               <li>
                 <HoverLink
+                  href="/policy"
+                  className="text-white/90 hover:text-white transition-colors font-medium"
+                >
+                  Practice Policy
+                </HoverLink>
+              </li>
+              <li>
+                <HoverLink
                   href="https://toastedsesametherapyllc.clientsecure.me/sign-in"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
@@ -103,11 +111,11 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
 
             {/* Copyright */}
-            <p className="text-white/80 text-sm text-center md:text-left">
+            <p className="text-white/80 text-sm text-center md:text-left font-bold">
               &copy; {new Date().getFullYear()} Toasted Sesame Therapy. All rights reserved.
             </p>
-            <p className="text-white/80 text-sm text-center md:text-left">
-               This site is not for crisis support
+            <p className="text-white/80 text-sm text-center md:text-right">
+               This site is not for crisis support. <br/>Crisis resources are available on the <Link href="/policy" className=" underline font-bold">Policy Page</Link>
             </p>
           </div>
         </div>
