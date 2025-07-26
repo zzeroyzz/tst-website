@@ -126,7 +126,7 @@ const ContactPage = () => {
                   <div className={`${therapyCardStyles.card} p-8 text-center min-h-[280px] flex flex-col justify-center`}>
                     <div className={`${card.bgColor} p-4 rounded-xl w-[100px] h-[100px] mx-auto mb-6 flex items-center justify-center border-2 border-black shadow-brutalistMd`}>
                        <Image
-                        src={card.iconUrl || card.icon}
+                        src={card.icon}
                         alt={card.title}
                         width={64}
                         height={64}
