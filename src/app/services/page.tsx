@@ -9,10 +9,16 @@ import ServiceOfferingCard from "@/components/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage";
 import { usePathname, useRouter } from "next/navigation";
+import type { Metadata } from 'next';
 import {
     individualTherapyData,
     ourApproachData
 } from "@/data/servicesPageData";
+
+export const metadata: Metadata = {
+  title: 'Therapy Services | Toasted Sesame Therapy',
+  description: 'Explore our neuro-affirming, trauma-informed, and somatic therapy services. Personalized online therapy that fits you, as you are.'
+};
 
 // Animation variants for Framer Motion
 const containerVariants = {

@@ -11,6 +11,12 @@ import { coreTags } from "@/data/tagData";
 import SubscribeModal from '@/components/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import { NewsletterArchiveSkeleton } from '@/components/skeleton';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Toasty Tidbits Archives | Toasted Sesame Therapy',
+  description: 'Browse the archives of the Toasty Tidbits newsletter. Explore past publications with reflections, practical tips, and resources for your healing journey.'
+};
 
 const NewsletterArchivePage = () => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);

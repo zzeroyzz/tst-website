@@ -3,7 +3,7 @@ import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { Toaster } from "react-hot-toast"; // Import Toaster
+import { Toaster } from "react-hot-toast";
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -12,8 +12,8 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "TST - Toasted Sesame Therapy",
-  description: "A new therapy practice.",
+  title: 'Toasted Sesame Therapy | Compassionate, Personalized Therapy',
+  description: 'A therapy space for the deep feelers, drained hearts, and healing seekers. Neuro-affirming and trauma-informed online therapy for adults in Georgia.'
 };
 
 export default function RootLayout({
