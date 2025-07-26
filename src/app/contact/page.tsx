@@ -6,6 +6,7 @@ import { motion, Variants } from "framer-motion";
 import Section from "@/components/Section";
 import ContactForm from "@/components/ContactForm";
 import FAQ from "@/components/FAQ";
+import Image from "next/image";
 import CircleIcon from "@/components/CircleIcon";
 import therapyCardStyles from "@/components/TherapyCard.module.css"; // Renamed for clarity
 import contactPageStyles from "@/components/ContactPage.module.css"; // Renamed for clarity
@@ -81,8 +82,8 @@ const ContactPage = () => {
                 variants={itemVariants}
                 className="flex justify-center"
               >
-                <div className="animate-bounce bg-black p-3 rounded-lg">
-                  <svg className="w-6 h-6 text-white" fill="white" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="animate-bounce bg-white p-3 rounded-lg shadow-brutalist border-2 border-black">
+                  <svg className="w-6 h-6 text-black" fill="white" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
                 </div>
@@ -98,9 +99,9 @@ const ContactPage = () => {
         </Section>
 
         {/* Benefits Section */}
-        <Section className="bg-tst-yellow py-20 border-y-2 border-black">
+        <Section className="bg-tst-yellow py-20 border-t-2 border-black">
           <motion.div
-            className="text-center max-w-5xl mx-auto"
+            className="text-center max-w-3xl mx-auto"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
@@ -118,13 +119,19 @@ const ContactPage = () => {
             >
               {benefitsSection.subtitle}
             </motion.p>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="flex flex-col gap-8">
               {benefitCards.map((card) => (
-                <motion.div key={card.id} variants={itemVariants} className={therapyCardStyles.wrapper}>
+                <motion.div key={card.id} variants={itemVariants} className={`${therapyCardStyles.wrapper} max-w-md mx-auto w-full`}>
                   <div className={therapyCardStyles.shadow}></div>
-                  <div className={`${therapyCardStyles.card} p-8`}>
-                    <div className={`${card.bgColor} p-6 rounded-xl w-20 h-20 mx-auto mb-6 flex items-center justify-center border-2 border-black shadow-brutalistMd`}>
-                      <span className="text-3xl">{card.iconEmoji}</span>
+                  <div className={`${therapyCardStyles.card} p-8 text-center min-h-[280px] flex flex-col justify-center`}>
+                    <div className={`${card.bgColor} p-4 rounded-xl w-[100px] h-[100px] mx-auto mb-6 flex items-center justify-center border-2 border-black shadow-brutalistMd`}>
+                       <Image
+                        src={card.iconUrl || card.icon}
+                        alt={card.title}
+                        width={64}
+                        height={64}
+                        className="object-contain"
+                      />
                     </div>
                     <h3 className="text-xl font-bold mb-4">{card.title}</h3>
                     <p className="text-gray-700 leading-relaxed font-medium">{card.description}</p>
@@ -136,7 +143,7 @@ const ContactPage = () => {
         </Section>
 
         {/* FAQ Section */}
-        <Section className="bg-tst-teal">
+        <Section className="bg-tst-teal border-t-2 border-black">
           <FAQ />
         </Section>
       </div>
