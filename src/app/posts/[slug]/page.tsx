@@ -104,11 +104,11 @@ const SinglePostPage = () => {
         <div className="max-w-3xl mx-auto px-6">
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-500 mb-8 font-medium">
-            <Link href="/resources" className="hover:text-gray-700 transition-colors">
+            <Link href="/guides" className="hover:text-gray-700 transition-colors">
               Resources
             </Link>
             <span className="mx-3 text-gray-300">›</span>
-            <Link href="/newsletter-archives" className="hover:text-gray-700 transition-colors">
+            <Link href="//toasty-tidbits-archives" className="hover:text-gray-700 transition-colors">
               Archives
             </Link>
             <span className="mx-3 text-gray-300">›</span>
@@ -247,7 +247,7 @@ const SinglePostPage = () => {
               </div>
 
               <div className="mt-12 text-center">
-                <Link href="/newsletter-archives">
+                <Link href="//toasty-tidbits-archives">
                   <Button className="bg-tst-yellow">View all stories</Button>
                 </Link>
               </div>

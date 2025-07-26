@@ -141,7 +141,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleResourcesClick = () => {
-    router.push('/resources');
+    router.push('/guides');
   };
 
   return (

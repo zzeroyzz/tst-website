@@ -21,7 +21,7 @@ interface GuideCardProps {
 }
 
 const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
-  <Link href="/resources" className={styles.wrapper}>
+  <Link href="/guides" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
       <div className="mb-3 flex justify-center flex-shrink-0">

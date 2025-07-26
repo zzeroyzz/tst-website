@@ -1,4 +1,4 @@
-// src/app/newsletter-archives/page.tsx
+// src/app//toasty-tidbits-archives/page.tsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";

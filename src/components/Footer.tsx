@@ -48,7 +48,7 @@ const Footer = () => {
               </li>
               <li>
                 <HoverLink
-                  href="/resources"
+                  href="/guides"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
                   Grab Your Free Resources
@@ -57,7 +57,7 @@ const Footer = () => {
 
               <li>
                 <HoverLink
-                  href="/newsletter-archives"
+                  href="//toasty-tidbits-archives"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
                   Newsletter Archive

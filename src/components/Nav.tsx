@@ -101,7 +101,7 @@ const Nav: React.FC = () => {
           <ul className="flex items-center space-x-8 font-bold">
             {!isDashboardPage && (
               <li>
-                <HoverLink href="/resources">
+                <HoverLink href="/guides">
                   Download Free Therapy Guides
                 </HoverLink>
               </li>

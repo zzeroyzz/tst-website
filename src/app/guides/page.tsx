@@ -1,4 +1,4 @@
-// src/app/resources/page.tsx
+// src/app/guides/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
