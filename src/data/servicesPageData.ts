@@ -30,7 +30,7 @@ export const individualTherapyData = {
     title: "One-on-One Support",
     description: "A supportive space to help you feel less alone in what you're holding. Together, we'll explore what’s been weighing on you, make sense of your experiences, and move at a pace that feels safe and manageable. This work is personalized and collaborative. It's guided by your needs, your voice, and your goals.",
     tags: ["50-minute sessions", "Virtual & Phone", "Personalized Approach"],
-    animationData: somaticAnimation,
+    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Services%20Page%20Asset.svg",
 };
 
 export const ourApproachData = [

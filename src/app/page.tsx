@@ -335,7 +335,7 @@ export default function HomePage() {
       </div>
 
       <div>
-        <Section minHeight="400px">
+        <Section minHeight="400px" className="border-t-2 border-black">
           <motion.div
             className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400"
             variants={sectionVariants}
