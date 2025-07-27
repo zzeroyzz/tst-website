@@ -1,4 +1,4 @@
-// src/app/newsletter-archives/page.tsx
+// src/app/toasty-tidbits-archives/page.tsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -12,7 +12,7 @@ import SubscribeModal from '@/components/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import { NewsletterArchiveSkeleton } from '@/components/skeleton';
 
-const NewsletterArchivePage = () => {
+const ToastyTidbitsArchivePageClient = () => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -290,4 +290,4 @@ const NewsletterArchivePage = () => {
   );
 };
 
-export default NewsletterArchivePage;
+export default ToastyTidbitsArchivePageClient;

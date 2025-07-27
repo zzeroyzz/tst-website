@@ -50,11 +50,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
             <ul className="flex flex-col items-center gap-8 text-xl font-bold text-center">
               <li>
                 <Link
-                  href="/resources"
+                  href="/guides"
                   onClick={onClose}
                   className="text-white hover:text-tst-yellow transition-colors"
                 >
-                  Download Free Therapy Guides
+                  Free Guides
                 </Link>
               </li>
               <li>

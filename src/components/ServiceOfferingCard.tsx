@@ -7,8 +7,9 @@ interface ServiceOfferingCardProps {
     title: string;
     description: string;
     tags: string[];
+    imageUrl: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    animationData: any;
+    animationData?: any; // Made optional with ?
   };
 }
 
@@ -36,7 +37,7 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
             </div>
           </div>
           <div className="hidden md:block">
-            <Image src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Services%20Page%20Asset.svg" alt="services" width={500} height={500} />
+            <Image src={service.imageUrl} alt="services" width={500} height={500} />
           </div>
         </div>
       </div>

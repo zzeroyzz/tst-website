@@ -8,10 +8,10 @@ const Footer = () => {
     <footer className="bg-tst-purple border-t-2 border-black">
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start mb-8">
 
-          {/* Logo Section */}
-          <div className="flex flex-col items-center md:items-start">
+          {/* Logo Section - Takes up 2 columns on larger screens */}
+          <div className="flex flex-col items-center md:items-start md:col-span-2">
             <Link href="/" className="mb-4">
               <Image
                 src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg"
@@ -32,10 +32,10 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <HoverLink
-                  href="/contact"
+                  href="/therapy-services"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
-                  Get Started
+                  Therapy Services
                 </HoverLink>
               </li>
               <li>
@@ -48,7 +48,7 @@ const Footer = () => {
               </li>
               <li>
                 <HoverLink
-                  href="/resources"
+                  href="/guides"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
                   Grab Your Free Resources
@@ -57,10 +57,10 @@ const Footer = () => {
 
               <li>
                 <HoverLink
-                  href="/newsletter-archives"
+                  href="/toasty-tidbits-archives"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
-                  Newsletter Archive
+                  Toasty Tidbits Archives
                 </HoverLink>
               </li>
               <li>

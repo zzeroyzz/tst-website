@@ -1,4 +1,4 @@
-// src/app/resources/page.tsx
+// src/app/guides/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -17,7 +17,7 @@ import { Post } from "@/types";
 import { toastyTidbitsAnimation } from "@/data/animations";
 import { resourcesPageData } from "@/data/resourceData";
 
-const ResourcesPage = () => {
+const GuidesPageClient = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [supabase] = useState(() => createClientComponentClient());
@@ -198,4 +198,4 @@ const ResourcesPage = () => {
   );
 };
 
-export default ResourcesPage;
+export default GuidesPageClient;

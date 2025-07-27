@@ -31,6 +31,6 @@ export const resourcesPageData = {
   },
   routes: {
     privacyPolicy: "/policy",
-    newsletterArchives: "/newsletter-archives"
+    newsletterArchives: "/toasty-tidbits-archives"
   }
 };

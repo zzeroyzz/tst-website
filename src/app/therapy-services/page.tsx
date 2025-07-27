@@ -1,14 +1,14 @@
-// src/app/contact/page.tsx
+// src/app/therapy-services/page.tsx
 import type { Metadata } from 'next';
-import ContactPageClient from '@/components/ContactPageClient';
+import ServicesPageClient from '@/components/ServicesPageClient';
 import { faqData } from '@/data/faqData'; // Import the FAQ data
 
 export const metadata: Metadata = {
-  title: 'Contact & Book a Consultation | Toasted Sesame Therapy',
-  description: 'Ready to start? Reach out to book a free, no-pressure 15-minute consultation. Your journey toward healing is one conversation away.'
+  title: 'Therapy Services | Toasted Sesame Therapy',
+  description: 'Explore our neuro-affirming, trauma-informed, and somatic therapy services. Personalized online therapy that fits you, as you are.'
 };
 
-export default function ContactPage() {
+export default function ServicesPage() {
   // Generate the JSON for the schema
   const faqSchema = {
     "@context": "https://schema.org",
@@ -33,7 +33,7 @@ export default function ContactPage() {
       />
 
       {/* Render the client component */}
-      <ContactPageClient />
+      <ServicesPageClient />
     </>
   );
 }

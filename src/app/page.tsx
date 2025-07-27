@@ -141,7 +141,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleResourcesClick = () => {
-    router.push('/resources');
+    router.push('/guides');
   };
 
   return (
@@ -184,7 +184,7 @@ export default function HomePage() {
                 Book a call
               </Button>
               <Button onClick={handleResourcesClick} className="bg-white">
-                Download Free Therapy Guide
+                Free Guides
               </Button>
             </motion.div>
 <motion.div
@@ -335,7 +335,7 @@ export default function HomePage() {
       </div>
 
       <div>
-        <Section minHeight="400px">
+        <Section minHeight="400px" className="border-t-2 border-black">
           <motion.div
             className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400"
             variants={sectionVariants}
