@@ -1,10 +1,3 @@
-import {
-  neuroAnimation,
-  traumaAnimation,
-  somaticAnimation,
-  identityAnimation,
-} from "./animations";
-
 export const socialProofIcons = [
   {
     bgColor: "bg-tst-purple",
