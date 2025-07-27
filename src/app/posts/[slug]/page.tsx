@@ -64,7 +64,7 @@ export default async function PostPage({ params }: Props) {
         "@type": "BlogPosting",
         "headline": post.title,
         "description": post.subtext || 'A reflection from the Toasty Tidbits newsletter.',
-        "image": post.image_url || 'https://your-domain.com/default-social-card.png',
+        "image": post.image_url || 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png',
         "author": {
             "@type": "Person",
             "name": "Kay"
