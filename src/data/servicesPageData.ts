@@ -28,7 +28,7 @@ export const helpWithKeywords = [
 
 export const individualTherapyData = {
     title: "One-on-One Support",
-    description: "A supportive space to help you feel less alone in what you're holding. Together, we'll explore what’s been weighing on you, make sense of your experiences, and move at a pace that feels safe and manageable. This work is personalized and collaborative. It's guided by your needs, your voice, and your goals.",
+    description: "A supportive space to help you feel less alone in what you're holding. Our individual therapy sessions are designed for adults in Georgia struggling with anxiety, burnout, and the weight of past trauma. Together, we'll explore what’s been weighing on you, make sense of your experiences, and find a path toward regulation and self-compassion. This work is personalized, collaborative, and guided by your unique needs.",
     tags: ["50-minute sessions", "Virtual & Phone", "Personalized Approach"],
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Services%20Page%20Asset.svg",
 };

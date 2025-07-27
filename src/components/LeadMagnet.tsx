@@ -13,6 +13,7 @@ interface Guide {
   iconUrl: string;
   tags: string[];
   bgColor: string;
+  alt: string;
 }
 
 // Define the props for the GuideCard component
@@ -25,7 +26,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
       <div className="mb-3 flex justify-center flex-shrink-0">
-        <Image src={guide.iconUrl} alt={guide.title} width={70} height={70} />
+        <Image src={guide.iconUrl} alt={guide.alt} width={100} height={100} />
       </div>
       <h3 className="text-lg font-bold mb-3 text-center leading-tight flex-shrink-0">{guide.title}</h3>
       <p className="text-center text-md leading-relaxed flex-grow mb-3">{guide.description}</p>

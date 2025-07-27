@@ -5,19 +5,19 @@ export const trustIndicators = [
     id: 1,
     text: "Phone and Video",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
   {
     id: 2,
     text: "No waitlist",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
   {
     id: 3,
     text: "11 A.M. to 5 P.M.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
 ];
 
@@ -28,6 +28,7 @@ export const benefitCards = [
     description: `You don’t need perfect words or a plan. Saying “I’m struggling” or “something needs to shift” is more than enough. I’ve worked with a wide range of stories, and whatever you’re carrying is welcome here. We’ll begin with what’s real for you right now.`,
     icon: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/start-here-icon.png",
     bgColor: "bg-tst-yellow",
+    alt: "Start Where You Are Icon",
   },
   {
     id: 2,
@@ -35,6 +36,7 @@ export const benefitCards = [
     description: "This is a supportive container for your thoughts and feelings. Your privacy and trust are the foundation of the work we do together. What’s shared here stays here, with no shame and no expectations.",
     icon: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Safe-space-icon.png",
     bgColor: "bg-tst-purple",
+    alt: "A Space Free of Judgment Icon",
   },
   {
     id: 3,
@@ -42,6 +44,7 @@ export const benefitCards = [
     description: "Not sure if I'm the right fit? That’s completely okay. We can start with one conversation to get a feel for how I work and what you're looking for. There’s no pressure to commit. You get to decide what feels right for your care.",
     icon: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/one-conversation-icon.png",
     bgColor: "bg-tst-teal",
+    alt: "One Conversation, Zero Commitment Icon",
   },
 ];
 

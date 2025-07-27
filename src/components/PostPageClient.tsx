@@ -95,7 +95,36 @@ const PostPageClient = () => {
     return <Section><p className="text-center">Post not found.</p></Section>;
   }
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Resources",
+        "item": "https://toastedsesametherapy.com/guides"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Archives",
+        "item": "https://toastedsesametherapy.com/toasty-tidbits-archives"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": post.title,
+        "item": `https://toastedsesametherapy.com/posts/${post.slug}`
+      }
+    ]
+  };
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
     <main className="bg-tst-cream">
       <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
@@ -256,6 +285,7 @@ const PostPageClient = () => {
         </div>
       )}
     </main>
+    </>
   );
 };
 

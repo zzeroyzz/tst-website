@@ -1,7 +1,8 @@
 // src/app/therapy-services/page.tsx
 import type { Metadata } from 'next';
 import ServicesPageClient from '@/components/ServicesPageClient';
-import { faqData } from '@/data/faqData'; // Import the FAQ data
+import { faqData } from '@/data/faqData';
+import { ourApproachData } from '@/data/servicesPageData';
 
 export const metadata: Metadata = {
   title: 'Therapy Services | Toasted Sesame Therapy',
@@ -24,6 +25,33 @@ export default function ServicesPage() {
     }))
   };
 
+   const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Individual Therapy",
+    "provider": {
+      "@type": "MedicalBusiness",
+      "name": "Toasted Sesame Therapy"
+    },
+    "description": "One-on-one support in a supportive space to help you feel less alone.",
+    "areaServed": {
+      "@type": "State",
+      "name": "Georgia"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Therapy Approaches",
+      "itemListElement": ourApproachData.map(service => ({
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": service.title,
+          "description": service.description
+        }
+      }))
+    }
+  };
+
   return (
     <>
       {/* Add the schema script here */}
@@ -31,7 +59,10 @@ export default function ServicesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-
+<script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
       {/* Render the client component */}
       <ServicesPageClient />
     </>

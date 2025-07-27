@@ -101,6 +101,7 @@ const TiredAnimationSection = ({width, height}) => {
         loop={true}
         autoplay={true}
         speed={1}
+        alt=""
       />
     </div>
   );
@@ -184,7 +185,7 @@ export default function HomePage() {
                 Book a call
               </Button>
               <Button onClick={handleResourcesClick} className="bg-white">
-                Free Guides
+               Download Your Free Guides
               </Button>
             </motion.div>
 <motion.div
@@ -197,7 +198,6 @@ export default function HomePage() {
         size="xs"
         bgColor="bg-green-100"
         iconUrl={indicator.iconUrl}
-        altText={indicator.altText}
       />
       <span className="font-bold">{indicator.text}</span>
     </div>
@@ -256,6 +256,7 @@ export default function HomePage() {
                 quote={testimonial.quote}
                 iconUrl={testimonial.iconUrl}
                 bgColor={testimonial.bgColor}
+                altText={testimonial.altText}
               />
             </motion.div>
           ))}

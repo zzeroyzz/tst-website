@@ -8,6 +8,7 @@ export const guides = [
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-1.svg", // Replace with your icons
     tags: ["Mindfulness", "Self-Awareness"],
     bgColor: "bg-tst-yellow",
+    alt: "Icon representing self-advocacy in healthcare",
   },
   {
     title: "Communicate with Heart & Clarity",
@@ -16,6 +17,7 @@ export const guides = [
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-2.svg",
     tags: ["Relationships", "Self-Care"],
     bgColor: "bg-tst-purple",
+    alt: "Icon representing compassionate communication",
   },
   {
     title: "Reconnect with yourself for Regulation",
@@ -24,5 +26,6 @@ export const guides = [
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Resource-Icon-3.svg",
     tags: ["Somatic", "Stress Relief"],
     bgColor: "bg-tst-teal",
+    alt: "Icon representing somatic practices for self-regulation",
   },
 ];

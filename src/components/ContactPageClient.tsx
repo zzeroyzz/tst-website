@@ -73,7 +73,7 @@ const ContactPageClient = () => {
                       size="xs"
                       bgColor="bg-green-500"
                       iconUrl={indicator.iconUrl}
-                      altText={indicator.altText}
+
                     />
                     <span className="font-bold">{indicator.text}</span>
                   </div>
@@ -128,10 +128,11 @@ const ContactPageClient = () => {
                     <div className={`${card.bgColor} p-4 rounded-xl w-[100px] h-[100px] mx-auto mb-6 flex items-center justify-center border-2 border-black shadow-brutalistMd`}>
                        <Image
                         src={card.icon}
-                        alt={card.title}
+                        alt={card.alt}
                         width={64}
                         height={64}
                         className="object-contain"
+    
                       />
                     </div>
                     <h3 className="text-xl font-bold mb-4">{card.title}</h3>

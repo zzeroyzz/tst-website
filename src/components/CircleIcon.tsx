@@ -6,7 +6,6 @@ import styles from "./CircleIcon.module.css";
 interface CircleIconProps {
   bgColor: string;
   iconUrl: string;
-  altText: string;
   size?: "xs" | "sm" | "md" | "lg";
   wrapperClassName?: string;
 }
@@ -14,7 +13,6 @@ interface CircleIconProps {
 const CircleIcon: React.FC<CircleIconProps> = ({
   bgColor,
   iconUrl,
-  altText,
   size = "sm",
   wrapperClassName = "",
 }) => {
@@ -38,7 +36,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
       <div className={clsx(styles.icon, bgColor, sizeClasses[size])}>
         <Image
           src={iconUrl}
-          alt={altText}
+          alt=""
           width={imageSizes[size]}
           height={imageSizes[size]}
           style={{

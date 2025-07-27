@@ -9,12 +9,12 @@ const createArchiveItemHtml = (post: any) => `
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td width="80" valign="top" style="width:80px;" class="archive-img">
-              <img src="${post.image_url || 'https://placehold.co/80x80'}" width="80" height="80" alt="" style="">
+              <img src="${post.image_url || 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'}" width="80" height="80" alt="" style="">
             </td>
             <td valign="top" style="padding-left:20px;" class="archive-text">
               <h3 style="font-family:'Work Sans',Arial,sans-serif;font-size:18px;font-weight:bold;color:#000;margin:0 0 5px;">${post.title}</h3>
               <p style="font-family:'Work Sans',Arial,sans-serif;font-size:14px;color:#000;margin:0 0 10px;">${post.subtext || ''}</p>
-              <a href="https://yourwebsite.com/blog/${post.slug}" target="_blank" style="font-family:'Work Sans',Arial,sans-serif;font-weight:bold;color:#000;">Read more &rarr;</a>
+              <a href="https://toastedsesametherapy.com/posts/${post.slug}" target="_blank" style="font-family:'Work Sans',Arial,sans-serif;font-weight:bold;color:#000;">Read more &rarr;</a>
             </td>
           </tr>
         </table>

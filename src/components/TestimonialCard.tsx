@@ -5,12 +5,14 @@ interface TestimonialCardProps {
   quote: string;
   iconUrl: string;
   bgColor: string;
+  altText: string;
 }
 
 const TestimonialCard: React.FC<TestimonialCardProps> = ({
   quote,
   iconUrl,
   bgColor,
+  altText,
 }) => {
   return (
     <div className="flex flex-col items-center text-center gap-6">
@@ -18,7 +20,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
         size="md"
         bgColor={bgColor}
         iconUrl={iconUrl}
-        altText="Testimonial icon"
+        altText={altText}
       />
       <p className="max-w-xs">&quot;{quote}&quot;</p>
     </div>

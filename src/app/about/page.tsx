@@ -8,5 +8,29 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  return <AboutPageClient />;
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Kay",
+    "jobTitle": "Licensed Professional Counselor",
+    "image": "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v2.png",
+    "url": "https://toastedsesametherapy.com/about",
+    "sameAs": [
+      // Add links to social media profiles if available
+    ],
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Toasted Sesame Therapy"
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+      />
+      <AboutPageClient />
+    </>
+  );
 }

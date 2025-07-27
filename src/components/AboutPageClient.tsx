@@ -175,7 +175,7 @@ const AboutPageClient = () => {
 
                             {index === 5 && (
                               <div className="mb-6">
-                                <div className="w-12 h-1 bg-tst-red rounded-full mb-4"></div>
+                                <div className="w-12 h-1 bg-tst-purple rounded-full mb-4"></div>
                                 <p className="text-sm uppercase tracking-wide text-gray-500 font-bold mb-2">
                                   My Values
                                 </p>
@@ -183,7 +183,7 @@ const AboutPageClient = () => {
                             )}
                             {index === 6 && (
                               <div className="mb-6">
-                                <div className="w-12 h-1 bg-tst-red rounded-full mb-4"></div>
+                                <div className="w-12 h-1 bg-tst-teal rounded-full mb-4"></div>
                                 <p className="text-sm uppercase tracking-wide text-gray-500 font-bold mb-2">
                                   Outside of Sessions
                                 </p>
@@ -191,7 +191,7 @@ const AboutPageClient = () => {
                             )}
                             {index === 7 && (
                               <div className="mb-6">
-                                <div className="w-12 h-1 bg-tst-red rounded-full mb-4"></div>
+                                <div className="w-12 h-1 bg-tst-yellow rounded-full mb-4"></div>
                                 <p className="text-sm uppercase tracking-wide text-gray-500 font-bold mb-2">
                                   Lets connect
                                 </p>

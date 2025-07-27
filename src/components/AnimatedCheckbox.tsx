@@ -49,7 +49,7 @@ const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ label }) => {
           )}
         </div>
       </div>
-      <span className="font-medium">{label}</span>
+      <span className="font-medium text-lg">{label}</span>
     </label>
   );
 };

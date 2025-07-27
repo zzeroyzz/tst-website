@@ -90,6 +90,7 @@ const GuidesPageClient = () => {
                   file={toastyTidbitsAnimation}
                   width={400}
                   height={400}
+                  alt=""
                 />
               </div>
               <div className="w-full max-w-sm flex justify-center md:hidden lg:hidden">
@@ -97,6 +98,7 @@ const GuidesPageClient = () => {
                   file={toastyTidbitsAnimation}
                   width={200}
                   height={200}
+                  alt=""
                 />
               </div>
               <div className="w-full flex justify-center -mt-10">

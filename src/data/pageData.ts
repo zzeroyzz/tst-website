@@ -9,31 +9,31 @@ export const socialProofIcons = [
   {
     bgColor: "bg-tst-purple",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg",
-    altText: "Icon 1",
+     altText:  "Purple decorative icon for client avatar.",
     className: "",
   },
   {
     bgColor: "bg-tst-teal",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cloud-blue-icon.svg",
-    altText: "Icon 2",
+     altText:  "Teal decorative icon for client avatar.",
     className: "",
   },
   {
     bgColor: "bg-tst-red",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-8.svg",
-    altText: "Icon 3",
+     altText:  "Red decorative icon for client avatar.",
     className: "",
   },
   {
     bgColor: "bg-tst-yellow",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cloud-yellow-icon.png",
-    altText: "Icon 4",
+    altText:  "Yellow decorative icon for client avatar.",
     className: "",
   },
   {
     bgColor: "bg-tst-green",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/green-plus-icon.svg",
-    altText: "More icon",
+    altText:  "Green decorative icon for client avatar.",
     className: "",
   },
 
@@ -45,18 +45,21 @@ export const testimonials = [
       "I felt safe bringing in my real emotions. Messy, complicated, unfiltered. I didn't have to explain or justify them.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-10.svg",
     bgColor: "bg-tst-yellow",
+     altText: "Yellow decorative icon for testimonial.",
   },
   {
     quote:
       "The way things were reflected back helped me feel compassion instead of shame. I started to believe I wasn't broken. Just human.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-7.svg",
     bgColor: "bg-tst-green",
+     altText: "Green decorative icon for testimonial.",
   },
   {
     quote:
       "Therapy helped me reconnect with parts of myself I hadn't felt in years. I feel more grounded, more real, more me.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-6.svg",
     bgColor: "bg-tst-teal",
+     altText: "Teal decorative icon for testimonial.",
   },
 ];
 export const checklistItems = [
@@ -97,8 +100,8 @@ export const meetYourTherapist = {
   title: "Meet your therapist",
   paragraphs: [
     "I'm Kay (she/they), a Korean American, queer, neurodivergent therapist living with CPTSD.",
-    "I work with people who carry a lot. The ones who make space for everyone else and rarely get that same care in return.",
-    "My practice is shaped by lived experience, strong values, and the belief that healing is personal but never separate from the world we live in.",
+    "I work with people who carry a lot. As an online therapist providing services across Georgia, I make space for those who rarely get that same care in return.", // Added keywords
+    "My practice is shaped by lived experience and a commitment to trauma-informed and somatic therapy. I believe that healing is personal but never separate from the world we live in.", // Added keywords
     "Here, you don't have to explain who you are. You get to bring your full self.",
   ],
 };
@@ -144,18 +147,18 @@ export const trustIndicators = [
     id: 1,
     text: "Phone and Video",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
   {
     id: 2,
     text: "No Waitlist",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
   {
     id: 3,
     text: "11 A.M. to 5 P.M.",
     iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "Checkmark",
+    altText: "",
   },
 ];

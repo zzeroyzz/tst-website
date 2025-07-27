@@ -48,6 +48,7 @@ const TherapyCard = () => {
                   file={card.animationPath}
                   width={280}
                   height={280}
+                  alt={card.altText}
                 />
               </div>
               <div className="p-6 flex-grow flex flex-col">

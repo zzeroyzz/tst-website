@@ -9,6 +9,7 @@ interface LottieProps {
   speed?: number;
   loop?: boolean;
   autoplay?: boolean;
+  alt: string;
 }
 
 export function LottiePlayer({
@@ -18,10 +19,12 @@ export function LottiePlayer({
   speed = 1,
   loop = true,
   autoplay = true,
+  alt,
 }: LottieProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+   const isDecorative = alt === "";
 
   useEffect(() => {
     let isMounted = true;
@@ -94,6 +97,9 @@ export function LottiePlayer({
       ref={containerRef}
       style={{ width, height }}
       className="flex items-center justify-center"
+      role="img"
+      aria-label={!isDecorative ? alt : undefined}
+      aria-hidden={isDecorative ? "true" : undefined}
     >
       {!isLoaded && (
         <div
