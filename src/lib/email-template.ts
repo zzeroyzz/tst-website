@@ -128,7 +128,7 @@ export const getEmailHtml = (data: any): string => {
                           <td style="background-color:#7FBC8C; border:3px solid #000000; ">
                               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                   <tr><td style="padding:20px 30px 10px 30px;" class="mobile-padding"><img src="https://mcusercontent.com/f4b2666465f26c26e8f765b7e/images/f55df04f-ec82-a245-d156-765ea70160d7.png" width="250" alt="Toasty Tidbit Icon" style="max-width:250px; height:auto;"></td></tr>
-                                  <tr><td style="padding:0 30px 30px 30px;" class="mobile-padding"><p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000; margin:0;">"${data.toasty_take}"<br><br>&ndash; Your favorite therapist, Kay</p></td></tr>
+                                  <tr><td style="padding:0 30px 30px 30px;" class="mobile-padding"><p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000; margin:0;">${data.toasty_take}<br><br>&ndash; Your favorite therapist, Kay</p></td></tr>
                               </table>
                           </td>
                           <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;">&nbsp;</td>
