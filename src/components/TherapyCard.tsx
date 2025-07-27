@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { LottiePlayer } from "./LottiePlayer";
 import styles from "./TherapyCard.module.css";
-import { therapyCards } from "@/data/pageData";
+import { therapyCards } from "@/data/therapyCardData";
 
 // Animation variants for a staggered reveal effect
 const containerVariants = {
@@ -32,7 +32,7 @@ const itemVariants = {
 const TherapyCard = () => {
   return (
     <motion.div
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-575"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
@@ -51,11 +51,10 @@ const TherapyCard = () => {
                   alt={card.altText}
                 />
               </div>
-              <div className="p-6 flex-grow flex flex-col">
+              <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-2xl font-bold mb-2">{card.title}</h3>
-                <p>{card.description}</p>
-                <div className="flex-grow" />
-                <div className="flex justify-end mt-4">
+                <p className="flex-grow">{card.description}</p>
+                <div className="mt-4 flex justify-end">
                   <svg
                     width="32"
                     height="32"

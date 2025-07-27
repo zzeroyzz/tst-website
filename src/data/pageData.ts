@@ -1,10 +1,3 @@
-import {
-  neuroAnimation,
-  traumaAnimation,
-  somaticAnimation,
-  identityAnimation,
-} from "./animations";
-
 export const socialProofIcons = [
   {
     bgColor: "bg-tst-purple",
@@ -69,32 +62,6 @@ export const checklistItems = [
   "You're ready for change, but don't know where to start.",
 ];
 
-export const therapyCards = [
-  {
-    title: "Neuro-Affirming",
-    description: "We work with your brain, not against it...",
-    animationPath: neuroAnimation,
-    altText: "Animation of a brain with gears turning, symbolizing neuro-affirming therapy",
-  },
-  {
-    title: "Trauma-Informed",
-    description: "We move at your pace and honor your nervous system...",
-    animationPath: traumaAnimation,
-    altText: "Animation of a heart with a protective shield, symbolizing trauma-informed care",
-  },
-  {
-    title: "Somatic",
-    description: "Your body holds wisdom, not just symptoms...",
-    animationPath: somaticAnimation,
-    altText: "Animation of a person meditating with flowing energy, symbolizing somatic therapy",
-  },
-  {
-    title: "Identity Work",
-    description: "We make space for your gender, sexuality, race...",
-    animationPath: identityAnimation,
-    altText: "Animation of diverse hands coming together, symbolizing identity work and inclusivity",
-  },
-];
 
 export const meetYourTherapist = {
   title: "Meet your therapist",
