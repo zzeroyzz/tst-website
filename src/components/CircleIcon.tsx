@@ -8,6 +8,7 @@ interface CircleIconProps {
   iconUrl: string;
   size?: "xs" | "sm" | "md" | "lg";
   wrapperClassName?: string;
+  altText?: string;
 }
 
 const CircleIcon: React.FC<CircleIconProps> = ({
@@ -15,6 +16,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
   iconUrl,
   size = "sm",
   wrapperClassName = "",
+  altText,
 }) => {
   const sizeClasses = {
     xs: "w-6 h-6",
@@ -36,7 +38,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
       <div className={clsx(styles.icon, bgColor, sizeClasses[size])}>
         <Image
           src={iconUrl}
-          alt=""
+          alt={altText || ""} // Use altText here
           width={imageSizes[size]}
           height={imageSizes[size]}
           style={{

@@ -93,6 +93,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
       file={toastyTidbitsAnimation}
       width={100}
       height={100}
+      alt=""
     />
                   </div>
                   <div className="w-32 -mt-2">

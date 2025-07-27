@@ -238,6 +238,7 @@ const AboutPageClient = () => {
                                             file={toastyTidbitsAnimation}
                                             width={100}
                                             height={100}
+                                            alt=""
                                         />
                                     </div>
                                     <h1 className="text-black font-black text-4xl md:text-4xl lg:text-5xl text-center leading-none -mt-2">

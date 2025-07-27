@@ -42,7 +42,9 @@ export const ourApproachData = [
       "Sessions are flexible to accommodate your sensory needs and energy levels.",
       "Your natural ways of processing and communicating are respected and validated.",
     ],
-    animationData: neuroAnimation, // <-- FIX: Renamed from animationData
+    animationData: neuroAnimation,
+    altText: "Animation of a brain with gears turning, symbolizing neuro-affirming therapy",
+
   },
   {
     title: "Trauma-Informed",
@@ -52,7 +54,8 @@ export const ourApproachData = [
         "We focus on building trust and collaboration in our therapeutic relationship.",
         "The goal is to empower you with tools for regulation, not to force you to relive painful memories.",
     ],
-    animationData: traumaAnimation, // <-- FIX: Renamed from animationData
+    animationData: traumaAnimation,
+    altText: "Animation of a heart with a protective shield, symbolizing trauma-informed care",
   },
     {
     title: "Somatic",
@@ -62,7 +65,8 @@ export const ourApproachData = [
         "You'll learn practical techniques to release stored tension and calm your nervous system.",
         "It's about learning to listen to your body's wisdom as a path to healing and wholeness.",
     ],
-    animationData: somaticAnimation, // <-- FIX: Renamed from animationData
+    animationData: somaticAnimation,
+    altText: "Animation of a person meditating with flowing energy, symbolizing somatic therapy",
   },
   {
     title: "Identity Work",
@@ -72,6 +76,7 @@ export const ourApproachData = [
         "We help you build and reinforce boundaries that protect your energy and sense of self.",
         "Your lived experience is honored as a central and valid part of your story.",
     ],
-    animationData: identityAnimation, // <-- FIX: Renamed from animationData
+    animationData: identityAnimation,
+    altText: "Animation of diverse hands coming together, symbolizing identity work and inclusivity",
   },
 ];

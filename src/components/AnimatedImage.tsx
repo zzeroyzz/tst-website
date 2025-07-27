@@ -4,8 +4,8 @@ import { LottiePlayer } from './LottiePlayer';
 import styles from './AnimatedImage.module.css';
 
 interface AnimatedImageProps {
-  // FIXED: Changed prop name to animationPath
   animationData: any;
+  alt: string;
 }
 
 const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
@@ -20,6 +20,7 @@ const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
         loop={true}
         autoplay={true}
         speed={1}
+        alt={animationData.alt}
       />
       </div>
     </div>
