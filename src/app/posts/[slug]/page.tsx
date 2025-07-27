@@ -2,26 +2,40 @@
 import { createClient } from '@supabase/supabase-js';
 import PostPageClient from '@/components/PostPageClient';
 import type { Metadata } from 'next';
-import { Post } from '@/types'; // Import your Post type
+
+// Define the expected props shape for this page
+// Updated to match Next.js 15 App Router requirements
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+// Type for the minimal post data needed for metadata
+type PostMetadata = {
+  title: string;
+  subtext?: string;
+  image_url?: string;
+  created_at: string;
+  sent_at?: string;
+};
 
 // Helper function to fetch post data on the server
-// This prevents us from having to write the same fetch logic twice
-async function getPost(slug: string): Promise<Post | null> {
+async function getPost(slug: string): Promise<PostMetadata | null> {
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
     const { data } = await supabase
         .from('posts')
-        .select('title, subtext, image_url, created_at, sent_at') // Fetch all fields needed for metadata and schema
+        .select('title, subtext, image_url, created_at, sent_at')
         .eq('slug', slug)
         .single();
     return data;
 }
 
-// 1. Generate the dynamic page title and description
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPost(params.slug);
+// Generate the dynamic page title and description
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params; // Await the params promise
+  const post = await getPost(slug);
 
   if (!post) {
     return {
@@ -36,22 +50,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-// 2. This is the main server component for the page
-export default async function PostPage({ params }: { params: { slug: string } }) {
-    const post = await getPost(params.slug);
+// This is the main server component for the page
+export default async function PostPage({ params }: Props) {
+    const { slug } = await params; // Await the params promise
+    const post = await getPost(slug);
 
-    // If the post doesn't exist, we'll let the client component handle showing the "not found" message.
     if (!post) {
         return <PostPageClient />;
     }
 
-    // 3. Build the Article schema JSON using the fetched post data
     const articleSchema = {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
         "headline": post.title,
         "description": post.subtext || 'A reflection from the Toasty Tidbits newsletter.',
-        "image": post.image_url || 'https://your-domain.com/default-social-card.png', // A fallback image is important
+        "image": post.image_url || 'https://your-domain.com/default-social-card.png',
         "author": {
             "@type": "Person",
             "name": "Kay"
@@ -70,12 +83,10 @@ export default async function PostPage({ params }: { params: { slug: string } })
 
     return (
         <>
-            {/* 4. Inject the schema script into the page's <head> */}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
             />
-            {/* 5. Render the client component to display the page content */}
             <PostPageClient />
         </>
     );
