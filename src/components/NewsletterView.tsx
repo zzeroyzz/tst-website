@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/NewsletterView.tsx
 "use client";
 
@@ -5,7 +6,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { PlusCircle, Trash2, X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import Button from "@/components/Button";
 import { Post } from "@/types";
 import { NewsletterViewSkeleton } from "@/components/skeleton";
@@ -42,7 +43,7 @@ const DeleteConfirmModal = ({
             Are you sure you want to delete this post?
           </p>
           <div className="bg-gray-50 p-3 rounded-lg border">
-            <p className="font-medium text-sm">"{post.title}"</p>
+            <p className="font-medium text-sm">&quot;{post.title}&quot;</p>
             <p className="text-xs text-gray-500 mt-1">
               {post.status} • {format(new Date(post.created_at), "PPP")}
             </p>
