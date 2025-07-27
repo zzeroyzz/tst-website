@@ -54,7 +54,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
                   onClick={onClose}
                   className="text-white hover:text-tst-yellow transition-colors"
                 >
-                  Download Free Therapy Guides
+                  Free Guides
                 </Link>
               </li>
               <li>

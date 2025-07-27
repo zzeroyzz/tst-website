@@ -98,13 +98,13 @@ const Nav: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-8">
-          <ul className="flex items-center space-x-8 font-bold">
+          <ul className="flex items-center space-x-3 font-bold">
             {!isDashboardPage && (
-              <li>
-                <HoverLink href="/guides">
-                  Download Free Therapy Guides
-                </HoverLink>
-              </li>
+              <>
+             <li><HoverLink href="/therapy-services">Therapy Services</HoverLink></li>
+            <li><HoverLink href="/about">About</HoverLink></li>
+            <li><HoverLink href="/guides">Free Guides</HoverLink></li>
+            </>
             )}
             {user && (
               <li>

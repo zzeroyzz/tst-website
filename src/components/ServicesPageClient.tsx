@@ -2,25 +2,18 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import Section from "@/components/Section";
 import Button from "@/components/Button";
 import FAQ from "@/components/FAQ";
 import ServiceOfferingCard from "@/components/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage";
-import { usePathname, useRouter } from "next/navigation";
-import type { Metadata } from 'next';
 import {
     individualTherapyData,
     ourApproachData
 } from "@/data/servicesPageData";
 
-export const metadata: Metadata = {
-  title: 'Therapy Services | Toasted Sesame Therapy',
-  description: 'Explore our neuro-affirming, trauma-informed, and somatic therapy services. Personalized online therapy that fits you, as you are.'
-};
-
-// Animation variants for Framer Motion
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -38,7 +31,7 @@ const itemVariants = {
   },
 };
 
-const ServicesPage = () => {
+const ServicesPageClient = () => {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -55,7 +48,7 @@ const ServicesPage = () => {
 
   return (
     <main>
-      {/* 1. Hero Section */}
+      {/* Hero Section */}
       <Section>
         <motion.div
             className="flex flex-col items-center gap-8"
@@ -91,7 +84,7 @@ const ServicesPage = () => {
         </motion.div>
       </Section>
 
-      {/* 2. Individual Therapy Section */}
+      {/* Individual Therapy Section */}
       <Section>
          <div className="text-center mb-12">
           <h2 className="text-5xl font-extrabold">
@@ -105,7 +98,7 @@ const ServicesPage = () => {
         </div>
       </Section>
 
-      {/* 3. Our Approach Section - OPTIMIZED */}
+      {/* Our Approach Section */}
        <Section
          className="bg-tst-purple border-t-2 border-black"
        >
@@ -161,7 +154,7 @@ const ServicesPage = () => {
         </motion.div>
       </Section>
 
-      {/* 4. FAQ Section */}
+      {/* FAQ Section */}
       <div id="faq-section" className="border-t-2 border-black">
         <Section className="bg-tst-teal">
           <FAQ/>
@@ -171,4 +164,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage;
+export default ServicesPageClient;

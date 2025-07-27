@@ -40,7 +40,7 @@ const TherapyCard = () => {
     >
       {therapyCards.map((card) => (
         <motion.div key={card.title} variants={itemVariants}>
-          <Link href="/services" className={styles.wrapper}>
+          <Link href="/therapy-services" className={styles.wrapper}>
             <div className={styles.shadow}></div>
             <div className={styles.card}>
               <div className="w-full bg-white aspect-video min-h-340 overflow-hidden flex items-center justify-center">

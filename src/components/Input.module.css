@@ -26,6 +26,7 @@
   border-radius: 8px;
   background-color: white;
   transition: transform 150ms ease-in-out;
+  box-shadow: 4px 4px 0 0;
 }
 
 .input::placeholder {

@@ -19,6 +19,11 @@ export const helpWithKeywords = [
   "LGBTQ+ Affirming",
   "Cultural Identity",
   "BIPOC Affirming",
+  "Adoption",
+ " Attention Deficit (ADHD)",
+  "Autism Spectrum",
+  "Racial Stress & Trauma",
+  "Gender or Sexual Identity Exploration",
 ];
 
 export const individualTherapyData = {

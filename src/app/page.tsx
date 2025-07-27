@@ -184,7 +184,7 @@ export default function HomePage() {
                 Book a call
               </Button>
               <Button onClick={handleResourcesClick} className="bg-white">
-                Download Free Therapy Guide
+                Free Guides
               </Button>
             </motion.div>
 <motion.div

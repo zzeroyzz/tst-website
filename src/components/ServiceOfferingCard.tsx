@@ -36,7 +36,7 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
             </div>
           </div>
           <div className="hidden md:block">
-            <Image src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Services%20Page%20Asset.svg" alt="services" width={500} height={500} />
+            <Image src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/therapy-services%20Page%20Asset.svg" alt="services" width={500} height={500} />
           </div>
         </div>
       </div>
