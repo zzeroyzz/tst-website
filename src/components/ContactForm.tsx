@@ -69,9 +69,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
           <h2 className="text-4xl font-extrabold mb-6">Thank You!</h2>
           <h3 className="text-3xl font-bold mb-4">Here&apos;s what to expect next:</h3>
           <ul className="list-disc list-inside space-y-3 text-lg text-left">
-            <li>You'll receive a personal email from me within 1-2 business days.</li>
-            <li>In the email, I'll provide a link to schedule your free 15-minute video consultation.</li>
-            <li>We'll use that time to chat, see if it's a good fit, and answer any questions you have.</li>
+            <li>You&apos;ll receive a personal email from me within 1-2 business days.</li>
+            <li>In the email, I&apos;ll provide a link to schedule your free 15-minute video consultation.</li>
+            <li>We&apos;ll use that time to chat, see if it&apos;s a good fit, and answer any questions you have.</li>
           </ul>
         </div>
 
