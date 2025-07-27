@@ -7,8 +7,9 @@ interface ServiceOfferingCardProps {
     title: string;
     description: string;
     tags: string[];
+    imageUrl: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    animationData: any;
+    animationData?: any; // Made optional with ?
   };
 }
 
