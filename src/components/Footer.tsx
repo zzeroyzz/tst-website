@@ -107,16 +107,25 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-white/20 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-white/20 pt-8 mt-8 space-y-6">
+          {/* Business Info */}
+           <div className="flex flex-col md:flex-row justify-between items-start gap-8 text-white/80 text-sm">
+            {/* Business Info - Left Side */}
+            <div className="text-left">
+              <p className="font-bold">Toasted Sesame Therapy, LLC, Atlanta, GA</p>
+              <p>A Telehealth-Only Practice <br/>Serving Clients Across Georgia</p>
+            </div>
 
-            {/* Copyright */}
-            <p className="text-white/80 text-sm text-center md:text-left font-bold">
-              &copy; {new Date().getFullYear()} Toasted Sesame Therapy. All rights reserved.
-            </p>
-            <p className="text-white/80 text-sm text-center md:text-right">
-               This site is not for crisis support. <br/>Crisis resources are available on the <Link href="/policy" className=" underline font-bold">Policy Page</Link>
-            </p>
+            {/* Crisis Info and Copyright - Right Side */}
+            <div className="text-center md:text-right">
+              <p className="mb-2">
+                This site is not for crisis support.<br className="hidden md:inline" />
+                <span className="md:ml-1">Crisis resources are available on the <Link href="/policy" className="underline font-bold">Policy Page</Link></span>
+              </p>
+              <p className="font-bold">
+                &copy; {new Date().getFullYear()} Toasted Sesame Therapy. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </div>
