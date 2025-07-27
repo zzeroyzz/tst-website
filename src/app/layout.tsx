@@ -4,6 +4,7 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/next"
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -62,7 +63,9 @@ export default function RootLayout({
       >
         <Toaster position="top-center" reverseOrder={false} />
         <Nav />
-        <main>{children}</main>
+        <main>{children}
+           <Analytics />
+        </main>
         <Footer />
       </body>
     </html>

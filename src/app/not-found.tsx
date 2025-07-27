@@ -1,5 +1,7 @@
 // app/not-found.tsx
 import Image from 'next/image';
+import Link from 'next/link'; // Import Link
+import Button from '@/components/Button'; // Import Button
 
 export default function NotFound() {
   return (
@@ -10,7 +12,7 @@ export default function NotFound() {
           <Image
             src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/404%20Page%2001%20Artboard%201.svg"
             alt="404 - Page not found illustration"
-            width={600}
+            width={400}
             height={400}
             className="mx-auto"
             priority
@@ -27,6 +29,14 @@ export default function NotFound() {
             Don&apos;t worry—even the most organized among us lose track of things sometimes.
             Let&apos;s get you back to somewhere more familiar and supportive.
           </p>
+        </div>
+         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Link href="/">
+            <Button className="bg-tst-purple">Go to Homepage</Button>
+          </Link>
+          <Link href="/toasty-tidbits-archives">
+            <Button className="bg-white">Browse the Archives</Button>
+          </Link>
         </div>
       </div>
     </div>
