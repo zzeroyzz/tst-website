@@ -22,6 +22,9 @@ module.exports = {
         brutalist: "4px 4px 0 #000",
         brutalistLg: "6px 6px 0 #000",
       },
+      height:{
+        "96": "24rem",
+      },
       minHeight: {
        '0': '0',
        '110': '110px',

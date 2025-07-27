@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       main_image_url: savedPost.image_url || 'https://placehold.co/640x360/F9F5F2/000000?text=Main+Article+Image',
       main_title: savedPost.title,
       main_body: marked.parse(savedPost.body || ''),
-      toasty_take: savedPost.toasty_take,
+      toasty_take: marked.parse(savedPost.toasty_take || ''),
       archive_posts: archivePosts || [],
     };
 

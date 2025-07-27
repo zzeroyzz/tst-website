@@ -3,7 +3,7 @@
 // src/components/NewsletterEditor.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import Button from './Button';
@@ -11,7 +11,9 @@ import Input from './Input';
 import { Post } from '@/types';
 import toast from 'react-hot-toast';
 import NewsletterPreviewModal from './NewsletterPreviewModal';
-import { coreTags } from '@/data/tagData'; // Import core tags
+import { coreTags } from '@/data/tagData';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface NewsletterEditorProps {
     post: Post | null;
@@ -27,12 +29,15 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     const [imageUrl, setImageUrl] = useState(initialPost?.image_url || '');
     const [toastyTake, setToastyTake] = useState(initialPost?.toasty_take || '');
     const [archivePosts, setArchivePosts] = useState<string[]>(initialPost?.archive_posts || []);
-    const [tags, setTags] = useState<string[]>(initialPost?.tags || []); // State for tags
+    const [tags, setTags] = useState<string[]>(initialPost?.tags || []);
 
     const [allPosts, setAllPosts] = useState<ArchivePost[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPreviewing, setIsPreviewing] = useState(false);
     const [previewHtml, setPreviewHtml] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
     const supabase = createClientComponentClient();
 
@@ -66,27 +71,69 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     };
 
     const handleTagSelection = (tag: string) => {
-        console.log(`Tag clicked: ${tag}`);
-        console.log('Tags before update:', tags);
         setTags(prev => {
             const newTags = prev.includes(tag)
                 ? prev.filter(t => t !== tag)
                 : [...prev, tag];
-            console.log('Tags after update:', newTags);
             return newTags;
         });
+    };
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const uploadToast = toast.loading('Uploading image...');
+
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch('/api/upload/image', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to upload image');
+            }
+
+            setImageUrl(result.url);
+            toast.dismiss(uploadToast);
+            toast.success('Image uploaded successfully!');
+
+        } catch (error: any) {
+            toast.dismiss(uploadToast);
+            toast.error(`Upload failed: ${error.message}`);
+        } finally {
+            setIsUploading(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    const removeImage = () => {
+        setImageUrl('');
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const slugify = (text: string) => {
         return text
             .toString()
             .toLowerCase()
-            .replace(/\s+/g, '-')           // Replace spaces with -
-            .replace(/[^\w-]+/g, '')       // Remove all non-word chars
-            .replace(/--+/g, '-')         // Replace multiple - with single -
-            .replace(/^-+/, '')             // Trim - from start of text
-            .replace(/-+$/, '');            // Trim - from end of text
-    }
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    };
 
     const handleSaveForLater = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -204,10 +251,98 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Main Content</h2>
                     <div className="space-y-4">
-                        <Input type="text" placeholder="Article Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-                        <Input type="text" placeholder="Email Subject Line" value={subject} onChange={(e) => setSubject(e.target.value)} required />
-                        <textarea placeholder="Main body content... (supports Markdown)" value={body} onChange={(e) => setBody(e.target.value)} required className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple" rows={15} />
-                        <Input type="url" placeholder="Main Article Image URL (e.g., https://...)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                        <Input
+                            type="text"
+                            placeholder="Article Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                        />
+                        <Input
+                            type="text"
+                            placeholder="Email Subject Line"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            required
+                        />
+                        <textarea
+                            placeholder="Main body content..."
+                            value={body}
+                            onChange={(e) => setBody(e.target.value)}
+                            required
+                            className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple"
+                            rows={15}
+                        />
+
+                        {/* Image Upload Section */}
+                        <div className="space-y-4">
+                            <label className="block font-bold text-gray-700">Main Article Image</label>
+
+                            {/* Current Image Display */}
+                            {imageUrl && (
+                                <div className="relative inline-block">
+                                    <Image
+                                        src={imageUrl}
+                                        alt="Article preview"
+                                        width={192}
+                                        height={128}
+                                        className="w-48 h-32 object-cover rounded-lg border-2 border-gray-300"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={removeImage}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                        wrapperClassName="absolute -top-2 -right-2"
+                                    >
+                                        <X size={16} />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Upload Controls */}
+                            <div className="flex gap-4 items-center">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                />
+
+                                <Button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={isUploading}
+                                    className="flex items-center gap-2 bg-tst-yellow"
+                                >
+                                    {isUploading ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                            Uploading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Upload size={16} />
+                                            Upload Image
+                                        </>
+                                    )}
+                                </Button>
+
+                                {!imageUrl && (
+                                    <span className="text-sm text-gray-500">
+                                        Or paste an image URL below
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Manual URL Input */}
+                            <Input
+                                type="url"
+                                placeholder="Or paste image URL here (e.g., https://...)"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -238,7 +373,13 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 {/* Toasty Take Section */}
                 <div className="p-6 bg-tst-green border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Toasty Take</h2>
-                    <textarea placeholder="Your weekly tip or reflection..." value={toastyTake} onChange={(e) => setToastyTake(e.target.value)} className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple" rows={5} />
+                    <textarea
+                        placeholder="Your weekly tip or reflection..."
+                        value={toastyTake}
+                        onChange={(e) => setToastyTake(e.target.value)}
+                        className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple"
+                        rows={5}
+                    />
                 </div>
 
                 {/* Archive Selection Section */}
@@ -248,7 +389,13 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     <div className="space-y-2 max-h-60 overflow-y-auto border-2 border-gray-200 rounded-lg p-2">
                         {allPosts.length > 0 ? allPosts.map(p => (
                             <label key={p.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                                <input type="checkbox" checked={archivePosts.includes(p.id)} onChange={() => handleArchiveSelection(p.id)} disabled={archivePosts.length >= 3 && !archivePosts.includes(p.id)} className="h-5 w-5 rounded border-gray-300 text-tst-purple focus:ring-tst-purple" />
+                                <input
+                                    type="checkbox"
+                                    checked={archivePosts.includes(p.id)}
+                                    onChange={() => handleArchiveSelection(p.id)}
+                                    disabled={archivePosts.length >= 3 && !archivePosts.includes(p.id)}
+                                    className="h-5 w-5 rounded border-gray-300 text-tst-purple focus:ring-tst-purple"
+                                />
                                 <span>{p.title}</span>
                             </label>
                         )) : <p className="text-gray-500">No published posts available to select.</p>}
@@ -257,10 +404,10 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
                 {/* Buttons */}
                 <div className="flex justify-end items-center gap-4">
-                    <Button type="submit" className="bg-tst-purple" disabled={isSubmitting}>
+                    <Button type="submit" className="bg-tst-purple" disabled={isSubmitting || isUploading}>
                         {isSubmitting ? 'Saving...' : 'Save for Later'}
                     </Button>
-                    <Button type="button" onClick={handlePreview} className="bg-tst-yellow" disabled={isSubmitting}>
+                    <Button type="button" onClick={handlePreview} className="bg-tst-yellow" disabled={isSubmitting || isUploading}>
                         {isSubmitting ? 'Generating...' : 'Preview'}
                     </Button>
                 </div>
