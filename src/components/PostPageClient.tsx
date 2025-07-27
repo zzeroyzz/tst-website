@@ -17,6 +17,7 @@ marked.setOptions({
   headerIds: false,
   mangle: false,
 });
+
 import Section from '@/components/Section';
 import ResourceCard from '@/components/ResourceCard';
 import Link from 'next/link';
@@ -26,7 +27,7 @@ import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import Button from "@/components/Button";
 import { SinglePostSkeleton } from '@/components/skeleton';
 
-const PostPageClient = () => {
+const PostPageClient: React.FC = () => {
   const { slug } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [parsedBody, setParsedBody] = useState<string>('');
@@ -55,31 +56,16 @@ const PostPageClient = () => {
         console.error('Error fetching post:', postError);
         setPost(null);
       } else {
-        console.log('=== POST DATA DEBUG ===');
-        console.log('Full post data:', postData);
-        console.log('Post body type:', typeof postData.body);
-        console.log('Post body length:', postData.body?.length);
-        console.log('Post body (first 200 chars):', postData.body?.substring(0, 200));
-        console.log('Post body (raw):', JSON.stringify(postData.body));
-        console.log('========================');
-
         setPost(postData);
 
         // Parse the markdown body
         if (postData.body && typeof postData.body === 'string') {
           try {
             let bodyToProcess = postData.body.trim();
-
-            // Split content into paragraphs and add double newlines between them
-            // This handles the case where content has single newlines but needs double for markdown
             const paragraphs = bodyToProcess.split('\n').filter(line => line.trim() !== '');
             bodyToProcess = paragraphs.join('\n\n');
 
-            console.log('Processed body for markdown:', bodyToProcess);
-
             const parsed = await marked.parse(bodyToProcess);
-            console.log('Final parsed HTML:', parsed);
-
             setParsedBody(parsed);
           } catch (error) {
             console.error('Error parsing markdown:', error);
@@ -112,39 +98,28 @@ const PostPageClient = () => {
   if (loading) {
     return (
       <SinglePostSkeleton
-        showSuggestedPosts={true}
-        showImage={true}
+        showSuggestedPosts
+        showImage
         contentParagraphs={6}
       />
     );
   }
 
   if (!post) {
-    return <Section><p className="text-center">Post not found.</p></Section>;
+    return (
+      <Section>
+        <p className="text-center">Post not found.</p>
+      </Section>
+    );
   }
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Resources",
-        "item": "https://toastedsesametherapy.com/guides"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Archives",
-        "item": "https://toastedsesametherapy.com/toasty-tidbits-archives"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": post.title,
-        "item": `https://toastedsesametherapy.com/posts/${post.slug}`
-      }
+      {"@type": "ListItem", "position": 1, "name": "Resources", "item": "https://toastedsesametherapy.com/guides"},
+      {"@type": "ListItem", "position": 2, "name": "Archives", "item": "https://toastedsesametherapy.com/toasty-tidbits-archives"},
+      {"@type": "ListItem", "position": 3, "name": post.title, "item": `https://toastedsesametherapy.com/posts/${post.slug}`}
     ]
   };
 
@@ -154,6 +129,7 @@ const PostPageClient = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+
       <main className="bg-tst-cream min-h-screen">
         <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
@@ -175,7 +151,6 @@ const PostPageClient = () => {
 
             {/* Post Header */}
             <header className="mb-16">
-              {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="mb-8 flex flex-wrap gap-3">
                   {post.tags.map(tag => (
@@ -189,26 +164,22 @@ const PostPageClient = () => {
                 </div>
               )}
 
-              {/* Title */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight text-gray-900">
                 {post.title}
               </h1>
 
-              {/* Author and Date Info */}
               <div className="flex items-center gap-4 py-6">
-                <div className="flex items-center gap-4">
-                  <CircleIcon
-                    size="md"
-                    bgColor="bg-tst-purple"
-                    iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
-                    altText="Author Icon"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900 text-base">Kay</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
-                    </p>
-                  </div>
+                <CircleIcon
+                  size="md"
+                  bgColor="bg-tst-purple"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
+                  altText="Author Icon"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900 text-base">Kay</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
+                  </p>
                 </div>
               </div>
             </header>
@@ -216,8 +187,7 @@ const PostPageClient = () => {
             {/* Featured Image */}
             {post.image_url && (
               <div className="mb-16">
-                <div className="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-brutalist border-2 border-black">
-                  <Image
+                  <div className="relative w-full h-96 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-brutalist border-2 border-black">                  <Image
                     src={post.image_url}
                     alt={post.title}
                     fill
@@ -229,16 +199,16 @@ const PostPageClient = () => {
               </div>
             )}
 
-            {/* Post Content - Using Raw Body */}
+            {/* Content */}
             <article className="mb-20">
-              <div className="text-lg leading-relaxed space-y-6">
+               <div className="text-lg leading-relaxed space-y-6">
                 {post.body.split('\n').filter(line => line.trim() !== '').map((paragraph, index) => (
                   <p key={index} className="mb-6">
                     {paragraph.trim()}
                   </p>
                 ))}
               </div>
-             {post.toasty_take && (
+              {post.toasty_take && (
                 <div className="mt-12 p-6 bg-tst-yellow rounded-lg shadow-brutalist border-2 border-black">
                   <h2 className="text-xl font-bold mb-4">Toasty Take</h2>
                   <blockquote className="text-lg leading-relaxed italic">
@@ -249,37 +219,34 @@ const PostPageClient = () => {
             </article>
 
             {/* Article Footer */}
-            <div className="border-t-2 border-gray-300 pt-12 mb-8">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <CircleIcon
-                    size="md"
-                    bgColor="bg-tst-purple"
-                    iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
-                    altText="Author Icon"
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900 text-base">Kay</p>
-                    <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
-                  </div>
+            <div className="border-t-2 border-gray-300 pt-12 mb-8 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <CircleIcon
+                  size="md"
+                  bgColor="bg-tst-purple"
+                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
+                  altText="Author Icon"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900 text-base">Kay</p>
+                  <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
                 </div>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer px-4 py-2 rounded-lg hover:bg-blue-50"
-                >
-                  Follow
-                </button>
               </div>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer px-4 py-2 rounded-lg hover:bg-blue-50"
+              >
+                Follow
+              </button>
             </div>
           </div>
         </Section>
 
-        {/* Suggested Posts Section */}
+        {/* Suggested Posts */}
         {suggestedPosts.length > 0 && (
           <div className="bg-gray-50 border-t-2 border-gray-300">
             <Section className="py-24">
               <div className="max-w-6xl mx-auto px-6 lg:px-8">
-                {/* Section Header */}
                 <div className="text-center mb-20">
                   <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
                     More stories you might enjoy
@@ -288,8 +255,6 @@ const PostPageClient = () => {
                     Continue your journey with these thoughtful reflections and insights.
                   </p>
                 </div>
-
-                {/* Posts Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
                   {suggestedPosts.map((suggestion) => (
                     <div key={suggestion.id} className="group">
@@ -299,15 +264,14 @@ const PostPageClient = () => {
                           date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
                           author: "Kay",
                           authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
-                          imageUrl: suggestion.image_url || "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
+                          imageUrl: suggestion.image_url || "",
                           tags: suggestion.tags,
-                          href: `/posts/${suggestion.slug}`,
+                          href: `/posts/${suggestion.slug}`
                         }}
                       />
                     </div>
                   ))}
                 </div>
-
                 <div className="mt-16 text-center">
                   <Link href="/toasty-tidbits-archives">
                     <Button className="bg-tst-yellow">View all stories</Button>
