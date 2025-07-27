@@ -3,7 +3,7 @@
 export const resourcesPageData = {
   hero: {
     title: "toasty\ntidbits",
-    headline: "3 Free Tools to Lighten the Load",
+    headline: "3 Free Guides to Lighten the Load",
     description: {
       main: "Get instant access to our weekly(ish) newsletter plus 3 powerful tools to help you feel more clear, grounded, and supported right when you need it most.",
       tools: [

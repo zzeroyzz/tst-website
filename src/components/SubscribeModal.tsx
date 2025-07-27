@@ -104,7 +104,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <h2 className="text-3xl font-extrabold mb-4">Wait, did you get your free tools?</h2>
                 <p className="text-lg mb-6">
-                  Grab our 3 free tools for instant support. You&apos;ll also be subscribed to our weekly newsletter and receive a new, bonus therapy resource in your inbox each month.
+                  Grab our 3 free guides for instant support. You&apos;ll also be subscribed to our weekly newsletter and receive a new, bonus therapy resource in your inbox each month.
                 </p>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <Input
