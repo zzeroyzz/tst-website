@@ -233,11 +233,11 @@ export default function HomePage() {
             variants={heroItemVariants}
           >
             <Image
-              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png"
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/Hero%20Bean%20Bun.png"
               alt="Therapy illustration"
-              width={500}
-              height={500}
-              className="w-full h-auto max-w-md mx-auto"
+              width={600}
+              height={600}
+              className="w-full h-auto max-w-xl mx-auto"
               priority
             />
           </motion.div>

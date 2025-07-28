@@ -135,51 +135,94 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             .replace(/-+$/, '');
     };
 
+    // Enhanced slug generation to ensure uniqueness
+    const generateUniqueSlug = async (title: string, existingPostId?: string) => {
+        const baseSlug = slugify(title);
+
+        // Check if this slug already exists (excluding the current post if editing)
+        let query = supabase
+            .from('posts')
+            .select('slug')
+            .eq('slug', baseSlug);
+
+        if (existingPostId) {
+            query = query.neq('id', existingPostId);
+        }
+
+        const { data: existingSlugs, error } = await query;
+
+        if (error) {
+            console.error('Error checking slug uniqueness:', error);
+            // Fallback to timestamp-based slug
+            return `${baseSlug}-${Date.now()}`;
+        }
+
+        // If no conflicts, use the base slug
+        if (!existingSlugs || existingSlugs.length === 0) {
+            return baseSlug;
+        }
+
+        // If conflicts exist, append timestamp
+        return `${baseSlug}-${Date.now()}`;
+    };
+
     const handleSaveForLater = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const postData = {
-            title,
-            subject,
-            body,
-            image_url: imageUrl,
-            toasty_take: toastyTake,
-            archive_posts: archivePosts,
-            tags: tags,
-            status: 'draft',
-            slug: slugify(title),
-            ...(post?.id && { id: post.id }),
-        };
+        try {
+            // Generate unique slug
+            const uniqueSlug = await generateUniqueSlug(title, post?.id);
 
-        const { error } = await supabase.from('posts').upsert(postData);
+            const postData = {
+                title,
+                subject,
+                body,
+                image_url: imageUrl,
+                toasty_take: toastyTake,
+                archive_posts: archivePosts,
+                tags: tags,
+                status: 'draft',
+                slug: uniqueSlug,
+                ...(post?.id && { id: post.id }),
+            };
 
-        if (error) {
+            const { data: savedPost, error } = await supabase.from('posts').upsert(postData).select().single();
+
+            if (error) {
+                toast.error(`Error saving draft: ${error.message}`);
+            } else {
+                toast.success('Draft saved successfully!');
+                // Redirect to the specific newsletter page that was just created/updated
+                router.push(`/dashboard/newsletter/${savedPost.id}`);
+                router.refresh();
+            }
+        } catch (error: any) {
             toast.error(`Error saving draft: ${error.message}`);
-        } else {
-            toast.success('Draft saved successfully!');
-            router.push('/dashboard?view=Newsletter');
-            router.refresh();
+        } finally {
+            setIsSubmitting(false);
         }
-        setIsSubmitting(false);
     };
 
     const handlePreview = async () => {
         setIsSubmitting(true);
         const loadingToast = toast.loading('Generating preview...');
 
-        const currentPostData = {
-            title,
-            subject,
-            body,
-            image_url: imageUrl,
-            toasty_take: toastyTake,
-            archive_posts: archivePosts,
-            tags: tags,
-            slug: slugify(title),
-        };
-
         try {
+            // Generate unique slug for preview
+            const uniqueSlug = await generateUniqueSlug(title, post?.id);
+
+            const currentPostData = {
+                title,
+                subject,
+                body,
+                image_url: imageUrl,
+                toasty_take: toastyTake,
+                archive_posts: archivePosts,
+                tags: tags,
+                slug: uniqueSlug,
+            };
+
             const response = await fetch('/api/newsletter/preview', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -205,20 +248,23 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
         setIsSubmitting(true);
         const loadingToast = toast.loading('Sending newsletter...');
 
-        const postData = {
-            title,
-            subject,
-            body,
-            image_url: imageUrl,
-            toasty_take: toastyTake,
-            archive_posts: archivePosts,
-            tags: tags,
-            slug: slugify(title),
-            ...(post?.id && { id: post.id }),
-            ...(post?.created_at && { created_at: post.created_at }),
-        };
-
         try {
+            // Generate unique slug
+            const uniqueSlug = await generateUniqueSlug(title, post?.id);
+
+            const postData = {
+                title,
+                subject,
+                body,
+                image_url: imageUrl,
+                toasty_take: toastyTake,
+                archive_posts: archivePosts,
+                tags: tags,
+                slug: uniqueSlug,
+                ...(post?.id && { id: post.id }),
+                ...(post?.created_at && { created_at: post.created_at }),
+            };
+
             const response = await fetch('/api/newsletter/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -231,7 +277,14 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             toast.dismiss(loadingToast);
             toast.success('Newsletter sent successfully!');
             setIsPreviewing(false);
-            router.push('/dashboard?view=Newsletter');
+
+            // Redirect to the public post page that was just published
+            if (result.slug) {
+                router.push(`/posts/${result.slug}`);
+            } else {
+                // Fallback to newsletter list if no slug returned
+                router.push('/dashboard?view=Newsletter');
+            }
             router.refresh();
 
         } catch (err: any) {

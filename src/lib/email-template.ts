@@ -106,8 +106,8 @@ export const getEmailHtml = (data: any): string => {
                 <tr>
                   <td style="background-color:#ffffff; border:3px solid #000000; ">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td><img src="${data.main_image_url}" width="640" alt="Main Article" style="width:100%; max-width:100%; height:auto; border-radius:9px 9px 0 0;"></td></tr>
-                      <tr><td style="padding:20px 30px 0 30px;" class="mobile-padding"><h2 class="h2" style="font-family:'Work Sans',Arial,sans-serif; font-size:28px; font-weight:bold; color:#000000; margin:0;">${data.main_title}</h2></td></tr>
+                      <tr><td><img src="${data.main_image_url}" width="640" alt="Main Article" style="width:100%; max-width:100%; height:auto;"></td></tr>
+                      <tr><td style="padding:20px 30px 0 30px;" class="mobile-padding"><h2 class="h2" style="font-family:'Work Sans',Arial,sans-serif; font-size:30px; font-weight:bold; color:#000000; margin:0;">${data.main_title}</h2></td></tr>
                       <tr><td style="padding:15px 30px 30px 30px;" class="mobile-padding">${data.main_body}</td></tr>
                     </table>
                   </td>
