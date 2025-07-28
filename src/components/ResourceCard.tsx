@@ -23,17 +23,21 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
     <Link href={card.href} className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
-        <div className="relative w-full h-40">
-          <Image
-            src={card.imageUrl}
-            alt={card.title}
-            fill
-            className="object-cover"
-          />
+        {/* Fixed image container with 3:2 aspect ratio for 600x400 images - much smaller size with border */}
+        <div className="p-3">
+          <div className="relative w-full max-w-[200px] mx-auto border-2 border-black rounded-lg overflow-hidden" style={{ aspectRatio: '3/2' }}>
+            <Image
+              src={card.imageUrl}
+              alt={card.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 200px"
+            />
+          </div>
         </div>
         <div className="p-4 flex flex-col flex-grow">
-          <h3 className="text-xl font-bold mb-2">{card.title}</h3>
-          <p className="text-sm text-gray-600 mb-4">{card.date}</p>
+          <h3 className="text-base font-bold mb-2">{card.title}</h3>
+          <p className="text-xs text-gray-600 mb-4">{card.date}</p>
           <div className="flex-grow" />
           {card.tags && card.tags.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
