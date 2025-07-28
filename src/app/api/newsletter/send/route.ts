@@ -82,7 +82,13 @@ export async function POST(request: Request) {
     await mailchimp.campaigns.setContent(campaign.id, { html: finalHtml });
     await mailchimp.campaigns.send(campaign.id);
 
-    return NextResponse.json({ message: 'Campaign sent successfully!', campaignId: campaign.id });
+    // Return campaign ID, post ID, and slug for proper redirection
+    return NextResponse.json({
+      message: 'Campaign sent successfully!',
+      campaignId: campaign.id,
+      postId: savedPost.id,
+      slug: savedPost.slug // Include the slug for redirection to public post page
+    });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
