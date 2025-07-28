@@ -182,16 +182,18 @@ const PostPageClient: React.FC = () => {
               </div>
             </header>
 
-            {/* Featured Image */}
+            {/* Featured Image - Fixed for 600x400 aspect ratio with smaller desktop size */}
             {post.image_url && (
               <div className="mb-16">
-                  <div className="relative w-full h-96 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-brutalist border-2 border-black">                  <Image
+                <div className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-brutalist border-2 border-black"
+                     style={{ aspectRatio: '3/2' }}>
+                  <Image
                     src={post.image_url}
                     alt={post.title}
                     fill
                     className="object-cover"
                     priority
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 768px"
+                    sizes="(max-width: 768px) 100vw, 672px"
                   />
                 </div>
               </div>
@@ -199,7 +201,7 @@ const PostPageClient: React.FC = () => {
 
             {/* Content */}
             <article className="mb-20">
-               <div className="text-lg leading-relaxed space-y-6">
+               <div className="text-lg leading-relaxed space-y-6 max-w-2xl mx-auto mt-12">
                 {post.body.split('\n').filter(line => line.trim() !== '').map((paragraph, index) => (
                   <p key={index} className="mb-6">
                     {paragraph.trim()}
@@ -207,7 +209,7 @@ const PostPageClient: React.FC = () => {
                 ))}
               </div>
               {post.toasty_take && (
-                <div className="mt-12 p-6 bg-tst-yellow rounded-lg shadow-brutalist border-2 border-black">
+                <div className="mt-16 p-6 bg-tst-yellow rounded-lg shadow-brutalist border-2 border-black max-w-2xl mx-auto">
                   <h2 className="text-xl font-bold mb-4">Toasty Take</h2>
                   <blockquote className="text-lg leading-relaxed italic">
                     &quot;{post.toasty_take}&quot;

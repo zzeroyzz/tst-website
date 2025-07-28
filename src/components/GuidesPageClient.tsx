@@ -1,4 +1,4 @@
-// src/app/guides/page.tsx
+// src/components/GuidesPageClient.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -16,6 +16,7 @@ import { LottiePlayer } from '@/components/LottiePlayer';
 import { Post } from "@/types";
 import { toastyTidbitsAnimation } from "@/data/animations";
 import { resourcesPageData } from "@/data/resourceData";
+import { SkeletonCard } from "@/components/skeleton";
 
 const GuidesPageClient = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -171,7 +172,18 @@ const GuidesPageClient = () => {
           </p>
         </div>
         {loading ? (
-          <p className="text-center">{resourcesPageData.postsSection.loadingText}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div key={index} className="w-full max-w-xs mx-auto">
+                <SkeletonCard
+                  hasImage={true}
+                  hasTags={true}
+                  hasAuthor={true}
+                  className="h-full"
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
