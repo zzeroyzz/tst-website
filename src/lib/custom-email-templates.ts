@@ -9,6 +9,9 @@ interface ContactConfirmationData {
   name: string;
 }
 
+interface ContactWarmupData {
+  name: string;
+}
 // Base template with dark mode bypass
 const getBaseEmailTemplate = (content: string, img: string) => `
 <!DOCTYPE html>
@@ -329,6 +332,75 @@ export const getContactConfirmationTemplate = (data: ContactConfirmationData): s
                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
                       I'm so glad you took this step. The next part is easy: just click the button below to schedule your free, no-pressure 15-minute consultation.
                     </p>
+
+                    <!-- CTA Button with table-based shadow -->
+                    <div style="text-align:center; margin:50px 0;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                        <tr>
+                          <td style="background-color:#F7BD01 !important; border:3px solid #000000;" class="force-yellow">
+                            <a href="https://toastedsesametherapyllc.clientsecure.me/request/service" target="_blank"
+                               style="display:inline-block; padding:20px 40px; font-family:'Work Sans',Arial,sans-serif; font-size:18px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
+                              Schedule Your Free Consultation
+                            </a>
+                          </td>
+                          <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                        </tr>
+                        <tr>
+                          <td height="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                          <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:30px 0 0;" class="mobile-text force-black-text">
+                      We'll use that time to chat, see if it's a good fit, and answer any questions you have. I'm looking forward to connecting with you.
+                    </p>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:40px 0 0;" class="mobile-text force-black-text">
+                      Warmly,<br>
+                      Kay
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+          </tr>
+          <tr>
+            <td height="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+            <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+
+  return getBaseEmailTemplate(content, img);
+};
+
+export const getContactWarmupTemplate = (data: ContactWarmupData): string => {
+  const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
+  const content = `
+    <!-- Main Card with Table-Based Shadow -->
+    <tr>
+      <td style="padding:0 20px 20px 20px; background-color: #F9F5F2 !important;" class="card-wrapper force-light">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background-color:#ffffff !important; border:3px solid #000000;" class="force-white">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:60px 40px; background-color:#ffffff !important;" class="mobile-padding force-white">
+                    <h1 style="font-family:'Work Sans',Arial,sans-serif; font-size:48px; font-weight:900; color:#000000 !important; margin:0 0 40px; line-height:1.2;" class="h1 force-black-text">
+                     Hi, ${data.name}!
+                    </h1>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
+                      Checking in to see if you're still interested in scheduling your free 15-minute consultation. It's a great opportunity for us to connect, see if we're a good fit, and answer any questions you might have about therapy.
+                    </p>
+
+                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
+                        You can book a time that works for you by clicking the button below.
+                        </p>
 
                     <!-- CTA Button with table-based shadow -->
                     <div style="text-align:center; margin:50px 0;">

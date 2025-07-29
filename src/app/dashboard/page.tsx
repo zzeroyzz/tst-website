@@ -70,8 +70,8 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-64 flex-shrink-0 bg-white border-r p-4 flex flex-col">
+    <div className="flex h-screen bg-gray-50 border-2 border-black">
+      <aside className="w-64 flex-shrink-0 bg-white border-r p-4 flex flex-col ">
         <div className="font-bold text-2xl mb-10">Admin Panel</div>
         <nav className="flex-grow">
           <ul>

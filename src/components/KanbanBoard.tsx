@@ -146,32 +146,36 @@ const KanbanBoard = () => {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.from("tasks").select("*");
-      if (error) {
-        console.error("Error fetching tasks:", error);
-        setLoading(false);
-      } else {
-        processTasks(data);
+ useEffect(() => {
+  const fetchTasks = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("tasks").select("*");
+
+    if (error) {
+      console.error("Error fetching tasks:", error);
+      setLoading(false);
+    } else {
+      console.log('Processing tasks...');
+      processTasks(data);
+    }
+  };
+
+  fetchTasks();
+
+  const channel = supabase
+    .channel('realtime-tasks')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' },
+      (payload) => {
+        console.log('Realtime update received:', payload);
+        fetchTasks();
       }
-    };
-    fetchTasks();
+    )
+    .subscribe();
 
-    const channel = supabase
-      .channel('realtime-tasks')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' },
-        () => {
-            fetchTasks();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, processTasks]);
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [supabase, processTasks]);
 
   const handleAddTask = async (columnId, title, description) => {
     setAddingToColumn(null);
