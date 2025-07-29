@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { getContactConfirmationTemplate } from '@/lib/custom-email-templates';
 
-// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -19,26 +20,23 @@ export async function POST(request: Request) {
   }
 
   try {
+    // 1. Save to database
     await supabase.from('contacts').insert([{ name, email, phone }]);
 
-    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
-
+    // 2. Add to Mailchimp leads audience (for analytics, NO automation)
     const nameParts = name.split(' ');
     const FNAME = nameParts[0];
     const LNAME = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
+    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
     const mailchimpData = {
       email_address: email,
       status: 'subscribed',
-      merge_fields: {
-        FNAME: FNAME,
-        LNAME: LNAME,
-        PHONE: phone,
-      },
-      tags: ["leads"] // <-- This is the updated tag
+      merge_fields: { FNAME, LNAME, PHONE: phone },
+      tags: ["leads-v2"] // Keep for tracking, but turn OFF automation
     };
 
-    // Send data to Mailchimp
+    // console.log('Adding lead to Mailchimp...');
     const response = await fetch(mailchimpUrl, {
       method: 'POST',
       headers: {
@@ -49,14 +47,39 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        // Ignore "Member Exists" error, but throw others
-        if (errorData.title !== 'Member Exists') {
-             throw new Error(`Mailchimp API Error: ${errorData.detail}`);
-        }
+      const errorData = await response.json();
+      if (errorData.title !== 'Member Exists') {
+        throw new Error(`Mailchimp API Error: ${errorData.detail}`);
+      }
     }
 
-    return NextResponse.json({ message: 'Successfully submitted!' }, { status: 200 });
+    // 3. Send custom confirmation email using your beautiful template
+    // console.log('Sending custom confirmation email...');
+
+    const confirmationHtml = getContactConfirmationTemplate({
+      name: FNAME
+    });
+
+    const emailResult = await sendCustomEmailWithRetry({
+      recipientEmail: email,
+      recipientName: FNAME,
+      subject: 'Thank you for reaching out - Toasted Sesame Therapy',
+      htmlContent: confirmationHtml,
+      listId: mailchimpAudienceId!,
+      campaignTitle: `Contact Confirmation - ${FNAME} - ${new Date().toISOString()}`
+    });
+
+    if (!emailResult.success) {
+      console.error('Failed to send confirmation email:', emailResult.error);
+      // Don't fail the contact submission, but log the issue
+    } else {
+      // console.log('Confirmation email sent successfully!');
+    }
+
+    return NextResponse.json({
+      message: 'Successfully submitted!',
+      emailSent: emailResult.success
+    }, { status: 200 });
 
   } catch (error) {
     console.error(error);
