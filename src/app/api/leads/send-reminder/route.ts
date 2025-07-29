@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/api/leads/send-reminder/route.ts
 import { NextResponse } from 'next/server';
-import mailchimp from '@mailchimp/mailchimp_marketing';
-import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { getContactWarmupTemplate } from '@/lib/custom-email-templates';
 
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_SERVER_PREFIX,
-});
+// Create admin client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const mailchimpAudienceId = process.env.MAILCHIMP_LEAD_AUDIENCE_ID;
 
@@ -23,24 +25,74 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Mailchimp requires the subscriber hash, which is the MD5 hash of the lowercase email address.
-    const subscriberHash = crypto.createHash('md5').update(email.toLowerCase()).digest('hex');
+    // 1. First, get the contact's name from the database
+    console.log('Looking up contact:', email);
+    const { data: contact, error: contactError } = await supabase
+      .from('contacts')
+      .select('name, email')
+      .eq('email', email.toLowerCase().trim())
+      .single();
 
-    // Add the 'reminder-follow-up' tag to the contact.
-    // This tag will trigger the new Customer Journey you create in Mailchimp.
-    await mailchimp.lists.updateListMemberTags(
-      mailchimpAudienceId,
-      subscriberHash,
-      {
-        tags: [{ name: 'reminder-follow-up', status: 'active' }]
-      }
-    );
+    if (contactError || !contact) {
+      console.error('Contact not found:', contactError);
+      return NextResponse.json({
+        error: 'Contact not found in database.'
+      }, { status: 404 });
+    }
 
-    return NextResponse.json({ message: 'Reminder successfully sent!' }, { status: 200 });
+    console.log('Found contact:', contact);
+
+    // 2. Extract first name from full name
+    const firstName = contact.name.split(' ')[0] || 'there';
+
+    // 3. Send custom warmup email
+    console.log('Sending warmup email...');
+    const warmupHtml = getContactWarmupTemplate({
+      name: firstName
+    });
+
+    const emailResult = await sendCustomEmailWithRetry({
+      recipientEmail: email,
+      recipientName: firstName,
+      subject: 'Still interested in connecting? - Toasted Sesame Therapy',
+      htmlContent: warmupHtml,
+      listId: mailchimpAudienceId!,
+      campaignTitle: `Contact Warmup - ${firstName} - ${new Date().toISOString()}`
+    });
+
+    if (!emailResult.success) {
+      console.error('Failed to send warmup email:', emailResult.error);
+      return NextResponse.json({
+        error: 'Failed to send reminder email.',
+        details: emailResult.error
+      }, { status: 500 });
+    }
+
+    // 4. Update the contact's status in the database (optional)
+    const { error: updateError } = await supabase
+      .from('contacts')
+      .update({
+        status: 'Reminder Sent',
+        reminder_at: new Date().toISOString()
+      })
+      .eq('email', email.toLowerCase().trim());
+
+    if (updateError) {
+      console.error('Failed to update contact status:', updateError);
+      // Don't fail the request for this, just log it
+    }
+
+    console.log('Warmup email sent successfully!');
+
+    return NextResponse.json({
+      message: 'Reminder email sent successfully!',
+      contactName: firstName,
+      emailSent: true
+    }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Mailchimp API Error:', error.response?.body || error.message);
-    const errorMessage = error.response?.body?.detail || 'Failed to send reminder. The contact may not exist in Mailchimp.';
+    console.error('Send reminder error:', error);
+    const errorMessage = error.message || 'Failed to send reminder email.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
