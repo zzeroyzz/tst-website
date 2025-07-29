@@ -164,7 +164,7 @@ export const getEmailHtml = (data: any): string => {
           <tr>
             <td style="padding:20px 30px;" class="mobile-padding">
               <h2 class="h2" style="font-family:'Work Sans',Arial,sans-serif; font-size:28px; font-weight:bold; text-align:center; color:#000000; margin:0 0 20px;">Ready to go deeper?</h2>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center"><a href="https://yourwebsite.com/contact" target="_blank" style="display:inline-block; padding:12px 25px; font-family:'Work Sans',Arial,sans-serif; font-size:16px; font-weight:bold; text-decoration:none; color:#000000; background-color:#F7BD01; border:2px solid #000000; box-shadow:4px 4px 0 0; ">Book a Free Consultation</a></td></tr></table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center"><a href="https://toastedsesametherapy.com/contact" target="_blank" style="display:inline-block; padding:12px 25px; font-family:'Work Sans',Arial,sans-serif; font-size:16px; font-weight:bold; text-decoration:none; color:#000000; background-color:#F7BD01; border:2px solid #000000; box-shadow:4px 4px 0 0; ">Book a Free Consultation</a></td></tr></table>
             </td>
           </tr>
           <!-- Footer -->

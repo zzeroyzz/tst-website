@@ -1,5 +1,7 @@
-// src/app/api/newsletter/subscribe/route.ts
+// src/app/api/newsletter/subscribe/route.ts - Updated
 import { NextResponse } from 'next/server';
+import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { getWelcomeEmailTemplate } from '@/lib/custom-email-templates';
 
 const mailchimpApiKey = process.env.MAILCHIMP_API_KEY;
 const mailchimpServerPrefix = process.env.MAILCHIMP_SERVER_PREFIX;
@@ -9,42 +11,27 @@ export async function POST(request: Request) {
   try {
     const { email, name } = await request.json();
 
-    // Validate email
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 });
     }
 
-    // Check environment variables
-    if (!mailchimpApiKey || !mailchimpServerPrefix || !mailchimpAudienceId) {
-      console.error('Missing Mailchimp environment variables:', {
-        apiKey: !!mailchimpApiKey,
-        serverPrefix: !!mailchimpServerPrefix,
-        audienceId: !!mailchimpAudienceId
-      });
-      return NextResponse.json({ error: 'Server configuration error.' }, { status: 500 });
-    }
+    // Extract username from email (everything before @)
+    const emailUsername = email.split('@')[0];
 
-    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
-
-    // Parse name more robustly
     const nameParts = name?.trim() ? name.trim().split(' ') : [];
     const FNAME = nameParts[0] || '';
     const LNAME = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
+    // 1. Add to Mailchimp audience (for analytics, NO automation)
+    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
     const mailchimpData = {
       email_address: email.toLowerCase().trim(),
-      status: 'subscribed', // This will trigger the automation
-      merge_fields: {
-        FNAME: FNAME,
-        LNAME: LNAME,
-      },
-      tags: ['newsletter-signup'], // Make sure this matches your automation trigger
-      // Optional: Add double opt-in if required
-      // status: 'pending', // Use this if you want double opt-in
+      status: 'subscribed',
+      merge_fields: { FNAME, LNAME },
+      tags: ['newsletter-signup-v2'], // Keep for tracking, but turn OFF automation
     };
 
-    console.log('Attempting to subscribe:', email, 'to list:', mailchimpAudienceId);
-
+    // console.log('Adding subscriber to Mailchimp...');
     const response = await fetch(mailchimpUrl, {
       method: 'POST',
       headers: {
@@ -56,49 +43,58 @@ export async function POST(request: Request) {
 
     const responseData = await response.json();
 
-    if (!response.ok) {
-      // Handle different types of errors
-      if (responseData.title === 'Member Exists') {
-        console.log('Member already exists:', email);
+    // Handle existing subscriber
+    if (!response.ok && responseData.title === 'Member Exists') {
+      // console.log('Subscriber already exists, updating...');
+      // Update existing subscriber
+      const subscriberHash = Buffer.from(email.toLowerCase()).toString('base64').replace(/=/g, '');
+      const updateUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members/${subscriberHash}`;
 
-        // Try to update the existing member to ensure they're subscribed
-        const updateUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members/${Buffer.from(email.toLowerCase()).toString('base64').replace(/=/g, '')}`;
-
-        const updateResponse = await fetch(updateUrl, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `apikey ${mailchimpApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            status: 'subscribed',
-            merge_fields: {
-              FNAME: FNAME,
-              LNAME: LNAME,
-            },
-          }),
-        });
-
-        if (updateResponse.ok) {
-          return NextResponse.json({
-            message: 'Successfully updated subscription!',
-            status: 'updated'
-          }, { status: 200 });
-        }
-      }
-
+      await fetch(updateUrl, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `apikey ${mailchimpApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'subscribed',
+          merge_fields: { FNAME, LNAME },
+        }),
+      });
+    } else if (!response.ok) {
       console.error('Mailchimp API Error:', responseData);
       return NextResponse.json({
         error: `Subscription failed: ${responseData.detail || responseData.title}`
       }, { status: 400 });
     }
 
-    console.log('Successfully subscribed:', email, 'Response:', responseData);
+    // 2. Send custom welcome email using your beautiful template
+    // console.log('Sending custom welcome email...');
+
+    const welcomeHtml = getWelcomeEmailTemplate({
+      name: emailUsername || 'friend'
+    });
+
+    const emailResult = await sendCustomEmailWithRetry({
+      recipientEmail: email,
+      recipientName: FNAME,
+      subject: 'Welcome! Your free guides are here ☁️',
+      htmlContent: welcomeHtml,
+      listId: mailchimpAudienceId!,
+      campaignTitle: `New Subscriber Email - ${emailUsername || 'subscriber'} - ${new Date().toISOString()}`
+    });
+
+    if (!emailResult.success) {
+      console.error('Failed to send welcome email:', emailResult.error);
+      // Don't fail the subscription, but log the issue
+    } else {
+      console.log('Welcome email sent successfully!');
+    }
 
     return NextResponse.json({
       message: 'Successfully subscribed to newsletter!',
       status: 'subscribed',
-      id: responseData.id
+      emailSent: emailResult.success
     }, { status: 200 });
 
   } catch (error) {
