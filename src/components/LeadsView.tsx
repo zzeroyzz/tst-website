@@ -8,6 +8,7 @@ import { format, differenceInDays, parseISO } from "date-fns";
 import { X, Send } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
+import Button from "@/components/Button";
 
 type Lead = {
   id: number;
@@ -39,6 +40,68 @@ const getStatusClasses = (status: string) => {
     default:
       return "bg-gray-100 text-gray-800";
   }
+};
+
+// Delete Confirmation Modal Component
+const DeleteConfirmModal = ({
+  lead,
+  onClose,
+  onConfirm,
+  isDeleting
+}: {
+  lead: Lead;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-bold">Delete Lead</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 transition-colors"
+            disabled={isDeleting}
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="mb-6">
+          <p className="text-gray-700 mb-2">
+            Are you sure you want to delete this lead?
+          </p>
+          <div className="bg-gray-50 p-3 rounded-lg border">
+            <p className="font-medium text-sm">{lead.name}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {lead.email} • {format(new Date(lead.created_at), "PPP")}
+            </p>
+          </div>
+          <p className="text-red-600 text-sm mt-2">
+            This action cannot be undone.
+          </p>
+        </div>
+
+        <div className="flex gap-3 justify-end">
+          <Button
+            onClick={onClose}
+            className="bg-gray-200"
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={onConfirm}
+            className="bg-red-500 text-white"
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Lead'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 // --- Lead Detail Modal Component ---
@@ -193,6 +256,11 @@ const LeadsView = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; lead: Lead | null }>({
+    show: false,
+    lead: null
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createClientComponentClient();
 
   const fetchLeads = useCallback(async () => {
@@ -248,68 +316,133 @@ const LeadsView = () => {
     }
   };
 
+  const handleDeleteClick = (e: React.MouseEvent, lead: Lead) => {
+    e.stopPropagation(); // Prevent row click
+    setDeleteModal({ show: true, lead });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.lead) return;
+
+    setIsDeleting(true);
+    const deleteToast = toast.loading('Deleting lead...');
+
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .delete()
+        .eq("id", deleteModal.lead.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state to remove the deleted lead
+      setLeads(prev => prev.filter(l => l.id !== deleteModal.lead!.id));
+
+      toast.dismiss(deleteToast);
+      toast.success('Lead deleted successfully!');
+      setDeleteModal({ show: false, lead: null });
+
+    } catch (error: any) {
+      toast.error(`Failed to delete lead: ${error.message}`, { id: deleteToast });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleRowClick = (lead: Lead) => {
+    setSelectedLead(lead);
+  };
+
   // Show skeleton while loading
   if (loading) {
     return <LeadsViewSkeleton rowCount={5} />;
   }
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-6">Leads</h2>
-      <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="border-b-2 border-black bg-gray-50">
-              <tr>
-                <th className="p-4 font-bold"></th>
-                <th className="p-4 font-bold">Name</th>
-                <th className="p-4 font-bold">Contact</th>
-                <th className="p-4 font-bold">Submitted</th>
-                <th className="p-4 font-bold">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leads.map((lead) => {
-                const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-                // FIX: A lead is only "warm" if it's recent AND requires action.
-                const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
-                const isWarm = daysOld <= 7 && isActionableStatus;
+    <>
+      <div>
+        <h2 className="text-3xl font-bold mb-6">Leads</h2>
+        <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="border-b-2 border-black bg-gray-50">
+                <tr>
+                  <th className="p-4 font-bold"></th>
+                  <th className="p-4 font-bold">Name</th>
+                  <th className="p-4 font-bold">Contact</th>
+                  <th className="p-4 font-bold">Submitted</th>
+                  <th className="p-4 font-bold">Status</th>
+                  <th className="p-4 font-bold w-20">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leads.map((lead) => {
+                  const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
+                  // FIX: A lead is only "warm" if it's recent AND requires action.
+                  const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
+                  const isWarm = daysOld <= 7 && isActionableStatus;
 
-                return (
-                  <tr
-                    key={lead.id}
-                    onClick={() => setSelectedLead(lead)}
-                    className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer"
-                  >
-                    <td className="p-4">
-                      <div className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
-                    </td>
-                    <td className="p-4 font-medium">{lead.name}</td>
-                    <td className="p-4">
-                        <div>{lead.email}</div>
-                        <div className="text-sm text-gray-500">{lead.phone}</div>
-                    </td>
-                    <td className="p-4">{format(new Date(lead.created_at), "PPP")}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
-                        {lead.status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  return (
+                    <tr
+                      key={lead.id}
+                      className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer group"
+                    >
+                      <td className="p-4" onClick={() => handleRowClick(lead)}>
+                        <div className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
+                      </td>
+                      <td className="p-4 font-medium" onClick={() => handleRowClick(lead)}>
+                        {lead.name}
+                      </td>
+                      <td className="p-4" onClick={() => handleRowClick(lead)}>
+                          <div>{lead.email}</div>
+                          <div className="text-sm text-gray-500">{lead.phone}</div>
+                      </td>
+                      <td className="p-4" onClick={() => handleRowClick(lead)}>
+                        {format(new Date(lead.created_at), "PPP")}
+                      </td>
+                      <td className="p-4" onClick={() => handleRowClick(lead)}>
+                        <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
+                          {lead.status}
+                        </span>
+                      </td>
+                      <td className="p-4 relative">
+                        <Button
+                          type="button"
+                          onClick={(e) => handleDeleteClick(e, lead)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                        wrapperClassName="absolute -top-2 -right-2"
+                        >
+                          <X size={16} />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
+        {selectedLead && (
+          <LeadDetailModal
+            lead={selectedLead}
+            onClose={() => setSelectedLead(null)}
+            onUpdate={handleUpdateLead}
+          />
+        )}
       </div>
-      {selectedLead && (
-        <LeadDetailModal
-          lead={selectedLead}
-          onClose={() => setSelectedLead(null)}
-          onUpdate={handleUpdateLead}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.show && deleteModal.lead && (
+        <DeleteConfirmModal
+          lead={deleteModal.lead}
+          onClose={() => setDeleteModal({ show: false, lead: null })}
+          onConfirm={handleDeleteConfirm}
+          isDeleting={isDeleting}
         />
       )}
-    </div>
+    </>
   );
 };
 
