@@ -15,6 +15,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 });
     }
 
+    // Extract username from email (everything before @)
+    const emailUsername = email.split('@')[0];
+
     const nameParts = name?.trim() ? name.trim().split(' ') : [];
     const FNAME = nameParts[0] || '';
     const LNAME = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
@@ -69,7 +72,7 @@ export async function POST(request: Request) {
     // console.log('Sending custom welcome email...');
 
     const welcomeHtml = getWelcomeEmailTemplate({
-      name: FNAME || 'friend'
+      name: emailUsername || 'friend'
     });
 
     const emailResult = await sendCustomEmailWithRetry({
@@ -78,7 +81,7 @@ export async function POST(request: Request) {
       subject: 'Welcome! Your free guides are here ☁️',
       htmlContent: welcomeHtml,
       listId: mailchimpAudienceId!,
-      campaignTitle: `Welcome Email - ${FNAME || 'subscriber'} - ${new Date().toISOString()}`
+      campaignTitle: `New Subscriber Email - ${emailUsername || 'subscriber'} - ${new Date().toISOString()}`
     });
 
     if (!emailResult.success) {

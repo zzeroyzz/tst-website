@@ -32,7 +32,7 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
     // console.log(`Creating Mailchimp campaign for: ${emailData.recipientEmail}`);
 
     // Create a targeted campaign for the specific email
-    const campaign = await mailchimp.campaigns.create({
+    const campaignResponse = await mailchimp.campaigns.create({
       type: 'regular',
       recipients: {
         list_id: emailData.listId,
@@ -54,12 +54,20 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
         authenticate: true,
         auto_footer: false,
         fb_comments: false,
-        // Add tracking settings for better analytics
+      },
+      tracking: {
         opens: true,
         html_clicks: true,
         text_clicks: false,
       }
     });
+
+    // Type assertion to handle the response properly
+    const campaign = campaignResponse as any;
+
+    if (!campaign.id) {
+      throw new Error('Campaign creation failed - no ID returned');
+    }
 
     // console.log(`Campaign created with ID: ${campaign.id}`);
 
