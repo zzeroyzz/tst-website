@@ -4,12 +4,12 @@
 import React from "react";
 import { motion, Variants } from "framer-motion";
 import Section from "@/components/Section";
-import ContactForm from "@/components/ContactForm";
+import ContactForm from "./ContactForm";
 import FAQ from "@/components/FAQ";
 import Image from "next/image";
 import CircleIcon from "@/components/CircleIcon";
 import therapyCardStyles from "@/components/TherapyCard.module.css";
-import contactPageStyles from "@/components/ContactPage.module.css";
+import contactPageStyles from "./modules/ContactForm.module.css";
 
 import {
   trustIndicators,
@@ -132,7 +132,7 @@ const ContactPageClient = () => {
                         width={64}
                         height={64}
                         className="object-contain"
-    
+
                       />
                     </div>
                     <h3 className="text-xl font-bold mb-4">{card.title}</h3>

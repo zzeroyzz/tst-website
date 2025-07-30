@@ -2,10 +2,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Button from "./Button";
-import FAQ from "./FAQ";
 import Confetti from "react-confetti";
-import Input from "./Input";
+import Button from "@/components/Button";
+import FAQ from "@/components/FAQ";
+import Input from "@/components/Input";
 
 interface ContactFormProps {
   isContactPage?: boolean;
