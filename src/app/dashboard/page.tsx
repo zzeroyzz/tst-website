@@ -13,8 +13,8 @@ import {
   LogOut,
 } from "lucide-react";
 import KanbanBoard from "@/components/KanbanBoard";
-import LeadsView from "@/components/LeadsView";
-import NewsletterView from "@/components/NewsletterView";
+import LeadsView from "@/components/Leads/LeadsView";
+import NewsletterView from "@/components/Newsletter/NewsletterView";
 import DashboardView from "@/components/DashboardView"; // Import the new component
 
 const DashboardPage = () => {
