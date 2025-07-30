@@ -1,6 +1,6 @@
 // src/app/policy/page.tsx
 import type { Metadata } from 'next';
-import PolicyPageClient from '@/components/PolicyPageClient';
+import PolicyPageClient from '@/components/clients/PolicyPageClient/PolicyPageClient';
 
 // The metadata is right here
 export const metadata: Metadata = {

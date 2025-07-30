@@ -3,9 +3,9 @@
 
 import React, { useState, useEffect } from "react";
 import Confetti from "react-confetti";
-import Button from "@/components/Button";
-import FAQ from "@/components/FAQ";
-import Input from "@/components/Input";
+import Button from "@/components/Button/Button";
+import FAQ from "@/components/FAQ/FAQ";
+import Input from "@/components/Input/Input";
 
 interface ContactFormProps {
   isContactPage?: boolean;

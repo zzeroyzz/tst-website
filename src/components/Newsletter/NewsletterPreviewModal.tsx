@@ -1,6 +1,6 @@
 // src/components/NewsletterPreviewModal.tsx
 import React from 'react';
-import Button from '@/components/Button';
+import Button from '@/components/Button/Button';
 
 interface NewsletterPreviewModalProps {
   htmlContent: string;

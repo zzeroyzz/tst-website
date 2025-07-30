@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Work_Sans } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
+import Nav from "@/components/Nav/Nav";
+import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next"
 

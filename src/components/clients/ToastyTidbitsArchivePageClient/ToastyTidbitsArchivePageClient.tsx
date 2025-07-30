@@ -4,11 +4,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format } from "date-fns";
-import Section from "@/components/Section";
-import ResourceCard from "@/components/ResourceCard";
+import Section from "@/components/Section/Section";
+import ResourceCard from "@/components/ResourceCard/ResourceCard";
 import { Post } from "@/types";
 import { coreTags } from "@/data/tagData";
-import SubscribeModal from '@/components/SubscribeModal';
+import SubscribeModal from '@/components/SubscribeModal/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import { NewsletterArchiveSkeleton } from '@/components/skeleton';
 

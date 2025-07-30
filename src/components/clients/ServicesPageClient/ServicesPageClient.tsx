@@ -3,12 +3,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import Section from "@/components/Section";
-import Button from "@/components/Button";
-import FAQ from "@/components/FAQ";
-import ServiceOfferingCard from "@/components/ServiceOfferingCard";
-import FallingPills from "@/components/FallingPills";
-import AnimatedImage from "@/components/AnimatedImage";
+import Section from "@/components/Section/Section";
+import Button from "@/components/Button/Button";
+import FAQ from "@/components/FAQ/FAQ";
+import ServiceOfferingCard from "@/components/Services/ServiceOfferingCard";
+import FallingPills from "@/components/FallingPills/FallingPills";
+import AnimatedImage from "@/components/AnimatedImage/AnimatedImage";
 import {
     individualTherapyData,
     ourApproachData

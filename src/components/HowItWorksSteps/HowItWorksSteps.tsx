@@ -3,10 +3,10 @@
 import React from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
-import styles from "./HowItWorksStep.module.css";
+import styles from "./HowItWorksSteps.module.css";
 import clsx from "clsx";
 
-interface HowItWorksStepProps {
+interface HowItWorksStepsProps {
   step: {
     number: string;
     title: string;
@@ -20,7 +20,7 @@ interface HowItWorksStepProps {
   nextStepInView?: boolean;
 }
 
-const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
+const HowItWorksSteps: React.FC<HowItWorksStepsProps> = ({
   step,
   index,
   nextStepInView = false,
@@ -114,4 +114,4 @@ const HowItWorksStep: React.FC<HowItWorksStepProps> = ({
   );
 };
 
-export default HowItWorksStep;
+export default HowItWorksSteps;

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import Section from '@/components/Section';
+import Section from '@/components/Section/Section';
 import { privacyPolicy, practicePolicies } from '@/data/policyData';
 
 // Define the types for the props

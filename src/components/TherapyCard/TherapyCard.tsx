@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LottiePlayer } from "./LottiePlayer";
+import { LottiePlayer } from "@/components/LottiePlayer/LottiePlayer";
 import styles from "./TherapyCard.module.css";
 import { therapyCards } from "@/data/therapyCardData";
 

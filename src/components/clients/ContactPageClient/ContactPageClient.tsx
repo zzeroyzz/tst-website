@@ -3,13 +3,13 @@
 
 import React from "react";
 import { motion, Variants } from "framer-motion";
-import Section from "@/components/Section";
-import ContactForm from "./ContactForm";
-import FAQ from "@/components/FAQ";
+import Section from "@/components/Section/Section";
+import ContactForm from "@/components/Contact/ContactForm";
+import FAQ from "@/components/FAQ/FAQ";
 import Image from "next/image";
-import CircleIcon from "@/components/CircleIcon";
-import therapyCardStyles from "@/components/TherapyCard.module.css";
-import contactPageStyles from "./modules/ContactForm.module.css";
+import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import therapyCardStyles from "@/components/TherapyCard/TherapyCard.module.css";
+import contactPageStyles from "@/components/Contact/modules/ContactForm.module.css";
 
 import {
   trustIndicators,

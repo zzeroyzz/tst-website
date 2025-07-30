@@ -1,6 +1,6 @@
 // src/app/therapy-services/page.tsx
 import type { Metadata } from 'next';
-import ServicesPageClient from '@/components/ServicesPageClient';
+import ServicesPageClient from '@/components/clients/ServicesPageClient/ServicesPageClient';
 import { faqData } from '@/data/faqData';
 import { ourApproachData } from '@/data/servicesPageData';
 

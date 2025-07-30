@@ -4,9 +4,9 @@
 import React, { useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
-import Section from "@/components/Section";
-import Input from "@/components/Input";
-import Button from "@/components/Button";
+import Section from "@/components/Section/Section";
+import Input from "@/components/Input/Input";
+import Button from "@/components/Button/Button";
 import Image from "next/image";
 
 const LoginPage = () => {

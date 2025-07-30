@@ -5,9 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import Button from "@/components/Button";
-import MobileMenu from "@/components/MobileMenu";
-import HoverLink from './HoverLink';
+import Button from "@/components/Button/Button";
+import MobileMenu from "@/components/MobileMenu/MobileMenu";
+import HoverLink from '@/components/HoverLink/HoverLink';
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { User } from "@supabase/supabase-js";
 

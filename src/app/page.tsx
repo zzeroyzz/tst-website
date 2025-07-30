@@ -4,15 +4,15 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import Section from "@/components/Section";
-import TestimonialCard from "@/components/TestimonialCard";
+import Section from "@/components/Section/Section";
+import TestimonialCard from "@/components/TestimonialCard/TestimonialCard";
 import Image from "next/image";
-import Button from "@/components/Button";
-import CircleIcon from "@/components/CircleIcon";
-import AnimatedCheckbox from "@/components/AnimatedCheckbox";
-import ProfileImage from "@/components/ProfileImage";
-import HoverLink from '@/components/HoverLink';
-import { LottiePlayer } from "@/components/LottiePlayer";
+import Button from "@/components/Button/Button";
+import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import AnimatedCheckbox from "@/components/AnimatedCheckbox/AnimatedCheckbox";
+import ProfileImage from "@/components/ProfileImage/ProfileImage";
+import HoverLink from '@/components/HoverLink/HoverLink';
+import { LottiePlayer } from "@/components/LottiePlayer/LottiePlayer";
 import {tiredAnimation} from "@/data/animations";
 import {
   socialProofIcons,
@@ -24,7 +24,7 @@ import {
 } from "@/data/pageData";
 import ContactForm from "@/components/Contact/ContactForm";
 
-const TherapyCard = dynamic(() => import("@/components/TherapyCard"), {
+const TherapyCard = dynamic(() => import("@/components/TherapyCard/TherapyCard"), {
   loading: () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       {[...Array(4)].map((_, i) => (
@@ -34,13 +34,13 @@ const TherapyCard = dynamic(() => import("@/components/TherapyCard"), {
   ),
 });
 
-const HowItWorksStep = dynamic(() => import("@/components/HowItWorksStep"), {
+const HowItWorksStep = dynamic(() => import("@/components/HowItWorksSteps/HowItWorksSteps"), {
   loading: () => (
     <div className="animate-pulse bg-gray-200 rounded-lg h-48 border-2 border-black"></div>
   ),
 });
 
-const LeadMagnet = dynamic(() => import("@/components/LeadMagnet"), {
+const LeadMagnet = dynamic(() => import("@/components/LeadMagnet/LeadMagnet"), {
   loading: () => (
     <div className="animate-pulse bg-gray-200 rounded-lg h-96 border-2 border-black"></div>
   ),

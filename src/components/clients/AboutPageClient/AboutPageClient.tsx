@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from 'react'; // Import useState
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import toast from 'react-hot-toast'; // Import toast
-import ProfileImage from '@/components/ProfileImage';
-import Button from "@/components/Button";
-import Input from "@/components/Input";
+import toast from 'react-hot-toast';
+import ProfileImage from '@/components/ProfileImage/ProfileImage';
+import Button from "@/components/Button/Button";
+import Input from "@/components/Input/Input";
 import { aboutPageContent } from '@/data/aboutData';
-import { LottiePlayer } from '@/components/LottiePlayer';
+import { LottiePlayer } from '@/components/LottiePlayer/LottiePlayer';
 import { toastyTidbitsAnimation } from "@/data/animations";
 import { resourcesPageData } from "@/data/resourceData";
 import type { Metadata } from 'next';

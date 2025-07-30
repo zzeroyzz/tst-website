@@ -1,6 +1,6 @@
 // Now create the reusable SinglePostSkeleton using these components
 // components/skeleton/SinglePostSkeleton.tsx
-import Section from '@/components/Section';
+import Section from '@/components/Section/Section';
 import {
   Skeleton,
   SkeletonText,

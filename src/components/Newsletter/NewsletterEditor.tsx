@@ -6,8 +6,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
+import Button from '@/components/Button/Button';
+import Input from '@/components/Input/Input';
 import { Post } from '@/types';
 import toast from 'react-hot-toast';
 import NewsletterPreviewModal from './NewsletterPreviewModal';

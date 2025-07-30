@@ -9,22 +9,20 @@ import { Post } from '@/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { marked } from 'marked';
+import Section from '@/components/Section/Section';
+import ResourceCard from '@/components/ResourceCard/ResourceCard';
+import Link from 'next/link';
+import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import SubscribeModal from '@/components/SubscribeModal/SubscribeModal';
+import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
+import Button from "@/components/Button/Button";
+import { SinglePostSkeleton } from '@/components/skeleton';
 
 // Configure marked with proper options for better parsing
 marked.setOptions({
   breaks: true,
   gfm: true,
 });
-
-import Section from '@/components/Section';
-import ResourceCard from '@/components/ResourceCard';
-import Link from 'next/link';
-import CircleIcon from "@/components/CircleIcon";
-import SubscribeModal from '@/components/SubscribeModal';
-import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
-import Button from "@/components/Button";
-import { SinglePostSkeleton } from '@/components/skeleton';
-
 const PostPageClient: React.FC = () => {
   const { slug } = useParams();
   const [post, setPost] = useState<Post | null>(null);

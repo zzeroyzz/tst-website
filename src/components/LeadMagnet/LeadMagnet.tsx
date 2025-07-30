@@ -1,12 +1,11 @@
 import React from "react";
 import Link from "next/link";
-import Section from "./Section";
+import Section from "@/components/Section/Section";
 import Image from "next/image";
-import styles from "./GuideCard.module.css";
+import styles from "./LeadMagnet.module.css";
 import clsx from "clsx";
-import { guides } from "@/data/leadData"; // Import data from the new file
+import { guides } from "@/data/leadData";
 
-// Define the type for a single guide object
 interface Guide {
   title: string;
   description: string;
@@ -16,12 +15,11 @@ interface Guide {
   alt: string;
 }
 
-// Define the props for the GuideCard component
-interface GuideCardProps {
+interface LeadMagnetProps {
   guide: Guide;
 }
 
-const GuideCard: React.FC<GuideCardProps> = ({ guide }) => (
+const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
   <Link href="/guides" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)}>
@@ -82,7 +80,7 @@ const LeadMagnet = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {guides.map((guide) => (
-            <GuideCard key={guide.title} guide={guide} />
+            <LeadMagnetCard key={guide.title} guide={guide} />
           ))}
         </div>
       </div>

@@ -7,7 +7,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { PlusCircle, X } from "lucide-react";
-import Button from "@/components/Button";
+import Button from "@/components/Button/Button";
 import { Post } from "@/types";
 import { NewsletterViewSkeleton } from "@/components/skeleton";
 import toast from "react-hot-toast";

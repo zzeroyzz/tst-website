@@ -1,6 +1,6 @@
 // src/app/toasty-tidbits-archives/page.tsx
 import type { Metadata } from 'next';
-import ToastyTidbitsArchivePageClient from '@/components/ToastyTidbitsArchivePageClient';
+import ToastyTidbitsArchivePageClient from '@/components/clients/ToastyTidbitsArchivePageClient/ToastyTidbitsArchivePageClient';
 
 // This is a Server Component, so we can correctly export metadata
 export const metadata: Metadata = {

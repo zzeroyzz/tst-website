@@ -3,9 +3,9 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Input from './Input';
-import Button from './Button';
-import { LottiePlayer } from './LottiePlayer';
+import Input from '@/components/Input/Input';
+import Button from '@/components/Button/Button';
+import { LottiePlayer } from '@/components/LottiePlayer/LottiePlayer';
 import toast from 'react-hot-toast';
 import { toastyTidbitsAnimation } from '@/data/animations';
 

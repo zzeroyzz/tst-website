@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { LottiePlayer } from './LottiePlayer';
+import { LottiePlayer } from '@/components/LottiePlayer/LottiePlayer';
 import styles from './AnimatedImage.module.css';
 
 interface AnimatedImageProps {

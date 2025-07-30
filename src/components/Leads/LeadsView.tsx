@@ -8,7 +8,7 @@ import { format, differenceInDays, parseISO } from "date-fns";
 import { X, Send } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
-import Button from "@/components/Button";
+import Button from "@/components/Button/Button";
 
 type Lead = {
   id: number;
