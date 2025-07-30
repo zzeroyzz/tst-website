@@ -1,6 +1,6 @@
 // src/app/about/page.tsx
 import type { Metadata } from 'next';
-import AboutPageClient from '@/components/AboutPageClient';
+import AboutPageClient from '@/components/About/AboutPageClient';
 
 export const metadata: Metadata = {
   title: 'About Kay | Toasted Sesame Therapy',

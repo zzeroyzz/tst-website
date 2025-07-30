@@ -22,7 +22,7 @@ import {
   howItWorksSteps,
   trustIndicators,
 } from "@/data/pageData";
-import ContactForm from "@/components/ContactForm";
+import ContactForm from "@/components/Contact/ContactForm";
 
 const TherapyCard = dynamic(() => import("@/components/TherapyCard"), {
   loading: () => (
