@@ -2,6 +2,9 @@
 import '@testing-library/jest-dom'
 import 'whatwg-fetch'
 
+// Import MSW server setup
+import './src/__tests__/setup-msw'
+
 // Mock next/router
 jest.mock('next/router', () => ({
   useRouter() {
