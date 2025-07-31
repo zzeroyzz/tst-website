@@ -1,132 +1,85 @@
-// src/__tests__/test-utils.tsx
-import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
+// src/__tests__/test-utils.js
+import { render } from '@testing-library/react'
 
-// Mock providers that your components might need
-const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div>
-      {/* Add any providers your app uses here, like:
-          <AuthProvider>
-            <ThemeProvider>
-              {children}
-            </ThemeProvider>
-          </AuthProvider>
-      */}
-      {children}
-    </div>
-  )
-}
-
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>,
-) => render(ui, { wrapper: AllTheProviders, ...options })
-
-export * from '@testing-library/react'
-export { customRender as render }
-
-// Helper functions for common test scenarios
-export const mockApiResponse = (data: any, ok = true) => {
-  return Promise.resolve({
-    ok,
-    json: () => Promise.resolve(data),
-  })
-}
-
-export const mockApiError = (message: string, status = 500) => {
-  return Promise.resolve({
-    ok: false,
-    status,
-    json: () => Promise.resolve({ error: message }),
-  })
-}
-
-// Mock Supabase client for component tests
-export const mockSupabaseClient = {
-  auth: {
-    getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
-    onAuthStateChange: jest.fn(() => ({
-      data: { subscription: { unsubscribe: jest.fn() } }
-    })),
-    signOut: jest.fn().mockResolvedValue({ error: null }),
-    signInWithPassword: jest.fn(),
-  },
-  from: jest.fn(() => ({
+// Create a proper mock chain for Supabase queries
+const createSupabaseQueryChain = () => {
+  const chain = {
     select: jest.fn().mockReturnThis(),
+    insert: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    upsert: jest.fn().mockReturnThis(),
+    delete: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
+    neq: jest.fn().mockReturnThis(),
+    gt: jest.fn().mockReturnThis(),
+    gte: jest.fn().mockReturnThis(),
+    lt: jest.fn().mockReturnThis(),
+    lte: jest.fn().mockReturnThis(),
+    like: jest.fn().mockReturnThis(),
+    ilike: jest.fn().mockReturnThis(),
+    is: jest.fn().mockReturnThis(),
+    in: jest.fn().mockReturnThis(),
+    contains: jest.fn().mockReturnThis(),
+    containedBy: jest.fn().mockReturnThis(),
+    rangeGt: jest.fn().mockReturnThis(),
+    rangeGte: jest.fn().mockReturnThis(),
+    rangeLt: jest.fn().mockReturnThis(),
+    rangeLte: jest.fn().mockReturnThis(),
+    rangeAdjacent: jest.fn().mockReturnThis(),
+    overlaps: jest.fn().mockReturnThis(),
+    textSearch: jest.fn().mockReturnThis(),
+    match: jest.fn().mockReturnThis(),
+    not: jest.fn().mockReturnThis(),
+    or: jest.fn().mockReturnThis(),
+    filter: jest.fn().mockReturnThis(),
     order: jest.fn().mockReturnThis(),
     limit: jest.fn().mockReturnThis(),
+    range: jest.fn().mockReturnThis(),
     single: jest.fn().mockResolvedValue({ data: null, error: null }),
-    insert: jest.fn().mockResolvedValue({ data: null, error: null }),
-    update: jest.fn().mockResolvedValue({ data: null, error: null }),
-    delete: jest.fn().mockResolvedValue({ data: null, error: null }),
-    upsert: jest.fn().mockResolvedValue({ data: null, error: null }),
-  })),
-  channel: jest.fn(() => ({
-    on: jest.fn().mockReturnThis(),
-    subscribe: jest.fn(),
-  })),
-  removeChannel: jest.fn(),
+    maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+    then: jest.fn().mockResolvedValue({ data: [], error: null }),
+  }
+  return chain
 }
 
-// Mock data factories
+// Mock Supabase client with all necessary methods
+export const mockSupabaseClient = {
+  from: jest.fn(() => createSupabaseQueryChain()),
+  auth: {
+    getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    signInWithPassword: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    signOut: jest.fn().mockResolvedValue({ error: null }),
+  },
+  storage: {
+    from: jest.fn().mockReturnValue({
+      upload: jest.fn().mockResolvedValue({ data: null, error: null }),
+      download: jest.fn().mockResolvedValue({ data: null, error: null }),
+      remove: jest.fn().mockResolvedValue({ data: null, error: null }),
+      list: jest.fn().mockResolvedValue({ data: [], error: null }),
+      getPublicUrl: jest.fn().mockReturnValue({ data: { publicUrl: 'mock-url' } }),
+    }),
+  },
+}
+
+// Create mock post helper
 export const createMockPost = (overrides = {}) => ({
-  id: '1',
+  id: '123',
   title: 'Test Post',
   subject: 'Test Subject',
   body: 'Test body content',
-  image_url: 'https://example.com/image.jpg',
-  toasty_take: 'Test toasty take',
+  tags: ['anxiety'],
   archive_posts: [],
-  status: 'published' as const,
-  created_at: '2024-01-01T00:00:00Z',
-  sent_at: '2024-01-01T12:00:00Z',
-  tags: ['test', 'example'],
+  image_url: null,
+  status: 'draft',
   slug: 'test-post',
-  subtext: 'Test subtext',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
   ...overrides,
 })
 
-export const createMockContact = (overrides = {}) => ({
-  id: 1,
-  name: 'John Doe',
-  email: 'john@example.com',
-  phone: '555-0123',
-  status: 'New',
-  created_at: '2024-01-01T00:00:00Z',
-  notes: '',
-  reminder_at: null,
-  reminder_message: null,
-  ...overrides,
-})
+// Custom render function (if you need providers later)
+export const customRender = (ui, options) => render(ui, options)
 
-// Test helpers for form validation
-export const fillContactForm = async (user: any, data: any) => {
-  const { name, email, phone } = data
-  if (name) await user.type(screen.getByPlaceholderText('Your name'), name)
-  if (email) await user.type(screen.getByPlaceholderText('Your email'), email)
-  if (phone) await user.type(screen.getByPlaceholderText('Phone number'), phone)
-}
-
-export const fillNewsletterForm = async (user: any, email: string, name?: string) => {
-  await user.type(screen.getByPlaceholderText(/email/i), email)
-  if (name) {
-    const nameField = screen.queryByPlaceholderText(/name/i)
-    if (nameField) await user.type(nameField, name)
-  }
-}
-
-// Mock window.fs for file operations
-export const mockWindowFs = {
-  readFile: jest.fn().mockResolvedValue(new Uint8Array()),
-}
-
-// Setup function to reset all mocks
-export const setupTest = () => {
-  jest.clearAllMocks()
-  global.fetch = jest.fn()
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  window.fs = mockWindowFs
-}
+// Re-export everything
+export * from '@testing-library/react'
