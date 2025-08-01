@@ -1,4 +1,4 @@
-// src/components/ContactPageClient.tsx
+// src/components/clients/ContactPageClient/ContactPageClient.tsx
 "use client";
 
 import React from "react";
