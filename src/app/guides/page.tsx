@@ -1,6 +1,6 @@
 // src/app/guides/page.tsx
 import type { Metadata } from 'next';
-import GuidesPageClient from '@/components/GuidesPageClient'; // Import the new client component
+import GuidesPageClient from '@/components/clients/GuidesPageClient/GuidesPageClient'; // Import the new client component
 
 // This is a Server Component, so we can export metadata
 export const metadata: Metadata = {

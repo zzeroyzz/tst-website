@@ -12,10 +12,10 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
-import KanbanBoard from "@/components/KanbanBoard";
-import LeadsView from "@/components/LeadsView";
-import NewsletterView from "@/components/NewsletterView";
-import DashboardView from "@/components/DashboardView"; // Import the new component
+import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
+import LeadsView from "@/components/Leads/LeadsView";
+import NewsletterView from "@/components/Newsletter/NewsletterView";
+import DashboardView from "@/components/DashboardView/DashboardView"; // Import the new component
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);

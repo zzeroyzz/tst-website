@@ -1,6 +1,6 @@
 // src/app/contact/page.tsx
 import type { Metadata } from 'next';
-import ContactPageClient from '@/components/ContactPageClient';
+import ContactPageClient from '@/components/clients/ContactPageClient/ContactPageClient';
 import { faqData } from '@/data/faqData'; // Import the FAQ data
 
 export const metadata: Metadata = {

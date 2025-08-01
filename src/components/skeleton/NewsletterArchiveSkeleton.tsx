@@ -1,5 +1,5 @@
 // components/skeleton/NewsletterArchiveSkeleton.tsx
-import Section from '@/components/Section';
+import Section from '@/components/Section/Section';
 import { Skeleton } from './SkeletonBase';
 import { SkeletonCard }  from './index';
 

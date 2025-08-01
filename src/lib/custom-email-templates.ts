@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/lib/custom-email-templates.ts
 
 interface WelcomeEmailData {
@@ -12,6 +11,16 @@ interface ContactConfirmationData {
 interface ContactWarmupData {
   name: string;
 }
+
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Base template with dark mode bypass
 const getBaseEmailTemplate = (content: string, img: string) => `
 <!DOCTYPE html>
@@ -192,6 +201,9 @@ const getBaseEmailTemplate = (content: string, img: string) => `
 
 // Welcome email - Using table-based shadow with proper light mode forcing
 export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
+  // Fix: Use data.name instead of undefined 'name' variable
+  const escapedName = escapeHtml(data.name);
+
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/toasty-tidbits-logo-2.png" alt="Toasted Tidbits Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -206,7 +218,7 @@ export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
 
                     <!-- Welcome Headline -->
                     <h1 style="font-family:'Work Sans',Arial,sans-serif; font-size:48px; font-weight:900; color:#000000 !important; margin:0 0 40px; line-height:1.2;" class="h1 force-black-text">
-                      Welcome to toasty tidbits, ${data.name}!
+                      Welcome to toasty tidbits, ${escapedName}!
                     </h1>
 
                     <!-- Welcome Message -->
@@ -236,7 +248,7 @@ export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
                           <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
                         </tr>
                       </table>
-<!-- Spacer -->
+                            <!-- Spacer -->
                             <div style="height:30px; line-height:30px; font-size:1px;">&nbsp;</div>
 
                             <!-- Button 3 with shadow -->
@@ -257,7 +269,7 @@ export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
                           <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
                         </tr>
                       </table>
-<!-- Spacer -->
+                                <!-- Spacer -->
                             <div style="height:30px; line-height:30px; font-size:1px;">&nbsp;</div>
 
                             <!-- Button 3 with shadow -->
@@ -311,9 +323,9 @@ export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
 
   return getBaseEmailTemplate(content, img);
 };
-
 // Contact confirmation email - Using table-based shadow like email-template.ts
 export const getContactConfirmationTemplate = (data: ContactConfirmationData): string => {
+   const escapedName = escapeHtml(data.name);
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -326,7 +338,7 @@ export const getContactConfirmationTemplate = (data: ContactConfirmationData): s
                 <tr>
                   <td style="padding:60px 40px; background-color:#ffffff !important;" class="mobile-padding force-white">
                     <h1 style="font-family:'Work Sans',Arial,sans-serif; font-size:48px; font-weight:900; color:#000000 !important; margin:0 0 40px; line-height:1.2;" class="h1 force-black-text">
-                      Thanks for reaching out, ${data.name}!
+                      Thanks for reaching out, ${escapedName}!
                     </h1>
 
                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
@@ -379,6 +391,8 @@ export const getContactConfirmationTemplate = (data: ContactConfirmationData): s
 };
 
 export const getContactWarmupTemplate = (data: ContactWarmupData): string => {
+     const escapedName = escapeHtml(data.name);
+
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -391,7 +405,7 @@ export const getContactWarmupTemplate = (data: ContactWarmupData): string => {
                 <tr>
                   <td style="padding:60px 40px; background-color:#ffffff !important;" class="mobile-padding force-white">
                     <h1 style="font-family:'Work Sans',Arial,sans-serif; font-size:48px; font-weight:900; color:#000000 !important; margin:0 0 40px; line-height:1.2;" class="h1 force-black-text">
-                     Hi, ${data.name}!
+                     Hi, ${escapedName}!
                     </h1>
 
                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">

@@ -1,6 +1,6 @@
 // src/app/posts/[slug]/page.tsx
 import { createClient } from '@supabase/supabase-js';
-import PostPageClient from '@/components/PostPageClient';
+import PostPageClient from '@/components/clients/PostPageClient/PostPageClient';
 import type { Metadata } from 'next';
 
 // Define the expected props shape for this page
