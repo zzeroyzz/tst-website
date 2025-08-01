@@ -265,14 +265,14 @@ const NewsletterView = () => {
                     <td className="p-4 relative">
                       <div className="wrapper relative">
                         <div className="shadow"></div>
-                        <button
+                        <Button
                           type="button"
                           onClick={(e) => handleDeleteClick(e, post)}
                           className="button bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors relative z-10"
                           title={`Delete "${post.title}"`}
                         >
                           <X size={16} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
