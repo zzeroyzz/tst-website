@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/api/newsletter/subscribe/route.test.ts
 // Test newsletter subscription logic without importing the actual route
 

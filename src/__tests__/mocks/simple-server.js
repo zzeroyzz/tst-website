@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/__tests__/mocks/simple-server.js
 // Simple mock setup without MSW
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/lib/custom-email-templates.ts
 
 interface WelcomeEmailData {

@@ -48,7 +48,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
           {/* Menu card */}
           <div className="relative bg-tst-purple border-2 border-black rounded-lg p-8 shadow-brutalistLg">
             <ul className="flex flex-col items-center gap-8 text-xl font-bold text-center ">
-               <li classNam>
+               <li>
                 <Link
                   href="/therapy-services"
                   onClick={onClose}

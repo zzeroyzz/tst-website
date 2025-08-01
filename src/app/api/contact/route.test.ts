@@ -1,14 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/api/contact/route.test.ts
 // Comprehensive test suite for contact API logic
 
 describe('/api/contact API Route', () => {
-  // Mock the NextRequest constructor to avoid Web API issues
-  const createMockRequest = (body: any, method = 'POST') => ({
-    method,
-    json: jest.fn().mockResolvedValue(body),
-    headers: new Map([['content-type', 'application/json']]),
-  })
-
   describe('Input Validation', () => {
     const validateContactData = (data: any) => {
       if (!data.email) throw new Error('Email is required.')
