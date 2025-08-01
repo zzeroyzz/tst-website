@@ -1,20 +1,78 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/email-template.ts
 
+// Add this security function at the top
+function escapeHtml(unsafe: string): string {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// NEW: Function to sanitize HTML content while preserving safe tags
+function sanitizeHtmlContent(content: string): string {
+  if (!content) return '';
+
+  // First, escape any potential script tags and dangerous content
+  const sanitized = content
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+    .replace(/javascript:/gi, '') // Remove javascript: URLs
+    .replace(/on\w+\s*=/gi, '') // Remove event handlers like onclick, onload, etc.
+    .replace(/style\s*=\s*['""][^'"]*['"]/gi, ''); // Remove style attributes to prevent CSS injection
+
+  return sanitized;
+}
+
+// IMPROVED: Helper function to validate and process image URLs for email compatibility
+function getSafeImageUrl(url: string, fallback: string = ''): string {
+  if (!url) return fallback;
+
+  // Ensure absolute URLs for email compatibility
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return escapeHtml(url);
+  }
+
+  // Convert relative URLs to absolute (adjust domain as needed)
+  if (url.startsWith('/')) {
+    return escapeHtml(`https://toastedsesametherapy.com${url}`);
+  }
+
+  return fallback;
+}
+
 // Helper function to build the HTML for a single archive post
-const createArchiveItemHtml = (post: any) => `
+const createArchiveItemHtml = (post: any) => {
+  // Escape user-provided content (these should be escaped as they're displayed as text)
+  const safeTitle = escapeHtml(post.title || '');
+  const safeSubtext = escapeHtml(post.subtext || '');
+  const safeSlug = escapeHtml(post.slug || '');
+
+  // FIXED: Better image URL handling with proper fallback
+  const safeImageUrl = getSafeImageUrl(
+    post.image_url,
+    'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'
+  );
+
+  return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:2px solid #eeeeee;">
     <tr>
       <td style="padding:20px 0;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td width="80" valign="top" style="width:80px;" class="archive-img">
-              <img src="${post.image_url || 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'}" width="80" height="80" alt="" style="">
+              <img src="${safeImageUrl}"
+                   width="80"
+                   height="80"
+                   alt="${safeTitle}"
+                   style="width:80px;height:80px;object-fit:cover;border:0;display:block;">
             </td>
             <td valign="top" style="padding-left:20px;" class="archive-text">
-              <h3 style="font-family:'Work Sans',Arial,sans-serif;font-size:18px;font-weight:bold;color:#000;margin:0 0 5px;">${post.title}</h3>
-              <p style="font-family:'Work Sans',Arial,sans-serif;font-size:14px;color:#000;margin:0 0 10px;">${post.subtext || ''}</p>
-              <a href="https://toastedsesametherapy.com/posts/${post.slug}" target="_blank" style="font-family:'Work Sans',Arial,sans-serif;font-weight:bold;color:#000;">Read more &rarr;</a>
+              <h3 style="font-family:'Work Sans',Arial,sans-serif;font-size:18px;font-weight:bold;color:#000;margin:0 0 5px;">${safeTitle}</h3>
+              <p style="font-family:'Work Sans',Arial,sans-serif;font-size:14px;color:#000;margin:0 0 10px;">${safeSubtext}</p>
+              <a href="https://toastedsesametherapy.com/posts/${safeSlug}" target="_blank" style="font-family:'Work Sans',Arial,sans-serif;font-weight:bold;color:#000;">Read more &rarr;</a>
             </td>
           </tr>
         </table>
@@ -22,12 +80,27 @@ const createArchiveItemHtml = (post: any) => `
     </tr>
   </table>
 `;
+};
 
 // This is the main function that builds the entire email.
 export const getEmailHtml = (data: any): string => {
-  const archiveHtml = data.archive_posts.map(createArchiveItemHtml).join('');
+  // Escape text content (titles, dates) but NOT HTML content (main_body, toasty_take)
+  const safeHeaderTitle = escapeHtml(data.header_title || '');
+  const safeFormattedDate = escapeHtml(data.formatted_date || '');
+  const safeMainTitle = escapeHtml(data.main_title || '');
 
-  // This is your full, final HTML template with placeholders for your content.
+  // Use sanitizeHtmlContent for content that should allow HTML tags
+  const safeMainBody = sanitizeHtmlContent(data.main_body || '');
+  const safeToastyTake = sanitizeHtmlContent(data.toasty_take || '');
+
+  // FIXED: Better main image URL handling
+  const safeMainImageUrl = getSafeImageUrl(
+    data.main_image_url,
+    'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'
+  );
+
+  const archiveHtml = data.archive_posts?.map(createArchiveItemHtml).join('') || '';
+
   return `
   <!DOCTYPE html>
   <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -68,8 +141,55 @@ export const getEmailHtml = (data: any): string => {
         height: auto;
         display: block;
         border: 0;
+        outline: none;
+        text-decoration: none;
       }
-      a { text-decoration: none; }
+      a {
+        text-decoration: none;
+        outline: none;
+      }
+
+      /* FIXED: Better image handling for email clients */
+      .main-image {
+        width: 100% !important;
+        max-width: 640px !important;
+        height: auto !important;
+        display: block !important;
+        border: 0 !important;
+      }
+
+      .logo-image {
+        width: 300px !important;
+        max-width: 300px !important;
+        height: auto !important;
+        display: block !important;
+        margin: 0 auto 20px auto !important;
+      }
+
+      .icon-image {
+        width: 250px !important;
+        max-width: 250px !important;
+        height: auto !important;
+        display: block !important;
+      }
+
+      /* Add better styling for main body content */
+      .main-content {
+        font-family: 'Work Sans', Arial, sans-serif !important;;
+        font-size: 18px !important;;
+        line-height: 1.6 !important;;
+        color: #000000;
+      }
+      .main-content p {
+        margin: 0 0 16px 0;
+        font-size:  18px !important;
+        line-height: 1.6 !important;
+      }
+      .main-content h1, .main-content h2, .main-content h3 {
+        margin: 20px 0 12px 0;
+        font-weight: bold;
+      }
+
       @media screen and (max-width: 680px) {
           .email-container { width: 100% !important; }
           .card-wrapper { padding: 0 10px 20px 10px !important; }
@@ -77,8 +197,20 @@ export const getEmailHtml = (data: any): string => {
           .h1 { font-size: 32px !important; line-height: 1.2 !important; }
           .h2 { font-size: 24px !important; line-height: 1.3 !important; }
           .archive-img { width: 60px !important; height: 60px !important; }
+          .archive-img img { width: 60px !important; height: 60px !important; }
           .archive-text { padding-left: 15px !important; }
+          .main-content { font-size: 15px !important; }
+          .main-content p { font-size: 15px !important; }
+          .logo-image { width: 250px !important; max-width: 250px !important; }
+          .icon-image { width: 200px !important; max-width: 200px !important; }
       }
+
+      /* Outlook specific fixes */
+      <!--[if mso]>
+      .main-image { width: 640px !important; }
+      .logo-image { width: 300px !important; }
+      .icon-image { width: 250px !important; }
+      <![endif]-->
     </style>
   </head>
 
@@ -94,9 +226,12 @@ export const getEmailHtml = (data: any): string => {
           <!-- Header -->
           <tr>
             <td style="padding:40px 30px; text-align:center;" class="mobile-padding">
-              <img src="https://mcusercontent.com/f4b2666465f26c26e8f765b7e/images/bae03227-4033-0c24-6304-fc4189935fd5.png" width="300" alt="Toasted Sesame Therapy Logo" style="display:block; margin:0 auto 20px auto; max-width:300px; height:auto;">
-              <h1 class="h1" style="font-family:'Work Sans',Arial,sans-serif; font-size:44px; font-weight:900; line-height:1.1; color:#000000; margin:0;">${data.header_title}</h1>
-              <p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000; margin:10px 0 0;">${data.formatted_date}</p>
+              <img src="https://mcusercontent.com/f4b2666465f26c26e8f765b7e/images/bae03227-4033-0c24-6304-fc4189935fd5.png"
+                   class="logo-image"
+                   alt="Toasted Sesame Therapy Logo"
+                   style="width:300px;max-width:300px;height:auto;display:block;margin:0 auto 20px auto;border:0;">
+              <h1 class="h1" style="font-family:'Work Sans',Arial,sans-serif; font-size:44px; font-weight:900; line-height:1.1; color:#000000; margin:0;">${safeHeaderTitle}</h1>
+              <p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000; margin:10px 0 0;">${safeFormattedDate}</p>
             </td>
           </tr>
           <!-- Main Article -->
@@ -106,9 +241,16 @@ export const getEmailHtml = (data: any): string => {
                 <tr>
                   <td style="background-color:#ffffff; border:3px solid #000000; ">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td><img src="${data.main_image_url}" width="640" alt="Main Article" style="width:100%; max-width:100%; height:auto;"></td></tr>
-                      <tr><td style="padding:20px 30px 0 30px;" class="mobile-padding"><h2 class="h2" style="font-family:'Work Sans',Arial,sans-serif; font-size:30px; font-weight:bold; color:#000000; margin:0;">${data.main_title}</h2></td></tr>
-                      <tr><td style="padding:15px 30px 30px 30px;" class="mobile-padding">${data.main_body}</td></tr>
+                      <tr>
+                        <td>
+                          <img src="${safeMainImageUrl}"
+                               class="main-image"
+                               alt="Main Article Image"
+                               style="width:100%;max-width:640px;height:auto;display:block;border:0;">
+                        </td>
+                      </tr>
+                      <tr><td style="padding:20px 30px 0 30px;" class="mobile-padding"><h2 class="h2" style="font-family:'Work Sans',Arial,sans-serif; font-size:30px; font-weight:bold; color:#000000; margin:0;">${safeMainTitle}</h2></td></tr>
+                      <tr><td style="padding:15px 30px 30px 30px;" class="mobile-padding"><div class="main-content" style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000;">${safeMainBody}</div></td></tr>
                     </table>
                   </td>
                   <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;">&nbsp;</td>
@@ -127,8 +269,15 @@ export const getEmailHtml = (data: any): string => {
                       <tr>
                           <td style="background-color:#7FBC8C; border:3px solid #000000; ">
                               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                                  <tr><td style="padding:20px 30px 10px 30px;" class="mobile-padding"><img src="https://mcusercontent.com/f4b2666465f26c26e8f765b7e/images/f55df04f-ec82-a245-d156-765ea70160d7.png" width="250" alt="Toasty Tidbit Icon" style="max-width:250px; height:auto;"></td></tr>
-                                  <tr><td style="padding:0 30px 30px 30px;" class="mobile-padding"><p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000; margin:0;">${data.toasty_take}<br><br>&ndash; Your favorite therapist, Kay</p></td></tr>
+                                  <tr>
+                                    <td style="padding:20px 30px 10px 30px;" class="mobile-padding">
+                                      <img src="https://mcusercontent.com/f4b2666465f26c26e8f765b7e/images/f55df04f-ec82-a245-d156-765ea70160d7.png"
+                                           class="icon-image"
+                                           alt="Toasty Tidbit Icon"
+                                           style="width:250px;max-width:250px;height:auto;display:block;border:0;">
+                                    </td>
+                                  </tr>
+                                  <tr><td style="padding:0 30px 30px 30px;" class="mobile-padding"><div style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.5; color:#000000;">${safeToastyTake}<br><br>&ndash; Your favorite therapist, Kay</div></td></tr>
                               </table>
                           </td>
                           <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;">&nbsp;</td>
@@ -186,3 +335,4 @@ export const getEmailHtml = (data: any): string => {
     </html>
   `;
 };
+
