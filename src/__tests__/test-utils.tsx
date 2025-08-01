@@ -45,6 +45,11 @@ const createSupabaseQueryChain = () => {
 // Mock Supabase client with all necessary methods
 export const mockSupabaseClient = {
   from: jest.fn(() => createSupabaseQueryChain()),
+  channel: jest.fn().mockReturnValue({
+    on: jest.fn().mockReturnThis(),
+    subscribe: jest.fn(),
+  }),
+  removeChannel: jest.fn(),
   auth: {
     getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
     getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
@@ -62,6 +67,20 @@ export const mockSupabaseClient = {
   },
 }
 
+// Create mock contact helper (this was missing!)
+export const createMockContact = (overrides = {}) => ({
+  id: 1,
+  name: 'John Doe',
+  email: 'john@example.com',
+  status: 'New',
+  phone: null,
+  company: null,
+  notes: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...overrides,
+})
+
 // Create mock post helper
 export const createMockPost = (overrides = {}) => ({
   id: '123',
@@ -76,6 +95,21 @@ export const createMockPost = (overrides = {}) => ({
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   ...overrides,
+})
+
+// Mock API response helpers
+export const mockApiResponse = (data = {}, status = 200) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  json: () => Promise.resolve(data),
+  text: () => Promise.resolve(JSON.stringify(data)),
+})
+
+export const mockApiError = (message = 'API Error', status = 500) => ({
+  ok: false,
+  status,
+  json: () => Promise.resolve({ error: message }),
+  text: () => Promise.resolve(JSON.stringify({ error: message })),
 })
 
 // Custom render function (if you need providers later)
