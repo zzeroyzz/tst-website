@@ -103,6 +103,7 @@ const NewsletterView = () => {
 
     if (error) {
       console.error("Error fetching posts:", error);
+      toast.error("Failed to fetch posts");
     } else {
       setPosts(data as Post[]);
     }
@@ -115,35 +116,72 @@ const NewsletterView = () => {
 
   const handleDeleteClick = (e: React.MouseEvent, post: Post) => {
     e.stopPropagation(); // Prevent row click
+    console.log("Delete button clicked for post:", post.id, post.title); // Debug log
     setDeleteModal({ show: true, post });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteModal.post) return;
+    if (!deleteModal.post) {
+      console.error("No post selected for deletion");
+      return;
+    }
+
+    const postToDelete = deleteModal.post;
+    console.log("Attempting to delete post:", postToDelete.id, postToDelete.title); // Debug log
 
     setIsDeleting(true);
     const deleteToast = toast.loading('Deleting post...');
 
     try {
-      const { error } = await supabase
+      // First, let's check if the post exists
+      const { data: existingPost, error: checkError } = await supabase
         .from("posts")
-        .delete()
-        .eq("id", deleteModal.post.id);
+        .select("id, title")
+        .eq("id", postToDelete.id)
+        .single();
 
-      if (error) {
-        throw error;
+      if (checkError) {
+        console.error("Error checking if post exists:", checkError);
+        throw new Error(`Post not found: ${checkError.message}`);
       }
 
+      console.log("Post exists, proceeding with deletion:", existingPost); // Debug log
+
+      // Now delete the post
+      const { error: deleteError, data: deletedData } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", postToDelete.id)
+        .select(); // This will return the deleted rows
+
+      console.log("Delete operation result:", { deleteError, deletedData }); // Debug log
+
+      if (deleteError) {
+        console.error("Delete error:", deleteError);
+        throw new Error(deleteError.message);
+      }
+
+      if (!deletedData || deletedData.length === 0) {
+        throw new Error("No rows were deleted. Post may not exist or you may not have permission.");
+      }
+
+      console.log("Successfully deleted post:", deletedData); // Debug log
+
       // Update local state to remove the deleted post
-      setPosts(prev => prev.filter(p => p.id !== deleteModal.post!.id));
+      setPosts(prev => {
+        const updated = prev.filter(p => p.id !== postToDelete.id);
+        console.log("Updated posts array, removed post:", postToDelete.id); // Debug log
+        return updated;
+      });
 
       toast.dismiss(deleteToast);
-      toast.success('Post deleted successfully!');
+      toast.success(`Post "${postToDelete.title}" deleted successfully!`);
       setDeleteModal({ show: false, post: null });
 
     } catch (error: any) {
+      console.error("Delete operation failed:", error); // Debug log
       toast.dismiss(deleteToast);
-      toast.error(`Failed to delete post: ${error.message}`);
+      toast.error(`Failed to delete post: ${error.message || 'Unknown error'}`);
     } finally {
       setIsDeleting(false);
     }
@@ -224,15 +262,18 @@ const NewsletterView = () => {
                         {post.status}
                       </span>
                     </td>
-                    <td className="p-4">
-                       <Button
-                                        type="button"
-                                         onClick={(e) => handleDeleteClick(e, post)}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                                        wrapperClassName="absolute -top-2 -right-2"
-                                    >
-                                        <X size={16} />
-                                    </Button>
+                    <td className="p-4 relative">
+                      <div className="wrapper relative">
+                        <div className="shadow"></div>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteClick(e, post)}
+                          className="button bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors relative z-10"
+                          title={`Delete "${post.title}"`}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -240,6 +281,18 @@ const NewsletterView = () => {
             </table>
           </div>
         </div>
+
+        {posts.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>No newsletter posts found.</p>
+            <Button
+              className="bg-tst-purple mt-4"
+              onClick={() => router.push('/dashboard/newsletter/create')}
+            >
+              Create Your First Post
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
