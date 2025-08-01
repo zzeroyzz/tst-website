@@ -5,9 +5,9 @@ import LeadsView from '../LeadsView'
 import { createMockContact, mockSupabaseClient } from '@/__tests__/test-utils'
 
 // Mock dependencies
-jest.mock('@supabase/auth-helpers-nextjs')
-
-global.fetch = jest.fn()
+jest.mock('@supabase/auth-helpers-nextjs', () => ({
+  createClientComponentClient: jest.fn(() => mockSupabaseClient)
+}))
 
 describe('LeadsView', () => {
   const mockLeads = [
@@ -30,23 +30,22 @@ describe('LeadsView', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    // Mock Supabase client
-    mockSupabaseClient.from.mockReturnValue({
+    // Reset Supabase client mocks
+    jest.mocked(mockSupabaseClient.from).mockReturnValue({
       select: jest.fn().mockReturnThis(),
       order: jest.fn().mockResolvedValue({
         data: mockLeads,
         error: null,
       }),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValue({ data: null, error: null }),
     })
 
-    mockSupabaseClient.channel.mockReturnValue({
+    jest.mocked(mockSupabaseClient.channel).mockReturnValue({
       on: jest.fn().mockReturnThis(),
       subscribe: jest.fn(),
     })
-
-    require('@supabase/auth-helpers-nextjs').createClientComponentClient = jest.fn(
-      () => mockSupabaseClient
-    )
   })
 
   it('renders leads table with data', async () => {
@@ -62,48 +61,56 @@ describe('LeadsView', () => {
   })
 
   it('shows loading skeleton initially', () => {
-    // Mock loading state
-    mockSupabaseClient.from.mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      order: jest.fn().mockImplementation(
-        () => new Promise(() => {}) // Never resolves
-      ),
-    })
-
-    render(<LeadsView />)
-
-    // Should show skeleton loader
-    expect(screen.getByText('Leads')).toBeInTheDocument()
-    // Skeleton elements would be tested via data-testid or class names
+  // Mock loading state - never resolving promise
+  jest.mocked(mockSupabaseClient.from).mockReturnValue({
+    select: jest.fn().mockReturnThis(),
+    order: jest.fn().mockImplementation(
+      () => new Promise(() => {}) // Never resolves
+    ),
   })
+
+  render(<LeadsView />)
+
+  // Should show skeleton loader elements
+  expect(screen.getByRole('table')).toBeInTheDocument()
+
+  // Check for skeleton elements by their CSS classes
+  const skeletonElements = document.querySelectorAll('.animate-pulse')
+  expect(skeletonElements.length).toBeGreaterThan(0)
+})
 
   it('opens lead detail modal when row is clicked', async () => {
-    const user = userEvent.setup()
-    render(<LeadsView />)
+  const user = userEvent.setup()
+  render(<LeadsView />)
 
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-    })
-
-    // Click on lead row
-    await user.click(screen.getByText('John Doe'))
-
-    // Modal should open
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-      expect(screen.getByDisplayValue('New')).toBeInTheDocument()
-    })
+  await waitFor(() => {
+    expect(screen.getByText('John Doe')).toBeInTheDocument()
   })
+
+  // Click on lead row
+  await user.click(screen.getByText('John Doe'))
+
+  // Modal should open - check for the modal content that's actually rendered
+  await waitFor(() => {
+    // Check for the "Save Changes" button which is unique to the modal
+    expect(screen.getByText('Save Changes')).toBeInTheDocument()
+    // And check for the status select field
+    expect(screen.getByDisplayValue('New')).toBeInTheDocument()
+  })
+})
 
   it('updates lead status in modal', async () => {
     const user = userEvent.setup()
 
     // Mock update response
-    mockSupabaseClient.from.mockReturnValue({
+    const mockUpdate = jest.fn().mockReturnThis()
+    const mockEq = jest.fn().mockResolvedValue({ data: null, error: null })
+
+    jest.mocked(mockSupabaseClient.from).mockReturnValue({
       select: jest.fn().mockReturnThis(),
       order: jest.fn().mockResolvedValue({ data: mockLeads, error: null }),
-      update: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+      update: mockUpdate,
+      eq: mockEq,
     })
 
     render(<LeadsView />)
@@ -124,10 +131,11 @@ describe('LeadsView', () => {
     await user.selectOptions(statusSelect, 'Contacted')
 
     // Save changes
-    await user.click(screen.getByText('Save Changes'))
+    const saveButton = screen.getByText('Save Changes')
+    await user.click(saveButton)
 
     await waitFor(() => {
-      expect(mockSupabaseClient.from().update).toHaveBeenCalledWith(
+      expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ status: 'Contacted' })
       )
     })
@@ -135,15 +143,6 @@ describe('LeadsView', () => {
 
   it('sends reminder email', async () => {
     const user = userEvent.setup()
-
-    // Mock API response for reminder
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({
-        message: 'Reminder sent successfully!',
-        emailSent: true,
-      }),
-    })
 
     render(<LeadsView />)
 
@@ -171,39 +170,44 @@ describe('LeadsView', () => {
   })
 
   it('deletes lead with confirmation', async () => {
-    const user = userEvent.setup()
+  const user = userEvent.setup()
 
-    // Mock delete response
-    mockSupabaseClient.from.mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      order: jest.fn().mockResolvedValue({ data: mockLeads, error: null }),
-      delete: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockResolvedValue({ data: null, error: null }),
-    })
+  // Mock delete response
+  const mockDelete = jest.fn().mockReturnThis()
+  const mockEq = jest.fn().mockResolvedValue({ data: null, error: null })
 
-    render(<LeadsView />)
-
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-    })
-
-    // Find and click delete button (X button)
-    const deleteButtons = screen.getAllByText('×')
-    await user.click(deleteButtons[0])
-
-    // Confirmation modal should appear
-    await waitFor(() => {
-      expect(screen.getByText('Delete Lead')).toBeInTheDocument()
-      expect(screen.getByText('Are you sure you want to delete this lead?')).toBeInTheDocument()
-    })
-
-    // Confirm deletion
-    await user.click(screen.getByText('Delete Lead'))
-
-    await waitFor(() => {
-      expect(mockSupabaseClient.from().delete).toHaveBeenCalled()
-    })
+  jest.mocked(mockSupabaseClient.from).mockReturnValue({
+    select: jest.fn().mockReturnThis(),
+    order: jest.fn().mockResolvedValue({ data: mockLeads, error: null }),
+    delete: mockDelete,
+    eq: mockEq,
   })
+
+  render(<LeadsView />)
+
+  await waitFor(() => {
+    expect(screen.getByText('John Doe')).toBeInTheDocument()
+  })
+
+  // Find delete button by its red background color class
+  const deleteButton = document.querySelector('.bg-red-500')
+  expect(deleteButton).toBeInTheDocument()
+  await user.click(deleteButton!)
+
+  // Confirmation modal should appear
+  await waitFor(() => {
+    expect(screen.getByRole('heading', { name: 'Delete Lead' })).toBeInTheDocument()
+    expect(screen.getByText('Are you sure you want to delete this lead?')).toBeInTheDocument()
+  })
+
+  // Confirm deletion - find the button specifically
+  const confirmDeleteButton = screen.getByRole('button', { name: 'Delete Lead' })
+  await user.click(confirmDeleteButton)
+
+  await waitFor(() => {
+    expect(mockDelete).toHaveBeenCalled()
+  })
+})
 
   it('filters warm vs cold leads correctly', async () => {
     const warmLead = createMockContact({
@@ -220,7 +224,7 @@ describe('LeadsView', () => {
       created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
     })
 
-    mockSupabaseClient.from.mockReturnValue({
+    jest.mocked(mockSupabaseClient.from).mockReturnValue({
       select: jest.fn().mockReturnThis(),
       order: jest.fn().mockResolvedValue({
         data: [warmLead, coldLead],
@@ -235,17 +239,15 @@ describe('LeadsView', () => {
       expect(screen.getByText('Cold Lead')).toBeInTheDocument()
     })
 
-    // Check for warm/cold indicators
+    // Check for warm/cold indicators - adjust based on your implementation
+    // You might need to add data-testid attributes to make this more reliable
     const indicators = screen.getAllByTitle(/Lead$/)
     expect(indicators).toHaveLength(2)
-
-    // Visual indicators would be tested via CSS classes or colors
-    // This would require more specific selectors or data-testid attributes
   })
 
   it('handles API errors gracefully', async () => {
     // Mock API error
-    mockSupabaseClient.from.mockReturnValue({
+    jest.mocked(mockSupabaseClient.from).mockReturnValue({
       select: jest.fn().mockReturnThis(),
       order: jest.fn().mockResolvedValue({
         data: null,
@@ -264,12 +266,20 @@ describe('LeadsView', () => {
   it('updates lead data in real-time', async () => {
     let channelCallback: (payload: any) => void
 
-    mockSupabaseClient.channel.mockReturnValue({
+    jest.mocked(mockSupabaseClient.channel).mockReturnValue({
       on: jest.fn().mockImplementation((event, config, callback) => {
         channelCallback = callback
         return { subscribe: jest.fn() }
       }),
       subscribe: jest.fn(),
+    })
+
+    const mockSelect = jest.fn().mockReturnThis()
+    const mockOrder = jest.fn().mockResolvedValue({ data: mockLeads, error: null })
+
+    jest.mocked(mockSupabaseClient.from).mockReturnValue({
+      select: mockSelect,
+      order: mockOrder,
     })
 
     render(<LeadsView />)
@@ -285,6 +295,6 @@ describe('LeadsView', () => {
     })
 
     // Component should refetch data
-    expect(mockSupabaseClient.from().select).toHaveBeenCalledTimes(2)
+    expect(mockSelect).toHaveBeenCalledTimes(2)
   })
 })
