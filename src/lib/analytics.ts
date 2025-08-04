@@ -1,10 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// Track custom events
-export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, parameters);
+// Add a utility to check if gtag is ready
+const waitForGtag = (timeout = 5000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      resolve(true);
+      return;
+    }
+
+    const startTime = Date.now();
+    const checkGtag = () => {
+      if (window.gtag) {
+        resolve(true);
+      } else if (Date.now() - startTime > timeout) {
+        resolve(false);
+      } else {
+        setTimeout(checkGtag, 100);
+      }
+    };
+    checkGtag();
+  });
+};
+
+// Track custom events with better error handling
+export const trackEvent = async (eventName: string, parameters?: Record<string, any>) => {
+  if (typeof window === 'undefined') return;
+
+  const gtagReady = await waitForGtag();
+  if (!gtagReady) {
+    console.warn('⚠️ gtag not ready, event not sent:', eventName);
+    return;
   }
+
+  try {
+    window.gtag('event', eventName, {
+      debug_mode: process.env.NODE_ENV === 'development',
+      ...parameters
+    });
+  } catch (error) {
+    console.error('❌ GA4 event failed:', eventName, error);
+  }
+};
+
+// Ultra-simplified contact form conversion tracking
+export const trackContactFormConversion = async (
+  source: 'homepage' | 'contact',
+  additionalData?: Record<string, any>
+) => {
+  const eventParams = {
+    value: 1,
+    currency: 'USD',
+    source: source,
+    ...additionalData,
+  };
+
+  await trackEvent('tst_contact_lead', eventParams);
 };
 
 // Track page views (for client-side navigation)
@@ -14,33 +64,6 @@ export const trackPageView = (url: string, title?: string) => {
       page_path: url,
       page_title: title,
     });
-  }
-};
-
-// NEW: Enhanced contact form conversion tracking
-export const trackContactFormConversion = (source: 'homepage' | 'contact', additionalData?: Record<string, any>) => {
-  // Track the main conversion event that Google Ads can use
-  trackEvent('contact_form_conversion', {
-    event_category: 'conversion',
-    event_label: `contact_form_${source}`,
-    source: source,
-    value: 1, // Assign a value for conversion optimization
-    currency: 'USD',
-    ...additionalData
-  });
-
-  // Also track as a 'generate_lead' event (Google Ads recommended event)
-  trackEvent('generate_lead', {
-    event_category: 'conversion',
-    event_label: source,
-    value: 1,
-    currency: 'USD',
-    ...additionalData
-  });
-
-  // Debug log in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🎯 Conversion tracked:', { source, additionalData });
   }
 };
 
