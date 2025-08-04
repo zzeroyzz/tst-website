@@ -30,6 +30,23 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({ measurementId }) => {
       gtag('js', new Date());
       gtag('config', measurementId, {
         page_path: window.location.pathname,
+        // Enhanced ecommerce and conversion tracking
+        custom_map: {
+          'custom_parameter_1': 'contact_source'
+        },
+        // Enable enhanced measurement for better conversion tracking
+        enhanced_measurements: {
+          scrolls: true,
+          outbound_clicks: true,
+          site_search: true,
+          video_engagement: true,
+          file_downloads: true
+        }
+      });
+
+      // Set up conversion linker for Google Ads
+      gtag('config', 'AW-CONVERSION_ID', {
+        allow_enhanced_conversions: true
       });
     }
   }, [measurementId]);
@@ -42,4 +59,3 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({ measurementId }) => {
 };
 
 export default GoogleAnalytics;
-
