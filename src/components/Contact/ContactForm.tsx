@@ -38,20 +38,20 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔍 Form submitted - start');
+
+    // Prevent double execution
+    if (trackingInProgress.current) {
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
+    trackingInProgress.current = true;
 
     // Determine the source for tracking
     const source = isContactPage ? 'contact' : 'homepage';
-    console.log('🔍 Source determined:', source);
 
     try {
       const response = await fetch('/api/contact', {
@@ -64,14 +64,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         throw new Error('Something went wrong. Please try again.');
       }
 
-      console.log('🔍 About to call trackContactFormConversion');
       // ✅ Track successful conversion
       await trackContactFormConversion(source, {
         name: formData.name,
         has_phone: !!formData.phone,
         timestamp: new Date().toISOString(),
       });
-      console.log('🔍 trackContactFormConversion completed');
 
       // Also track the form submission success
       trackFormSubmission(`contact_form_${source}`, true);
@@ -79,7 +77,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       setIsSubmitted(true);
 
     } catch (err: unknown) {
-      console.log('🔍 Error occurred, tracking failure');
       // ❌ Track the failed submission
       trackFormSubmission(`contact_form_${source}`, false);
 
@@ -90,22 +87,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       }
     } finally {
       setIsSubmitting(false);
+      trackingInProgress.current = false;
     }
-  };
-
-  // Test function for development
-  const handleTestTracking = async () => {
-    const source = isContactPage ? 'contact' : 'homepage';
-    console.log('🧪 Testing tracking for:', source);
-
-    await trackContactFormConversion(source, {
-      name: 'Test User',
-      has_phone: true,
-      timestamp: new Date().toISOString(),
-      test_mode: true,
-    });
-
-    console.log('🧪 Test tracking completed');
   };
 
   const renderPostSubmitContent = () => {
@@ -150,18 +133,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
           <h2 className="text-4xl md:text-5xl font-extrabold mb-10">
             Reach out to start therapy.
           </h2>
-
-          {/* Test button for development */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mb-6">
-              <button
-                onClick={handleTestTracking}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                🧪 Test Tracking (Dev Only)
-              </button>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-8">
