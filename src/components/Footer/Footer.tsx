@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import HoverLink from '@/components/HoverLink/HoverLink';
+import CookieSettings from '@/components/CookieSettings/CookieSettings';
 
 const Footer = () => {
   return (
@@ -125,6 +126,7 @@ const Footer = () => {
               <p className="font-bold">
                 &copy; {new Date().getFullYear()} Toasted Sesame Therapy. All rights reserved.
               </p>
+               <CookieSettings />
             </div>
           </div>
         </div>

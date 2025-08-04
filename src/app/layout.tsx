@@ -5,6 +5,8 @@ import Nav from "@/components/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next"
+import GoogleAnalytics from "@/components/Analytics/GoogleAnalytics";
+import CookieConsent from "@/components/CookieConsent/CookieConsent";
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -67,6 +69,11 @@ export default function RootLayout({
            <Analytics />
         </main>
         <Footer />
+         {/* Google Analytics with Consent Mode */}
+        <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!} />
+
+        {/* Cookie Consent Banner */}
+        <CookieConsent />
       </body>
     </html>
   );
