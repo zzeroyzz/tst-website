@@ -3,14 +3,14 @@
 // Add a utility to check if gtag is ready
 const waitForGtag = (timeout = 5000): Promise<boolean> => {
   return new Promise((resolve) => {
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       resolve(true);
       return;
     }
 
     const startTime = Date.now();
     const checkGtag = () => {
-      if (window.gtag) {
+      if (typeof window.gtag === 'function') {
         resolve(true);
       } else if (Date.now() - startTime > timeout) {
         resolve(false);
@@ -59,7 +59,7 @@ export const trackContactFormConversion = async (
 
 // Track page views (for client-side navigation)
 export const trackPageView = (url: string, title?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     window.gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID, {
       page_path: url,
       page_title: title,
