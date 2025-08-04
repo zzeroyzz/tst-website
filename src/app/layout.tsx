@@ -5,7 +5,6 @@ import Nav from "@/components/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next"
-import GoogleAnalytics from "@/components/Analytics/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent/CookieConsent";
 
 const workSans = Work_Sans({
@@ -59,6 +58,22 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessSchema) }}
         />
+
+  {/* ✅ Google Analytics Tag */}
+  <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`} />
+
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
+          debug_mode: true
+        });
+      `,
+    }}
+  />
       </head>
       <body
         className={`${workSans.variable} font-sans bg-tst-cream text-black antialiased`}
@@ -69,10 +84,7 @@ export default function RootLayout({
            <Analytics />
         </main>
         <Footer />
-         {/* Google Analytics with Consent Mode */}
-        <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!} />
-
-        {/* Cookie Consent Banner */}
+         
         <CookieConsent />
       </body>
     </html>
