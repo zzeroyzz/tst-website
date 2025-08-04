@@ -1,9 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
 
 // Track custom events
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {

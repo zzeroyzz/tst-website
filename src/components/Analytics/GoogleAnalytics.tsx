@@ -1,14 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { GoogleAnalytics as NextGoogleAnalytics } from '@next/third-parties/google';
 import { useEffect } from 'react';
-
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
-  }
-}
 
 interface GoogleAnalyticsProps {
   measurementId: string;
