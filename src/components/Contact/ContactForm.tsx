@@ -1,4 +1,4 @@
-// src/components/Contact/ContactForm.tsx
+// Update src/components/Contact/ContactForm.tsx - Add conversion tracking
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -6,6 +6,7 @@ import Confetti from "react-confetti";
 import Button from "@/components/Button/Button";
 import FAQ from "@/components/FAQ/FAQ";
 import Input from "@/components/Input/Input";
+import { trackContactFormConversion, trackFormSubmission } from "@/lib/analytics";
 
 interface ContactFormProps {
   isContactPage?: boolean;
@@ -39,6 +40,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     setIsSubmitting(true);
     setError(null);
 
+    // Determine the source for tracking
+    const source = isContactPage ? 'contact' : 'homepage';
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -50,8 +54,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         throw new Error('Something went wrong. Please try again.');
       }
 
+      // SUCCESS: Track the conversion
+      trackContactFormConversion(source, {
+        name: formData.name,
+        has_phone: !!formData.phone,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Also track the form submission success
+      trackFormSubmission(`contact_form_${source}`, true);
+
       setIsSubmitted(true);
+
     } catch (err: unknown) {
+      // ERROR: Track the failed submission
+      trackFormSubmission(`contact_form_${source}`, false);
+
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -124,7 +142,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-
                 />
                 <Input
                   type="email"
@@ -134,7 +151,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-
                 />
               </div>
               <div className="mt-4">

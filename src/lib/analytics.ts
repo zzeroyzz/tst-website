@@ -17,6 +17,33 @@ export const trackPageView = (url: string, title?: string) => {
   }
 };
 
+// NEW: Enhanced contact form conversion tracking
+export const trackContactFormConversion = (source: 'homepage' | 'contact', additionalData?: Record<string, any>) => {
+  // Track the main conversion event that Google Ads can use
+  trackEvent('contact_form_conversion', {
+    event_category: 'conversion',
+    event_label: `contact_form_${source}`,
+    source: source,
+    value: 1, // Assign a value for conversion optimization
+    currency: 'USD',
+    ...additionalData
+  });
+
+  // Also track as a 'generate_lead' event (Google Ads recommended event)
+  trackEvent('generate_lead', {
+    event_category: 'conversion',
+    event_label: source,
+    value: 1,
+    currency: 'USD',
+    ...additionalData
+  });
+
+  // Debug log in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🎯 Conversion tracked:', { source, additionalData });
+  }
+};
+
 // Track form submissions
 export const trackFormSubmission = (formName: string, success: boolean = true) => {
   trackEvent('form_submit', {
