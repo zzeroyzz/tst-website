@@ -1,4 +1,4 @@
-// src/components/ContactForm.tsx
+// src/components/Contact/ContactForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
