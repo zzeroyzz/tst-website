@@ -53,7 +53,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     // }
 
     setIsSubmitted(true);
-     window.dataLayer = window.dataLayer || [];
+      window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "generate_lead",
         page_source: isContactPage ? "contact" : "homepage",
