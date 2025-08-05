@@ -6,6 +6,7 @@ import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next"
 import CookieConsent from "@/components/CookieConsent/CookieConsent";
+import Script from 'next/script';
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -59,21 +60,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessSchema) }}
         />
 
-  {/* ✅ Google Analytics Tag */}
-  <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`} />
-
-  <script
-    dangerouslySetInnerHTML={{
-      __html: `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
-          debug_mode: true
-        });
-      `,
-    }}
-  />
+<Script
+  id="gtm-init"
+  strategy="afterInteractive"
+  dangerouslySetInnerHTML={{
+    __html: `
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id=GTM-N6VXX6CK'+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-N6VXX6CK');
+    `,
+  }}
+/>
       </head>
       <body
         className={`${workSans.variable} font-sans bg-tst-cream text-black antialiased`}
@@ -84,8 +83,16 @@ export default function RootLayout({
            <Analytics />
         </main>
         <Footer />
-         
+
         <CookieConsent />
+<noscript>
+  <iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-N6VXX6CK"
+    height="0"
+    width="0"
+    style={{ display: 'none', visibility: 'hidden' }}
+  />
+</noscript>
       </body>
     </html>
   );
