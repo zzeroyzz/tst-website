@@ -108,7 +108,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
             Reach out to start therapy.
           </h2>
 
-          <form onSubmit={handleSubmit}>
+          <form id="contact-form" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-8">
               <Input
                 type="text"
