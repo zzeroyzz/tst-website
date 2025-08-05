@@ -88,7 +88,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   };
 
   return (
-    <div id="contact-form" className="relative bg-white p-12 rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
+    <div className="relative bg-white p-12 rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
       {isSubmitted && (
         <Confetti
           width={width}
