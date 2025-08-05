@@ -51,14 +51,15 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     // if (!response.ok) {
     //   throw new Error('Something went wrong. Please try again.');
     // }
-      window.dataLayer = window.dataLayer || [];
+
+    setIsSubmitted(true);
+     window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "generate_lead",
         page_source: isContactPage ? "contact" : "homepage",
         form_location: window.location.pathname,
         form_type: isContactPage ? "contact" : "homepage",
       });
-    setIsSubmitted(true);
 
   } catch (err: unknown) {
     if (err instanceof Error) {
