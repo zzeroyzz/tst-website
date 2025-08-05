@@ -41,15 +41,16 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   setError(null);
 
   try {
-    const response = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
+    // Mailchimp API call commented out
+    // const response = await fetch('/api/contact', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(formData),
+    // });
 
-    if (!response.ok) {
-      throw new Error('Something went wrong. Please try again.');
-    }
+    // if (!response.ok) {
+    //   throw new Error('Something went wrong. Please try again.');
+    // }
 
     setIsSubmitted(true);
 
