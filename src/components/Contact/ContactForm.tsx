@@ -1,12 +1,11 @@
-// Update src/components/Contact/ContactForm.tsx - Add conversion tracking
+// Update src/components/Contact/ContactForm.tsx
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Confetti from "react-confetti";
 import Button from "@/components/Button/Button";
 import FAQ from "@/components/FAQ/FAQ";
 import Input from "@/components/Input/Input";
-import { trackContactFormConversion, trackFormSubmission } from "@/lib/analytics";
 
 interface ContactFormProps {
   isContactPage?: boolean;
@@ -31,65 +30,39 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [error, setError] = useState<string | null>(null);
   const { width, height } = useWindowSize();
 
-  // Prevent double-execution with ref
-  const trackingInProgress = useRef(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Prevent double execution
-    if (trackingInProgress.current) {
-      return;
+  setIsSubmitting(true);
+  setError(null);
+
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Something went wrong. Please try again.');
     }
 
-    setIsSubmitting(true);
-    setError(null);
-    trackingInProgress.current = true;
+    setIsSubmitted(true);
 
-    // Determine the source for tracking
-    const source = isContactPage ? 'contact' : 'homepage';
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Something went wrong. Please try again.');
-      }
-
-      // ✅ Track successful conversion
-      await trackContactFormConversion(source, {
-        name: formData.name,
-        has_phone: !!formData.phone,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Also track the form submission success
-      trackFormSubmission(`contact_form_${source}`, true);
-
-      setIsSubmitted(true);
-
-    } catch (err: unknown) {
-      // ❌ Track the failed submission
-      trackFormSubmission(`contact_form_${source}`, false);
-
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-    } finally {
-      setIsSubmitting(false);
-      trackingInProgress.current = false;
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError("An unexpected error occurred.");
     }
-  };
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const renderPostSubmitContent = () => {
     return (
