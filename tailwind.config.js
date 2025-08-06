@@ -19,6 +19,8 @@ module.exports = {
         sans: ["var(--font-work-sans)", "sans-serif"],
       },
       boxShadow: {
+        brutalistXs: "2px 3px 0 #000",
+        brutalistSm: "3px 3px 0 #000",
         brutalist: "4px 4px 0 #000",
         brutalistLg: "6px 6px 0 #000",
       },
