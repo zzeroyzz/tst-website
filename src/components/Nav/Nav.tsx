@@ -101,9 +101,9 @@ const Nav: React.FC = () => {
           <ul className="flex items-center space-x-3 font-bold">
             {!isDashboardPage && (
               <>
-             <li><HoverLink href="/therapy-services">Therapy Services</HoverLink></li>
-            <li><HoverLink href="/about">About</HoverLink></li>
-            <li><HoverLink href="/guides">Free Guides</HoverLink></li>
+             <li><HoverLink href="/therapy-services" id="therapy-service-nav-link">Therapy Services</HoverLink></li>
+            <li><HoverLink href="/about" id="about-nav-link">About</HoverLink></li>
+            <li><HoverLink href="/guides" id="guides-nav-link">Free Guides</HoverLink></li>
             </>
             )}
             {user && (
@@ -116,7 +116,7 @@ const Nav: React.FC = () => {
           </ul>
           {!isDashboardPage && (
             <div>
-              <Button onClick={handleGetStartedClick} className="bg-tst-purple">
+              <Button onClick={handleGetStartedClick} className="bg-tst-purple" id="nav-get-started-btn">
                 Get Started
               </Button>
             </div>
