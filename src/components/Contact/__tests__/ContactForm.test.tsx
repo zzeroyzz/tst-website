@@ -29,10 +29,6 @@ jest.mock('@/lib/analytics', () => ({
   trackFormSubmission: jest.fn(),
 }))
 
-// Type the mocked functions
-const mockTrackContactFormConversion = trackContactFormConversion as jest.MockedFunction<typeof trackContactFormConversion>
-const mockTrackFormSubmission = trackFormSubmission as jest.MockedFunction<typeof trackFormSubmission>
-
 describe('ContactForm', () => {
   beforeEach(() => {
     jest.clearAllMocks()
