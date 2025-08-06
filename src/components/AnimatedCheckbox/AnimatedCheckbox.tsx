@@ -5,15 +5,17 @@ import clsx from "clsx";
 import styles from "./AnimatedCheckbox.module.css";
 
 interface AnimatedCheckboxProps {
+  id: string;
   label: string;
 }
 
-const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ label }) => {
+const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ id, label }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <label className="flex items-center gap-4 cursor-pointer group">
+    <label htmlFor={id} className="flex items-center gap-4 cursor-pointer group">
       <input
+        id={id}
         type="checkbox"
         className="hidden"
         checked={isChecked}

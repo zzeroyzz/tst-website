@@ -55,11 +55,24 @@ export const testimonials = [
      altText: "Teal decorative icon for testimonial.",
   },
 ];
+
 export const checklistItems = [
-  "You meet others' needs and lose track of your own.",
-  "You feel everything, even when you wish you didn't.",
-  "You're tired in a way rest doesn't fix.",
-  "You're ready for change, but don't know where to start.",
+  {
+    id: "checkbox-1",
+    label: "You meet others' needs and lose track of your own.",
+  },
+  {
+    id: "checkbox-2",
+    label: "You feel everything, even when you wish you didn't.",
+  },
+  {
+    id: "checkbox-3",
+    label: "You're tired in a way rest doesn't fix.",
+  },
+  {
+    id: "checkbox-4",
+    label: "You're ready for change, but don't know where to start.",
+  },
 ];
 
 
