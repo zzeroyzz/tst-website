@@ -13,6 +13,7 @@ interface Guide {
   tags: string[];
   bgColor: string;
   alt: string;
+  id: string;
 }
 
 interface LeadMagnetProps {
@@ -22,7 +23,7 @@ interface LeadMagnetProps {
 const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
   <Link href="/guides" className={styles.wrapper}>
     <div className={styles.shadow}></div>
-    <div className={clsx(styles.card, guide.bgColor)}>
+    <div className={clsx(styles.card, guide.bgColor)} id={guide.id}>
       <div className="mb-3 flex justify-center flex-shrink-0">
         <Image src={guide.iconUrl} alt={guide.alt} width={100} height={100} />
       </div>
