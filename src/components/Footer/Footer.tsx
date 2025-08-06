@@ -120,7 +120,7 @@ const Footer = () => {
             {/* Crisis Info and Copyright - Right Side */}
             <div className="text-center md:text-right">
               <p className="mb-2">
-                This site is not for crisis support.<br className="hidden md:inline" />
+                This site is not for crisis support. <br className="hidden md:inline" />
                 <span className="md:ml-1">Crisis resources are available on the <Link href="/policy" className="underline font-bold">Policy Page</Link></span>
               </p>
               <p className="font-bold">

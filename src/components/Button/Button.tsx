@@ -3,6 +3,7 @@ import clsx from "clsx";
 import styles from "./Button.module.css";
 
 interface ButtonProps {
+  id?: string,
   children: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
@@ -18,6 +19,7 @@ const Button: React.FC<ButtonProps> = ({
   type = "button",
   wrapperClassName = "",
   disabled = false,
+  id
 }) => {
   return (
     <div className={clsx(styles.wrapper, wrapperClassName)}>
@@ -27,6 +29,7 @@ const Button: React.FC<ButtonProps> = ({
         onClick={onClick}
         className={clsx(styles.button, className)}
         disabled={disabled}
+        id={id}
       >
         {children}
       </button>

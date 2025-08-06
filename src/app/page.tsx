@@ -181,10 +181,10 @@ export default function HomePage() {
               className="flex flex-col md:flex-row flex-wrap gap-4 pt-4"
               variants={heroItemVariants}
             >
-              <Button onClick={handleScroll} className="bg-tst-yellow">
+              <Button onClick={handleScroll} className="bg-tst-yellow" id="book-a-call-btn">
                 Book a call
               </Button>
-              <Button onClick={handleResourcesClick} className="bg-white">
+              <Button onClick={handleResourcesClick} className="bg-white" id="download-free-guides-btn">
                Download Your Free Guides
               </Button>
             </motion.div>
@@ -293,13 +293,13 @@ export default function HomePage() {
                   <TiredAnimationSection width={200} height={200}/>
                 </div>
 
-                <div className="flex flex-col gap-4">
-                  {checklistItems.map((item, index) => (
-                    <AnimatedCheckbox key={index} label={item} />
-                  ))}
+              <div className="flex flex-col gap-4">
+                {checklistItems.map((item) => (
+                <AnimatedCheckbox key={item.id} id={item.id} label={item.label} />
+                ))}
                 </div>
                 <div className="pt-4">
-                  <Button onClick={handleScroll} className="bg-tst-purple">
+                  <Button onClick={handleScroll} className="bg-tst-purple" id="checkbox-get-started-btn">
                     Get Started
                   </Button>
                 </div>

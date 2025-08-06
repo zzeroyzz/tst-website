@@ -9,6 +9,7 @@ export const guides = [
     tags: ["Mindfulness", "Self-Awareness"],
     bgColor: "bg-tst-yellow",
     alt: "Icon representing self-advocacy in healthcare",
+    id:"guide-1"
   },
   {
     title: "Communicate with Heart & Clarity",
@@ -18,6 +19,7 @@ export const guides = [
     tags: ["Relationships", "Self-Care"],
     bgColor: "bg-tst-purple",
     alt: "Icon representing compassionate communication",
+    id:"guide-2"
   },
   {
     title: "Reconnect with yourself for Regulation",
@@ -27,5 +29,6 @@ export const guides = [
     tags: ["Somatic", "Stress Relief"],
     bgColor: "bg-tst-teal",
     alt: "Icon representing somatic practices for self-regulation",
+    id:"guide-3"
   },
 ];
