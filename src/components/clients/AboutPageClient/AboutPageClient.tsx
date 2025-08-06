@@ -74,7 +74,7 @@ const AboutPageClient = () => {
 
   return (
     <main>
-        <div className="grid lg:grid-cols-2 border-2 border-black">
+        <div className="grid lg:grid-cols-2 border-t-2 border-black">
 
             {/* Image Column */}
             <div className="hidden lg:flex items-center justify-center bg-tst-yellow p-8 h-screen sticky top-0">
@@ -120,7 +120,6 @@ const AboutPageClient = () => {
                     </motion.div>
 
                     {/* Styled Paragraphs */}
-                    {/* ... (paragraph mapping code remains the same) ... */}
                     <div className="space-y-8">
                         {aboutPageContent.paragraphs.map((text, index) => (
                           <motion.div
