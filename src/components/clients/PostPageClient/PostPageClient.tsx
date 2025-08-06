@@ -17,12 +17,14 @@ import SubscribeModal from '@/components/SubscribeModal/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import Button from "@/components/Button/Button";
 import { SinglePostSkeleton } from '@/components/skeleton';
-
+import PostStats from '@/components/PostStats/PostStats';
+import styles from './PostPageClient.module.css'
 // Configure marked with proper options for better parsing
 marked.setOptions({
   breaks: true,
   gfm: true,
 });
+
 const PostPageClient: React.FC = () => {
   const { slug } = useParams();
   const [post, setPost] = useState<Post | null>(null);
@@ -41,10 +43,10 @@ const PostPageClient: React.FC = () => {
       if (!slug) return;
       setLoading(true);
 
-      // Fetch post by slug
+      // Fetch post by slug - now including view_count and like_count
       const { data: postData, error: postError } = await supabase
         .from('posts')
-        .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug')
+        .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug, view_count, like_count')
         .eq('slug', slug as string)
         .single();
 
@@ -147,36 +149,28 @@ const PostPageClient: React.FC = () => {
 
             {/* Post Header */}
             <header className="mb-16">
-              {post.tags && post.tags.length > 0 && (
-                <div className="mb-8 flex flex-wrap gap-3">
-                  {post.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="bg-tst-yellow text-xs font-bold px-4 py-2 rounded-full border-2 border-black shadow-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight text-gray-900">
                 {post.title}
               </h1>
 
-              <div className="flex items-center gap-4 py-6">
-                <CircleIcon
-                  size="md"
-                  bgColor="bg-tst-purple"
-                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
-                  altText="Author Icon"
-                />
-                <div>
-                  <p className="font-semibold text-gray-900 text-base">Kay</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
-                  </p>
+              <div className="border-t-2 border-b-2 border-gray-300 flex items-center justify-between py-6">
+                <div className="flex items-center gap-4">
+                  <CircleIcon
+                    size="md"
+                    bgColor="bg-tst-purple"
+                    iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
+                    altText="Author Icon"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900 text-base">Kay</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
+                    </p>
+                  </div>
                 </div>
+
+                {/* Post Stats - Views and Likes */}
+                <PostStats slug={post.slug} title={post.title} />
               </div>
             </header>
 
@@ -207,35 +201,59 @@ const PostPageClient: React.FC = () => {
                 ))}
               </div>
               {post.toasty_take && (
-                <div className="mt-16 p-6 bg-tst-yellow rounded-lg shadow-brutalist border-2 border-black max-w-2xl mx-auto">
+                <div className="mt-16 p-6 bg-white rounded-lg shadow-brutalist border-2 border-black max-w-2xl mx-auto">
                   <h2 className="text-xl font-bold mb-4">Toasty Take</h2>
                   <blockquote className="text-lg leading-relaxed italic">
                     &quot;{post.toasty_take}&quot;
                   </blockquote>
                 </div>
               )}
+
+              {/* Tags at bottom of article - smaller size */}
+              {post.tags && post.tags.length > 0 && (
+                <div className={`${styles.tagsWrapper} mt-12 max-w-2xl mx-auto`}>
+                  {post.tags.map(tag => (
+                    <div
+                      key={tag}
+                      className={styles.tagWrapper}
+                    >
+                      <div className={styles.shadow}></div>
+                      <div className={`${styles.tag} text-xs`}>
+                        {tag}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </article>
 
             {/* Article Footer */}
-            <div className="border-t-2 border-gray-300 pt-12 mb-8 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <CircleIcon
-                  size="md"
-                  bgColor="bg-tst-purple"
-                  iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
-                  altText="Author Icon"
-                />
-                <div>
-                  <p className="font-semibold text-gray-900 text-base">Kay</p>
-                  <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
-                </div>
+            <div className="border-t-2 border-gray-300 pt-12 mb-8">
+              {/* Post Stats - Also show at bottom */}
+              <div className="flex items-center justify-center mb-8">
+                <PostStats slug={post.slug} className="text-lg" />
               </div>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer px-4 py-2 rounded-lg hover:bg-blue-50"
-              >
-                Follow
-              </button>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <CircleIcon
+                    size="md"
+                    bgColor="bg-tst-purple"
+                    iconUrl="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg"
+                    altText="Author Icon"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900 text-base">Kay</p>
+                    <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer px-4 py-2 rounded-lg hover:bg-blue-50"
+                >
+                  Follow
+                </button>
+              </div>
             </div>
           </div>
         </Section>
@@ -255,7 +273,7 @@ const PostPageClient: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
                   {suggestedPosts.map((suggestion) => (
-                    <div key={suggestion.id} className="group">
+                                            <div key={suggestion.id} className="group">
                       <ResourceCard
                         card={{
                           title: suggestion.title,
