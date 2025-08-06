@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/components/PostStats/PostStats.tsx
 'use client';
 
@@ -6,7 +7,7 @@ import { usePostInteractions } from '@/hooks/usePostInteractions';
 import toast from 'react-hot-toast';
 
 interface PostStatsProps {
-  slug: string;
+  slug: string | "";
   title?: string;
   className?: string;
 }
@@ -27,7 +28,7 @@ const PostStats: React.FC<PostStatsProps> = ({ slug, title, className = '' }) =>
       // Show success toast
       toast.success('Link copied to clipboard!', {
         duration: 3000,
-        position: 'top-center',
+        position: 'bottom-center',
         style: {
           background: '#10B981',
           color: '#fff',
@@ -45,8 +46,7 @@ const PostStats: React.FC<PostStatsProps> = ({ slug, title, className = '' }) =>
             url: url,
           });
         } catch (shareError) {
-          // User probably canceled native share, but clipboard copy already succeeded
-          console.log('Native share canceled or failed, but link was copied');
+          return
         }
       }
 
