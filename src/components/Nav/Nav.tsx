@@ -83,7 +83,7 @@ const Nav: React.FC = () => {
   const isDashboardPage = pathname.startsWith('/dashboard');
 
   return (
-    <nav className="relative w-full max-w-7xl mx-auto min-h-110 p-1">
+    <nav className="relative w-full max-w-7xl mx-auto min-h-100 p-1">
       <div className="flex items-center justify-between p-4">
         <div className="flex-shrink-0">
           <Link href="/" className="font-extrabold text-3xl">
