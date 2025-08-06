@@ -10,6 +10,6 @@ export interface Post {
     status: 'draft' | 'published';
     sent_at?: string;
     tags?: string[];
-    slug?: string;
+    slug: string;
     subtext?: string;
   }

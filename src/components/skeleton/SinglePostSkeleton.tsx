@@ -8,7 +8,6 @@ import {
   SkeletonAvatar,
   SkeletonButton,
   SkeletonBreadcrumb,
-  SkeletonHeader
 } from './index';
 
 interface SinglePostSkeletonProps {
@@ -31,11 +30,38 @@ export const SinglePostSkeleton = ({
           <SkeletonBreadcrumb items={3} />
 
           {/* Post Header */}
-          <SkeletonHeader
-            hasTags={true}
-            hasAuthor={true}
-            titleLines={2}
-          />
+          <div className="mb-16">
+            {/* Title */}
+            <div className="mb-8">
+              <Skeleton className="h-12 w-full mb-3 rounded-lg" />
+              <Skeleton className="h-12 w-4/5 rounded-lg" />
+            </div>
+
+            {/* Author and Stats Row */}
+            <div className="flex items-center justify-between py-6">
+              <div className="flex items-center gap-4">
+                <SkeletonAvatar size="md" />
+                <div>
+                  <Skeleton className="h-5 w-12 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+
+              {/* Post Stats Skeleton - Views and Likes */}
+              <div className="flex items-center gap-6">
+                {/* View Count Skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-5 h-5 rounded" />
+                  <Skeleton className="h-4 w-8" />
+                </div>
+                {/* Like Count Skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-5 h-5 rounded" />
+                  <Skeleton className="h-4 w-8" />
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Featured Image */}
           {showImage && (
@@ -73,11 +99,34 @@ export const SinglePostSkeleton = ({
               <Skeleton className="h-8 w-2/3 rounded-lg mt-8 mb-4" />
 
               <SkeletonText lines={4} lastLineWidth="2/3" />
+
+              {/* Tags skeleton at bottom of article */}
+              <div className="mt-12 flex flex-wrap gap-2 justify-center">
+                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-14 rounded-full" />
+              </div>
             </div>
           </article>
 
           {/* Article Footer */}
           <div className="border-t border-gray-400 pt-8 mb-8">
+            {/* Post Stats at bottom - larger version */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center gap-6 text-lg">
+                {/* View Count Skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-6 h-6 rounded" />
+                  <Skeleton className="h-5 w-10" />
+                </div>
+                {/* Like Count Skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-6 h-6 rounded" />
+                  <Skeleton className="h-5 w-10" />
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <SkeletonAvatar size="md" />
@@ -86,7 +135,7 @@ export const SinglePostSkeleton = ({
                   <Skeleton className="h-4 w-28" />
                 </div>
               </div>
-              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-8 w-16 rounded-lg" />
             </div>
           </div>
         </div>
