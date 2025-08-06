@@ -6,13 +6,15 @@ import styles from './HoverLink.module.css'; // Import the CSS module
 type HoverLinkProps = {
   href: string;
   children: React.ReactNode;
-  className?: string; // Allow passing additional classes
+  className?: string;
+  id?: string;
 };
 
-const HoverLink = ({ href, children, className = '' }: HoverLinkProps) => {
+const HoverLink = ({ href, children, className = '', id }: HoverLinkProps) => {
   return (
     <Link
       href={href}
+      id={id}
       className={`${styles.link} ${className}`}
     >
       <svg
