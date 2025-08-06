@@ -2,7 +2,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContactForm from '../ContactForm'
-import { trackContactFormConversion, trackFormSubmission } from '@/lib/analytics'
 
 // Mock fetch
 global.fetch = jest.fn()

@@ -8,7 +8,6 @@ import {
   SkeletonAvatar,
   SkeletonButton,
   SkeletonBreadcrumb,
-  SkeletonHeader
 } from './index';
 
 interface SinglePostSkeletonProps {
