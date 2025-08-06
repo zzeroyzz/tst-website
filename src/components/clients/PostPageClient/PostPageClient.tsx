@@ -135,7 +135,7 @@ const PostPageClient: React.FC = () => {
         <Section className="pt-16 pb-24">
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             {/* Breadcrumb */}
-            <nav className="text-sm text-gray-500 mb-12 font-medium">
+            <nav className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 mb-12 font-medium">
               <Link href="/guides" className="hover:text-gray-700 transition-colors">
                 Resources
               </Link>
@@ -153,7 +153,7 @@ const PostPageClient: React.FC = () => {
                 {post.title}
               </h1>
 
-              <div className="border-t-2 border-b-2 border-gray-300 flex items-center justify-between py-6">
+              <div className=" border-t-2 border-b-2 border-gray-300 flex flex-col items-center gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <CircleIcon
                     size="md"
@@ -230,11 +230,8 @@ const PostPageClient: React.FC = () => {
             {/* Article Footer */}
             <div className="border-t-2 border-gray-300 pt-12 mb-8">
               {/* Post Stats - Also show at bottom */}
-              <div className="flex items-center justify-center mb-8">
-                <PostStats slug={post.slug} className="text-lg" />
-              </div>
 
-              <div className="flex items-center justify-between">
+              <div className=" flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <CircleIcon
                     size="md"
@@ -247,12 +244,12 @@ const PostPageClient: React.FC = () => {
                     <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => setIsModalOpen(true)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer px-4 py-2 rounded-lg hover:bg-blue-50"
+                  className="text-sm bg-tst-teal font-medium text-white-600  cursor-pointer px-4 py-2 rounded-lg"
                 >
                   Follow
-                </button>
+                </Button>
               </div>
             </div>
           </div>
