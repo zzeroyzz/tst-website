@@ -1,4 +1,5 @@
-import { zonedTimeToUtc } from 'date-fns-tz';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 const EASTERN = 'America/New_York';
 
@@ -20,17 +21,22 @@ export function toUtcIsoForSave(input: string | Date): string {
      input.getMinutes().toString().padStart(2, '0'),
      input.getSeconds().toString().padStart(2, '0')].join(':');
 
-    return zonedTimeToUtc(localIso, EASTERN).toISOString();
+    // Parse the local ISO string as Eastern time and convert to UTC
+    const easternDate = new Date(localIso + ' ' + EASTERN);
+    const utcDate = fromZonedTime(localIso, EASTERN);
+    return utcDate.toISOString();
   }
 
   // string path
   const s = input.trim();
 
-  // If it already looks like UTC (has a trailing Z or +hh:mm offset), don't “convert” again
+  // If it already looks like UTC (has a trailing Z or +hh:mm offset), don't "convert" again
   if (/[zZ]$/.test(s) || /[+-]\d{2}:\d{2}$/.test(s)) {
     return new Date(s).toISOString();
   }
 
-  // Otherwise it’s a bare local wall time (no zone) like "2025-08-13T09:15:00"
-  return zonedTimeToUtc(s, EASTERN).toISOString();
+  // Otherwise it's a bare local wall time (no zone) like "2025-08-13T09:15:00"
+  // fromZonedTime treats the input as being in the specified timezone and converts to UTC
+  const utcDate = fromZonedTime(s, EASTERN);
+  return utcDate.toISOString();
 }
