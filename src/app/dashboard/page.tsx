@@ -10,12 +10,14 @@ import {
   CheckSquare,
   Newspaper,
   Users,
+  Calendar,
   LogOut,
 } from "lucide-react";
 import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
 import LeadsView from "@/components/Leads/LeadsView";
 import NewsletterView from "@/components/Newsletter/NewsletterView";
-import DashboardView from "@/components/DashboardView/DashboardView"; // Import the new component
+import DashboardView from "@/components/DashboardView/DashboardView";
+import AppointmentsDashboard from "@/components/AppointmentsDashboard/AppointmentsDashboard";
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
@@ -48,6 +50,8 @@ const DashboardPage = () => {
         return <NewsletterView />;
       case "Leads":
         return <LeadsView />;
+      case "Appointments":
+        return <AppointmentsDashboard />;
       case "Dashboard":
       default:
         return <DashboardView />;
@@ -67,6 +71,7 @@ const DashboardPage = () => {
     { name: "Tasks", icon: CheckSquare },
     { name: "Newsletter", icon: Newspaper },
     { name: "Leads", icon: Users },
+    { name: "Appointments", icon: Calendar },
   ];
 
   return (

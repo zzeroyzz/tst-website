@@ -5,7 +5,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format, differenceInDays, parseISO } from "date-fns";
-import { X, Send } from "lucide-react";
+import { X, Send, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
 import Button from "@/components/Button/Button";
@@ -20,6 +20,14 @@ type Lead = {
   created_at: string;
   reminder_at?: string;
   reminder_message?: string;
+  // Questionnaire fields
+  questionnaire_completed?: boolean;
+  questionnaire_token?: string;
+  questionnaire_reminder_sent_at?: string;
+  interested_in?: string[];
+  scheduling_preference?: string;
+  payment_method?: string;
+  budget_works?: boolean;
 };
 
 // Replaced statusColors object with a function to be more Tailwind-friendly
@@ -104,7 +112,124 @@ const DeleteConfirmModal = ({
   );
 };
 
-// --- Lead Detail Modal Component ---
+// --- Add Lead Modal Component ---
+const AddLeadModal = ({ onClose, onAdd }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    notes: ""
+  });
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toast.error("Name and email are required");
+      return;
+    }
+
+    setIsAdding(true);
+    const success = await onAdd(formData);
+    setIsAdding(false);
+
+    if (success) {
+      onClose();
+    }
+  };
+
+  const handleInputChange = (field) => (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: e.target.value
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-bold">Add New Lead</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 transition-colors"
+            disabled={isAdding}
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="font-bold block mb-1">Name *</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={handleInputChange('name')}
+              className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+              placeholder="Enter full name"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="font-bold block mb-1">Email *</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+              placeholder="Enter email address"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="font-bold block mb-1">Phone</label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={handleInputChange('phone')}
+              className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          <div>
+            <label className="font-bold block mb-1">Notes</label>
+            <textarea
+              value={formData.notes}
+              onChange={handleInputChange('notes')}
+              rows={3}
+              className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+              placeholder="Add any initial notes..."
+            />
+          </div>
+
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+
+              onClick={onClose}
+              className="bg-gray-200"
+              disabled={isAdding}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-tst-purple text-black"
+              disabled={isAdding}
+            >
+              {isAdding ? 'Adding...' : 'Add Lead'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
   const [status, setStatus] = useState(lead.status);
   const [notes, setNotes] = useState(lead.notes || "");
@@ -165,6 +290,13 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
     }
   };
 
+  const handleCopyQuestionnaireLink = () => {
+    if (lead.questionnaire_token) {
+      navigator.clipboard.writeText(`${window.location.origin}/questionnaire/${lead.questionnaire_token}`);
+      toast.success('Questionnaire link copied to clipboard');
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl border-2 border-black">
@@ -173,9 +305,15 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
                 <h2 className="text-2xl font-bold">{lead.name}</h2>
                 <p className="text-gray-600">{lead.email} | {lead.phone}</p>
             </div>
-            <button onClick={onClose} className="p-1 text-gray-500 hover:text-red-500">
+            {/* <button onClick={onClose} className="p-1 text-gray-500 hover:text-red-500">
                 <X size={24} />
-            </button>
+            </button> */}
+            <Button
+                onClick={onClose}
+                className="p-2   rounded-lg transition-colors bg-tst-red"
+              >
+                <X size={20} />
+              </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -208,6 +346,52 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
                     <h3 className="font-bold text-lg mb-2">Lead Information</h3>
                     <p><strong>Submitted:</strong> {format(new Date(lead.created_at), "PPP")}</p>
                  </div>
+
+                 <div>
+                    <h3 className="font-bold text-lg mb-2">Questionnaire Status</h3>
+                    {lead.questionnaire_completed ? (
+                      <div className="space-y-2">
+                        <p className="text-green-600 font-medium">✓ Completed</p>
+                        {lead.interested_in && (
+                          <div>
+                            <p className="font-medium text-sm">Interested in:</p>
+                            <p className="text-sm">{lead.interested_in.join(', ')}</p>
+                          </div>
+                        )}
+                        {lead.scheduling_preference && (
+                          <p className="text-sm">
+                            <span className="font-medium">Scheduling:</span> {lead.scheduling_preference}
+                          </p>
+                        )}
+                        {lead.payment_method && (
+                          <p className="text-sm">
+                            <span className="font-medium">Payment:</span> {lead.payment_method}
+                          </p>
+                        )}
+                        {lead.budget_works !== null && (
+                          <p className="text-sm">
+                            <span className="font-medium">Budget ($150):</span> {lead.budget_works ? 'Works' : 'Needs alternatives'}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-orange-600 font-medium">⏳ Pending completion</p>
+                        <button
+                          onClick={handleCopyQuestionnaireLink}
+                          className="text-sm text-blue-600 underline hover:text-blue-800"
+                        >
+                          Copy questionnaire link
+                        </button>
+                        {lead.questionnaire_reminder_sent_at && (
+                          <p className="text-xs text-gray-500">
+                            Reminder sent: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                 </div>
+
                  <div>
                     <h3 className="font-bold text-lg mb-2">Set a Reminder</h3>
                     <div className="space-y-2">
@@ -230,21 +414,21 @@ const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
         </div>
 
         <div className="flex justify-between items-center mt-6">
-            <button
+            <Button
                 onClick={handleSendReminder}
                 disabled={isSending || isSaving}
                 className="flex items-center gap-2 px-6 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
                 <Send size={18} />
                 {isSending ? 'Sending...' : 'Send Reminder'}
-            </button>
-            <button
+            </Button>
+            <Button
                 onClick={handleSave}
                 disabled={isSaving || isSending}
                 className="px-6 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black"
             >
                 {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
+            </Button>
         </div>
       </div>
     </div>
@@ -261,6 +445,7 @@ const LeadsView = () => {
     lead: null
   });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const supabase = createClientComponentClient();
 
   const fetchLeads = useCallback(async () => {
@@ -295,6 +480,43 @@ const LeadsView = () => {
     };
   }, [supabase, fetchLeads]);
 
+  const handleAddLead = async (formData) => {
+    const addToast = toast.loading('Adding new lead...');
+
+    try {
+      // Create new lead data with default values
+      const newLeadData = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || null,
+        notes: formData.notes.trim() || null,
+        status: 'New',
+        questionnaire_completed: false,
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from("contacts")
+        .insert([newLeadData])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Add the new lead to the local state
+      setLeads(prev => [data, ...prev]);
+
+      toast.dismiss(addToast);
+      toast.success('Lead added successfully!');
+      return true;
+
+    } catch (error: any) {
+      toast.error(`Failed to add lead: ${error.message}`, { id: addToast });
+      return false;
+    }
+  };
   const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
     // Implement optimistic UI update correctly
     const originalLeads = [...leads];
@@ -363,7 +585,16 @@ const LeadsView = () => {
   return (
     <>
       <div>
-        <h2 className="text-3xl font-bold mb-6">Leads</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold">Leads</h2>
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="bg-tst-purple text-black flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add Lead
+          </Button>
+        </div>
         <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -373,6 +604,7 @@ const LeadsView = () => {
                   <th className="p-4 font-bold">Name</th>
                   <th className="p-4 font-bold">Contact</th>
                   <th className="p-4 font-bold">Submitted</th>
+                  <th className="p-4 font-bold">Questionnaire</th>
                   <th className="p-4 font-bold">Status</th>
                   <th className="p-4 font-bold w-20">Actions</th>
                 </tr>
@@ -403,13 +635,31 @@ const LeadsView = () => {
                         {format(new Date(lead.created_at), "PPP")}
                       </td>
                       <td className="p-4" onClick={() => handleRowClick(lead)}>
+                        <div className="flex items-center gap-2">
+                          {lead.questionnaire_completed ? (
+                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800">
+                              Completed
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
+                              Pending
+                            </span>
+                          )}
+                          {!lead.questionnaire_completed && lead.questionnaire_reminder_sent_at && (
+                            <span className="text-xs text-gray-500">
+                              (Reminder sent)
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4" onClick={() => handleRowClick(lead)}>
                         <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
                           {lead.status}
                         </span>
                       </td>
                       <td className="p-4 relative">
                         <Button
-                          type="button"
+
                           onClick={(e) => handleDeleteClick(e, lead)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                                         wrapperClassName="absolute -top-2 -right-2"
@@ -432,6 +682,14 @@ const LeadsView = () => {
           />
         )}
       </div>
+
+      {/* Add Lead Modal */}
+      {showAddModal && (
+        <AddLeadModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddLead}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && deleteModal.lead && (

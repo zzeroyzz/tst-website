@@ -266,7 +266,6 @@ const NewsletterView = () => {
                       <div className="wrapper relative">
                         <div className="shadow"></div>
                         <Button
-                          type="button"
                           onClick={(e) => handleDeleteClick(e, post)}
                           className="button bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors relative z-10"
                           aria-label={`Delete "${post.title}"`}
