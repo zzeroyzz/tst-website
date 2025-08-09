@@ -16,7 +16,7 @@ const EASTERN_TIMEZONE = 'America/New_York';
 const sendCancellationEmail = async (contact: any) => {
   if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) return;
 
-  // Parse the UTC date and convert to Eastern
+  // Parse the UTC date and convert to Eastern - FIX APPLIED HERE
   const appointmentUtc = new Date(contact.scheduled_appointment_at);
   const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
@@ -26,8 +26,9 @@ const sendCancellationEmail = async (contact: any) => {
     subject: 'Your consultation has been cancelled - Toasted Sesame Therapy',
     html: getAppointmentCancellationTemplate({
       name: `${contact.name} ${contact.last_name || ''}`.trim(),
+      // FIX: Use the Eastern timezone converted date for formatting
       appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-      appointmentTime: format(appointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE })
+      appointmentTime: format(appointmentEastern, 'h:mm a zzzz', { timeZone: EASTERN_TIMEZONE })
     })
   };
 
