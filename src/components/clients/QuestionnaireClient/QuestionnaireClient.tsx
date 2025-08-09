@@ -381,6 +381,22 @@ useEffect(() => {
           })
         });
 
+        window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'generate_lead',
+            event_id: crypto.randomUUID(),           // helps dedupe if you ever dual-send
+            form_name: 'Consultation Scheduler',
+            lead_source: 'Questionnaire',
+            contact_id: contact?.id ?? null,         // avoid PII like email
+            appointment_iso: dateTime.toISOString(),
+            appointment_tz_offset_min: new Date().getTimezoneOffset() * -1,
+            is_in_georgia: !!isInGeorgia,
+            interested_in: interestedIn,             // e.g. 'Therapy'
+            scheduling_preference: schedulingPreference,
+            payment_method: paymentMethod,           // e.g. 'HSA/FSA'
+            budget_works: !!budgetWorks
+      });
+
         clearFormState();
       } else {
         const errorData = await response.json();
@@ -796,7 +812,7 @@ useEffect(() => {
                     {budgetOptions.map((option) => (
                       <Button
                         key={option.value.toString()}
-                        
+
                         onClick={() => setBudgetWorks(option.value)}
                         className={`w-full flex items-center justify-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md ${
                           budgetWorks === option.value
