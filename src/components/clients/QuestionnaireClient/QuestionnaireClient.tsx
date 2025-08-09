@@ -383,17 +383,17 @@ useEffect(() => {
 
         window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
-            event: 'generate_lead',
-            event_id: crypto.randomUUID(),           // helps dedupe if you ever dual-send
+            event: 'qualified_lead',
+            event_id: crypto.randomUUID(),
             form_name: 'Consultation Scheduler',
             lead_source: 'Questionnaire',
-            contact_id: contact?.id ?? null,         // avoid PII like email
+            contact_id: contact?.id ?? null,
             appointment_iso: dateTime.toISOString(),
             appointment_tz_offset_min: new Date().getTimezoneOffset() * -1,
             is_in_georgia: !!isInGeorgia,
-            interested_in: interestedIn,             // e.g. 'Therapy'
+            interested_in: interestedIn,
             scheduling_preference: schedulingPreference,
-            payment_method: paymentMethod,           // e.g. 'HSA/FSA'
+            payment_method: paymentMethod,
             budget_works: !!budgetWorks
       });
 
