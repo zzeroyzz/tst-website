@@ -7,8 +7,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Section from '@/components/Section/Section';
 import Button from '@/components/Button/Button';
 import { Calendar, Clock, X, Check } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, toZonedTime } from 'date-fns-tz'; // CHANGED: Import from date-fns-tz
 import toast from 'react-hot-toast';
+
+// ADDED: Define the timezone constant
+const EASTERN_TIMEZONE = 'America/New_York';
 
 interface Contact {
   id: string;
@@ -148,7 +151,9 @@ export default function CancelAppointmentPage() {
     );
   }
 
-  const appointmentDate = new Date(contact.scheduled_appointment_at);
+  // CHANGED: Convert UTC to Eastern timezone before formatting
+  const appointmentUtc = new Date(contact.scheduled_appointment_at);
+  const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
   return (
     <Section className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -187,10 +192,12 @@ export default function CancelAppointmentPage() {
                 <div>
                   <span className="font-medium text-gray-600">Date & Time:</span>
                   <p className="text-lg font-semibold text-tst-purple">
-                    {format(appointmentDate, 'EEEE, MMMM d, yyyy')}
+                    {/* CHANGED: Use Eastern timezone for formatting */}
+                    {format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}
                   </p>
                   <p className="text-lg font-semibold text-tst-purple">
-                    {format(appointmentDate, 'h:mm a zzz')}
+                    {/* CHANGED: Use Eastern timezone for formatting */}
+                    {format(appointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE })}
                   </p>
                 </div>
               </div>

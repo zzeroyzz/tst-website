@@ -42,8 +42,6 @@ export default function QuestionnaireClient({
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [budgetWorks, setBudgetWorks] = useState<boolean | null>(null);
   const [hasScheduled, setHasScheduled] = useState<boolean>(false);
-  const [submittedOutOfState, setSubmittedOutOfState] = useState(false);
-  const [submittedBudgetNo, setSubmittedBudgetNo] = useState(false);
 
   // Appointment confirmation
   const [appointmentConfirmed, setAppointmentConfirmed] = useState<boolean>(false);
@@ -51,45 +49,8 @@ export default function QuestionnaireClient({
 
   // Window size for confetti
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-// helper calls already exist; use silent versions that DON'T redirect
-const markOutOfStateSilently = async () => {
-  try {
-    await fetch(`/api/questionnaire/${token}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isInGeorgia: false })
-    });
-  } catch (e) {
-    console.error('Silent out-of-state POST failed', e);
-  }
-};
 
-const markBudgetNoSilently = async () => {
-  try {
-    await fetch(`/api/questionnaire/${token}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isInGeorgia: true, budgetWorks: false })
-    });
-  } catch (e) {
-    console.error('Silent budget=no POST failed', e);
-  }
-};
-// EFFECT 1: when user picks "No, I'm not in Georgia"
-useEffect(() => {
-  if (token && isInGeorgia === false && !submittedOutOfState) {
-    setSubmittedOutOfState(true);
-    markOutOfStateSilently(); // sets located_in_georgia=false, qualified_lead=false, completed=true
-  }
-}, [token, isInGeorgia, submittedOutOfState]);
-
-// EFFECT 2: when user picks "No, I need to explore other options"
-useEffect(() => {
-  if (token && isInGeorgia === true && budgetWorks === false && !submittedBudgetNo) {
-    setSubmittedBudgetNo(true);
-    markBudgetNoSilently(); // sets located_in_georgia=true, qualified_lead=false, budget_works=false, completed=true
-  }
-}, [token, isInGeorgia, budgetWorks, submittedBudgetNo]);
+  // REMOVED: The aggressive useEffects that were causing 409 errors
 
   useEffect(() => {
     const handleResize = () => {
@@ -163,7 +124,7 @@ useEffect(() => {
     }
   };
 
-  // --- API helpers for branch completions / pre-marking ---
+  // --- API helpers for branch completions ---
 
   // Out-of-state: mark located_in_georgia=false, qualified_lead=false, completed=true
   const completeOutOfState = async () => {
@@ -191,7 +152,7 @@ useEffect(() => {
         body: JSON.stringify({ isInGeorgia: true, budgetWorks: false })
       });
       clearFormState();
-      toast.success('Thanks! We’ve shared lower-cost options.');
+      toast.success(`Thanks! We've shared lower-cost options.`)
       window.location.href = '/';
     } catch (err) {
       console.error('Budget-not-fit completion failed:', err);
@@ -754,12 +715,10 @@ useEffect(() => {
                 {/* Step 3: Payment */}
                 {currentStep === 3 && (
                   <div className={`space-y-4 pr-2 ${styles.centerColumn}`}>
-                    {/* Grid layout: 2 buttons on top row, 1 button on bottom */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {paymentOptions.slice(0, 2).map((option) => (
                         <Button
                           key={option.value}
-
                           onClick={() => setPaymentMethod(option.value)}
                           className={`flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all text-left ${
                             paymentMethod === option.value
@@ -777,32 +736,29 @@ useEffect(() => {
                           <span className="font-medium text-lg break-words">{option.label}</span>
                         </Button>
                       ))}
-
-                      {/* Third button spans both columns on desktop */}
-                      <div className="md:col-span-2 md:col-start-1 md:col-end-3">
-                        {paymentOptions.slice(2).map((option) => (
-                          <Button
-                            key={option.value}
-
-                            onClick={() => setPaymentMethod(option.value)}
-                            className={`w-full flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
-                              paymentMethod === option.value
-                                ? 'bg-tst-teal text-black shadow-md'
-                                : 'bg-white hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0 ${
-                              paymentMethod === option.value ? 'bg-transparent' : 'bg-white'
-                            }`}>
-                              {paymentMethod === option.value && (
-                                <div className="w-2 h-2 rounded-full bg-black"></div>
-                              )}
-                            </div>
-                            <span className="font-medium text-lg break-words">{option.label}</span>
-                          </Button>
-                        ))}
-                      </div>
                     </div>
+
+                    {/* Third button spans full width */}
+                    {paymentOptions.slice(2).map((option) => (
+                      <Button
+                        key={option.value}
+                        onClick={() => setPaymentMethod(option.value)}
+                        className={`w-full flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
+                          paymentMethod === option.value
+                            ? 'bg-tst-teal text-black shadow-md'
+                            : 'bg-white hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0 ${
+                          paymentMethod === option.value ? 'bg-transparent' : 'bg-white'
+                        }`}>
+                          {paymentMethod === option.value && (
+                            <div className="w-2 h-2 rounded-full bg-black"></div>
+                          )}
+                        </div>
+                        <span className="font-medium text-lg break-words">{option.label}</span>
+                      </Button>
+                    ))}
                   </div>
                 )}
 

@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       const contact = data[0];
       const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link';
 
-      // Send confirmation email to client with calendar data
+      // Send confirmation email to client (NO CALENDAR DATA - just the email)
       const clientEmailData: ZapierEmailData = {
         type: 'appointment_confirmation',
         to: email || contact.email,
@@ -132,30 +132,11 @@ export async function POST(request: NextRequest) {
         html: getAppointmentConfirmationTemplate({
           name: name || `${contact.name} ${contact.last_name || ''}`.trim(),
           appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-          appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
+          appointmentTime: format(appointmentDateEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) + 'EST',
           googleMeetLink,
           cancelToken
-        }),
-
-        // Calendar event fields
-        eventTitle: `Therapy Session - ${name || contact.name} ${contact.last_name || ''}`.trim(),
-        eventDescription: `
-Therapy session with ${name || contact.name} ${contact.last_name || ''}
-Email: ${email || contact.email}
-Phone: ${contact.phone || 'Not provided'}
-${questionnaireData ? `
-Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
-Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
-Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
-` : ''}
-
-Google Meet Link: ${googleMeetLink}
-        `.trim(),
-        startDateTime: appointmentUtc.toISOString(),
-        endDateTime: endTimeUtc.toISOString(),
-        attendeeEmail: email || contact.email,
-        attendeeName: `${name || contact.name} ${contact.last_name || ''}`.trim(),
-        location: googleMeetLink
+        })
+        // REMOVED: All calendar event fields to prevent duplicate calendar invites
       };
 
       // Send notification email to admin (WITH calendar data so it creates an event)
@@ -167,11 +148,11 @@ Google Meet Link: ${googleMeetLink}
           clientName: name || `${contact.name} ${contact.last_name || ''}`.trim(),
           clientEmail: email || contact.email,
           appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-          appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
+          appointmentTime: format(appointmentDateEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) + 'EST',
           questionnaireData: questionnaireData
         }),
 
-        // Include calendar event fields for admin too
+        // Include calendar event fields for admin only
         eventTitle: `Therapy Session - ${name || contact.name} ${contact.last_name || ''}`.trim(),
         eventDescription: `
 Therapy session with ${name || contact.name} ${contact.last_name || ''}
@@ -236,7 +217,7 @@ Google Meet Link: ${googleMeetLink}
 
     const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link';
 
-    // Send confirmation email to client with calendar data
+    // Send confirmation email to client (NO CALENDAR DATA - just the email)
     const clientEmailData: ZapierEmailData = {
       type: 'appointment_confirmation',
       to: contacts.email,
@@ -244,30 +225,11 @@ Google Meet Link: ${googleMeetLink}
       html: getAppointmentConfirmationTemplate({
         name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
         appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-        appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
+        appointmentTime: format(appointmentDateEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) + 'EST',
         googleMeetLink,
         cancelToken
-      }),
-
-      // Calendar event fields
-      eventTitle: `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
-      eventDescription: `
-Therapy session with ${contacts.name} ${contacts.last_name || ''}
-Email: ${contacts.email}
-Phone: ${contacts.phone || 'Not provided'}
-${questionnaireData ? `
-Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
-Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
-Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
-` : ''}
-
-Google Meet Link: ${googleMeetLink}
-      `.trim(),
-      startDateTime: appointmentUtc.toISOString(),
-      endDateTime: endTimeUtc.toISOString(),
-      attendeeEmail: contacts.email,
-      attendeeName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
-      location: googleMeetLink
+      })
+      // REMOVED: All calendar event fields to prevent duplicate calendar invites
     };
 
     // Send notification email to admin (WITH calendar data so it creates an event)
@@ -279,11 +241,11 @@ Google Meet Link: ${googleMeetLink}
         clientName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
         clientEmail: contacts.email,
         appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-        appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
+        appointmentTime: format(appointmentDateEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) + 'EST',
         questionnaireData: questionnaireData
       }),
 
-      // Include calendar event fields for admin too
+      // Include calendar event fields for admin only
       eventTitle: `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
       eventDescription: `
 Therapy session with ${contacts.name} ${contacts.last_name || ''}
