@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { format, toZonedTime } from 'date-fns-tz';
-import { parseISO } from 'date-fns';
 import { getAppointmentCancellationTemplate } from '@/lib/appointment-email-templates';
 
 const supabase = createClient(
@@ -13,33 +12,13 @@ const supabase = createClient(
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
-function toEasternOrNull(raw: string | Date | null | undefined) {
-  if (!raw) return null;
-
-  let isoString: string;
-
-  if (raw instanceof Date) {
-    if (isNaN(raw.getTime())) return null;
-    isoString = raw.toISOString();
-  } else if (typeof raw === 'string') {
-    // Add Z if a bare "YYYY-MM-DDTHH:mm:ss" is stored
-    const hasTz = /(?:Z|[+\-]\d{2}:\d{2})$/i.test(raw);
-    isoString = hasTz ? raw : `${raw}Z`;
-  } else {
-    return null;
-  }
-
-  const parsed = parseISO(isoString);
-  if (isNaN(parsed.getTime())) return null;
-
-  return toZonedTime(parsed, EASTERN_TIMEZONE);
-}
-
 // Function to send cancellation email via Zapier
 const sendCancellationEmail = async (contact: any) => {
   if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) return;
 
-  const easternDate = toEasternOrNull(contact.scheduled_appointment_at);
+  // Parse the UTC date and convert to Eastern
+  const appointmentUtc = new Date(contact.scheduled_appointment_at);
+  const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
   const emailData = {
     type: 'appointment_cancellation',
@@ -47,12 +26,8 @@ const sendCancellationEmail = async (contact: any) => {
     subject: 'Your consultation has been cancelled - Toasted Sesame Therapy',
     html: getAppointmentCancellationTemplate({
       name: `${contact.name} ${contact.last_name || ''}`.trim(),
-      appointmentDate: easternDate
-        ? format(easternDate, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE })
-        : '—',
-      appointmentTime: easternDate
-        ? format(easternDate, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE })
-        : '—'
+      appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
+      appointmentTime: format(appointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE })
     })
   };
 
@@ -121,7 +96,9 @@ export async function POST(request: NextRequest) {
 
     // Notify admin about cancellation
     if (process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
-      const easternDate = toEasternOrNull(contact.scheduled_appointment_at);
+      // Parse the UTC date and convert to Eastern for admin email too
+      const appointmentUtc = new Date(contact.scheduled_appointment_at);
+      const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
       const adminNotification = {
         type: 'appointment_cancelled_notification',
@@ -137,7 +114,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${contact.email}">${contact.email}</a></p>
               ${contact.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${contact.phone}</p>` : ''}
               <p style="margin: 5px 0;"><strong>Original appointment:</strong><br>
-              ${easternDate ? format(easternDate, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", { timeZone: EASTERN_TIMEZONE }) : '—'}</p>
+              ${format(appointmentEastern, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", { timeZone: EASTERN_TIMEZONE })}</p>
             </div>
 
             <div style="background-color: #F0F9FF; border-left: 4px solid #3B82F6; padding: 15px; margin: 20px 0;">

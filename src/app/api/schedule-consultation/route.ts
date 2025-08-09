@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
     }
     const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
-    // Calculate end time (default 60 minutes)
-    const duration = 60; // minutes
+    // Calculate end time (default 15 minutes)
+    const duration = 15; // minutes
     const endTimeUtc = new Date(appointmentUtc);
     endTimeUtc.setMinutes(endTimeUtc.getMinutes() + duration);
 
