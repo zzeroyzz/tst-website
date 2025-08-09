@@ -10,14 +10,12 @@ mailchimp.setConfig({
 interface EmailData {
   recipientEmail: string;
   recipientName?: string;
-  to: string;
   subject: string;
   htmlContent: string;
   listId: string;
   campaignTitle: string;
   fromName?: string;
   replyTo?: string;
-  html: string;
 }
 
 interface EmailResult {
