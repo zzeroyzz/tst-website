@@ -69,7 +69,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       // Track the lead generation
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
-        event: "generate_lead",
+        event: "generate_lead_form_start",
         page_source: isContactPage ? "contact" : "homepage",
         form_location: window.location.pathname,
         form_type: isContactPage ? "contact" : "homepage",
