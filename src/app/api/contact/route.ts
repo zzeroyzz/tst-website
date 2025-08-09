@@ -3,15 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { sendCustomEmailWithRetry } from '@/lib/email-sender';
 import { getContactConfirmationTemplate } from '@/lib/custom-email-templates';
+import { randomUUID } from 'crypto';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-const mailchimpApiKey = process.env.MAILCHIMP_API_KEY;
-const mailchimpServerPrefix = process.env.MAILCHIMP_SERVER_PREFIX;
-const mailchimpAudienceId = process.env.MAILCHIMP_LEAD_AUDIENCE_ID;
 
 export async function POST(request: Request) {
   const { name, email, phone } = await request.json();
@@ -21,69 +18,82 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 1. Save to database
-    await supabase.from('contacts').insert([{ name, email, phone }]);
+    // 1. Check if contact already exists
+    const { data: existingContact, error: checkError } = await supabase
+      .from('contacts')
+      .select('id, email, name')
+      .eq('email', email.toLowerCase())
+      .single();
 
-    // 2. Add to Mailchimp leads audience (for analytics, NO automation)
-    const nameParts = name.split(' ');
-    const FNAME = nameParts[0];
-    const LNAME = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    if (existingContact) {
+      return NextResponse.json({
+        error: 'An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.',
+        contactExists: true
+      }, { status: 409 }); // 409 Conflict status code
+    }
 
-    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
-    const mailchimpData = {
-      email_address: email,
-      status: 'subscribed',
-      merge_fields: { FNAME, LNAME, PHONE: phone },
-      tags: ["leads-v2"] // Keep for tracking, but turn OFF automation
-    };
+    // If checkError is not "no rows returned", then it's a real error
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Database check error:', checkError);
+      throw new Error('Failed to check existing contacts');
+    }
 
-    // console.log('Adding lead to Mailchimp...');
-    const response = await fetch(mailchimpUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `apikey ${mailchimpApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(mailchimpData),
-    });
+    // Generate secure token for questionnaire
+    const questionnaireToken = randomUUID();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      if (errorData.title !== 'Member Exists') {
-        throw new Error(`Mailchimp API Error: ${errorData.detail}`);
+    // 2. Save new contact to database
+    const { data: newContact, error: dbError } = await supabase
+      .from('contacts')
+      .insert([{
+        name,
+        email: email.toLowerCase(), // Normalize email to lowercase
+        phone,
+        questionnaire_token: questionnaireToken,
+        questionnaire_completed: false,
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Database insert error:', dbError);
+
+      // Handle unique constraint violation (duplicate email)
+      if (dbError.code === '23505') {
+        return NextResponse.json({
+          error: 'An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.',
+          contactExists: true
+        }, { status: 409 });
       }
+
+      throw new Error('Failed to save contact');
     }
 
-    // 3. Send custom confirmation email using your beautiful template
-    // console.log('Sending custom confirmation email...');
-
-    const confirmationHtml = getContactConfirmationTemplate({
-      name: FNAME
-    });
-
-    const emailResult = await sendCustomEmailWithRetry({
-      recipientEmail: email,
-      recipientName: FNAME,
-      subject: 'Thank you for reaching out - Toasted Sesame Therapy',
-      htmlContent: confirmationHtml,
-      listId: mailchimpAudienceId!,
-      campaignTitle: `Contact Confirmation - ${FNAME} - ${new Date().toISOString()}`
-    });
-
-    if (!emailResult.success) {
-      console.error('Failed to send confirmation email:', emailResult.error);
-      // Don't fail the contact submission, but log the issue
-    } else {
-      // console.log('Confirmation email sent successfully!');
+    // 3. Send confirmation email
+    try {
+      const emailTemplate = getContactConfirmationTemplate({ name });
+      await sendCustomEmailWithRetry({
+        to: email,
+        subject: 'Thanks for reaching out! Next steps inside 📝',
+        html: emailTemplate
+      });
+      console.log('Confirmation email sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the entire request if email fails
     }
 
+    // 4. Return success with questionnaire token for redirect
     return NextResponse.json({
-      message: 'Successfully submitted!',
-      emailSent: emailResult.success
+      message: 'Contact saved successfully!',
+      questionnaireToken: questionnaireToken,
+      contactId: newContact.id
     }, { status: 200 });
 
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
+    console.error('Contact API error:', error);
+    return NextResponse.json({
+      error: 'An unexpected error occurred. Please try again or contact care@toastedsesametherapy.com for assistance.'
+    }, { status: 500 });
   }
 }
