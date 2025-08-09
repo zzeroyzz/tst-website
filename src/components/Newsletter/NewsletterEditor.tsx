@@ -342,7 +342,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                                         className="w-48 h-32 object-cover rounded-lg border-2 border-gray-300"
                                     />
                                     <Button
-                                        type="button"
+
                                         onClick={removeImage}
                                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                                         wrapperClassName="absolute -top-2 -right-2"
@@ -363,7 +363,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                                 />
 
                                 <Button
-                                    type="button"
+
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={isUploading}
                                     className="flex items-center gap-2 bg-tst-yellow"
@@ -460,7 +460,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     <Button type="submit" className="bg-tst-purple" disabled={isSubmitting || isUploading}>
                         {isSubmitting ? 'Saving...' : 'Save for Later'}
                     </Button>
-                    <Button type="button" onClick={handlePreview} className="bg-tst-yellow" disabled={isSubmitting || isUploading}>
+                    <Button onClick={handlePreview} className="bg-tst-yellow" disabled={isSubmitting || isUploading}>
                         {isSubmitting ? 'Generating...' : 'Preview'}
                     </Button>
                 </div>

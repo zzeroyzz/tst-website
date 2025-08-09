@@ -12,6 +12,14 @@ const supabase = createClient(
 
 const mailchimpAudienceId = process.env.MAILCHIMP_LEAD_AUDIENCE_ID;
 
+// Define the result type
+interface ReminderResult {
+  contactId: string;
+  email: string;
+  status: 'success' | 'failed';
+  error?: string;
+}
+
 export async function POST(request: Request) {
   try {
     // Find contacts who:
@@ -39,7 +47,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const results = [];
+    const results: ReminderResult[] = [];
     let successCount = 0;
     let errorCount = 0;
 

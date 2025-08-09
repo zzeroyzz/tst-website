@@ -550,7 +550,7 @@ useEffect(() => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Button
-                        type="Button"
+
                         onClick={() => setIsInGeorgia(true)}
                         className={`flex items-center justify-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md ${
                           isInGeorgia === true
@@ -569,7 +569,7 @@ useEffect(() => {
                       </Button>
 
                       <Button
-                        type="Button"
+
                         onClick={() => setIsInGeorgia(false)}
                         className={`flex items-center justify-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md ${
                           isInGeorgia === false
@@ -651,7 +651,7 @@ useEffect(() => {
                             {workingOnOptions.map((option) => (
                               <Button
                                 key={option}
-                                type="Button"
+
                                 onClick={() => handleInterestedToggle(option)}
                                 className={`flex items-center gap-3 p-4 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
                                   interestedIn.includes(option)
@@ -690,7 +690,7 @@ useEffect(() => {
                       {schedulingOptions.slice(0, 2).map((option) => (
                         <Button
                           key={option.value}
-                          type="Button"
+
                           onClick={() => setSchedulingPreference(option.value)}
                           className={`flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
                             schedulingPreference === option.value
@@ -714,7 +714,7 @@ useEffect(() => {
                     {schedulingOptions.slice(2).map((option) => (
                       <Button
                         key={option.value}
-                        type="Button"
+
                         onClick={() => setSchedulingPreference(option.value)}
                         className={`w-full flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
                           schedulingPreference === option.value
@@ -743,7 +743,7 @@ useEffect(() => {
                       {paymentOptions.slice(0, 2).map((option) => (
                         <Button
                           key={option.value}
-                          type="Button"
+
                           onClick={() => setPaymentMethod(option.value)}
                           className={`flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all text-left ${
                             paymentMethod === option.value
@@ -767,7 +767,7 @@ useEffect(() => {
                         {paymentOptions.slice(2).map((option) => (
                           <Button
                             key={option.value}
-                            type="Button"
+
                             onClick={() => setPaymentMethod(option.value)}
                             className={`w-full flex items-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md text-left ${
                               paymentMethod === option.value
@@ -796,7 +796,7 @@ useEffect(() => {
                     {budgetOptions.map((option) => (
                       <Button
                         key={option.value.toString()}
-                        type="Button"
+                        
                         onClick={() => setBudgetWorks(option.value)}
                         className={`w-full flex items-center justify-center gap-3 p-6 rounded-lg border-2 border-black transition-all hover:shadow-md ${
                           budgetWorks === option.value

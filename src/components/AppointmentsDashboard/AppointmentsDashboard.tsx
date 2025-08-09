@@ -302,12 +302,15 @@ const AppointmentsDashboard: React.FC = () => {
     setShowRescheduleModal(true);
   };
 
-  const handleRescheduleConfirm = async (contactId: string, newDateTime: Date) => {
+  const handleRescheduleConfirm = async (contactId: string | number, newDateTime: Date): Promise<void> => {
+    // Convert contactId to string if it's a number
+    const contactIdStr = typeof contactId === 'number' ? contactId.toString() : contactId;
+
     const response = await fetch('/api/appointment/reschedule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contactId: contactId,
+        contactId: contactIdStr,
         newDateTime: newDateTime.toISOString()
       })
     });
@@ -315,7 +318,6 @@ const AppointmentsDashboard: React.FC = () => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to reschedule appointment');
     refreshAppointments();
-    return data;
   };
 
   const filteredAppointments = appointments.filter(contact => {

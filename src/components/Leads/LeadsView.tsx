@@ -210,7 +210,7 @@ const AddLeadModal = ({ onClose, onAdd }) => {
 
           <div className="flex gap-3 justify-end pt-4">
             <Button
-              type="button"
+
               onClick={onClose}
               className="bg-gray-200"
               disabled={isAdding}
@@ -659,7 +659,7 @@ const LeadsView = () => {
                       </td>
                       <td className="p-4 relative">
                         <Button
-                          type="button"
+
                           onClick={(e) => handleDeleteClick(e, lead)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                                         wrapperClassName="absolute -top-2 -right-2"
