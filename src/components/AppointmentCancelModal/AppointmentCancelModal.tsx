@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Calendar, AlertTriangle } from 'lucide-react';
 import { toZonedTime, format as formatTz } from 'date-fns-tz';
+import { parseISO } from 'date-fns';
 import Button from '@/components/Button/Button';
 
 const EASTERN_TIMEZONE = 'America/New_York';
@@ -16,11 +17,18 @@ interface AppointmentCancelModalProps {
 }
 
 const formatAppointmentForModal = (utcDateString: string): string => {
-  const utcString = utcDateString.endsWith('Z') ? utcDateString : `${utcDateString}Z`;
-  const utcDate = new Date(utcString);
+  if (!utcDateString) return '—';
+
+  // Check if date already has timezone info
+  const hasTz = /(?:Z|[+\-]\d{2}:\d{2})$/i.test(utcDateString);
+  const normalized = hasTz ? utcDateString : `${utcDateString}Z`;
+
+  const utcDate = parseISO(normalized);
+  if (isNaN(utcDate.getTime())) return '—';
+
   const easternDate = toZonedTime(utcDate, EASTERN_TIMEZONE);
 
-  return formatTz(easternDate, 'EEEE, MMMM d, yyyy \'at\' h:mm a zzz', {
+  return formatTz(easternDate, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", {
     timeZone: EASTERN_TIMEZONE
   });
 };
