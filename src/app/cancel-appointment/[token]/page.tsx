@@ -118,7 +118,7 @@ export default function CancelAppointmentPage() {
             Your consultation has been cancelled successfully. You&apos;ll receive a confirmation email shortly.
           </p>
           <p className="text-gray-600 mb-6">
-            If you'd like to reschedule, please feel free to reach out to us directly.
+            If you&apos;d like to reschedule, please feel free to reach out to us directly.
           </p>
           <Button
             onClick={() => router.push('/')}
@@ -136,7 +136,7 @@ export default function CancelAppointmentPage() {
       <Section className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center w-full max-w-md bg-white p-6 sm:p-8 rounded-xl border-2 border-black shadow-brutalistLg">
           <h1 className="text-2xl font-bold mb-4">No Appointment Found</h1>
-          <p className="text-lg mb-6">This appointment may have already been cancelled or doesn't exist.</p>
+          <p className="text-lg mb-6">This appointment may have already been cancelled or doesn&apos;t exist.</p>
           <Button
             onClick={() => router.push('/')}
             className="bg-tst-purple w-full sm:w-auto"
@@ -201,7 +201,7 @@ export default function CancelAppointmentPage() {
               <h3 className="font-bold text-yellow-800 mb-2">⚠️ Please Note:</h3>
               <ul className="text-yellow-700 space-y-1 text-sm">
                 <li>• Cancelling this appointment will remove it from both calendars</li>
-                <li>• You'll receive a confirmation email once cancelled</li>
+                <li>• You&apos;ll receive a confirmation email once cancelled</li>
                 <li>• To reschedule, please contact us directly</li>
               </ul>
             </div>

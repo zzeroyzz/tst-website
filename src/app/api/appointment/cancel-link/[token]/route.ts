@@ -39,10 +39,10 @@ const sendCancellationEmail = async (contact: any) => {
 // GET - Fetch appointment details by cancel token
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     const { data: contact, error } = await supabase
       .from('contacts')
@@ -71,10 +71,10 @@ export async function GET(
 // POST - Cancel appointment by token
 export async function POST(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     // First, get the contact details before cancelling
     const { data: contact, error: fetchError } = await supabase

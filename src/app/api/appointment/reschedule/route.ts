@@ -1,7 +1,7 @@
 // src/app/api/appointment/reschedule/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { format, toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { format, toZonedTime } from 'date-fns-tz';
 import { getAppointmentRescheduleTemplate } from '@/lib/appointment-email-templates';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,8 +12,27 @@ const supabase = createClient(
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
+// Define the email data type with calendar fields
+interface EmailData {
+  type: string;
+  to: string;
+  subject: string;
+  html: string;
+
+  // Calendar update fields (for rescheduling)
+  eventTitle?: string;
+  eventDescription?: string;
+  oldStartDateTime?: string;
+  oldEndDateTime?: string;
+  newStartDateTime?: string;
+  newEndDateTime?: string;
+  attendeeEmail?: string;
+  attendeeName?: string;
+  location?: string;
+}
+
 // Function to send emails via Zapier webhook
-const sendEmailViaZapier = async (emailData: any) => {
+const sendEmailViaZapier = async (emailData: EmailData) => {
   if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
     console.log('No Zapier webhook URL configured, skipping email');
     return;
@@ -75,11 +94,11 @@ export async function POST(request: NextRequest) {
     const oldAppointmentEastern = toZonedTime(oldAppointmentDate, EASTERN_TIMEZONE);
 
     // Convert new datetime to Eastern time and then to UTC for storage
-  const newAppointmentUtc = new Date(newDateTime);
-if (Number.isNaN(newAppointmentUtc.getTime())) {
-  return NextResponse.json({ message: 'Invalid newDateTime' }, { status: 400 });
-}
-const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
+    const newAppointmentUtc = new Date(newDateTime);
+    if (Number.isNaN(newAppointmentUtc.getTime())) {
+      return NextResponse.json({ message: 'Invalid newDateTime' }, { status: 400 });
+    }
+    const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
 
     const newCancelToken = uuidv4(); // Generate new cancellation token
 
@@ -106,8 +125,15 @@ const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
       );
     }
 
-    // Send reschedule confirmation email to client (format in Eastern time)
-    const clientEmailData = {
+    // Calculate end times (default 60 minutes)
+    const duration = 60; // minutes
+    const oldEndDate = new Date(oldAppointmentDate);
+    oldEndDate.setMinutes(oldEndDate.getMinutes() + duration);
+    const newEndDate = new Date(newAppointmentUtc);
+    newEndDate.setMinutes(newEndDate.getMinutes() + duration);
+
+    // Send reschedule confirmation email to client with calendar update data
+    const clientEmailData: EmailData = {
       type: 'appointment_reschedule',
       to: contact.email,
       subject: 'Your consultation has been rescheduled! 📅',
@@ -117,13 +143,28 @@ const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
         oldAppointmentTime: format(oldAppointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
         newAppointmentDate: format(newAppointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
         newAppointmentTime: format(newAppointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
-        googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link',
+        googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab',
         cancelToken: newCancelToken
-      })
+      }),
+
+      // Calendar update fields
+      eventTitle: `Therapy Session - ${contact.name} ${contact.last_name || ''}`.trim(),
+      eventDescription: `RESCHEDULED therapy session with ${contact.name} ${contact.last_name || ''}
+Email: ${contact.email}
+Phone: ${contact.phone || 'Not provided'}
+
+Google Meet Link: ${process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab'}`,
+      oldStartDateTime: oldAppointmentDate.toISOString(),
+      oldEndDateTime: oldEndDate.toISOString(),
+      newStartDateTime: newAppointmentUtc.toISOString(),
+      newEndDateTime: newEndDate.toISOString(),
+      attendeeEmail: contact.email,
+      attendeeName: `${contact.name} ${contact.last_name || ''}`.trim(),
+      location: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab'
     };
 
     // Send notification email to admin (Kay) (format in Eastern time)
-    const adminEmailData = {
+    const adminEmailData: EmailData = {
       type: 'appointment_reschedule_admin',
       to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
       subject: `📅 Appointment Rescheduled - ${contact.name}`,
@@ -165,7 +206,7 @@ const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
       message: 'Appointment rescheduled successfully',
       contact: data[0],
       oldDateTime: oldAppointmentDate.toISOString(),
-      newDateTime: newAppointmentUTC.toISOString()
+      newDateTime: newAppointmentUtc.toISOString()
     });
 
   } catch (error) {

@@ -121,7 +121,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     return (
       <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center">
         <div className="text-4xl mb-4">👋</div>
-        <h3 className="text-2xl font-bold mb-4 text-yellow-800">We've connected before!</h3>
+        <h3 className="text-2xl font-bold mb-4 text-yellow-800">We&apos;ve connected before!</h3>
         <p className="text-lg text-yellow-700 mb-6">
           It looks like we already have your information in our system. For personalized assistance with scheduling or any questions, please reach out directly.
         </p>
@@ -133,7 +133,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
             Email Us: care@toastedsesametherapy.com
           </a>
           <p className="text-sm text-yellow-600">
-            We'll get back to you within 1 business day
+            We&apos;ll get back to you within 1 business day
           </p>
         </div>
       </div>

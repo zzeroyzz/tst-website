@@ -13,8 +13,25 @@ const supabase = createClient(
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
+// Enhanced interface for Zapier with calendar fields
+interface ZapierEmailData {
+  type: string;
+  to: string;
+  subject: string;
+  html: string;
+
+  // Calendar event fields (for appointment confirmations)
+  eventTitle?: string;
+  eventDescription?: string;
+  startDateTime?: string; // ISO format for Google Calendar
+  endDateTime?: string;   // ISO format for Google Calendar
+  attendeeEmail?: string;
+  attendeeName?: string;
+  location?: string;
+}
+
 // Function to send emails via Zapier webhook
-const sendEmailViaZapier = async (emailData: any) => {
+const sendEmailViaZapier = async (emailData: ZapierEmailData) => {
   if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
     console.log('No Zapier webhook URL configured, skipping email');
     return;
@@ -51,11 +68,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle timezone conversion
-const appointmentUtc = new Date(dateTime);
-if (Number.isNaN(appointmentUtc.getTime())) {
-  return NextResponse.json({ message: 'Invalid dateTime' }, { status: 400 });
-}
-const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
+    const appointmentUtc = new Date(dateTime);
+    if (Number.isNaN(appointmentUtc.getTime())) {
+      return NextResponse.json({ message: 'Invalid dateTime' }, { status: 400 });
+    }
+    const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
+
+    // Calculate end time (default 60 minutes)
+    const duration = 60; // minutes
+    const endTimeUtc = new Date(appointmentUtc);
+    endTimeUtc.setMinutes(endTimeUtc.getMinutes() + duration);
 
     const cancelToken = uuidv4(); // Generate unique cancellation token
 
@@ -100,32 +122,75 @@ const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
         );
       }
 
-      // Send confirmation email to client (format in Eastern time)
-      const clientEmailData = {
+      const contact = data[0];
+      const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link';
+
+      // Send confirmation email to client with calendar data
+      const clientEmailData: ZapierEmailData = {
         type: 'appointment_confirmation',
-        to: email || data[0].email,
+        to: email || contact.email,
         subject: 'Your consultation is confirmed! 📅',
         html: getAppointmentConfirmationTemplate({
-          name: name || `${data[0].name} ${data[0].last_name}`,
+          name: name || `${contact.name} ${contact.last_name || ''}`.trim(),
           appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
           appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
-          googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link',
-          cancelToken: cancelToken
-        })
+          googleMeetLink,
+          cancelToken
+        }),
+
+        // Calendar event fields
+        eventTitle: `Therapy Session - ${name || contact.name} ${contact.last_name || ''}`.trim(),
+        eventDescription: `
+Therapy session with ${name || contact.name} ${contact.last_name || ''}
+Email: ${email || contact.email}
+Phone: ${contact.phone || 'Not provided'}
+${questionnaireData ? `
+Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
+Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
+Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
+` : ''}
+
+Google Meet Link: ${googleMeetLink}
+        `.trim(),
+        startDateTime: appointmentUtc.toISOString(),
+        endDateTime: endTimeUtc.toISOString(),
+        attendeeEmail: email || contact.email,
+        attendeeName: `${name || contact.name} ${contact.last_name || ''}`.trim(),
+        location: googleMeetLink
       };
 
-      // Send notification email to admin (Kay) (format in Eastern time)
-      const adminEmailData = {
+      // Send notification email to admin (WITH calendar data so it creates an event)
+      const adminEmailData: ZapierEmailData = {
         type: 'appointment_notification',
         to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
-        subject: `🎉 New Consultation Scheduled - ${name || data[0].name}`,
+        subject: `🎉 New Consultation Scheduled - ${name || contact.name}`,
         html: getAppointmentNotificationTemplate({
-          clientName: name || `${data[0].name} ${data[0].last_name}`,
-          clientEmail: email || data[0].email,
+          clientName: name || `${contact.name} ${contact.last_name || ''}`.trim(),
+          clientEmail: email || contact.email,
           appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
           appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
           questionnaireData: questionnaireData
-        })
+        }),
+
+        // Include calendar event fields for admin too
+        eventTitle: `Therapy Session - ${name || contact.name} ${contact.last_name || ''}`.trim(),
+        eventDescription: `
+Therapy session with ${name || contact.name} ${contact.last_name || ''}
+Email: ${email || contact.email}
+Phone: ${contact.phone || 'Not provided'}
+${questionnaireData ? `
+Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
+Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
+Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
+` : ''}
+
+Google Meet Link: ${googleMeetLink}
+        `.trim(),
+        startDateTime: appointmentUtc.toISOString(),
+        endDateTime: endTimeUtc.toISOString(),
+        attendeeEmail: email || contact.email,
+        attendeeName: `${name || contact.name} ${contact.last_name || ''}`.trim(),
+        location: googleMeetLink
       };
 
       // Send both emails via Zapier
@@ -136,7 +201,7 @@ const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
 
       return NextResponse.json({
         message: 'Appointment scheduled successfully',
-        contact: data[0]
+        contact: contact
       });
     }
 
@@ -170,32 +235,74 @@ const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
       );
     }
 
-    // Send confirmation email to client (format in Eastern time)
-    const clientEmailData = {
+    const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link';
+
+    // Send confirmation email to client with calendar data
+    const clientEmailData: ZapierEmailData = {
       type: 'appointment_confirmation',
       to: contacts.email,
       subject: 'Your consultation is confirmed! 📅',
       html: getAppointmentConfirmationTemplate({
-        name: `${contacts.name} ${contacts.last_name}`,
+        name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
         appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
         appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
-        googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-meeting-link',
-        cancelToken: cancelToken
-      })
+        googleMeetLink,
+        cancelToken
+      }),
+
+      // Calendar event fields
+      eventTitle: `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
+      eventDescription: `
+Therapy session with ${contacts.name} ${contacts.last_name || ''}
+Email: ${contacts.email}
+Phone: ${contacts.phone || 'Not provided'}
+${questionnaireData ? `
+Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
+Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
+Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
+` : ''}
+
+Google Meet Link: ${googleMeetLink}
+      `.trim(),
+      startDateTime: appointmentUtc.toISOString(),
+      endDateTime: endTimeUtc.toISOString(),
+      attendeeEmail: contacts.email,
+      attendeeName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
+      location: googleMeetLink
     };
 
-    // Send notification email to admin (Kay) (format in Eastern time)
-    const adminEmailData = {
+    // Send notification email to admin (WITH calendar data so it creates an event)
+    const adminEmailData: ZapierEmailData = {
       type: 'appointment_notification',
       to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
       subject: `🎉 New Consultation Scheduled - ${contacts.name}`,
       html: getAppointmentNotificationTemplate({
-        clientName: `${contacts.name} ${contacts.last_name}`,
+        clientName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
         clientEmail: contacts.email,
         appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
         appointmentTime: format(appointmentDateEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
         questionnaireData: questionnaireData
-      })
+      }),
+
+      // Include calendar event fields for admin too
+      eventTitle: `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
+      eventDescription: `
+Therapy session with ${contacts.name} ${contacts.last_name || ''}
+Email: ${contacts.email}
+Phone: ${contacts.phone || 'Not provided'}
+${questionnaireData ? `
+Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
+Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
+Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
+` : ''}
+
+Google Meet Link: ${googleMeetLink}
+      `.trim(),
+      startDateTime: appointmentUtc.toISOString(),
+      endDateTime: endTimeUtc.toISOString(),
+      attendeeEmail: contacts.email,
+      attendeeName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
+      location: googleMeetLink
     };
 
     // Send both emails via Zapier
@@ -213,9 +320,9 @@ const appointmentDateEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: `${contacts.name} ${contacts.last_name}`,
+            name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
             email: contacts.email,
-            dateTime: appointmentDateUTC.toISOString(), // Send UTC to webhook
+            dateTime: appointmentUtc.toISOString(),
             token,
             action: 'appointment_scheduled',
             cancelToken,

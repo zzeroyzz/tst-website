@@ -1,5 +1,5 @@
 // src/utils/appointmentHelpers.ts
-import { format, isToday, isTomorrow, isThisWeek, isAfter, isBefore } from 'date-fns';
+import { format, isToday, isTomorrow, isThisWeek, isBefore } from 'date-fns';
 
 export const formatAppointmentDate = (dateString: string): string => {
   const date = new Date(dateString);

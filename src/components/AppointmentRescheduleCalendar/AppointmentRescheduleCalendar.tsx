@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx
 "use client";
 
@@ -13,7 +14,6 @@ import {
   subMonths,
   isSameMonth,
   isToday,
-  addDays,
   addHours,
   getDay,
   isSameDay,

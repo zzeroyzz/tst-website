@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/LeadCalendar/LeadCalendar.tsx
 "use client";
 
@@ -18,8 +19,6 @@ import {
   addHours,
   getDay,
   isSameDay,
-  addMinutes,
-  isWithinInterval,
 } from 'date-fns';
 import { fromZonedTime, toZonedTime, format as formatTz } from 'date-fns-tz';
 import Button from '@/components/Button/Button';
@@ -53,7 +52,8 @@ interface BookedSlot {
 }
 
 const EASTERN_TIMEZONE = 'America/New_York';
-const APPOINTMENT_DURATION = 15; // 50 minutes per appointment
+//TODO
+// const APPOINTMENT_DURATION = 15;
 
 // Your availability configuration
 const AVAILABILITY = {
@@ -132,8 +132,6 @@ const scheduleAppointment = async (data: ScheduleAppointmentData): Promise<void>
 const LeadCalendar: React.FC<LeadCalendarProps> = ({
   onSchedule,
   contactId,
-  contactName = '',
-  contactEmail = '',
   existingAppointment = null
 }) => {
   // Convert existing appointment to Eastern time for display
@@ -450,7 +448,7 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
           {selectedTime} (Eastern)
         </p>
         <p className="text-sm text-gray-500 mt-4 mb-6">
-          You'll receive a confirmation email shortly.
+          You&apos;ll receive a confirmation email shortly.
         </p>
 
         <div className="flex gap-3 justify-center">

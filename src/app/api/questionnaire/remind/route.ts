@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/app/api/questionnaire/remind/route.ts
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';

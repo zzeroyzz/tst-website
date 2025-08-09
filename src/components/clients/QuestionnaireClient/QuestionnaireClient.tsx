@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 // src/app/questionnaire/[token]/QuestionnaireClient.tsx
 "use client";
@@ -564,7 +565,7 @@ useEffect(() => {
                             <div className="w-3 h-3 rounded-full bg-white"></div>
                           )}
                         </div>
-                        <span className="font-medium text-lg">Yes, I'm in Georgia</span>
+                        <span className="font-medium text-lg">Yes, I&apos;m in Georgia</span>
                       </Button>
 
                       <Button
@@ -583,7 +584,7 @@ useEffect(() => {
                             <div className="w-3 h-3 rounded-full bg-white"></div>
                           )}
                         </div>
-                        <span className="font-medium text-lg">No, I'm not in Georgia</span>
+                        <span className="font-medium text-lg">No, I&apos;m not in Georgia</span>
                       </Button>
                     </div>
 
@@ -610,7 +611,7 @@ useEffect(() => {
                         />
                         <div className="bg-blue-50 border-2 border-black rounded-lg p-6">
                           <p className="text-gray-700 mb-4">
-                            We appreciate your interest in our services. While we can't work together at this time due to state licensing requirements, we encourage you to seek support from a licensed therapist in your state.
+                            We appreciate your interest in our services. While we can&apos;t work together at this time due to state licensing requirements, we encourage you to seek support from a licensed therapist in your state.
                           </p>
                           <p className="text-sm text-gray-600">
                             You can find qualified therapists in your area through{" "}

@@ -1,7 +1,7 @@
 // src/app/api/contact/route.ts
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { sendZapierEmailWithRetry } from '@/lib/zapier-email-sender';
 import { getContactConfirmationTemplate } from '@/lib/custom-email-templates';
 import { randomUUID } from 'crypto';
 
@@ -69,10 +69,10 @@ export async function POST(request: Request) {
       throw new Error('Failed to save contact');
     }
 
-    // 3. Send confirmation email
+    // 3. Send confirmation email via Zapier
     try {
       const emailTemplate = getContactConfirmationTemplate({ name });
-      await sendCustomEmailWithRetry({
+      await sendZapierEmailWithRetry({
         to: email,
         subject: 'Thanks for reaching out! Next steps inside 📝',
         html: emailTemplate
