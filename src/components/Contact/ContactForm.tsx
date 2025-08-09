@@ -28,31 +28,45 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [contactExists, setContactExists] = useState(false);
   const { width, height } = useWindowSize();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (error) setError(null);
+    if (contactExists) setContactExists(false);
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  setIsSubmitting(true);
-  setError(null);
+    setIsSubmitting(true);
+    setError(null);
+    setContactExists(false);
 
-  try {
-    // Mailchimp API call commented out
-    const response = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    if (!response.ok) {
-      throw new Error('Something went wrong. Please try again.');
-    }
+      const data = await response.json();
 
-    setIsSubmitted(true);
+      if (!response.ok) {
+        // Handle duplicate contact error (409 status)
+        if (response.status === 409 && data.contactExists) {
+          setContactExists(true);
+          setError(data.error);
+          return;
+        }
+
+        // Handle other errors
+        throw new Error(data.error || 'Something went wrong. Please try again.');
+      }
+
+      // Track the lead generation
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "generate_lead",
@@ -61,16 +75,25 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         form_type: isContactPage ? "contact" : "homepage",
       });
 
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      setError(err.message);
-    } else {
-      setError("An unexpected error occurred.");
+      // Redirect to questionnaire
+      if (data.questionnaireToken) {
+        window.location.href = `/questionnaire/${data.questionnaireToken}`;
+        return;
+      }
+
+      // Fallback to success state if no token (shouldn't happen)
+      setIsSubmitted(true);
+
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   const renderPostSubmitContent = () => {
     return (
@@ -94,6 +117,29 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     );
   };
 
+  const renderContactExistsMessage = () => {
+    return (
+      <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center">
+        <div className="text-4xl mb-4">👋</div>
+        <h3 className="text-2xl font-bold mb-4 text-yellow-800">We've connected before!</h3>
+        <p className="text-lg text-yellow-700 mb-6">
+          It looks like we already have your information in our system. For personalized assistance with scheduling or any questions, please reach out directly.
+        </p>
+        <div className="space-y-4">
+          <a
+            href="mailto:care@toastedsesametherapy.com"
+            className="inline-block bg-tst-purple text-black font-bold py-3 px-6 rounded-lg border-2 border-black shadow-brutalist hover:shadow-brutalistLg transition-all"
+          >
+            Email Us: care@toastedsesametherapy.com
+          </a>
+          <p className="text-sm text-yellow-600">
+            We'll get back to you within 1 business day
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="relative bg-white p-12 rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
       {isSubmitted && (
@@ -109,6 +155,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
 
       {isSubmitted ? (
         renderPostSubmitContent()
+      ) : contactExists ? (
+        renderContactExistsMessage()
       ) : (
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-10">
@@ -148,10 +196,14 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
               </div>
               <div className="mt-4">
                 <Button type="submit" className="bg-tst-yellow py-3" wrapperClassName="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                  {isSubmitting ? 'Processing...' : 'Next →'}
                 </Button>
               </div>
-              {error && <p className="text-red-500 mt-4">{error}</p>}
+              {error && !contactExists && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mt-4">
+                  <p className="text-red-700 font-medium">{error}</p>
+                </div>
+              )}
             </div>
           </form>
         </div>
