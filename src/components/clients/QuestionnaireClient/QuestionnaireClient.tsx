@@ -619,7 +619,7 @@ export default function QuestionnaireClient({
                         {/* Wrap scrollable content in relative container for gradient */}
                         <div className="relative">
                           <div
-                            className="grid grid-cols-1 md:grid-cols-2 gap-3"
+                            className="grid grid-cols-1 px-4 sm:px-0 md:grid-cols-2 gap-3 "
                             style={{
                               maxHeight: window.innerWidth < 768 ? '400px' : 'none',
                               overflowY: window.innerWidth < 768 ? 'auto' : 'visible'
@@ -648,7 +648,7 @@ export default function QuestionnaireClient({
 
                           {/* Gradient fade indicator - only visible on mobile */}
                           <div
-                            className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none md:hidden"
+                            className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none md:hidden"
                             style={{
                               display: window.innerWidth < 768 ? 'block' : 'none'
                             }}

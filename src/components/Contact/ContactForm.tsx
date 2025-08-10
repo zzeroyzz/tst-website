@@ -128,9 +128,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
         <div className="space-y-4">
           <a
             href="mailto:care@toastedsesametherapy.com"
-            className="inline-block bg-tst-purple text-black font-bold py-3 px-6 rounded-lg border-2 border-black shadow-brutalist hover:shadow-brutalistLg transition-all"
+            className="inline-block bg-tst-purple text-black font-bold py-3 px-4 sm:px-6 rounded-lg border-2 border-black shadow-brutalist hover:shadow-brutalistLg transition-all text-sm sm:text-base break-all sm:break-normal"
           >
-            Email Us: care@toastedsesametherapy.com
+            <span className="hidden sm:inline">Contact Us</span>
+            <span className="sm:hidden">Contact Us</span>
           </a>
           <p className="text-sm text-yellow-600">
             We&apos;ll get back to you within 1 business day
