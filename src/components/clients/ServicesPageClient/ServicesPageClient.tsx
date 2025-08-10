@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Section from "@/components/Section/Section";
 import Button from "@/components/Button/Button";
 import FAQ from "@/components/FAQ/FAQ";
