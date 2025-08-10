@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav/Nav";
@@ -18,7 +18,6 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: 'Toasted Sesame Therapy | Compassionate, Personalized Therapy',
   description: 'A therapy space for the deep feelers, drained hearts, and healing seekers. Neuro-affirming and trauma-informed online therapy for adults in Georgia.',
-  themeColor: '#ffffff',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -40,7 +39,9 @@ export const metadata: Metadata = {
     ],
   }
 };
-
+export const viewport: Viewport = {
+  themeColor: '#F9F5F0',
+};
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,7 +73,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+         <meta name="msapplication-TileColor" content="#F9F5F0" />
+          <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
