@@ -43,7 +43,6 @@ export const sendEmailViaZapier = async (emailData: ZapierEmailData): Promise<Em
       throw new Error(`Zapier webhook failed: ${response.status} ${response.statusText}`);
     }
 
-    console.log('Email sent successfully via Zapier');
     return {
       success: true,
       message: 'Email sent successfully'
@@ -66,7 +65,6 @@ export const sendZapierEmailWithRetry = async (
 ): Promise<EmailResult> => {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    console.log(`Email send attempt ${attempt}/${maxRetries} for ${emailData.to}`);
 
     const result = await sendEmailViaZapier(emailData);
 
@@ -77,7 +75,6 @@ export const sendZapierEmailWithRetry = async (
     // If we have retries left, wait and try again
     if (attempt < maxRetries) {
       const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
-      console.log(`Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       continue;
     }

@@ -3,11 +3,12 @@ import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
-import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/next"
 import CookieConsent from "@/components/CookieConsent/CookieConsent";
 import Script from 'next/script';
 import ConditionalLayout from '@/components/ConditionalLayout/ConditionalLayout';
+import ToasterClient from "@/components/clients/ToasterClient/ToasterClient";
+
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -64,34 +65,41 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-         <meta name="msapplication-TileColor" content="#F9F5F2" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessSchema) }}
-        />
+  <meta name="msapplication-TileColor" content="#F9F5F2" />
 
-        <Script
-          id="gtm-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id=GTM-N6VXX6CK'+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-N6VXX6CK');
-            `,
-          }}
-        />
-      </head>
+  {/* connection hints first */}
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+  <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+  />
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(medicalBusinessSchema) }}
+  />
+
+  <Script
+    id="gtm-init"
+    strategy="afterInteractive"
+    dangerouslySetInnerHTML={{
+      __html: `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id=GTM-N6VXX6CK'+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-N6VXX6CK');
+      `,
+    }}
+  />
+</head>
       <body
         className={`${workSans.variable} font-sans bg-tst-cream text-black antialiased`}
       >
-        <Toaster position="top-center" reverseOrder={false} />
+        <ToasterClient />
 
         <ConditionalLayout>
           <Nav />

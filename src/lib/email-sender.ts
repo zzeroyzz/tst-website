@@ -29,9 +29,6 @@ interface EmailResult {
 
 export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult> => {
   try {
-    // console.log(`Creating Mailchimp campaign for: ${emailData.recipientEmail}`);
-
-    // Create a targeted campaign for the specific email
     const campaignResponse = await mailchimp.campaigns.create({
       type: 'regular',
       recipients: {
@@ -68,20 +65,10 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
     if (!campaign.id) {
       throw new Error('Campaign creation failed - no ID returned');
     }
-
-    // console.log(`Campaign created with ID: ${campaign.id}`);
-
-    // Set the custom HTML content
     await mailchimp.campaigns.setContent(campaign.id, {
       html: emailData.htmlContent
     });
-
-    // console.log(`Content set for campaign: ${campaign.id}`);
-
-    // Send the campaign
     await mailchimp.campaigns.send(campaign.id);
-
-    // console.log(`Campaign sent successfully: ${campaign.id}`);
 
     return {
       success: true,
@@ -131,7 +118,6 @@ export const sendCustomEmailWithRetry = async (
 ): Promise<EmailResult> => {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    // console.log(`Email send attempt ${attempt}/${maxRetries} for ${emailData.recipientEmail}`);
 
     const result = await sendCustomEmail(emailData);
 
@@ -143,7 +129,6 @@ export const sendCustomEmailWithRetry = async (
     if (result.shouldRetry && attempt < maxRetries) {
       // Exponential backoff: 1s, 2s, 4s
       const delay = baseDelay * Math.pow(2, attempt - 1);
-      // console.log(`Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       continue;
     }

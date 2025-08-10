@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       tags: ['newsletter-signup-v2'], // Keep for tracking, but turn OFF automation
     };
 
-    // console.log('Adding subscriber to Mailchimp...');
     const response = await fetch(mailchimpUrl, {
       method: 'POST',
       headers: {
@@ -45,7 +44,6 @@ export async function POST(request: Request) {
 
     // Handle existing subscriber
     if (!response.ok && responseData.title === 'Member Exists') {
-      // console.log('Subscriber already exists, updating...');
       // Update existing subscriber
       const subscriberHash = Buffer.from(email.toLowerCase()).toString('base64').replace(/=/g, '');
       const updateUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members/${subscriberHash}`;
@@ -69,7 +67,6 @@ export async function POST(request: Request) {
     }
 
     // 2. Send custom welcome email using your beautiful template
-    // console.log('Sending custom welcome email...');
 
     const welcomeHtml = getWelcomeEmailTemplate({
       name: emailUsername || 'friend'
@@ -85,12 +82,8 @@ export async function POST(request: Request) {
     });
 
     if (!emailResult.success) {
-      console.error('Failed to send welcome email:', emailResult.error);
-      // Don't fail the subscription, but log the issue
-    } else {
-      console.log('Welcome email sent successfully!');
+      return
     }
-
     return NextResponse.json({
       message: 'Successfully subscribed to newsletter!',
       status: 'subscribed',

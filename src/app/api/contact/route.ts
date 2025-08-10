@@ -77,7 +77,6 @@ export async function POST(request: Request) {
         subject: 'Thanks for reaching out! Next steps inside 📝',
         html: emailTemplate
       });
-      console.log('Confirmation email sent successfully');
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
       // Don't fail the entire request if email fails

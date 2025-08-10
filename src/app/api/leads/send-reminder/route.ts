@@ -26,7 +26,6 @@ export async function POST(request: Request) {
 
   try {
     // 1. First, get the contact's name from the database
-    console.log('Looking up contact:', email);
     const { data: contact, error: contactError } = await supabase
       .from('contacts')
       .select('name, email')
@@ -40,13 +39,11 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    console.log('Found contact:', contact);
 
     // 2. Extract first name from full name
     const firstName = contact.name.split(' ')[0] || 'there';
 
     // 3. Send custom warmup email
-    console.log('Sending warmup email...');
     const warmupHtml = getContactWarmupTemplate({
       name: firstName
     });
@@ -82,7 +79,6 @@ export async function POST(request: Request) {
       // Don't fail the request for this, just log it
     }
 
-    console.log('Warmup email sent successfully!');
 
     return NextResponse.json({
       message: 'Reminder email sent successfully!',

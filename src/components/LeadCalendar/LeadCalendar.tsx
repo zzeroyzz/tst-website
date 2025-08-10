@@ -374,11 +374,7 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
 
       setScheduled(true);
       setIsRescheduling(false);
-      toast.success(
-        isRescheduling
-          ? 'Consultation rescheduled successfully!'
-          : 'Consultation scheduled successfully!'
-      );
+      toast.success('Consultation rescheduled successfully!');
 
       // Refresh booked slots after successful scheduling
       const booked = await fetchBookedAppointments(calendarStart, calendarEnd);

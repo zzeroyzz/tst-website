@@ -34,7 +34,6 @@ interface EmailData {
 // Function to send emails via Zapier webhook
 const sendEmailViaZapier = async (emailData: EmailData) => {
   if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
-    console.log('No Zapier webhook URL configured, skipping email');
     return;
   }
 
@@ -48,9 +47,7 @@ const sendEmailViaZapier = async (emailData: EmailData) => {
     });
 
     if (!response.ok) {
-      console.error('Zapier webhook failed:', response.status, response.statusText);
-    } else {
-      console.log('Email sent successfully via Zapier');
+     return
     }
   } catch (error) {
     console.error('Zapier webhook error:', error);
