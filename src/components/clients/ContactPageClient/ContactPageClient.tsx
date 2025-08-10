@@ -53,13 +53,19 @@ const ContactPageClient = () => {
             <div className="text-center">
               <motion.h1
                 variants={itemVariants}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight max-w-5xl mx-auto"
+                className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-8 leading-tight max-w-5xl mx-auto"
               >
                 {heroContent.title}
               </motion.h1>
               <motion.p
                 variants={itemVariants}
-                className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed"
+                className="text-xl md:text-4xl lg:text-2xl font-semibold leading-tight max-w-5xl mx-auto"
+              >
+                {heroContent.title2}
+              </motion.p>
+              <motion.p
+                variants={itemVariants}
+                className="text-md md:text-xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed"
               >
                 {heroContent.subtitle}
               </motion.p>

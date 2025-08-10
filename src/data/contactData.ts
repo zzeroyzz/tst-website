@@ -1,23 +1,27 @@
 // src/data/contactData.ts
 
+
 export const trustIndicators = [
   {
     id: 1,
-    text: "Phone and Video",
-    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "",
+    text: "Phone or Video",
+    iconUrl:
+      "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "Sessions by phone or video",
   },
   {
     id: 2,
-    text: "No waitlist",
-    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "",
+    text: "No Waitlist",
+    iconUrl:
+      "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "No waitlist indicator",
   },
   {
     id: 3,
-    text: "11 A.M. to 5 P.M.",
-    iconUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
-    altText: "",
+    text: "11 AM–5 PM ET",
+    iconUrl:
+      "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/checkmark.svg",
+    altText: "Office hours 11 AM to 5 PM Eastern",
   },
 ];
 
@@ -50,9 +54,15 @@ export const benefitCards = [
 
 export const heroContent = {
   badge: "Your First Step Towards Clarity",
-  title: "A Space to Be Seen and Heard",
-  subtitle: "Reaching out is an act of courage. I'm here to meet you with warmth and understanding. Let's schedule a free, no-pressure chat to see how I can support you.",
+  // SEO-focused, exact-match headline:
+  title: "Book a Consultation with Atlanta’s First Queer and Asian-Owned Therapy Practice",
+  title2: "Your Space to Be Seen and Heard",
+  subtitle:
+    "Atlanta, GA • Virtual therapy across Georgia. I’m Kay (she/they), a queer Korean American therapist. Schedule a free, no‑pressure 15‑minute consultation.",
+  // New: a short location line you can render under the hero
+  locationLine: "Atlanta, GA • Virtual therapy across Georgia",
 };
+
 
 export const benefitsSection = {
   title: "A Different Kind of Therapy Experience",

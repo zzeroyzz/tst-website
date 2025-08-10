@@ -32,18 +32,10 @@ const itemVariants = {
 };
 
 const ServicesPageClient = () => {
-  const pathname = usePathname();
   const router = useRouter();
 
   const handleClick = () => {
-    if (pathname === "/") {
-      const contactForm = document.getElementById("contact-form");
-      if (contactForm) {
-        contactForm.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      router.push("/#contact-form");
-    }
+    router.push("/contact");
   };
 
   return (
@@ -57,11 +49,11 @@ const ServicesPageClient = () => {
             animate="visible"
         >
           <motion.div
-            className="text-center max-w-4xl mx-auto flex flex-col gap-6 items-center"
+            className="text-center max-w-4xl mx-auto flex flex-col gap-5 items-center"
             variants={itemVariants}
            >
             <h1 className="text-5xl lg:text-6xl font-extrabold">
-              Therapy That Fits You, As You Are.
+              Therapy That Fits You, As You Are: Virtual Therapy Across Georgia
             </h1>
             <p className="text-lg">
               Explore our therapeutic approach and find the support that meets
@@ -76,7 +68,7 @@ const ServicesPageClient = () => {
           </motion.div>
 
           <motion.div
-            className="w-full max-w-5xl mx-auto mt-16"
+            className="w-full max-w-5xl mx-auto mt-10"
             variants={itemVariants}
           >
             <FallingPills/>
