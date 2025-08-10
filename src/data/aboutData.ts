@@ -1,7 +1,7 @@
 // src/data/aboutData.ts
 
 export const aboutPageContent = {
-  title: "About Me",
+  title: "Meet Kay, a therapist for the ones who hold it all",
   paragraphs: [
     "The people I work with often carry more than anyone realizes. They’re the ones others lean on, the ones who rarely have space to fall apart.",
     "I'm Kay (she/they), a Korean American, queer, neurodivergent therapist living with CPTSD.",
@@ -13,4 +13,3 @@ export const aboutPageContent = {
     "If this feels like a space you’ve been looking for, I would be honored to connect with you.",
   ],
 };
-

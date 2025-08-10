@@ -15,8 +15,8 @@ import type { Metadata } from 'next';
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: 'About Kay | Toasted Sesame Therapy',
-  description: 'Meet Kay (she/they), a Korean American, queer, and neurodivergent therapist dedicated to providing identity-centered care.'
+  title: 'About Kay — Queer- and Asian-Owned Therapy Practice in Atlanta',
+  description: 'Meet Kay (she/they), a licensed therapist providing affirming, identity-centered care for queer, neurodivergent, and trauma-impacted clients across Georgia.'
 };
 
 const containerVariants = {
