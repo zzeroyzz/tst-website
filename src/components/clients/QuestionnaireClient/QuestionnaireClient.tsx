@@ -136,7 +136,7 @@ export default function QuestionnaireClient({
       });
       clearFormState();
       toast.success("Thanks! We've shared some resources.");
-      window.location.href = '/';
+      window.location.href = '/guides';
     } catch (err) {
       console.error('Out-of-state completion failed:', err);
       toast.error('Something went wrong. Please try again.');
@@ -153,7 +153,7 @@ export default function QuestionnaireClient({
       });
       clearFormState();
       toast.success(`Thanks! We've shared lower-cost options.`)
-      window.location.href = '/';
+      window.location.href = '/guides';
     } catch (err) {
       console.error('Budget-not-fit completion failed:', err);
       toast.error('Something went wrong. Please try again.');
@@ -619,7 +619,7 @@ export default function QuestionnaireClient({
                         {/* Wrap scrollable content in relative container for gradient */}
                         <div className="relative">
                           <div
-                            className="grid grid-cols-1 md:grid-cols-2 gap-3"
+                            className="grid grid-cols-1 px-4 sm:px-0 md:grid-cols-2 gap-3 "
                             style={{
                               maxHeight: window.innerWidth < 768 ? '400px' : 'none',
                               overflowY: window.innerWidth < 768 ? 'auto' : 'visible'
@@ -648,7 +648,7 @@ export default function QuestionnaireClient({
 
                           {/* Gradient fade indicator - only visible on mobile */}
                           <div
-                            className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none md:hidden"
+                            className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none md:hidden"
                             style={{
                               display: window.innerWidth < 768 ? 'block' : 'none'
                             }}
@@ -916,18 +916,16 @@ export default function QuestionnaireClient({
                 <Button
                   onClick={() => {
                     if (isOutOfState) {
-                      // Submit minimal out-of-state completion so DB columns update
                       completeOutOfState();
                     } else if (currentStep === 5 && budgetWorks === false) {
-                      // In GA but budget doesn't work – finalize with minimal completion
                       completeBudgetNotFit();
                     } else {
-                      window.location.href = '/';
+                      window.location.href = '/guides';
                     }
                   }}
                   className="flex items-center gap-2 min-w-fit bg-tst-green"
                 >
-                  <span>Return Home</span>
+                  <span>Check Out Toasty Tidbits</span>
                   <ArrowRight size={16} className="flex-shrink-0" />
                 </Button>
               )}
