@@ -34,7 +34,7 @@ export default function AboutPage() {
         name: 'Kay',
         jobTitle: 'Licensed Professional Counselor',
         image:
-          'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v2.png',
+          'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png',
         url: canonical,
         worksFor: { '@type': 'Organization', name: 'Toasted Sesame Therapy', url: 'https://toastedsesametherapy.com/' },
         knowsAbout: [
