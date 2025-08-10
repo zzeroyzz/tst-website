@@ -8,7 +8,7 @@ interface Post {
   created_at: string;
 }
 
-export const revalidate = 60 * 60 * 24; // 24h; adjust as you like
+export const revalidate = 86400; // 24h; adjust as you like
 // export const dynamic = 'force-static'; // optional if you want static generation
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
