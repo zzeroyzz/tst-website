@@ -35,25 +35,19 @@ const parseUtc = (val: string): Date => {
 // Helper function to format appointment date in Eastern time
 const formatAppointmentDateEastern = (utcDateString: string): string => {
   try {
-    console.log('Input UTC string:', utcDateString);
 
     const utcDate = parseUtc(utcDateString);
     if (isNaN(utcDate.getTime())) {
       console.warn('Invalid date after parse:', utcDateString);
       return utcDateString ?? '';
     }
-    console.log('Parsed UTC date:', utcDate.toISOString());
-    console.log('UTC date toString:', utcDate.toString());
-
     const easternDate = toZonedTime(utcDate, EASTERN_TIMEZONE);
-    console.log('Eastern date:', easternDate.toString());
 
     const formatted = formatTz(
       easternDate,
       "EEEE, MMMM d, yyyy 'at' h:mm a zzz",
       { timeZone: EASTERN_TIMEZONE }
     );
-    console.log('Formatted result:', formatted);
 
     return formatted;
   } catch (e) {
@@ -77,7 +71,6 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  console.log(contact, 'contact');
 
   // Close dropdown when clicking outside
   useEffect(() => {

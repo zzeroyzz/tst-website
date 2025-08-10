@@ -69,9 +69,6 @@ const HowItWorksSteps: React.FC<HowItWorksStepsProps> = ({
             maxHeight: "300px"
           }}
           priority={index === 0}
-          // Add these for debugging
-          onLoad={() => console.log(`Image ${index} loaded successfully`)}
-          onError={(e) => console.error(`Image ${index} failed to load:`, e)}
         />
       </div>
     </div>

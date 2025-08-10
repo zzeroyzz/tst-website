@@ -33,7 +33,6 @@ export default function CancelAppointmentPage() {
   const [cancelled, setCancelled] = useState(false);
   const [error, setError] = useState<string>('');
 
-  console.log(contact, "contact")
 
   useEffect(() => {
     const fetchAppointment = async () => {
