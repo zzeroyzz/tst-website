@@ -39,7 +39,7 @@ const ServicesPageClient = () => {
   };
 
   return (
-    <main>
+    <main className="overflow-hidden">
       {/* Hero Section */}
       <Section>
         <motion.div
@@ -49,10 +49,10 @@ const ServicesPageClient = () => {
             animate="visible"
         >
           <motion.div
-            className="text-center max-w-4xl mx-auto flex flex-col gap-5 items-center"
+            className="text-center max-w-4xl mx-auto flex flex-col gap-5 items-center px-4"
             variants={itemVariants}
            >
-            <h1 className="text-5xl lg:text-6xl font-extrabold">
+            <h1 className="text-4xl lg:text-6xl font-extrabold">
               Therapy That Fits You, As You Are: Virtual Therapy Across Georgia
             </h1>
             <p className="text-lg">
@@ -68,7 +68,7 @@ const ServicesPageClient = () => {
           </motion.div>
 
           <motion.div
-            className="w-full max-w-5xl mx-auto mt-10"
+            className="w-full max-w-5xl mx-auto mt-10 px-4"
             variants={itemVariants}
           >
             <FallingPills/>
@@ -78,12 +78,12 @@ const ServicesPageClient = () => {
 
       {/* Individual Therapy Section */}
       <Section>
-         <div className="text-center mb-12">
+         <div className="text-center mb-12 px-4">
           <h2 className="text-5xl font-extrabold">
             Individual Therapy
           </h2>
         </div>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4">
            <ServiceOfferingCard
              service={individualTherapyData}
            />
@@ -92,10 +92,10 @@ const ServicesPageClient = () => {
 
       {/* Our Approach Section */}
        <Section
-         className="bg-tst-purple border-t-2 border-black"
+         className="bg-tst-purple border-t-2 border-black overflow-hidden"
        >
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-16 px-4"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.5 }}
@@ -106,7 +106,7 @@ const ServicesPageClient = () => {
           </h2>
         </motion.div>
         <motion.div
-            className="max-w-5xl mx-auto flex flex-col gap-24"
+            className="max-w-6xl mx-auto flex flex-col gap-24 px-4"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -115,17 +115,22 @@ const ServicesPageClient = () => {
           {ourApproachData.map((item, index) => (
             <motion.div
               key={item.title}
-              className="grid md:grid-cols-2 gap-12 items-center"
+              className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center w-full"
               variants={itemVariants}
             >
-              <div className={`w-full ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
-                <AnimatedImage animationData={item.animationData} alt={item.altText}/>
+              <div className={`w-full flex justify-center ${index % 2 === 0 ? 'md:order-1' : 'md:order-2'}`}>
+                <div className="max-w-md w-full aspect-square flex items-center justify-center">
+                  <AnimatedImage
+                    animationData={item.animationData}
+                    alt={item.altText}
+                  />
+                </div>
               </div>
-              <div className={`flex flex-col gap-4 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
-                <h3 className="text-3xl font-bold">
+              <div className={`flex flex-col gap-4 min-w-0 ${index % 2 === 0 ? 'md:order-2' : 'md:order-1'}`}>
+                <h3 className="text-2xl lg:text-3xl font-bold break-words">
                   {item.title}
                 </h3>
-                <p>
+                <p className="break-words">
                   {item.description}
                 </p>
                 <div className="mt-2">
@@ -134,7 +139,7 @@ const ServicesPageClient = () => {
                     </h4>
                     <ul className="list-disc list-inside flex flex-col gap-1">
                         {item.benefits.map((benefit) => (
-                          <li key={benefit}>
+                          <li key={benefit} className="break-words">
                             {benefit}
                           </li>
                         ))}
