@@ -21,6 +21,13 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="flex flex-col gap-4">
             <h3 className="text-3xl font-bold">{service.title}</h3>
+            <Image
+                src={service.imageUrl}
+                alt="services"
+                width={500}
+                height={500}
+                className="w-full h-auto object-contain md:hidden"
+              />
             <p>{service.description}</p>
             <div>
               <h4 className="font-bold mb-2">Best for:</h4>
