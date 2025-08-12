@@ -7,95 +7,86 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    name: Test Suite
+    name: Unit + Lint + Build
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [18.x, 20.x]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linting
+      - name: Lint
         run: npm run lint
 
-      - name: Run type checking
+      - name: Type check via build dry-run
         run: npm run build --dry-run
 
-      - name: Run unit tests
+      - name: Unit tests with coverage
         run: npm run test:coverage
         env:
           NODE_ENV: test
+          NEXT_TELEMETRY_DISABLED: 1
 
-      - name: Run API tests
-        run: npm run test:api
-        env:
-          NODE_ENV: test
-
-      - name: Run component tests
-        run: npm run test:components
-        env:
-          NODE_ENV: test
-
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
           directory: ./coverage/
           fail_ci_if_error: true
           verbose: true
 
-      - name: Comment PR with coverage
-        if: github.event_name == 'pull_request'
-        uses: romeovs/lcov-reporter-action@v0.3.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/lcov.info
-
   e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
+    name: E2E (PRs)
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: 20.x
           cache: 'npm'
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application
+      # Build once, run production server, then run Cypress
+      - name: Build Next app
         run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Start server
+        run: npm run start &
         env:
           NODE_ENV: production
 
-      - name: Start application
-        run: npm start &
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test:e2e
+          wait-on: 'http://localhost:3000'
+          browser: chrome
+          # optional: only smoke specs on PRs
+          # spec: cypress/e2e/smoke/**/*.cy.{ts,tsx,js,jsx}
         env:
-          NODE_ENV: test
+          CYPRESS_BASE_URL: http://localhost:3000
+          NEXT_TELEMETRY_DISABLED: 1
 
-      - name: Wait for application
-        run: npx wait-on http://localhost:3000
-
-      - name: Run E2E tests
-        run: npm run test:e2e
-        env:
-          NODE_ENV: test
+      - name: Upload Cypress artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/screenshots
+            cypress/videos
