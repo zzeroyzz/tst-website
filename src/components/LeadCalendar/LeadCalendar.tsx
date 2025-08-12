@@ -590,6 +590,7 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
                   key={slot.time}
                   onClick={() => handleTimeSelect(slot.time)}
                   disabled={!slot.available && !isRescheduling}
+                  data-testid="calendar-slot"
                   className={`
                     p-2 md:p-3 rounded-lg border-2 font-medium text-sm md:text-base
                     transition-all duration-200

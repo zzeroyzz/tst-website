@@ -66,6 +66,9 @@ declare global {
   namespace Cypress {
     interface Chainable {
       visitWithoutCookies(url: string): Chainable<void>
+      mockContactAPI(): Chainable<void>;
+      mockQuestionnaireAPI(): Chainable<void>;
+      mockAllAPIs(): Chainable<void>;
     }
   }
 }

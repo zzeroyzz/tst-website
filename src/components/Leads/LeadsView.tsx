@@ -4,45 +4,27 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { format, differenceInDays, parseISO } from "date-fns";
-import { X, Send, Plus } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
 import Button from "@/components/Button/Button";
+import LeadDetailModal from "@/components/LeadDetailModal/LeadDetailModal";
+import type { Lead } from '@/types/lead';
 
-type Lead = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  status: string;
-  notes?: string;
-  created_at: string;
-  reminder_at?: string;
-  reminder_message?: string;
-  // Questionnaire fields
-  questionnaire_completed?: boolean;
-  questionnaire_token?: string;
-  questionnaire_reminder_sent_at?: string;
-  interested_in?: string[];
-  scheduling_preference?: string;
-  payment_method?: string;
-  budget_works?: boolean;
-};
 
-// Replaced statusColors object with a function to be more Tailwind-friendly
 const getStatusClasses = (status: string) => {
   switch (status) {
     case "New":
-      return "bg-blue-100 text-blue-800";
+      return "bg-tst-tel text-blue-800";
     case "Contacted":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-tst-yellow text-yellow-800";
     case "Reminder Sent":
       return "bg-orange-100 text-orange-800";
     case "Consultation Scheduled":
-      return "bg-purple-100 text-purple-800";
+      return "bg-tst-purple text-purple-800";
     case "Converted":
-      return "bg-green-100 text-green-800";
+      return "bg-tst-green text-green-800";
     case "Not a Fit":
       return "bg-gray-100 text-gray-800";
     default:
@@ -62,18 +44,19 @@ const DeleteConfirmModal = ({
   onConfirm: () => void;
   isDeleting: boolean;
 }) => {
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-bold">Delete Lead</h3>
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-500 hover:text-red-500 transition-colors"
             disabled={isDeleting}
           >
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         <div className="mb-6">
@@ -152,13 +135,13 @@ const AddLeadModal = ({ onClose, onAdd }) => {
       <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-bold">Add New Lead</h3>
-          <button
+          <Button
             onClick={onClose}
             className="text-gray-500 hover:text-red-500 transition-colors"
             disabled={isAdding}
           >
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -210,7 +193,6 @@ const AddLeadModal = ({ onClose, onAdd }) => {
 
           <div className="flex gap-3 justify-end pt-4">
             <Button
-
               onClick={onClose}
               className="bg-gray-200"
               disabled={isAdding}
@@ -226,210 +208,6 @@ const AddLeadModal = ({ onClose, onAdd }) => {
             </Button>
           </div>
         </form>
-      </div>
-    </div>
-  );
-};
-const LeadDetailModal = ({ lead, onClose, onUpdate }) => {
-  const [status, setStatus] = useState(lead.status);
-  const [notes, setNotes] = useState(lead.notes || "");
-  const [reminderDate, setReminderDate] = useState(lead.reminder_at ? format(parseISO(lead.reminder_at), "yyyy-MM-dd'T'HH:mm") : "");
-  const [reminderNote, setReminderNote] = useState(lead.reminder_message || "");
-  const [isSending, setIsSending] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const statusOptions = ["New", "Contacted", "Reminder Sent", "Consultation Scheduled", "Converted", "Not a Fit"];
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    const updatedData = {
-        status,
-        notes,
-        reminder_at: reminderDate ? new Date(reminderDate).toISOString() : null,
-        reminder_message: reminderNote || null
-    };
-    const success = await onUpdate(lead.id, updatedData);
-    setIsSaving(false);
-    if (success) {
-        onClose();
-    }
-  };
-
-  const handleSendReminder = async () => {
-    setIsSending(true);
-    const toastId = toast.loading('Sending reminder...');
-
-    try {
-        const response = await fetch('/api/leads/send-reminder', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: lead.email }),
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error);
-
-        toast.dismiss(toastId);
-
-        const updatedData = {
-            status: 'Reminder Sent',
-            notes: notes,
-            reminder_at: reminderDate ? new Date(reminderDate).toISOString() : null,
-            reminder_message: reminderNote || null
-        };
-        const success = await onUpdate(lead.id, updatedData, 'Reminder sent! Lead status updated.');
-
-        if (success) {
-            onClose();
-        }
-
-    } catch (error: any) {
-        toast.error(`Error: ${error.message}`, { id: toastId });
-    } finally {
-        setIsSending(false);
-    }
-  };
-
-  const handleCopyQuestionnaireLink = () => {
-    if (lead.questionnaire_token) {
-      navigator.clipboard.writeText(`${window.location.origin}/questionnaire/${lead.questionnaire_token}`);
-      toast.success('Questionnaire link copied to clipboard');
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl border-2 border-black">
-        <div className="flex justify-between items-start mb-4">
-            <div>
-                <h2 className="text-2xl font-bold">{lead.name}</h2>
-                <p className="text-gray-600">{lead.email} | {lead.phone}</p>
-            </div>
-            {/* <button onClick={onClose} className="p-1 text-gray-500 hover:text-red-500">
-                <X size={24} />
-            </button> */}
-            <Button
-                onClick={onClose}
-                className="p-2   rounded-lg transition-colors bg-tst-red"
-              >
-                <X size={20} />
-              </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left side for notes */}
-            <div className="space-y-4">
-                <div>
-                    <label className="font-bold block mb-1">Status</label>
-                    <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        className={`w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple ${getStatusClasses(status)}`}
-                    >
-                        {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                </div>
-                <div>
-                    <label className="font-bold block mb-1">Notes</label>
-                    <textarea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        rows={10}
-                        className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
-                        placeholder="Add notes about your interactions with this lead..."
-                    />
-                </div>
-            </div>
-            {/* Right side for reminders and info */}
-            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                 <div>
-                    <h3 className="font-bold text-lg mb-2">Lead Information</h3>
-                    <p><strong>Submitted:</strong> {format(new Date(lead.created_at), "PPP")}</p>
-                 </div>
-
-                 <div>
-                    <h3 className="font-bold text-lg mb-2">Questionnaire Status</h3>
-                    {lead.questionnaire_completed ? (
-                      <div className="space-y-2">
-                        <p className="text-green-600 font-medium">✓ Completed</p>
-                        {lead.interested_in && (
-                          <div>
-                            <p className="font-medium text-sm">Interested in:</p>
-                            <p className="text-sm">{lead.interested_in.join(', ')}</p>
-                          </div>
-                        )}
-                        {lead.scheduling_preference && (
-                          <p className="text-sm">
-                            <span className="font-medium">Scheduling:</span> {lead.scheduling_preference}
-                          </p>
-                        )}
-                        {lead.payment_method && (
-                          <p className="text-sm">
-                            <span className="font-medium">Payment:</span> {lead.payment_method}
-                          </p>
-                        )}
-                        {lead.budget_works !== null && (
-                          <p className="text-sm">
-                            <span className="font-medium">Budget ($150):</span> {lead.budget_works ? 'Works' : 'Needs alternatives'}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-orange-600 font-medium">⏳ Pending completion</p>
-                        <button
-                          onClick={handleCopyQuestionnaireLink}
-                          className="text-sm text-blue-600 underline hover:text-blue-800"
-                        >
-                          Copy questionnaire link
-                        </button>
-                        {lead.questionnaire_reminder_sent_at && (
-                          <p className="text-xs text-gray-500">
-                            Reminder sent: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                 </div>
-
-                 <div>
-                    <h3 className="font-bold text-lg mb-2">Set a Reminder</h3>
-                    <div className="space-y-2">
-                        <input
-                            type="datetime-local"
-                            value={reminderDate}
-                            onChange={e => setReminderDate(e.target.value)}
-                            className="w-full p-2 border-2 border-gray-300 rounded-md bg-white"
-                        />
-                        <textarea
-                            rows={2}
-                            value={reminderNote}
-                            onChange={e => setReminderNote(e.target.value)}
-                            className="w-full p-2 border-2 border-gray-300 rounded-md bg-white"
-                            placeholder="Reminder note..."
-                        ></textarea>
-                    </div>
-                 </div>
-            </div>
-        </div>
-
-        <div className="flex justify-between items-center mt-6">
-            <Button
-                onClick={handleSendReminder}
-                disabled={isSending || isSaving}
-                className="flex items-center gap-2 px-6 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-                <Send size={18} />
-                {isSending ? 'Sending...' : 'Send Reminder'}
-            </Button>
-            <Button
-                onClick={handleSave}
-                disabled={isSaving || isSending}
-                className="px-6 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black"
-            >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
-        </div>
       </div>
     </div>
   );
@@ -452,6 +230,7 @@ const LeadsView = () => {
     const { data, error } = await supabase
       .from("contacts")
       .select("*")
+      .eq("archived", false)  // Only fetch non-archived leads
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -517,6 +296,7 @@ const LeadsView = () => {
       return false;
     }
   };
+
   const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
     // Implement optimistic UI update correctly
     const originalLeads = [...leads];
@@ -535,6 +315,27 @@ const LeadsView = () => {
     } else {
         toast.success(successMessage);
         return true;
+    }
+  };
+
+  const handleArchiveLead = async (leadId: number) => {
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update({ archived: true })
+        .eq("id", leadId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Remove from local state since it's archived
+      setLeads(prev => prev.filter(l => l.id !== leadId));
+      toast.success('Lead archived successfully!');
+      return true;
+    } catch (error: any) {
+      toast.error(`Failed to archive lead: ${error.message}`);
+      return false;
     }
   };
 
@@ -659,10 +460,9 @@ const LeadsView = () => {
                       </td>
                       <td className="p-4 relative">
                         <Button
-
                           onClick={(e) => handleDeleteClick(e, lead)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                                        wrapperClassName="absolute -top-2 -right-2"
+                          wrapperClassName="absolute -top-2 -right-2"
                         >
                           <X size={16} />
                         </Button>
@@ -674,11 +474,14 @@ const LeadsView = () => {
             </table>
           </div>
         </div>
+
+        {/* Lead Detail Modal */}
         {selectedLead && (
           <LeadDetailModal
             lead={selectedLead}
             onClose={() => setSelectedLead(null)}
             onUpdate={handleUpdateLead}
+            onArchive={handleArchiveLead}
           />
         )}
       </div>
