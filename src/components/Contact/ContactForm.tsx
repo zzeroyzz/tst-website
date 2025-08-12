@@ -116,7 +116,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       </div>
     );
   };
-
+const handleEmailClick = () => {
+  window.location.href = `mailto:hello@example.com?subject=${encodeURIComponent(
+    "Follow-up on My Therapy Inquiry"
+  )}&body=${encodeURIComponent(
+    "Hi Kay,\n\nI’ve connected with you before and would like to follow up regarding scheduling or questions I have about starting therapy.\n\nMy details are:\n• Name:\n• Best contact number:\n• Preferred availability:\n• What I am interested in working on in therapy:\n• My budget:\n• My location (city/state):\n\nThank you, and I look forward to hearing from you.\n\nBest,\n[Your Name]"
+  )}`;
+};
   const renderContactExistsMessage = () => {
     return (
       <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center">
@@ -126,13 +132,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
           It looks like we already have your information in our system. For personalized assistance with scheduling or any questions, please reach out directly.
         </p>
         <div className="space-y-4">
-          <a
-            href="mailto:care@toastedsesametherapy.com"
-            className="inline-block bg-tst-purple text-black font-bold py-3 px-4 sm:px-6 rounded-lg border-2 border-black shadow-brutalist hover:shadow-brutalistLg transition-all text-sm sm:text-base break-all sm:break-normal"
-          >
-            <span className="hidden sm:inline">Contact Us</span>
-            <span className="sm:hidden">Contact Us</span>
-          </a>
+
+            <Button onClick={handleEmailClick} className=" bg-tst-purple text-black">Contact Us</Button>
+
           <p className="text-sm text-yellow-600">
             We&apos;ll get back to you within 1 business day
           </p>
