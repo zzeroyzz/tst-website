@@ -8,7 +8,7 @@ import CookieConsent from "@/components/CookieConsent/CookieConsent";
 import Script from 'next/script';
 import ConditionalLayout from '@/components/ConditionalLayout/ConditionalLayout';
 import ToasterClient from "@/components/clients/ToasterClient/ToasterClient";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const workSans = Work_Sans({
   subsets: ["latin"],
@@ -105,6 +105,7 @@ export default function RootLayout({
           <Nav />
           <main>{children}
             <Analytics />
+            <SpeedInsights/>
           </main>
           <Footer />
         </ConditionalLayout>

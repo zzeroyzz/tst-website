@@ -3,12 +3,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, Phone, Mail, MoreVertical, Check, X, Edit } from 'lucide-react';
+import { Calendar, Clock, Phone, Mail, MoreVertical, Check, X, Edit, Eye } from 'lucide-react';
 import { toZonedTime, format as formatTz } from 'date-fns-tz';
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Contact } from '@/types/contact';
 import Button from '@/components/Button/Button';
 import AppointmentRescheduleCalendar from '@/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar';
 import AppointmentCancelModal from '@/components/AppointmentCancelModal/AppointmentCancelModal';
+import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
 import { useAppointments } from '@/hooks/useAppointments';
 import { getAppointmentStatus, getAppointmentStatusColor } from '@/utils/appointmentHelpers';
 import toast from 'react-hot-toast';
@@ -35,7 +37,6 @@ const parseUtc = (val: string): Date => {
 // Helper function to format appointment date in Eastern time
 const formatAppointmentDateEastern = (utcDateString: string): string => {
   try {
-
     const utcDate = parseUtc(utcDateString);
     if (isNaN(utcDate.getTime())) {
       console.warn('Invalid date after parse:', utcDateString);
@@ -61,13 +62,15 @@ interface AppointmentCardProps {
   onStatusUpdate: (contactId: string, status: string) => void;
   onReschedule: (contactId: string) => void;
   onCancel: (contactId: string) => void;
+  onViewLead: (contactId: string) => void;
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
   contact,
   onStatusUpdate,
   onReschedule,
-  onCancel
+  onCancel,
+  onViewLead
 }) => {
   const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -112,6 +115,17 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
           {showActions && (
             <div className="absolute right-0 top-full mt-1 bg-white border-2 border-black rounded-lg shadow-brutalistLg z-20 min-w-[160px] overflow-hidden">
+              <div
+                onClick={() => {
+                  onViewLead(contact.id);
+                  setShowActions(false);
+                }}
+                className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
+              >
+                <Eye size={16} />
+                View Lead
+              </div>
+              <div className="border-t border-gray-200"></div>
               <div
                 onClick={() => {
                   onStatusUpdate(contact.id, 'completed');
@@ -216,6 +230,12 @@ const AppointmentsDashboard: React.FC = () => {
   } | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
+  // Lead modal state
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<any | null>(null);
+
+  const supabase = createClientComponentClient();
+
   const handleStatusUpdate = async (contactId: string, status: string) => {
     if (status !== 'completed') {
       toast.error('Invalid status update');
@@ -313,6 +333,69 @@ const AppointmentsDashboard: React.FC = () => {
     refreshAppointments();
   };
 
+  const handleViewLead = async (contactId: string) => {
+    try {
+      // Fetch the full lead data from Supabase
+      const { data: lead, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("id", contactId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      setSelectedLead(lead);
+      setShowLeadModal(true);
+    } catch (error) {
+      console.error('Error fetching lead:', error);
+      toast.error('Failed to load lead details');
+    }
+  };
+
+  const handleUpdateLead = async (leadId: number, updatedData: any, successMessage = "Lead updated successfully!") => {
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update(updatedData)
+        .eq("id", leadId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success(successMessage);
+      // Refresh appointments to reflect any changes
+      refreshAppointments();
+      return true;
+    } catch (error: any) {
+      toast.error(`Failed to update lead: ${error.message}`);
+      return false;
+    }
+  };
+
+  const handleArchiveLead = async (leadId: number) => {
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update({ archived: true })
+        .eq("id", leadId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Lead archived successfully!');
+      // Refresh appointments since the archived lead should no longer appear
+      refreshAppointments();
+      return true;
+    } catch (error: any) {
+      toast.error(`Failed to archive lead: ${error.message}`);
+      return false;
+    }
+  };
+
   const filteredAppointments = appointments.filter(contact => {
     if (!contact.scheduled_appointment_at) return false;
     const status = getAppointmentStatus(
@@ -341,7 +424,7 @@ const AppointmentsDashboard: React.FC = () => {
         <p className="text-red-600">Error loading appointments: {error}</p>
         <Button
           onClick={refreshAppointments}
-          className="mt-2 px-4 py-2 bg-red-100 border border-red-300 rounded"
+          className="px-4 py-2 border-2 border-black rounded-lg bg-tst-green transition-colors"
         >
           Retry
         </Button>
@@ -429,6 +512,7 @@ const AppointmentsDashboard: React.FC = () => {
               onStatusUpdate={handleStatusUpdate}
               onReschedule={handleReschedule}
               onCancel={handleCancel}
+              onViewLead={handleViewLead}
             />
           ))}
         </div>
@@ -455,6 +539,19 @@ const AppointmentsDashboard: React.FC = () => {
           contactEmail={cancelModalData.contactEmail}
           appointmentDate={cancelModalData.appointmentDate}
           isLoading={isCancelling}
+        />
+      )}
+
+      {/* Lead Detail Modal */}
+      {showLeadModal && selectedLead && (
+        <LeadDetailModal
+          lead={selectedLead}
+          onClose={() => {
+            setShowLeadModal(false);
+            setSelectedLead(null);
+          }}
+          onUpdate={handleUpdateLead}
+          onArchive={handleArchiveLead}
         />
       )}
     </div>
