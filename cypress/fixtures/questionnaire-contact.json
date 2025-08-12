@@ -1,0 +1,7 @@
+{
+  "contact": {
+    "id": "test-contact-123",
+    "name": "Test User",
+    "email": "test@example.com"
+  }
+}

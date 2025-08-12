@@ -1,0 +1,5 @@
+{
+  "message": "Successfully subscribed to newsletter!",
+  "status": "subscribed",
+  "emailSent": true
+}
