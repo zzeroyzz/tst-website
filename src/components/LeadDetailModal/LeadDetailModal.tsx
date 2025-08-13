@@ -4,7 +4,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, Archive, ArchiveRestore } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import Button from '@/components/Button/Button';
 import toast from 'react-hot-toast';
@@ -35,16 +35,16 @@ interface LeadDetailModalProps {
   onClose: () => void;
   onUpdate: (leadId: number, updatedData: Partial<Lead>, successMessage?: string) => Promise<boolean>;
   onArchive?: (leadId: number) => Promise<boolean>;
+  onUnarchive?: (leadId: number) => Promise<boolean>;
 }
 
-interface LeadDetailModalProps {
-  lead: Lead;
-  onClose: () => void;
-  onUpdate: (leadId: number, updatedData: Partial<Lead>, successMessage?: string) => Promise<boolean>;
-  onArchive?: (leadId: number) => Promise<boolean>;
-}
-
-const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpdate, onArchive }) => {
+const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
+  lead,
+  onClose,
+  onUpdate,
+  onArchive,
+  onUnarchive
+}) => {
   const [status, setStatus] = useState(lead.status || 'New');
   const [notes, setNotes] = useState(lead.notes || "");
   const [reminderDate, setReminderDate] = useState(lead.reminder_at ? format(parseISO(lead.reminder_at), "yyyy-MM-dd'T'HH:mm") : "");
@@ -52,6 +52,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
   const [isSending, setIsSending] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isUnarchiving, setIsUnarchiving] = useState(false);
 
   const statusOptions = ["New", "Contacted", "Reminder Sent", "Consultation Scheduled", "Converted", "Not a Fit"];
 
@@ -165,12 +166,38 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
     }
   };
 
+  const handleUnarchive = async () => {
+    if (!onUnarchive) {
+      toast.error('Unarchive functionality not available');
+      return;
+    }
+
+    setIsUnarchiving(true);
+    try {
+      const success = await onUnarchive(lead.id);
+      if (success) {
+        onClose();
+      }
+    } catch (error) {
+      toast.error('Failed to unarchive lead');
+    } finally {
+      setIsUnarchiving(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl border-2 border-black">
         <div className="flex justify-between items-start mb-4">
             <div>
-                <h2 className="text-2xl font-bold">{lead.name}</h2>
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  {lead.name}
+                  {lead.archived && (
+                    <span className="px-3 py-1 text-sm bg-gray-200 text-gray-600 rounded-full">
+                      Archived
+                    </span>
+                  )}
+                </h2>
                 <p className="text-gray-600">{lead.email} | {lead.phone}</p>
             </div>
             <Button
@@ -191,17 +218,23 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
                         className={`w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple ${getStatusClasses(status)}`}
+                        disabled={lead.archived}
                     >
                         {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
+                    {lead.archived && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Status cannot be changed for archived leads
+                      </p>
+                    )}
                     {/* Status suggestions based on questionnaire/appointment data */}
-                    {lead.questionnaire_completed && !lead.scheduled_appointment_at && (
+                    {!lead.archived && lead.questionnaire_completed && !lead.scheduled_appointment_at && (
                       <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
                         💡 <strong>Suggestion:</strong> Questionnaire completed but no appointment scheduled.
                         Consider status: {lead.qualified_lead === false ? '"Not a Fit"' : '"Contacted"'}
                       </div>
                     )}
-                    {lead.scheduled_appointment_at && status !== 'Consultation Scheduled' && (
+                    {!lead.archived && lead.scheduled_appointment_at && status !== 'Consultation Scheduled' && (
                       <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
                         💡 <strong>Suggestion:</strong> Appointment scheduled - consider status &rdquo;Consultation Scheduled&quot;
                       </div>
@@ -216,9 +249,16 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
                         rows={8}
                         className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
                         placeholder="Add notes about your interactions with this lead..."
+                        disabled={lead.archived}
                     />
+                    {lead.archived && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Notes cannot be edited for archived leads
+                      </p>
+                    )}
                 </div>
-{/* Appointment Information */}
+
+                {/* Appointment Information */}
                 {lead.scheduled_appointment_at && (
                   <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
                     <h3 className="font-bold text-lg mb-2 text-purple-800">📅 Scheduled Appointment</h3>
@@ -274,6 +314,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
                         <button
                           onClick={handleCopyQuestionnaireLink}
                           className="text-sm text-blue-600 underline hover:text-blue-800"
+                          disabled={lead.archived}
                         >
                           Copy questionnaire link
                         </button>
@@ -343,34 +384,52 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ lead, onClose, onUpda
         {/* Action Buttons */}
         <div className="flex justify-between items-center mt-6">
             <div className="flex gap-3">
-                <Button
-                    onClick={handleSendReminder}
-                    disabled={isSending || isSaving || isArchiving}
-                    className="flex items-center gap-2 px-4 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                >
-                    <Send size={16} />
-                    {isSending ? 'Sending...' : 'Send Reminder'}
-                </Button>
-
-                {onArchive && (
+                {/* Send Reminder Button - only for active leads */}
+                {!lead.archived && (
                   <Button
-                      onClick={handleArchive}
-                      disabled={isSending || isSaving || isArchiving}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white font-bold rounded-md border-2 border-black hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                      onClick={handleSendReminder}
+                      disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                      className="flex items-center gap-2 px-4 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
-                      <X size={16} />
-                      {isArchiving ? 'Archiving...' : 'Archive Lead'}
+                      <Send size={16} />
+                      {isSending ? 'Sending...' : 'Send Reminder'}
                   </Button>
+                )}
+
+                {/* Archive/Unarchive Button */}
+                {lead.archived && onUnarchive ? (
+                  <Button
+                      onClick={handleUnarchive}
+                      disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-md border-2 border-black hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                      <ArchiveRestore size={16} />
+                      {isUnarchiving ? 'Unarchiving...' : 'Unarchive Lead'}
+                  </Button>
+                ) : (
+                  !lead.archived && onArchive && (
+                    <Button
+                        onClick={handleArchive}
+                        disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white font-bold rounded-md border-2 border-black hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        <Archive size={16} />
+                        {isArchiving ? 'Archiving...' : 'Archive Lead'}
+                    </Button>
+                  )
                 )}
             </div>
 
-            <Button
-                onClick={handleSave}
-                disabled={isSaving || isSending || isArchiving}
-                className="px-6 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black"
-            >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            {/* Save Button - only for active leads */}
+            {!lead.archived && (
+              <Button
+                  onClick={handleSave}
+                  disabled={isSaving || isSending || isArchiving || isUnarchiving}
+                  className="px-6 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black"
+              >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            )}
         </div>
       </div>
     </div>

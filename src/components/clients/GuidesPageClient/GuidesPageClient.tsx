@@ -32,8 +32,10 @@ const GuidesPageClient = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title, created_at, sent_at, image_url, tags, slug")
+        .select("id, title, created_at, sent_at, image_url, tags, slug, type")
         .eq("status", "published")
+        .eq("archived", false) // Only non-archived posts
+        .eq("visible_to_public", true) // Only posts visible to public
         .order("sent_at", { ascending: false })
         .limit(6);
 
@@ -197,6 +199,7 @@ const GuidesPageClient = () => {
                   imageUrl: post.image_url || resourcesPageData.postsSection.defaultImageUrl,
                   tags: post.tags,
                   href: `/posts/${post.slug}`,
+                  type: post.type // Pass the type to ResourceCard
                 }}
               />
             ))}

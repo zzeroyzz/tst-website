@@ -16,8 +16,10 @@ const ToastyTidbitsArchivePageClient = () => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<'all' | 'newsletter' | 'blog'>('all');
   const [sortOrder, setSortOrder] = useState<"new-to-old" | "old-to-new">("new-to-old");
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const supabase = createClientComponentClient();
   const { isModalOpen, setIsModalOpen } = useSubscribeModalTrigger();
@@ -27,8 +29,10 @@ const ToastyTidbitsArchivePageClient = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title, created_at, sent_at, image_url, tags, slug")
+        .select("id, title, created_at, sent_at, image_url, tags, slug, type")
         .eq("status", "published")
+        .eq("archived", false) // Only show non-archived posts
+        .eq("visible_to_public", true) // Only show posts marked as visible to public
         .order("sent_at", { ascending: false });
 
       if (error) {
@@ -52,11 +56,22 @@ const ToastyTidbitsArchivePageClient = () => {
     setSelectedTags([]);
   };
 
+  const clearAllFilters = () => {
+    setSelectedTags([]);
+    setSelectedType('all');
+  };
+
   const filteredAndSortedPosts = useMemo(() => {
     let filtered = allPosts;
 
+    // Filter by type
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(post => post.type === selectedType);
+    }
+
+    // Filter by tags
     if (selectedTags.length > 0) {
-      filtered = allPosts.filter(post =>
+      filtered = filtered.filter(post =>
         selectedTags.every(tag => post.tags?.includes(tag))
       );
     }
@@ -66,7 +81,17 @@ const ToastyTidbitsArchivePageClient = () => {
       const dateB = new Date(b.sent_at || b.created_at).getTime();
       return sortOrder === "new-to-old" ? dateB - dateA : dateA - dateB;
     });
-  }, [allPosts, selectedTags, sortOrder]);
+  }, [allPosts, selectedTags, selectedType, sortOrder]);
+
+  // Count posts by type for display
+  const postCounts = useMemo(() => {
+    const counts = { newsletter: 0, blog: 0, total: allPosts.length };
+    allPosts.forEach(post => {
+      if (post.type === 'newsletter') counts.newsletter++;
+      if (post.type === 'blog') counts.blog++;
+    });
+    return counts;
+  }, [allPosts]);
 
   // Show skeleton while loading
   if (loading) {
@@ -90,13 +115,76 @@ const ToastyTidbitsArchivePageClient = () => {
 
       <Section>
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold">Newsletter Archive</h1>
-          <p className="text-lg mt-4">Browse all of our past publications.</p>
+          <h1 className="text-5xl font-extrabold">Content Archive</h1>
+          <p className="text-lg mt-4">Browse all of our newsletters and blog posts.</p>
+          <div className="mt-2 text-sm text-gray-600">
+            {postCounts.newsletter} newsletters • {postCounts.blog} blog posts • {postCounts.total} total
+          </div>
         </div>
 
         {/* Filtering and Sorting Controls */}
         <div className="bg-white p-6 rounded-lg border-2 border-black shadow-brutalistLg mb-12">
-          <div className="grid md:grid-cols-2 gap-6 items-start">
+          <div className="grid md:grid-cols-3 gap-6 items-start">
+
+            {/* Content Type Filter */}
+            <div className="relative">
+              <h3 className="font-bold mb-2">Content Type:</h3>
+
+              {/* Type Dropdown Button */}
+              <button
+                onClick={() => {
+                  setIsTypeDropdownOpen(!isTypeDropdownOpen);
+                  setIsTagDropdownOpen(false);
+                  setIsSortDropdownOpen(false);
+                }}
+                className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
+              >
+                <span className="text-gray-700">
+                  {selectedType === 'all' ? 'All Content' :
+                   selectedType === 'newsletter' ? 'Newsletters Only' : 'Blog Posts Only'}
+                </span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Type Dropdown Menu */}
+              {isTypeDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                  {[
+                    { value: 'all', label: 'All Content', count: postCounts.total },
+                    { value: 'newsletter', label: 'Newsletters', count: postCounts.newsletter },
+                    { value: 'blog', label: 'Blog Posts', count: postCounts.blog }
+                  ].map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedType(option.value as 'all' | 'newsletter' | 'blog');
+                        setIsTypeDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors ${
+                        selectedType === option.value ? 'bg-tst-purple text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{option.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">({option.count})</span>
+                          {selectedType === option.value && (
+                            <span className="text-sm">✓</span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Tag Filter Dropdown */}
             <div className="relative">
@@ -132,7 +220,8 @@ const ToastyTidbitsArchivePageClient = () => {
               <button
                 onClick={() => {
                   setIsTagDropdownOpen(!isTagDropdownOpen);
-                  setIsSortDropdownOpen(false); // Close sort dropdown
+                  setIsTypeDropdownOpen(false);
+                  setIsSortDropdownOpen(false);
                 }}
                 className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
               >
@@ -183,7 +272,8 @@ const ToastyTidbitsArchivePageClient = () => {
               <button
                 onClick={() => {
                   setIsSortDropdownOpen(!isSortDropdownOpen);
-                  setIsTagDropdownOpen(false); // Close tag dropdown
+                  setIsTagDropdownOpen(false);
+                  setIsTypeDropdownOpen(false);
                 }}
                 className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
               >
@@ -245,8 +335,11 @@ const ToastyTidbitsArchivePageClient = () => {
         <div className="mb-6 text-center">
           <p className="text-gray-600">
             Showing {filteredAndSortedPosts.length} of {allPosts.length} posts
+            {selectedType !== 'all' && (
+              <span> • {selectedType === 'newsletter' ? 'Newsletters' : 'Blog Posts'} only</span>
+            )}
             {selectedTags.length > 0 && (
-              <span> filtered by: {selectedTags.join(', ')}</span>
+              <span> • filtered by: {selectedTags.join(', ')}</span>
             )}
           </p>
         </div>
@@ -254,7 +347,7 @@ const ToastyTidbitsArchivePageClient = () => {
         {/* Post Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredAndSortedPosts.map((post) => (
-            <div key={post.id}>
+            <div key={post.id} className="group">
               <ResourceCard
                 card={{
                   title: post.title,
@@ -264,6 +357,7 @@ const ToastyTidbitsArchivePageClient = () => {
                   imageUrl: post.image_url || "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
                   tags: post.tags,
                   href: `/posts/${post.slug}`,
+                  type: post.type // Pass type to ResourceCard if it supports it
                 }}
               />
             </div>
@@ -275,12 +369,12 @@ const ToastyTidbitsArchivePageClient = () => {
             <p className="text-lg text-gray-600 mb-4">
               No posts match the selected filters.
             </p>
-            {selectedTags.length > 0 && (
+            {(selectedTags.length > 0 || selectedType !== 'all') && (
               <button
-                onClick={clearAllTags}
+                onClick={clearAllFilters}
                 className="bg-tst-yellow text-black px-6 py-3 rounded-lg font-bold border-2 border-black hover:bg-yellow-400 transition-colors"
               >
-                Clear filters
+                Clear all filters
               </button>
             )}
           </div>
