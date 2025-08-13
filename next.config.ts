@@ -7,6 +7,13 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Enable CSS optimization
+  experimental: {
+    optimizeCss: true, // Removes unused CSS
+  },
+  // Enable SWC minification for better performance
+  swcMinify: true,
+
   images: {
     remotePatterns: [
       {
@@ -22,6 +29,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Add image optimization
+    formats: ['image/webp', 'image/avif'],
   },
   async redirects() {
     return [

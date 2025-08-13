@@ -12,6 +12,7 @@ import {
   Users,
   Calendar,
   LogOut,
+  Mail,
 } from "lucide-react";
 import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
 import LeadsView from "@/components/Leads/LeadsView";
