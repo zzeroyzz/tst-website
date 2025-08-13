@@ -79,7 +79,7 @@ const CookieConsent: React.FC = () => {
                     <div className="flex-shrink-0 text-sm md:text-base">
                       🍪
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-center md:text-left">
                       <h3 className="text-sm md:text-lg font-bold mb-1 md:mb-2">
                         We value your privacy
                       </h3>
