@@ -12,4 +12,10 @@ export interface Post {
     tags?: string[];
     slug: string;
     subtext?: string;
-  }
+    archived?: boolean;
+    visible_to_public?: boolean;
+    type?: string;
+    view_count?: number;
+    like_count?: number;
+}
+
