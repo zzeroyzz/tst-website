@@ -5,7 +5,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format, differenceInDays } from "date-fns";
-import { X, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
 import Button from "@/components/Button/Button";
@@ -30,69 +30,6 @@ const getStatusClasses = (status: string) => {
     default:
       return "bg-gray-100 text-gray-800";
   }
-};
-
-// Delete Confirmation Modal Component
-const DeleteConfirmModal = ({
-  lead,
-  onClose,
-  onConfirm,
-  isDeleting
-}: {
-  lead: Lead;
-  onClose: () => void;
-  onConfirm: () => void;
-  isDeleting: boolean;
-}) => {
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-bold">Delete Lead</h3>
-          <Button
-            onClick={onClose}
-            className="text-gray-500 hover:text-red-500 transition-colors"
-            disabled={isDeleting}
-          >
-            <X size={24} />
-          </Button>
-        </div>
-
-        <div className="mb-6">
-          <p className="text-gray-700 mb-2">
-            Are you sure you want to delete this lead?
-          </p>
-          <div className="bg-gray-50 p-3 rounded-lg border">
-            <p className="font-medium text-sm">{lead.name}</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {lead.email} • {format(new Date(lead.created_at), "PPP")}
-            </p>
-          </div>
-          <p className="text-red-600 text-sm mt-2">
-            This action cannot be undone.
-          </p>
-        </div>
-
-        <div className="flex gap-3 justify-end">
-          <Button
-            onClick={onClose}
-            className="bg-gray-200"
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={onConfirm}
-            className="bg-red-500 text-white"
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete Lead'}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 // --- Add Lead Modal Component ---
@@ -140,7 +77,7 @@ const AddLeadModal = ({ onClose, onAdd }) => {
             className="text-gray-500 hover:text-red-500 transition-colors"
             disabled={isAdding}
           >
-            <X size={24} />
+            ×
           </Button>
         </div>
 
@@ -216,30 +153,41 @@ const AddLeadModal = ({ onClose, onAdd }) => {
 // --- Main Leads View Component ---
 const LeadsView = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [archivedLeads, setArchivedLeads] = useState<Lead[]>([]);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState<{ show: boolean; lead: Lead | null }>({
-    show: false,
-    lead: null
-  });
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
   const [showAddModal, setShowAddModal] = useState(false);
   const supabase = createClientComponentClient();
 
   const fetchLeads = useCallback(async () => {
-    const { data, error } = await supabase
+    // Fetch active leads
+    const { data: activeData, error: activeError } = await supabase
       .from("contacts")
       .select("*")
-      .eq("archived", false)  // Only fetch non-archived leads
+      .eq("archived", false)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching leads:", error);
-      setLoading(false);
+    // Fetch archived leads
+    const { data: archivedData, error: archivedError } = await supabase
+      .from("contacts")
+      .select("*")
+      .eq("archived", true)
+      .order("created_at", { ascending: false });
+
+    if (activeError) {
+      console.error("Error fetching active leads:", activeError);
     } else {
-      setLeads(data);
-      setLoading(false);
+      setLeads(activeData);
     }
+
+    if (archivedError) {
+      console.error("Error fetching archived leads:", archivedError);
+    } else {
+      setArchivedLeads(archivedData);
+    }
+
+    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {
@@ -300,17 +248,26 @@ const LeadsView = () => {
   const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
     // Implement optimistic UI update correctly
     const originalLeads = [...leads];
+    const originalArchivedLeads = [...archivedLeads];
 
+    // Update in the appropriate list
     const newLeads = leads.map(lead =>
       lead.id === leadId ? { ...lead, ...updatedData } : lead
     );
+    const newArchivedLeads = archivedLeads.map(lead =>
+      lead.id === leadId ? { ...lead, ...updatedData } : lead
+    );
+
     setLeads(newLeads);
+    setArchivedLeads(newArchivedLeads);
 
     const { error } = await supabase.from("contacts").update(updatedData).eq("id", leadId);
 
     if (error) {
         toast.error(`Failed to update lead: ${error.message}`);
-        setLeads(originalLeads); // Revert on failure
+        // Revert on failure
+        setLeads(originalLeads);
+        setArchivedLeads(originalArchivedLeads);
         return false;
     } else {
         toast.success(successMessage);
@@ -329,8 +286,13 @@ const LeadsView = () => {
         throw error;
       }
 
-      // Remove from local state since it's archived
-      setLeads(prev => prev.filter(l => l.id !== leadId));
+      // Move lead from active to archived
+      const leadToArchive = leads.find(l => l.id === leadId);
+      if (leadToArchive) {
+        setLeads(prev => prev.filter(l => l.id !== leadId));
+        setArchivedLeads(prev => [{ ...leadToArchive, archived: true }, ...prev]);
+      }
+
       toast.success('Lead archived successfully!');
       return true;
     } catch (error: any) {
@@ -339,44 +301,38 @@ const LeadsView = () => {
     }
   };
 
-  const handleDeleteClick = (e: React.MouseEvent, lead: Lead) => {
-    e.stopPropagation(); // Prevent row click
-    setDeleteModal({ show: true, lead });
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteModal.lead) return;
-
-    setIsDeleting(true);
-    const deleteToast = toast.loading('Deleting lead...');
-
+  const handleUnarchiveLead = async (leadId: number) => {
     try {
       const { error } = await supabase
         .from("contacts")
-        .delete()
-        .eq("id", deleteModal.lead.id);
+        .update({ archived: false })
+        .eq("id", leadId);
 
       if (error) {
         throw error;
       }
 
-      // Update local state to remove the deleted lead
-      setLeads(prev => prev.filter(l => l.id !== deleteModal.lead!.id));
+      // Move lead from archived to active
+      const leadToUnarchive = archivedLeads.find(l => l.id === leadId);
+      if (leadToUnarchive) {
+        setArchivedLeads(prev => prev.filter(l => l.id !== leadId));
+        setLeads(prev => [{ ...leadToUnarchive, archived: false }, ...prev]);
+      }
 
-      toast.dismiss(deleteToast);
-      toast.success('Lead deleted successfully!');
-      setDeleteModal({ show: false, lead: null });
-
+      toast.success('Lead unarchived successfully!');
+      return true;
     } catch (error: any) {
-      toast.error(`Failed to delete lead: ${error.message}`, { id: deleteToast });
-    } finally {
-      setIsDeleting(false);
+      toast.error(`Failed to unarchive lead: ${error.message}`);
+      return false;
     }
   };
 
   const handleRowClick = (lead: Lead) => {
     setSelectedLead(lead);
   };
+
+  // Get the current leads to display based on active tab
+  const currentLeads = activeTab === 'active' ? leads : archivedLeads;
 
   // Show skeleton while loading
   if (loading) {
@@ -387,15 +343,46 @@ const LeadsView = () => {
     <>
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Leads</h2>
-          <Button
-            onClick={() => setShowAddModal(true)}
-            className="bg-tst-purple text-black flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Add Lead
-          </Button>
+          <div className="flex items-center gap-4">
+            <h2 className="text-3xl font-bold">Leads</h2>
+
+            {/* Tab Navigation */}
+            <div className="flex border-2 border-black rounded-lg overflow-hidden">
+              <button
+                onClick={() => setActiveTab('active')}
+                className={`px-4 py-2 font-bold transition-colors ${
+                  activeTab === 'active'
+                    ? 'bg-tst-purple text-black'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                Active ({leads.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('archived')}
+                className={`px-4 py-2 font-bold transition-colors border-l-2 border-black ${
+                  activeTab === 'archived'
+                    ? 'bg-tst-purple text-black'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+              >
+                Archived ({archivedLeads.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Only show Add Lead button on active tab */}
+          {activeTab === 'active' && (
+            <Button
+              onClick={() => setShowAddModal(true)}
+              className="bg-tst-purple text-black flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Add Lead
+            </Button>
+          )}
         </div>
+
         <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -407,69 +394,73 @@ const LeadsView = () => {
                   <th className="p-4 font-bold">Submitted</th>
                   <th className="p-4 font-bold">Questionnaire</th>
                   <th className="p-4 font-bold">Status</th>
-                  <th className="p-4 font-bold w-20">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {leads.map((lead) => {
-                  const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-                  // FIX: A lead is only "warm" if it's recent AND requires action.
-                  const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
-                  const isWarm = daysOld <= 7 && isActionableStatus;
+                {currentLeads.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-gray-500">
+                      {activeTab === 'active' ? 'No active leads found' : 'No archived leads found'}
+                    </td>
+                  </tr>
+                ) : (
+                  currentLeads.map((lead) => {
+                    const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
+                    // FIX: A lead is only "warm" if it's recent AND requires action.
+                    const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
+                    const isWarm = daysOld <= 7 && isActionableStatus && activeTab === 'active';
 
-                  return (
-                    <tr
-                      key={lead.id}
-                      className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer group"
-                    >
-                      <td className="p-4" onClick={() => handleRowClick(lead)}>
-                        <div className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
-                      </td>
-                      <td className="p-4 font-medium" onClick={() => handleRowClick(lead)}>
-                        {lead.name}
-                      </td>
-                      <td className="p-4" onClick={() => handleRowClick(lead)}>
-                          <div>{lead.email}</div>
-                          <div className="text-sm text-gray-500">{lead.phone}</div>
-                      </td>
-                      <td className="p-4" onClick={() => handleRowClick(lead)}>
-                        {format(new Date(lead.created_at), "PPP")}
-                      </td>
-                      <td className="p-4" onClick={() => handleRowClick(lead)}>
-                        <div className="flex items-center gap-2">
-                          {lead.questionnaire_completed ? (
-                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800">
-                              Completed
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
-                              Pending
+                    return (
+                      <tr
+                        key={lead.id}
+                        className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer group"
+                        onClick={() => handleRowClick(lead)}
+                      >
+                        <td className="p-4">
+                          <div className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
+                        </td>
+                        <td className="p-4 font-medium">
+                          {lead.name}
+                          {activeTab === 'archived' && (
+                            <span className="ml-2 px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
+                              Archived
                             </span>
                           )}
-                          {!lead.questionnaire_completed && lead.questionnaire_reminder_sent_at && (
-                            <span className="text-xs text-gray-500">
-                              (Reminder sent)
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-4" onClick={() => handleRowClick(lead)}>
-                        <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
-                          {lead.status}
-                        </span>
-                      </td>
-                      <td className="p-4 relative">
-                        <Button
-                          onClick={(e) => handleDeleteClick(e, lead)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                          wrapperClassName="absolute -top-2 -right-2"
-                        >
-                          <X size={16} />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="p-4">
+                            <div>{lead.email}</div>
+                            <div className="text-sm text-gray-500">{lead.phone}</div>
+                        </td>
+                        <td className="p-4">
+                          {format(new Date(lead.created_at), "PPP")}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            {lead.questionnaire_completed ? (
+                              <span className="px-2 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800">
+                                Completed
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
+                                Pending
+                              </span>
+                            )}
+                            {!lead.questionnaire_completed && lead.questionnaire_reminder_sent_at && (
+                              <span className="text-xs text-gray-500">
+                                (Reminder sent)
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
+                            {lead.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
@@ -481,7 +472,8 @@ const LeadsView = () => {
             lead={selectedLead}
             onClose={() => setSelectedLead(null)}
             onUpdate={handleUpdateLead}
-            onArchive={handleArchiveLead}
+            onArchive={selectedLead.archived ? undefined : handleArchiveLead}
+            onUnarchive={selectedLead.archived ? handleUnarchiveLead : undefined}
           />
         )}
       </div>
@@ -491,16 +483,6 @@ const LeadsView = () => {
         <AddLeadModal
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddLead}
-        />
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteModal.show && deleteModal.lead && (
-        <DeleteConfirmModal
-          lead={deleteModal.lead}
-          onClose={() => setDeleteModal({ show: false, lead: null })}
-          onConfirm={handleDeleteConfirm}
-          isDeleting={isDeleting}
         />
       )}
     </>

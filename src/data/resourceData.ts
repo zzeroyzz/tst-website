@@ -31,6 +31,6 @@ export const resourcesPageData = {
   },
   routes: {
     privacyPolicy: "/policy",
-    newsletterArchives: "/toasty-tidbits-archives"
+    newsletterArchives: "/mental-health-healing-blog"
   }
 };

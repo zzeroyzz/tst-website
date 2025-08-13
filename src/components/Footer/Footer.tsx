@@ -58,10 +58,10 @@ const Footer = () => {
 
               <li>
                 <HoverLink
-                  href="/toasty-tidbits-archives"
+                  href="/mental-health-healing-blog"
                   className="text-white/90 hover:text-white transition-colors font-medium"
                 >
-                  Toasty Tidbits Archives
+                  Toasted Insights Blog
                 </HoverLink>
               </li>
               <li>

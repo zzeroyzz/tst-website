@@ -103,6 +103,7 @@ const Nav: React.FC = () => {
               <>
              <li><HoverLink href="/therapy-services" id="therapy-service-nav-link">Therapy Services</HoverLink></li>
             <li><HoverLink href="/about" id="about-nav-link">About</HoverLink></li>
+            <li><HoverLink href="/mental-health-healing-blog" id="blog-nav-link">Toasted Insights Blog</HoverLink></li>
             <li><HoverLink href="/guides" id="guides-nav-link">Free Guides</HoverLink></li>
             </>
             )}

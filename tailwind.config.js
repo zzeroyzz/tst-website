@@ -4,6 +4,34 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  purge: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  safelist: [
+    // Background colors
+    'bg-tst-white',
+    'bg-tst-cream',
+    'bg-tst-yellow',
+    'bg-tst-purple',
+    'bg-tst-teal',
+    'bg-tst-green',
+    'bg-tst-red',
+    // Text colors
+    'text-tst-white',
+    'text-tst-cream',
+    'text-tst-yellow',
+    'text-tst-purple',
+    'text-tst-teal',
+    'text-tst-green',
+    'text-tst-red',
+    // Border colors (if you use them dynamically)
+    'border-tst-purple',
+    'border-tst-teal',
+    'border-tst-yellow',
+    // Add any other utility classes you generate dynamically
+  ],
   theme: {
     extend: {
       colors: {

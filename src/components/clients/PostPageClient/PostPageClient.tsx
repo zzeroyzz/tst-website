@@ -19,6 +19,7 @@ import Button from "@/components/Button/Button";
 import { SinglePostSkeleton } from '@/components/skeleton';
 import PostStats from '@/components/PostStats/PostStats';
 import styles from './PostPageClient.module.css'
+
 // Configure marked with proper options for better parsing
 marked.setOptions({
   breaks: true,
@@ -43,12 +44,26 @@ const PostPageClient: React.FC = () => {
       if (!slug) return;
       setLoading(true);
 
-      // Fetch post by slug - now including view_count and like_count
-      const { data: postData, error: postError } = await supabase
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      const isAuthenticated = !!user;
+
+      // Build query based on authentication status
+      let postQuery = supabase
         .from('posts')
-        .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug, view_count, like_count')
+        .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug, view_count, like_count, type, visible_to_public')
         .eq('slug', slug as string)
-        .single();
+        .eq('archived', false);
+
+      // If user is authenticated, they can see any post (including hidden ones)
+      // If not authenticated, they can only see visible posts
+      if (!isAuthenticated) {
+        postQuery = postQuery
+          .eq('visible_to_public', true)
+          .eq('status', 'published');
+      }
+
+      const { data: postData, error: postError } = await postQuery.single();
 
       if (postError) {
         console.error('Error fetching post:', postError);
@@ -71,20 +86,52 @@ const PostPageClient: React.FC = () => {
           }
         }
 
-        // Fetch suggestions, excluding the current post by its ID
-        const { data: suggestionsData, error: suggestionsError } = await supabase
+        // Fetch suggestions - prioritize same type, then show mixed content
+        let suggestionsQuery = supabase
           .from('posts')
-          .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug')
+          .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type')
           .eq('status', 'published')
+          .eq('archived', false)
+          .eq('type', postData.type) // Same type first
           .neq('id', postData.id)
           .order('sent_at', { ascending: false })
-          .limit(3);
+          .limit(2);
 
-        if (suggestionsError) {
-          console.error('Error fetching suggestions:', suggestionsError);
-        } else {
-          setSuggestedPosts(suggestionsData);
+        // If user is not authenticated, only show visible posts in suggestions
+        if (!isAuthenticated) {
+          suggestionsQuery = suggestionsQuery.eq('visible_to_public', true);
         }
+
+        const { data: sameTypeData, error: sameTypeError } = await suggestionsQuery;
+
+        let suggestions = sameTypeData || [];
+
+        // If we need more suggestions, get from other type
+        if (suggestions.length < 3) {
+          const remainingCount = 3 - suggestions.length;
+          let otherTypeQuery = supabase
+            .from('posts')
+            .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type')
+            .eq('status', 'published')
+            .eq('archived', false)
+            .neq('type', postData.type) // Different type
+            .neq('id', postData.id)
+            .order('sent_at', { ascending: false })
+            .limit(remainingCount);
+
+          // If user is not authenticated, only show visible posts
+          if (!isAuthenticated) {
+            otherTypeQuery = otherTypeQuery.eq('visible_to_public', true);
+          }
+
+          const { data: otherTypeData } = await otherTypeQuery;
+
+          if (otherTypeData) {
+            suggestions = [...suggestions, ...otherTypeData];
+          }
+        }
+
+        setSuggestedPosts(suggestions.slice(0, 3)); // Ensure max 3
       }
       setLoading(false);
     };
@@ -111,12 +158,15 @@ const PostPageClient: React.FC = () => {
     );
   }
 
+  // Dynamic breadcrumb and page title based on post type
+  const contentTypeLabel = post.type === 'blog' ? 'Blog' : 'Newsletter Archive';
+  const contentTypeUrl = post.type === 'blog' ? '/mental-health-healing-blog' : '/mental-health-healing-blog';
+
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": "Resources", "item": "https://toastedsesametherapy.com/guides"},
-      {"@type": "ListItem", "position": 2, "name": "Archives", "item": "https://toastedsesametherapy.com/toasty-tidbits-archives"},
+      {"@type": "ListItem", "position": 2, "name": "Back to posts", "item": `https://toastedsesametherapy.com/mental-health-healing-blog`},
       {"@type": "ListItem", "position": 3, "name": post.title, "item": `https://toastedsesametherapy.com/posts/${post.slug}`}
     ]
   };
@@ -136,19 +186,35 @@ const PostPageClient: React.FC = () => {
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 mb-12 font-medium">
-              <Link href="/guides" className="hover:text-gray-700 transition-colors">
-                Resources
+
+              <span className="mx-3">›</span>
+              <Link href="/mental-health-healing-blog" className="hover:text-gray-700 transition-colors">
+                Back to posts
               </Link>
-              <span className="mx-3 text-gray-300">›</span>
-              <Link href="/toasty-tidbits-archives" className="hover:text-gray-700 transition-colors">
-                Archives
-              </Link>
-              <span className="mx-3 text-gray-300">›</span>
+              <span className="mx-3">›</span>
               <span className="text-gray-900 truncate">{post.title}</span>
             </nav>
 
             {/* Post Header */}
             <header className="mb-16">
+              {/* Content Type Badge */}
+              <div className="mb-4 flex items-center gap-3">
+                <span className={`inline-flex items-center px-3 py-1 text-sm font-bold rounded-full border-2 border-black ${
+                  post.type === 'blog'
+                    ? 'bg-tst-teal text-white'
+                    : 'bg-tst-yellow text-black'
+                }`}>
+                  {post.type === 'blog' ? '📝 Blog Post' : '📧 Newsletter'}
+                </span>
+
+                {/* Show visibility status if user is authenticated and post is hidden */}
+                {!post.visible_to_public && (
+                  <span className="inline-flex items-center px-3 py-1 text-sm font-bold rounded-full border-2 border-black bg-orange-100 text-orange-800">
+                    🔒 Hidden from Public
+                  </span>
+                )}
+              </div>
+
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight text-gray-900">
                 {post.title}
               </h1>
@@ -229,8 +295,6 @@ const PostPageClient: React.FC = () => {
 
             {/* Article Footer */}
             <div className="border-t-2 border-gray-300 pt-12 mb-8">
-              {/* Post Stats - Also show at bottom */}
-
               <div className=" flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <CircleIcon
@@ -262,7 +326,7 @@ const PostPageClient: React.FC = () => {
               <div className="max-w-6xl mx-auto px-6 lg:px-8">
                 <div className="text-center mb-20">
                   <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
-                    More stories you might enjoy
+                    More content you might enjoy
                   </h2>
                   <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                     Continue your journey with these thoughtful reflections and insights.
@@ -270,7 +334,7 @@ const PostPageClient: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
                   {suggestedPosts.map((suggestion) => (
-                                            <div key={suggestion.id} className="group">
+                    <div key={suggestion.id} className="group">
                       <ResourceCard
                         card={{
                           title: suggestion.title,
@@ -279,15 +343,16 @@ const PostPageClient: React.FC = () => {
                           authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
                           imageUrl: suggestion.image_url || "",
                           tags: suggestion.tags,
-                          href: `/posts/${suggestion.slug}`
+                          href: `/posts/${suggestion.slug}`,
+                          type: suggestion.type // Pass type to ResourceCard
                         }}
                       />
                     </div>
                   ))}
                 </div>
                 <div className="mt-16 text-center">
-                  <Link href="/toasty-tidbits-archives">
-                    <Button className="bg-tst-yellow">View all stories</Button>
+                  <Link href="/mental-health-healing-blog">
+                    <Button className="bg-tst-yellow">View all posts</Button>
                   </Link>
                 </div>
               </div>

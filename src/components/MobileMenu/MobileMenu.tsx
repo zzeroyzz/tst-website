@@ -66,6 +66,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
                   About
                 </Link>
               </li>
+               <li>
+                <Link
+                  href="/mental-health-healing-blog"
+                  onClick={onClose}
+                  className="text-white hover:text-tst-yellow transition-colors"
+                >
+                  Toasted Insights Blog
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/guides"

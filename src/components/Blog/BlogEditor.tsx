@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// src/components/NewsletterEditor.tsx
+// src/components/BlogEditor.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -10,31 +10,30 @@ import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
 import { Post } from '@/types';
 import toast from 'react-hot-toast';
-import NewsletterPreviewModal from './NewsletterPreviewModal';
+import BlogPreviewModal from './BlogPreviewModal';
 import { coreTags } from '@/data/tagData';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import Image from 'next/image';
 
-interface NewsletterEditorProps {
+interface BlogEditorProps {
     post: Post | null;
 }
 
 type ArchivePost = Pick<Post, 'id' | 'title'>;
 
-const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }) => {
+const BlogEditor: React.FC<BlogEditorProps> = ({ post: initialPost }) => {
     const [post, setPost] = useState<Post | null>(initialPost);
     const [title, setTitle] = useState(initialPost?.title || '');
-    const [subject, setSubject] = useState(initialPost?.subject || '');
     const [body, setBody] = useState(initialPost?.body || '');
     const [imageUrl, setImageUrl] = useState(initialPost?.image_url || '');
     const [toastyTake, setToastyTake] = useState(initialPost?.toasty_take || '');
     const [archivePosts, setArchivePosts] = useState<string[]>(initialPost?.archive_posts || []);
     const [tags, setTags] = useState<string[]>(initialPost?.tags || []);
+    const [visibleToPublic, setVisibleToPublic] = useState(initialPost?.visible_to_public ?? false);
 
     const [allPosts, setAllPosts] = useState<ArchivePost[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPreviewing, setIsPreviewing] = useState(false);
-    const [previewHtml, setPreviewHtml] = useState('');
     const [isUploading, setIsUploading] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +45,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             .from('posts')
             .select('id, title')
             .eq('status', 'published')
-            .eq('archived', false) // Only show non-archived posts for selection
+            .eq('archived', false) // Only show non-archived posts for archive selection
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -177,16 +176,15 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
             const postData = {
                 title,
-                subject,
                 body,
                 image_url: imageUrl,
                 toasty_take: toastyTake,
                 archive_posts: archivePosts,
                 tags: tags,
                 status: 'draft',
-                type: 'newsletter', // Explicitly set type to newsletter
+                type: 'blog', // Set type to blog
                 archived: false, // New posts are not archived
-                visible_to_public: true, // Newsletters are visible by default (can be changed later)
+                visible_to_public: visibleToPublic, // Use the toggle value
                 slug: uniqueSlug,
                 ...(post?.id && { id: post.id }),
             };
@@ -196,9 +194,8 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             if (error) {
                 toast.error(`Error saving draft: ${error.message}`);
             } else {
-                toast.success('Newsletter draft saved successfully!');
-                // Redirect to the specific newsletter page that was just created/updated
-                router.push(`/dashboard/newsletter/${savedPost.id}`);
+                toast.success('Blog draft saved successfully!');
+                router.push(`/dashboard/mental-health-healing-blog/${savedPost.id}`);
                 router.refresh();
             }
         } catch (error: any) {
@@ -209,49 +206,23 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
     };
 
     const handlePreview = async () => {
-        setIsSubmitting(true);
-        const loadingToast = toast.loading('Generating preview...');
-
-        try {
-            // Generate unique slug for preview
-            const uniqueSlug = await generateUniqueSlug(title, post?.id);
-
-            const currentPostData = {
-                title,
-                subject,
-                body,
-                image_url: imageUrl,
-                toasty_take: toastyTake,
-                archive_posts: archivePosts,
-                tags: tags,
-                type: 'newsletter',
-                slug: uniqueSlug,
-            };
-
-            const response = await fetch('/api/newsletter/preview', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentPostData),
-            });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Failed to generate preview.');
-
-            setPreviewHtml(result.html);
-            setIsPreviewing(true);
-            toast.dismiss(loadingToast);
-
-        } catch (err: any) {
-            toast.dismiss(loadingToast);
-            toast.error(`Error: ${err.message}`);
-        } finally {
-            setIsSubmitting(false);
+        // Simple validation
+        if (!title.trim()) {
+            toast.error('Please enter a title to preview');
+            return;
         }
+        if (!body.trim()) {
+            toast.error('Please enter some content to preview');
+            return;
+        }
+
+        // Open preview modal with current data - no API call needed!
+        setIsPreviewing(true);
     };
 
-    const handleSend = async () => {
+    const handlePublish = async () => {
         setIsSubmitting(true);
-        const loadingToast = toast.loading('Sending newsletter...');
+        const loadingToast = toast.loading('Publishing blog post...');
 
         try {
             // Generate unique slug
@@ -259,54 +230,56 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
             const postData = {
                 title,
-                subject,
                 body,
                 image_url: imageUrl,
                 toasty_take: toastyTake,
                 archive_posts: archivePosts,
                 tags: tags,
-                type: 'newsletter',
+                type: 'blog',
                 archived: false,
-                visible_to_public: true, // Newsletters are public when sent
                 slug: uniqueSlug,
+                status: 'published',
+                visible_to_public: visibleToPublic, // Use the toggle value for publishing too
+                sent_at: new Date().toISOString(), // Set published date
                 ...(post?.id && { id: post.id }),
                 ...(post?.created_at && { created_at: post.created_at }),
             };
 
-            const response = await fetch('/api/newsletter/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(postData),
-            });
+            const { data: publishedPost, error } = await supabase
+                .from('posts')
+                .upsert(postData)
+                .select()
+                .single();
 
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Failed to send campaign.');
+            if (error) {
+                throw new Error(error.message);
+            }
 
             toast.dismiss(loadingToast);
-            toast.success('Newsletter sent successfully!');
+            toast.success('Blog post published successfully!');
             setIsPreviewing(false);
 
             // Redirect to the public post page that was just published
-            if (result.slug) {
-                router.push(`/posts/${result.slug}`);
+            if (publishedPost.slug) {
+                router.push(`/posts/${publishedPost.slug}`);
             } else {
-                // Fallback to newsletter list if no slug returned
-                router.push('/dashboard?view=Newsletter');
+                // Fallback to blog list if no slug returned
+                router.push('/dashboard?view=Blog');
             }
             router.refresh();
 
         } catch (err: any) {
             toast.dismiss(loadingToast);
-            toast.error(`Error sending newsletter: ${err.message}`);
+            toast.error(`Error publishing blog post: ${err.message}`);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <>
+        <div className="p-10 bg-gray-50 min-h-screen">
             <form onSubmit={handleSaveForLater} className="space-y-8 max-w-4xl mx-auto">
-                <h1 className="text-4xl font-extrabold">{post ? 'Edit Newsletter' : 'Create New Newsletter'}</h1>
+                <h1 className="text-4xl font-extrabold">{post ? 'Edit Blog Post' : 'Create New Blog Post'}</h1>
 
                 {/* Main Content Section */}
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
@@ -314,20 +287,13 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     <div className="space-y-4">
                         <Input
                             type="text"
-                            placeholder="Article Title"
+                            placeholder="Blog Post Title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
                         />
-                        <Input
-                            type="text"
-                            placeholder="Email Subject Line"
-                            value={subject}
-                            onChange={(e) => setSubject(e.target.value)}
-                            required
-                        />
                         <textarea
-                            placeholder="Main body content..."
+                            placeholder="Write your blog post content here..."
                             value={body}
                             onChange={(e) => setBody(e.target.value)}
                             required
@@ -337,14 +303,14 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
                         {/* Image Upload Section */}
                         <div className="space-y-4">
-                            <label className="block font-bold text-gray-700">Main Article Image</label>
+                            <label className="block font-bold text-gray-700">Featured Image</label>
 
                             {/* Current Image Display */}
                             {imageUrl && (
                                 <div className="relative inline-block">
                                     <Image
                                         src={imageUrl}
-                                        alt="Article preview"
+                                        alt="Blog post preview"
                                         width={192}
                                         height={128}
                                         className="w-48 h-32 object-cover rounded-lg border-2 border-gray-300"
@@ -433,7 +399,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 <div className="p-6 bg-tst-green border-2 border-black rounded-lg shadow-brutalistLg">
                     <h2 className="text-2xl font-bold mb-4">Toasty Take</h2>
                     <textarea
-                        placeholder="Your weekly tip or reflection..."
+                        placeholder="Your key insight or takeaway for this blog post..."
                         value={toastyTake}
                         onChange={(e) => setToastyTake(e.target.value)}
                         className="w-full p-4 font-medium border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple"
@@ -443,8 +409,8 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
                 {/* Archive Selection Section */}
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
-                    <h2 className="text-2xl font-bold mb-4">Select 3 Related Posts</h2>
-                    <p className="mb-4 text-sm text-gray-600">You have selected {archivePosts.length} of 3 posts.</p>
+                    <h2 className="text-2xl font-bold mb-4">Related Posts</h2>
+                    <p className="mb-4 text-sm text-gray-600">Select up to 3 related posts to show at the bottom of your blog post. You have selected {archivePosts.length} of 3 posts.</p>
                     <div className="space-y-2 max-h-60 overflow-y-auto border-2 border-gray-200 rounded-lg p-2">
                         {allPosts.length > 0 ? allPosts.map(p => (
                             <label key={p.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
@@ -461,27 +427,82 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                     </div>
                 </div>
 
+                {/* Public Visibility Section */}
+                <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
+                    <h2 className="text-2xl font-bold mb-4">Public Visibility</h2>
+                    <div className="space-y-4">
+                        <p className="text-sm text-gray-600">
+                            Control whether this blog post appears in public archives and is accessible via URL.
+                        </p>
+
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={visibleToPublic}
+                                onChange={(e) => setVisibleToPublic(e.target.checked)}
+                                className="h-5 w-5 rounded border-gray-300 text-tst-purple focus:ring-tst-purple"
+                            />
+                            <div>
+                                <span className="font-bold">Make visible to public</span>
+                                <p className="text-sm text-gray-500">
+                                    {visibleToPublic
+                                        ? 'This post will appear in archives and be accessible via URL'
+                                        : 'This post will be hidden from public view (testing mode)'
+                                    }
+                                </p>
+                            </div>
+                        </label>
+
+                        {/* Visual indicator */}
+                        <div className={`p-3 rounded-lg border-2 ${
+                            visibleToPublic
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-orange-50 border-orange-200'
+                        }`}>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-sm font-bold ${
+                                    visibleToPublic ? 'text-green-800' : 'text-orange-800'
+                                }`}>
+                                    {visibleToPublic ? '👁️ Public Mode' : '🔒 Testing Mode'}
+                                </span>
+                            </div>
+                            <p className={`text-xs mt-1 ${
+                                visibleToPublic ? 'text-green-600' : 'text-orange-600'
+                            }`}>
+                                {visibleToPublic
+                                    ? 'This post will be visible to all website visitors'
+                                    : 'This post will only be visible in the dashboard for testing'
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Buttons */}
                 <div className="flex justify-end items-center gap-4">
                     <Button type="submit" className="bg-tst-purple" disabled={isSubmitting || isUploading}>
-                        {isSubmitting ? 'Saving...' : 'Save for Later'}
+                        {isSubmitting ? 'Saving...' : 'Save Draft'}
                     </Button>
-                    <Button onClick={handlePreview} className="bg-tst-yellow" disabled={isSubmitting || isUploading}>
-                        {isSubmitting ? 'Generating...' : 'Preview'}
+                    <Button onClick={handlePreview} className="bg-tst-yellow" disabled={isUploading || !title.trim() || !body.trim()}>
+                        Preview
                     </Button>
                 </div>
             </form>
 
             {isPreviewing && (
-                <NewsletterPreviewModal
-                    htmlContent={previewHtml}
+                <BlogPreviewModal
+                    title={title}
+                    body={body}
+                    imageUrl={imageUrl}
+                    toastyTake={toastyTake}
+                    tags={tags}
                     onClose={() => setIsPreviewing(false)}
-                    onSend={handleSend}
-                    isSending={isSubmitting}
+                    onPublish={handlePublish}
+                    isPublishing={isSubmitting}
                 />
             )}
-        </>
+        </div>
     );
 };
 
-export default NewsletterEditor;
+export default BlogEditor;
