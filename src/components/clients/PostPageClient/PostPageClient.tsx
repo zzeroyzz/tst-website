@@ -160,14 +160,13 @@ const PostPageClient: React.FC = () => {
 
   // Dynamic breadcrumb and page title based on post type
   const contentTypeLabel = post.type === 'blog' ? 'Blog' : 'Newsletter Archive';
-  const contentTypeUrl = post.type === 'blog' ? '/blog' : '/toasty-tidbits-archives';
+  const contentTypeUrl = post.type === 'blog' ? '/mental-health-healing-blog' : '/mental-health-healing-blog';
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {"@type": "ListItem", "position": 1, "name": "Resources", "item": "https://toastedsesametherapy.com/guides"},
-      {"@type": "ListItem", "position": 2, "name": "All Posts", "item": `https://toastedsesametherapy.com/toasty-tidbits-archives`},
+      {"@type": "ListItem", "position": 2, "name": "Back to posts", "item": `https://toastedsesametherapy.com/mental-health-healing-blog`},
       {"@type": "ListItem", "position": 3, "name": post.title, "item": `https://toastedsesametherapy.com/posts/${post.slug}`}
     ]
   };
@@ -187,14 +186,12 @@ const PostPageClient: React.FC = () => {
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 mb-12 font-medium">
-              <Link href="/guides" className="hover:text-gray-700 transition-colors">
-                Resources
+
+              <span className="mx-3">›</span>
+              <Link href="/mental-health-healing-blog" className="hover:text-gray-700 transition-colors">
+                Back to posts
               </Link>
-              <span className="mx-3 text-gray-300">›</span>
-              <Link href="/toasty-tidbits-archives" className="hover:text-gray-700 transition-colors">
-                All Posts
-              </Link>
-              <span className="mx-3 text-gray-300">›</span>
+              <span className="mx-3">›</span>
               <span className="text-gray-900 truncate">{post.title}</span>
             </nav>
 
@@ -354,8 +351,8 @@ const PostPageClient: React.FC = () => {
                   ))}
                 </div>
                 <div className="mt-16 text-center">
-                  <Link href="/toasty-tidbits-archives">
-                    <Button className="bg-tst-yellow">View all content</Button>
+                  <Link href="/mental-health-healing-blog">
+                    <Button className="bg-tst-yellow">View all posts</Button>
                   </Link>
                 </div>
               </div>

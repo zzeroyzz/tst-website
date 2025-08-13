@@ -12,6 +12,7 @@ import { Post } from "@/types";
 import { NewsletterViewSkeleton } from "@/components/skeleton";
 import toast from "react-hot-toast";
 import BlogDetailModal from "@/components/Blog/BlogDetailModal";
+
 const BlogView = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [archivedPosts, setArchivedPosts] = useState<Post[]>([]);
@@ -157,7 +158,7 @@ const BlogView = () => {
   };
 
   const handleEditPost = (postId: string) => {
-    router.push(`/dashboard/blog/${postId}`);
+    router.push(`/dashboard/mental-health-healing-blog/${postId}`);
   };
 
   // Get the current posts to display based on active tab
@@ -173,7 +174,7 @@ const BlogView = () => {
       <div>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-bold">Blog Posts</h2>
+            <h2 className="text-3xl font-bold">Toasted Insights Blog Posts</h2>
 
             {/* Tab Navigation */}
             <div className="flex border-2 border-black rounded-lg overflow-hidden">
@@ -204,7 +205,7 @@ const BlogView = () => {
           {activeTab === 'active' && (
             <Button
               className="bg-tst-purple flex items-center"
-              onClick={() => router.push('/dashboard/blog/create')}
+              onClick={() => router.push('/dashboard/mental-health-healing-blog/create')}
             >
               <PlusCircle className="mr-2 h-4 w-4" /> Create Blog Post
             </Button>

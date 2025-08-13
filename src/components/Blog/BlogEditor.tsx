@@ -195,8 +195,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ post: initialPost }) => {
                 toast.error(`Error saving draft: ${error.message}`);
             } else {
                 toast.success('Blog draft saved successfully!');
-                // Redirect to the specific blog page that was just created/updated
-                router.push(`/dashboard/blog/${savedPost.id}`);
+                router.push(`/dashboard/mental-health-healing-blog/${savedPost.id}`);
                 router.refresh();
             }
         } catch (error: any) {

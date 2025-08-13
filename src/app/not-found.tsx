@@ -34,8 +34,8 @@ export default function NotFound() {
           <Link href="/">
             <Button className="bg-tst-purple">Go to Homepage</Button>
           </Link>
-          <Link href="/toasty-tidbits-archives">
-            <Button className="bg-white">Browse the Archives</Button>
+          <Link href="/mental-health-healing-blog">
+            <Button className="bg-white">Browse Toasted Insights Blog</Button>
           </Link>
         </div>
       </div>
