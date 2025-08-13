@@ -233,7 +233,7 @@ export default function HomePageClient() {
             variants={heroItemVariants}
           >
             <Image
-              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/hero-bean-bun.webp"
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/hero-bean-bun-optimized-v2.webp"
               alt="Therapy illustration"
               width={600}
               height={600}
