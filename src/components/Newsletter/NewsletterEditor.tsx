@@ -46,6 +46,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             .from('posts')
             .select('id, title')
             .eq('status', 'published')
+            .eq('archived', false) // Only show non-archived posts for selection
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -183,6 +184,9 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 archive_posts: archivePosts,
                 tags: tags,
                 status: 'draft',
+                type: 'newsletter', // Explicitly set type to newsletter
+                archived: false, // New posts are not archived
+                visible_to_public: true, // Newsletters are visible by default (can be changed later)
                 slug: uniqueSlug,
                 ...(post?.id && { id: post.id }),
             };
@@ -192,7 +196,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
             if (error) {
                 toast.error(`Error saving draft: ${error.message}`);
             } else {
-                toast.success('Draft saved successfully!');
+                toast.success('Newsletter draft saved successfully!');
                 // Redirect to the specific newsletter page that was just created/updated
                 router.push(`/dashboard/newsletter/${savedPost.id}`);
                 router.refresh();
@@ -220,6 +224,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 toasty_take: toastyTake,
                 archive_posts: archivePosts,
                 tags: tags,
+                type: 'newsletter',
                 slug: uniqueSlug,
             };
 
@@ -260,6 +265,9 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                 toasty_take: toastyTake,
                 archive_posts: archivePosts,
                 tags: tags,
+                type: 'newsletter',
+                archived: false,
+                visible_to_public: true, // Newsletters are public when sent
                 slug: uniqueSlug,
                 ...(post?.id && { id: post.id }),
                 ...(post?.created_at && { created_at: post.created_at }),
@@ -342,7 +350,6 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                                         className="w-48 h-32 object-cover rounded-lg border-2 border-gray-300"
                                     />
                                     <Button
-
                                         onClick={removeImage}
                                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                                         wrapperClassName="absolute -top-2 -right-2"
@@ -363,7 +370,6 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
                                 />
 
                                 <Button
-
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={isUploading}
                                     className="flex items-center gap-2 bg-tst-yellow"
@@ -437,7 +443,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ post: initialPost }
 
                 {/* Archive Selection Section */}
                 <div className="p-6 bg-white border-2 border-black rounded-lg shadow-brutalistLg">
-                    <h2 className="text-2xl font-bold mb-4">Select 3 Archived Posts</h2>
+                    <h2 className="text-2xl font-bold mb-4">Select 3 Related Posts</h2>
                     <p className="mb-4 text-sm text-gray-600">You have selected {archivePosts.length} of 3 posts.</p>
                     <div className="space-y-2 max-h-60 overflow-y-auto border-2 border-gray-200 rounded-lg p-2">
                         {allPosts.length > 0 ? allPosts.map(p => (

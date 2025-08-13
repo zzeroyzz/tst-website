@@ -247,7 +247,7 @@ const BlogDetailModal: React.FC<BlogDetailModalProps> = ({
                             {post.visible_to_public ? '✓ Visible to Public' : '✗ Hidden from Public'}
                         </span>
                         {!post.visible_to_public && (
-                            <p className="text-xs text-gray-500 mt-1">This post won't appear in archives or be accessible via URL</p>
+                            <p className="text-xs text-gray-500 mt-1">This post won&apos;t appear in archives or be accessible via URL</p>
                         )}
                     </div>
 
