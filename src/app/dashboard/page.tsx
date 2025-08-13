@@ -12,7 +12,6 @@ import {
   Users,
   Calendar,
   LogOut,
-  BookHeart,
 } from "lucide-react";
 import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
 import LeadsView from "@/components/Leads/LeadsView";
@@ -73,8 +72,8 @@ const DashboardPage = () => {
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Tasks", icon: CheckSquare },
-    { name: "Newsletter", icon: Newspaper },
-    { name: "Blogs", icon: BookHeart },
+    { name: "Newsletter", icon: Mail },
+    { name: "Blogs", icon: Newspaper },
     { name: "Leads", icon: Users },
     { name: "Appointments", icon: Calendar },
   ];
