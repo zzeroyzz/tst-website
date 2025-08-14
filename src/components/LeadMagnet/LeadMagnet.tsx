@@ -55,7 +55,7 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
             {guide.tags.map((tag) => (
               <div
                 key={tag}
-                className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black"
+                className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist"
               >
                 {tag}
               </div>
