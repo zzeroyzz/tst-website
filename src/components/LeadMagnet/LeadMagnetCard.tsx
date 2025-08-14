@@ -1,24 +1,23 @@
-import React from "react";
-import Link from "next/link";
-import Section from "@/components/Section/Section";
-import Image from "next/image";
-import styles from "./LeadMagnet.module.css";
-import clsx from "clsx";
-import { guides } from "@/data/leadData";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import clsx from 'clsx';
 
-interface Guide {
-  questions: string[];
-  subtitle: string;
-  benefits: string[];
-  iconUrl: string;
-  tags: string[];
-  bgColor: string;
-  alt: string;
-  id: string;
-}
+// Assuming these are your style classes - you'll need to import your actual styles
+const styles = {
+  wrapper: "block cursor-pointer transition-transform hover:scale-105",
+  shadow: "absolute inset-0 bg-black rounded-lg transform translate-x-1 translate-y-1 -z-10",
+  card: "relative bg-white border-2 border-black rounded-lg p-6 min-h-[300px] flex flex-col"
+};
 
 interface LeadMagnetProps {
-  guide: Guide;
+  guide: {
+    id: string;
+    iconUrl: string;
+    alt: string;
+    bgColor: string;
+    tags: string[];
+  };
 }
 
 const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
@@ -31,20 +30,26 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
 
       <div className="mb-4 flex-grow">
         <div className="mb-4">
-          {guide.questions.map((question, index) => (
-            <p key={index} className="text-lg font-bold mb-1 text-center">{question}</p>
-          ))}
+          <p className="text-lg font-bold mb-1 text-center">Nervous to go to the doctor?</p>
+          <p className="text-lg font-bold mb-1 text-center">Don't feel heard?</p>
+          <p className="text-lg font-bold mb-3 text-center">Worried you'll forget something important?</p>
         </div>
 
-        <p className="text-md font-medium mb-3 text-center">{guide.subtitle}</p>
+        <p className="text-md font-medium mb-3 text-center">This free guide helps you:</p>
 
         <ul className="space-y-2">
-          {guide.benefits.map((benefit, index) => (
-            <li key={index} className="flex items-start">
-              <span className="text-md mr-2">•</span>
-              <span className="text-md">{benefit}</span>
-            </li>
-          ))}
+          <li className="flex items-start">
+            <span className="text-md mr-2">•</span>
+            <span className="text-md">Walk in calm</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-md mr-2">•</span>
+            <span className="text-md">Speak up with confidence</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-md mr-2">•</span>
+            <span className="text-md">Remember everything you need to say</span>
+          </li>
         </ul>
       </div>
 
@@ -91,21 +96,4 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
   </Link>
 );
 
-const LeadMagnet = () => {
-  return (
-    <Section>
-      <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-5xl font-extrabold mb-12">
-          Grab Your Free Guides
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {guides.map((guide) => (
-            <LeadMagnetCard key={guide.id} guide={guide} />
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-};
-
-export default LeadMagnet;
+export default LeadMagnetCard;
