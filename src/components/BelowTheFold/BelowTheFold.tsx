@@ -93,7 +93,7 @@ const BelowTheFold = () => {
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-brutalist border-2 border-black">
             <h2 className="text-3xl font-bold mb-4 text-center">{heroContent.cta.title}</h2>
             <h3 className="text-lg mb-8 text-center">
-              {heroContent.cta.subtitle || heroContent.headline.subtitle}
+              {heroContent.headline.subtitle}
             </h3>
             <div className="text-center">
               <Button
