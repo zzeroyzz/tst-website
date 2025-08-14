@@ -10,6 +10,8 @@ import ConditionalLayout from '@/components/ConditionalLayout/ConditionalLayout'
 import ToasterClient from "@/components/clients/ToasterClient/ToasterClient";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
+
+
 const workSans = Work_Sans({
   subsets: ["latin"],
   variable: "--font-work-sans",
@@ -19,6 +21,7 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: "Toasted Sesame Therapy | Compassionate, Personalized Therapy in Georgia",
   description: 'A therapy space for the deep feelers, drained hearts, and healing seekers. Neuro-affirming and trauma-informed online therapy for adults in Georgia.',
+  keywords: 'online therapy Georgia, virtual therapy Atlanta, anxiety therapy, depression counseling, trauma therapy, ADHD support, highly sensitive person therapy, neuro-affirming therapist, trauma-informed counseling, emotional regulation therapy, mental health counseling Georgia, teletherapy',
   manifest: '/site.webmanifest',
   icons: {
     icon: [
@@ -74,8 +77,7 @@ export default function RootLayout({
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <link rel="dns-prefetch" href="https://www.google-analytics.com" />
   <link rel="dns-prefetch" href="https://www.clarity.ms" />
-
-  <script
+    <script
     type="application/ld+json"
     dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
   />
@@ -99,7 +101,7 @@ export default function RootLayout({
   />
 </head>
       <body
-        className={`${workSans.variable} font-sans bg-tst-cream text-black antialiased`}
+        className={`${workSans.className} bg-tst-cream text-black antialiased`}
       >
         <ToasterClient />
 

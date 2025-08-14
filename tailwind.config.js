@@ -4,34 +4,67 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  purge: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  safelist: [
-    // Background colors
-    'bg-tst-white',
-    'bg-tst-cream',
-    'bg-tst-yellow',
-    'bg-tst-purple',
-    'bg-tst-teal',
-    'bg-tst-green',
-    'bg-tst-red',
-    // Text colors
-    'text-tst-white',
-    'text-tst-cream',
-    'text-tst-yellow',
-    'text-tst-purple',
-    'text-tst-teal',
-    'text-tst-green',
-    'text-tst-red',
-    // Border colors (if you use them dynamically)
-    'border-tst-purple',
-    'border-tst-teal',
-    'border-tst-yellow',
-    // Add any other utility classes you generate dynamically
-  ],
+  purge: {
+    content: [
+      "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+      "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+      "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
+    // Prevent purging of critical styles
+    options: {
+      safelist: [
+        // Core layout classes that should never be purged
+        'bg-tst-cream',
+        'text-black',
+        'font-sans',
+        'antialiased',
+        // Navigation classes
+        'flex',
+        'justify-between',
+        'items-center',
+        'p-4',
+        'py-4',
+        'px-6',
+        // Typography
+        'font-bold',
+        'font-medium',
+        'text-lg',
+        'text-xl',
+        'text-2xl',
+        'text-3xl',
+        'text-4xl',
+        'text-5xl',
+        // All your custom colors
+        'bg-tst-white',
+        'bg-tst-cream',
+        'bg-tst-yellow',
+        'bg-tst-purple',
+        'bg-tst-teal',
+        'bg-tst-green',
+        'bg-tst-red',
+        'text-tst-white',
+        'text-tst-cream',
+        'text-tst-yellow',
+        'text-tst-purple',
+        'text-tst-teal',
+        'text-tst-green',
+        'text-tst-red',
+        'border-tst-purple',
+        'border-tst-teal',
+        'border-tst-yellow',
+        // Common layout classes
+        'container',
+        'mx-auto',
+        'grid',
+        'grid-cols-1',
+        'md:grid-cols-2',
+        'lg:grid-cols-3',
+        'gap-4',
+        'gap-6',
+        'gap-8',
+      ]
+    }
+  },
   theme: {
     extend: {
       colors: {
@@ -44,7 +77,7 @@ module.exports = {
         "tst-red": "#FF6B6B",
       },
       fontFamily: {
-        sans: ["var(--font-work-sans)", "sans-serif"],
+        sans: ["var(--font-work-sans)", "system-ui", "-apple-system", "sans-serif"],
       },
       boxShadow: {
         brutalistXs: "2px 3px 0 #000",
