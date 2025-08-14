@@ -4,67 +4,76 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  purge: {
-    content: [
-      "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-      "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-      "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    ],
-    // Prevent purging of critical styles
-    options: {
-      safelist: [
-        // Core layout classes that should never be purged
-        'bg-tst-cream',
-        'text-black',
-        'font-sans',
-        'antialiased',
-        // Navigation classes
-        'flex',
-        'justify-between',
-        'items-center',
-        'p-4',
-        'py-4',
-        'px-6',
-        // Typography
-        'font-bold',
-        'font-medium',
-        'text-lg',
-        'text-xl',
-        'text-2xl',
-        'text-3xl',
-        'text-4xl',
-        'text-5xl',
-        // All your custom colors
-        'bg-tst-white',
-        'bg-tst-cream',
-        'bg-tst-yellow',
-        'bg-tst-purple',
-        'bg-tst-teal',
-        'bg-tst-green',
-        'bg-tst-red',
-        'text-tst-white',
-        'text-tst-cream',
-        'text-tst-yellow',
-        'text-tst-purple',
-        'text-tst-teal',
-        'text-tst-green',
-        'text-tst-red',
-        'border-tst-purple',
-        'border-tst-teal',
-        'border-tst-yellow',
-        // Common layout classes
-        'container',
-        'mx-auto',
-        'grid',
-        'grid-cols-1',
-        'md:grid-cols-2',
-        'lg:grid-cols-3',
-        'gap-4',
-        'gap-6',
-        'gap-8',
-      ]
+  // Remove the entire 'purge' section - it's deprecated
+  // The 'content' array above replaces purge.content
+
+  // Add safelist to prevent important classes from being purged
+  safelist: [
+    // Core layout classes that should never be purged
+    'bg-tst-cream',
+    'text-black',
+    'font-sans',
+    'antialiased',
+    // Navigation classes
+    'flex',
+    'justify-between',
+    'items-center',
+    'p-4',
+    'py-4',
+    'px-6',
+    // Typography
+    'font-bold',
+    'font-medium',
+    'text-lg',
+    'text-xl',
+    'text-2xl',
+    'text-3xl',
+    'text-4xl',
+    'text-5xl',
+    // All your custom colors
+    'bg-tst-white',
+    'bg-tst-cream',
+    'bg-tst-yellow',
+    'bg-tst-purple',
+    'bg-tst-teal',
+    'bg-tst-green',
+    'bg-tst-red',
+    'text-tst-white',
+    'text-tst-cream',
+    'text-tst-yellow',
+    'text-tst-purple',
+    'text-tst-teal',
+    'text-tst-green',
+    'text-tst-red',
+    'border-tst-purple',
+    'border-tst-teal',
+    'border-tst-yellow',
+    // Common layout classes
+    'container',
+    'mx-auto',
+    'grid',
+    'grid-cols-1',
+    'md:grid-cols-2',
+    'lg:grid-cols-3',
+    'gap-4',
+    'gap-6',
+    'gap-8',
+    // Pride/identity classes for LGBTQ+ section
+    'identity-highlight',
+    'from-red-500',
+    'via-yellow-500',
+    'via-green-500',
+    'via-blue-500',
+    'to-purple-500',
+    // Dynamic classes that might be generated
+    {
+      pattern: /^(bg|text|border)-(red|yellow|green|blue|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)$/,
+    },
+    {
+      pattern: /^(grid-cols|gap|p|m|px|py|mx|my)-(1|2|3|4|5|6|8|10|12)$/,
     }
-  },
+  ],
+
   theme: {
     extend: {
       colors: {
@@ -89,21 +98,20 @@ module.exports = {
         "96": "24rem",
       },
       maxHeight:{
-      "80": "20rem",
-      "90": "24rem",
-
+        "80": "20rem",
+        "90": "24rem",
       },
       minHeight: {
-       '0': '0',
-       '100': '100px',
-       '110': '110px',
-       '250': '250px',
-       '320': '320px',
-       '340': '340px',
-       '400': '400px',
-       '500': '500px',
-       '575': '575px',
-       '1500': '1500px',
+        '0': '0',
+        '100': '100px',
+        '110': '110px',
+        '250': '250px',
+        '320': '320px',
+        '340': '340px',
+        '400': '400px',
+        '500': '500px',
+        '575': '575px',
+        '1500': '1500px',
       },
       minWidth:{
         '500': '500px'

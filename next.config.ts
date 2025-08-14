@@ -11,8 +11,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // optimizeCss: true, // Comment this out for now
   },
-  // Enable SWC minification for better performance
-  swcMinify: true,
 
   // Add CSS loading optimization
   compiler: {
