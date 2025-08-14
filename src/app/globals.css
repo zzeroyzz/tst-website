@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Critical styles that load immediately */
+.loading-fallback {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #F9F5F2;
+  color: black;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Hide content until fonts are ready */
+.fonts-loading {
+  visibility: hidden;
+}
+
+.fonts-loaded {
+  visibility: visible;
+}

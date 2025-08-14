@@ -9,15 +9,12 @@ import TestimonialCard from "@/components/TestimonialCard/TestimonialCard";
 import Image from "next/image";
 import Button from "@/components/Button/Button";
 import CircleIcon from "@/components/CircleIcon/CircleIcon";
-import AnimatedCheckbox from "@/components/AnimatedCheckbox/AnimatedCheckbox";
+import BelowTheFold from "@/components/BelowTheFold/BelowTheFold";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import HoverLink from '@/components/HoverLink/HoverLink';
-import { LottiePlayer } from "@/components/LottiePlayer/LottiePlayer";
-import {tiredAnimation} from "@/data/animations";
 import {
   socialProofIcons,
   testimonials,
-  checklistItems,
   meetYourTherapist,
   howItWorksSteps,
   trustIndicators,
@@ -90,23 +87,6 @@ const sectionVariants = {
   },
 };
 
-// Component for the tired animation section
-const TiredAnimationSection = ({width, height}) => {
-  return (
-    <div className="w-full h-full">
-      <LottiePlayer
-        file={tiredAnimation}
-        width={width}
-        height={height}
-        loop={true}
-        autoplay={true}
-        speed={1}
-        alt=""
-      />
-    </div>
-  );
-};
-
 export default function HomePageClient() {
   const howItWorksRef = useRef(null);
 
@@ -173,8 +153,7 @@ export default function HomePageClient() {
               For the deep feelers, drained hearts, and healing seekers.
             </motion.h1>
             <motion.p className="text-lg" variants={heroItemVariants}>
-              You&apos;ve carried too much for too long. It&apos;s time to finally care
-              for you.
+              Specialized therapy in Georgia for complex trauma, neurodivergent minds, and LGBTQ+ identities
             </motion.p>
 
             <motion.div
@@ -233,7 +212,7 @@ export default function HomePageClient() {
             variants={heroItemVariants}
           >
             <Image
-              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/hero-bean-bun-optimized-v2.webp"
+              src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero-bean.webp"
               alt="Therapy illustration"
               width={600}
               height={600}
@@ -277,38 +256,14 @@ export default function HomePageClient() {
       <div className="border-t-2 border-black">
         <Section className="bg-tst-yellow" minHeight="750px">
           <motion.div
-            className="bg-white border-2 border-black rounded-xl shadow-brutalistLg p-8 md:p-12"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
           >
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="flex flex-col gap-6">
-                <h2 className="text-4xl md:text-5xl font-extrabold">
-                  Check all that sound like you.
-                </h2>
 
-                <div className="block md:hidden w-56 mx-auto aspect-square">
-                  <TiredAnimationSection width={200} height={200}/>
-                </div>
+            <BelowTheFold />
 
-              <div className="flex flex-col gap-4">
-                {checklistItems.map((item) => (
-                <AnimatedCheckbox key={item.id} id={item.id} label={item.label} />
-                ))}
-                </div>
-                <div className="pt-4">
-                  <Button onClick={handleScroll} className="bg-tst-purple" id="checkbox-get-started-btn">
-                    Get Started
-                  </Button>
-                </div>
-              </div>
-
-              <div className="hidden md:block max-w-sm mx-auto aspect-square">
-                <TiredAnimationSection width={400} height={400}/>
-              </div>
-            </div>
 
           </motion.div>
         </Section>
@@ -328,7 +283,7 @@ export default function HomePageClient() {
             viewport={{ once: true, amount: 0.2 }}
           >
             <h2 className="text-5xl font-extrabold">
-              Therapy that actually gets you
+              Care that meets you where you are
             </h2>
           </motion.div>
           <TherapyCard />

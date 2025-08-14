@@ -9,6 +9,8 @@ import FAQ from "@/components/FAQ/FAQ";
 import ServiceOfferingCard from "@/components/Services/ServiceOfferingCard";
 import FallingPills from "@/components/FallingPills/FallingPills";
 import AnimatedImage from "@/components/AnimatedImage/AnimatedImage";
+import ContactForm from "@/components/Contact/ContactForm";
+
 import {
     individualTherapyData,
     ourApproachData
@@ -146,8 +148,10 @@ const ServicesPageClient = () => {
                     </ul>
                 </div>
               </div>
+
             </motion.div>
           ))}
+            <ContactForm id="contact-form"/>
         </motion.div>
       </Section>
 

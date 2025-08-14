@@ -7,8 +7,9 @@ import clsx from "clsx";
 import { guides } from "@/data/leadData";
 
 interface Guide {
-  title: string;
-  description: string;
+  questions: string[];
+  subtitle: string;
+  benefits: string[];
   iconUrl: string;
   tags: string[];
   bgColor: string;
@@ -24,11 +25,29 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
   <Link href="/guides" className={styles.wrapper}>
     <div className={styles.shadow}></div>
     <div className={clsx(styles.card, guide.bgColor)} id={guide.id}>
-      <div className="mb-3 flex justify-center flex-shrink-0">
+      <div className="mb-4 flex justify-center flex-shrink-0">
         <Image src={guide.iconUrl} alt={guide.alt} width={100} height={100} />
       </div>
-      <h3 className="text-lg font-bold mb-3 text-center leading-tight flex-shrink-0">{guide.title}</h3>
-      <p className="text-center text-md leading-relaxed flex-grow mb-3">{guide.description}</p>
+
+      <div className="mb-4 flex-grow">
+        <div className="mb-4">
+          {guide.questions.map((question, index) => (
+            <p key={index} className="text-lg font-bold mb-1 text-center">{question}</p>
+          ))}
+        </div>
+
+        <p className="text-md font-medium mb-3 text-center">{guide.subtitle}</p>
+
+        <ul className="space-y-2">
+          {guide.benefits.map((benefit, index) => (
+            <li key={index} className="flex items-start">
+              <span className="text-md mr-2">•</span>
+              <span className="text-md">{benefit}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className="flex justify-between items-end flex-shrink-0">
         <div className="flex-1">
           <h4 className="font-bold mb-2 text-left text-sm">Tags</h4>
@@ -36,7 +55,7 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
             {guide.tags.map((tag) => (
               <div
                 key={tag}
-                className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black"
+                className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist"
               >
                 {tag}
               </div>
@@ -81,7 +100,7 @@ const LeadMagnet = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {guides.map((guide) => (
-            <LeadMagnetCard key={guide.title} guide={guide} />
+            <LeadMagnetCard key={guide.id} guide={guide} />
           ))}
         </div>
       </div>

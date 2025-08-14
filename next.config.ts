@@ -7,12 +7,15 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  // Enable CSS optimization
+  // Disable CSS optimization temporarily to prevent purging issues
   experimental: {
-    optimizeCss: true, // Removes unused CSS
+    // optimizeCss: true, // Comment this out for now
   },
-  // Enable SWC minification for better performance
-  swcMinify: true,
+
+  // Add CSS loading optimization
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
 
   images: {
     remotePatterns: [

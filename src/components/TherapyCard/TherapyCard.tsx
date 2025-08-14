@@ -43,7 +43,7 @@ const TherapyCard = () => {
           <Link href="/therapy-services" className={styles.wrapper}>
             <div className={styles.shadow}></div>
             <div className={styles.card} id={card.id}>
-              <div className="w-full bg-white aspect-video min-h-340 overflow-hidden flex items-center justify-center">
+              <div className="w-full bg-white aspect-video min-h-240 overflow-hidden flex items-center justify-center">
                 <LottiePlayer
                   file={card.animationPath}
                   width={280}
@@ -52,15 +52,31 @@ const TherapyCard = () => {
                 />
               </div>
               <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-2xl font-bold mb-2">{card.title}</h3>
-                <p className="flex-grow">{card.description}</p>
-                <div className="mt-4 flex justify-end">
+                <h3 className="text-2xl font-bold mb-4">{card.title}</h3>
+
+                {/* Updated to use checkmark bullet points with better text wrapping */}
+                <ul className="flex-grow space-y-2 mb-4">
+                  {card.description.map((item, index) => (
+                    <li key={index} className="text-md opacity-90 flex items-start">
+                      <span className="text-green-500 mr-3 mt-1 flex-shrink-0">✓</span>
+                      <span className="leading-relaxed hyphens-none break-words" style={{ wordBreak: 'normal', overflowWrap: 'break-word' }}>
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-black hover:text-gray-700 transition-colors">
+                    {card.ctaLinkText}
+                  </span>
                   <svg
                     width="32"
                     height="32"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="flex-shrink-0"
                   >
                     <path
                       d="M5 12H19"
