@@ -52,7 +52,7 @@ const BelowTheFold = () => {
           <motion.div key={card.title} variants={itemVariants}>
             <div className={styles.wrapper}>
               <div className={styles.shadow}></div>
-              <div className={`${styles.card} ${card.specialClass || ''}`} id={card.id}>
+              <div className={`${styles.card}`} id={card.id}>
                 <div className="p-6 flex flex-col h-full">
                   {/* Header section with emoji and title */}
                   <div className="mb-6 flex flex-col items-center">
