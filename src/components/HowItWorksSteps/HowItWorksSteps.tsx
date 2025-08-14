@@ -10,7 +10,7 @@ interface HowItWorksStepsProps {
   step: {
     number: string;
     title: string;
-    description: string;
+    description: string[];  // Updated to array type
     imageUrl: string;
     imageAlt: string;
     isLastStep: boolean;
@@ -42,8 +42,17 @@ const HowItWorksSteps: React.FC<HowItWorksStepsProps> = ({
       <div className={styles.card_shadow} />
       <div className={styles.card}>
         <div className={styles.number}>{step.number}</div>
-        <h3 className="text-2xl font-bold mt-2">{step.title}</h3>
-        <p className="mt-2">{step.description}</p>
+        <h3 className="text-2xl font-bold mt-2 mb-4">{step.title}</h3>
+
+        {/* Updated to handle array of descriptions */}
+        <ul className="space-y-2">
+          {step.description.map((item, index) => (
+            <li key={index} className="text-md opacity-90 flex items-start">
+              <span className="text-tst-purple mr-3 mt-1 flex-shrink-0">▸</span>
+              <span className="leading-relaxed">{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

@@ -151,12 +151,15 @@
   .card_wrapper[id="step-01"] {
     height: 320px !important; /* Force override for step 1 */
   }
+  .card_wrapper[id="step-02"] {
+    height: 410px !important; /* Force override for step 1 */
+  }
   .card_wrapper[id="step-04"] {
-    height: 350px !important; /* Force override for step 4 */
+    height: 400px !important; /* Force override for step 4 */
   }
 
   .card_wrapper[id="step-03"] {
-    height: 375px !important; /* Force override for step 4 */
+    height: 400px !important; /* Force override for step 4 */
   }
 }
 
@@ -168,18 +171,18 @@
 
   /* Even smaller for short content steps on mobile */
   .card_wrapper[id="step-01"] {
-    height: 350px !important;
+    height: 360px !important;
   }
 
   .card_wrapper[id="step-04"] {
-    height: 400px !important;
+    height: 450px !important;
   }
    .card_wrapper[id="step-02"] {
     height: 450px !important;
   }
 
   .card_wrapper[id="step-03"] {
-    height: 400px !important;
+    height: 410px !important;
   }
 
 
