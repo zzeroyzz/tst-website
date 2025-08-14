@@ -17,7 +17,7 @@ export const therapyCards = [
   {
     id:"trauma-card",
     title: "Trauma-Informed",
-    description:["We specialize in complex trauma and PTSD treatment", "Use evidence-based somatic therapy to release stored trauma", "Help you regulate your nervous system safely", "Support healing without re-traumatization"],
+    description:["We specialize in complex trauma and CPTSD treatment", "Use evidence-based somatic therapy to release stored trauma", "Help you regulate your nervous system safely", "Support healing without re-traumatization"],
     animationPath: traumaAnimation,
     altText: "Animation of a heart with a protective shield, symbolizing trauma-informed care",
     ctaLinkText:"Get Trauma-Informed Care"

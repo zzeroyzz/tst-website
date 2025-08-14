@@ -283,7 +283,7 @@ export default function HomePageClient() {
             viewport={{ once: true, amount: 0.2 }}
           >
             <h2 className="text-5xl font-extrabold">
-              Therapy that actually gets you
+              Care that meets you where you are
             </h2>
           </motion.div>
           <TherapyCard />
