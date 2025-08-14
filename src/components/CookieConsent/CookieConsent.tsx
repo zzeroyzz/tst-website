@@ -63,27 +63,27 @@ const CookieConsent: React.FC = () => {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        className="fixed bottom-0 left-0 right-0 z-50 p-3 md:p-6"
+        className="fixed bottom-0 left-0 right-0 z-50 p-3 md:p-4"
       >
         <div className="max-w-4xl mx-auto">
           <div className="relative">
-            {/* Shadow - smaller on mobile */}
-            <div className="absolute inset-0 bg-black rounded-lg transform translate-x-1 translate-y-1 md:translate-x-2 md:translate-y-2"></div>
+            {/* Shadow - smaller on desktop */}
+            <div className="absolute inset-0 bg-black rounded-lg transform translate-x-1 translate-y-1 md:translate-x-1.5 md:translate-y-1.5"></div>
 
             {/* Main banner */}
             <div className="relative bg-white border-2 border-black rounded-lg shadow-brutalistLg">
-              <div className="p-3 md:p-6">
-                <div className="flex flex-col gap-3 md:gap-4">
-                  {/* Header - more compact on mobile */}
-                  <div className="flex items-start gap-2 md:gap-4">
-                    <div className="flex-shrink-0 text-sm md:text-base">
+              <div className="p-3 md:p-4">
+                <div className="flex flex-col gap-3 md:gap-3">
+                  {/* Header - more compact layout */}
+                  <div className="flex items-start gap-2 md:gap-3">
+                    <div className="flex-shrink-0 text-sm">
                       🍪
                     </div>
                     <div className="flex-1 min-w-0 text-center md:text-left">
-                      <h3 className="text-sm md:text-lg font-bold mb-1 md:mb-2">
+                      <h3 className="text-sm md:text-base font-bold mb-1">
                         We value your privacy
                       </h3>
-                      <p className="text-xs md:text-sm text-gray-700 mb-2 md:mb-4 leading-tight md:leading-normal">
+                      <p className="text-xs md:text-sm text-gray-700 mb-2 leading-tight">
                         We use cookies to enhance your experience. By clicking &quot;Accept All&quot;, you consent to our use of cookies.
                         <span className="hidden md:inline"> We use them to serve personalized content and analyze our traffic.</span>
                       </p>
@@ -93,9 +93,9 @@ const CookieConsent: React.FC = () => {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="border-t border-gray-200 pt-2 md:pt-4 mt-2 md:mt-4"
+                          className="border-t border-gray-200 pt-2 md:pt-3 mt-2 md:mt-3"
                         >
-                          <div className="space-y-2 md:space-y-3">
+                          <div className="space-y-1.5 md:space-y-2">
                             <div>
                               <h4 className="font-semibold text-xs md:text-sm">Essential Cookies</h4>
                               <p className="text-xs text-gray-600 leading-tight">
@@ -120,18 +120,18 @@ const CookieConsent: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Buttons - centered on mobile, right-aligned on desktop */}
-                  <div className="flex flex-col gap-2 md:flex-row md:gap-3 md:justify-end items-center">
-                    <div className="flex gap-2 md:gap-3 justify-center md:justify-end">
+                  {/* Buttons - more compact spacing */}
+                  <div className="flex flex-col gap-2 md:flex-row md:gap-2 md:justify-end items-center">
+                    <div className="flex gap-2 justify-center md:justify-end">
                       <Button
                         onClick={handleRejectAll}
-                        className="bg-gray-200 text-black text-xs md:text-sm py-2 px-3 md:py-2 md:px-4 flex-1 md:flex-none"
+                        className="bg-gray-200 text-black text-xs md:text-sm py-1.5 px-3 md:py-1.5 md:px-3 flex-1 md:flex-none"
                       >
                         Reject All
                       </Button>
                       <Button
                         onClick={handleAcceptAll}
-                        className="bg-tst-purple text-black text-xs md:text-sm py-2 px-3 md:py-2 md:px-4 flex-1 md:flex-none"
+                        className="bg-tst-purple text-black text-xs md:text-sm py-1.5 px-3 md:py-1.5 md:px-3 flex-1 md:flex-none"
                       >
                         Accept All
                       </Button>
