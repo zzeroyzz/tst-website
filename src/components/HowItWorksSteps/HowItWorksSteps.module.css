@@ -149,18 +149,19 @@
 @media (min-width: 768px) {
   /* Step-specific heights - use more specific selectors */
   .card_wrapper[id="step-01"] {
-    height: 320px !important; /* Force override for step 1 */
+    height: 375px !important; /* Force override for step 1 */
   }
   .card_wrapper[id="step-02"] {
-    height: 410px !important; /* Force override for step 1 */
+    height: 375px !important; /* Force override for step 1 */
+  }
+  .card_wrapper[id="step-03"] {
+    height: 375px !important; /* Force override for step 4 */
   }
   .card_wrapper[id="step-04"] {
-    height: 400px !important; /* Force override for step 4 */
+    height: 375px !important; /* Force override for step 4 */
   }
 
-  .card_wrapper[id="step-03"] {
-    height: 400px !important; /* Force override for step 4 */
-  }
+
 }
 
 /* Mobile styles */
@@ -171,21 +172,21 @@
 
   /* Even smaller for short content steps on mobile */
   .card_wrapper[id="step-01"] {
-    height: 360px !important;
+    height: 400px !important;
   }
 
-  .card_wrapper[id="step-04"] {
-    height: 450px !important;
-  }
+
    .card_wrapper[id="step-02"] {
-    height: 450px !important;
+    height: 400px !important;
   }
 
   .card_wrapper[id="step-03"] {
-    height: 410px !important;
+    height: 355px !important;
   }
 
-
+ .card_wrapper[id="step-04"] {
+    height: 415px !important;
+  }
   .image_wrapper {
     position: relative;
     width: 100%;
