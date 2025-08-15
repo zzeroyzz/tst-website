@@ -9,7 +9,7 @@ export const therapyCards = [
   {
     id:"neuro-card",
     title: "Neuro-Affirming",
-    description:["We assess your unique cognitive style and strengths", "Provide ADHD and autism-informed therapy approaches", "Teach executive function skills that actually stick","Create sensory-friendly session environments"],
+    description:["Work with your brain's natural wiring, not against it", "Build executive function skills that fit your unique style", "Create sensory-friendly spaces where you can unmask safely", "Shift RSD patterns into responses that serve you better",],
     animationPath: neuroAnimation,
     altText: "Animation of a brain with gears turning, symbolizing neuro-affirming therapy",
     ctaLinkText:"Get Neuro-Affirming Care"
@@ -17,7 +17,7 @@ export const therapyCards = [
   {
     id:"trauma-card",
     title: "Trauma-Informed",
-    description:["We specialize in complex trauma and CPTSD treatment", "Use evidence-based somatic therapy to release stored trauma", "Help you regulate your nervous system safely", "Support healing without re-traumatization"],
+    description:["Approach trauma healing at your nervous system's pace", "Guide you through releasing stored tension and hypervigilance", "Support you in rebuilding safety in relationships", "Explore gentle ways to process flashbacks and reconnection"],
     animationPath: traumaAnimation,
     altText: "Animation of a heart with a protective shield, symbolizing trauma-informed care",
     ctaLinkText:"Get Trauma-Informed Care"
@@ -25,7 +25,7 @@ export const therapyCards = [
   {
     id:"somatic-card",
     title: "Somatic",
-    description:["We integrate body-based healing with traditional therapy", "Teach you to recognize and release stored trauma", "Guide breathwork and grounding techniques", "Help you reconnect with your body's wisdom"],
+    description:["Reconnect with your body's signals and wisdom", "Learn grounding techniques that actually calm your system", "Explore how trauma shows up in your body and muscle tension","Develop manageable practices for daily regulation"],
     animationPath: somaticAnimation,
     altText: "Animation of a person meditating with flowing energy, symbolizing somatic therapy",
     ctaLinkText:"Get Somatic Therapy"
@@ -33,7 +33,7 @@ export const therapyCards = [
   {
     id:"identity-card",
     title: "Identity Work",
-    description:["We provide affirming therapy for LGBTQ+ and multicultural clients", "Help you navigate identity exploration and coming out", "Support healthy boundary-setting in relationships","Address intersectional identity challenges with expertise"],
+    description:["Share your experiences without feeling like you have to explain them","Learn to embrace who you are while the world tries to erase you","Explore how to recognize and build relationships that truly see you","Work through the exhaustion of existing at multiple intersections of marginalization"],
     animationPath: identityAnimation,
     altText: "Animation of diverse hands coming together, symbolizing identity work and inclusivity",
     ctaLinkText:"Get Identity-Affirming Care"

@@ -8,7 +8,7 @@ export const heroContent = {
 
   cta: {
     title: "You don't have to figure this out alone",
-    description: "Virtual therapy across Georgia for trauma survivors, neurodivergent folks, and LGBTQIA+ individuals who are ready to heal and thrive authentically.",
+    description: "Here, you'll have someone in your corner, helping you feel more grounded, understood, and supported.",
     buttonText: "Book Your Free 15-Minute Consultation",
     buttonLink: "/contact"
   }
