@@ -20,13 +20,13 @@ export const symptomCards = [
     tags: ["Trauma", "PTSD", "Complex PTSD"],
     tagBgColor: "bg-tst-teal",
     emoji: "🧠",
-    title: "When your mind feels overwhelming",
+    title: "When the past keeps showing up",
     symptoms: [
       "Flashbacks or nightmares that disrupt your sleep",
       "Feeling emotionally numb or disconnected",
       "Panic attacks that come out of nowhere",
       "Hypervigilance that exhausts you daily",
-      "Trust issues affecting your relationships"
+      "Feeling guarded in relationships"
     ],
     imageLink:"https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/star.webp",
     imageAlt: "Heart with a band-aid, symbolizing trauma and mental health",
@@ -39,8 +39,8 @@ export const symptomCards = [
     emoji: "🎭",
     title: "When your brain works differently",
     symptoms: [
-      "Executive dysfunction making daily tasks impossible",
-      "Sensory overload in \"normal\" environments",
+      "Executive dysfunction making daily tasks feel impossible",
+      "Sensory overload in everyday environments",
       "Masking who you are until you're exhausted",
       "RSD making criticism feel devastating",
       "Hyperfocus followed by complete burnout"
@@ -51,16 +51,16 @@ export const symptomCards = [
   },
   {
     id: "lgbtqia",
-    tags: ["LGBTQIA+", "Identity", "Affirming"],
+    tags: ["LGBTQIA+", "Identity", "Gender-Affirming"],
     tagBgColor: "bg-tst-purple",
     emoji: "🏳️‍🌈",
     title: "When the world doesn't affirm who you are",
     symptoms: [
-      "Identity-based trauma from rejection or discrimination",
+      "Identity-based trauma from exclusion or discrimination",
       "Internalized shame about your authentic self",
-      "Family or religious trauma around your identity",
+      "Family or religious rejection of your identity",
       "Anxiety about coming out or transitioning",
-      "Finding community while healing past wounds"
+      "Navigating intersections of racial, LGBTQIA+, and non-monogamous identities"
     ],
     imageLink:"https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/btf-pride.webp",
     imageAlt: "Pride flag star representing LGBTQIA+ identity",

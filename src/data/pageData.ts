@@ -89,35 +89,46 @@ export const meetYourTherapist = {
 export const howItWorksSteps = [
   {
     number: "01",
-    title: "Submit the contact form",
-    description:["30-second contact form submission", "Under 1-minute questionnaire completion", "Next-day consultation scheduling available", "Start your therapy journey this week"],
+    title: "Form, Questionnaire, & Schedule",
+description: [
+  "Complete a simple contact form that takes less than a minute",
+  "Answer a few questions about what brings you to therapy",
+  "Schedule your consultation as soon as tomorrow"
+],    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_2.png",
+    imageAlt: "Illustration of a calendar",
+    isLastStep:false,
+  },
+  {
+    number: "02",
+    title: "Join Your 15-Minute Consultation",
+    description: [
+  "Receive your secure video link and everything you need to join",
+  "Share what's on your mind in a relaxed, judgment-free conversation",
+  "Discover how our approach can support your unique journey"
+],
     imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_1.png",
     imageAlt: "Illustration of a cloud holding a phone",
     isLastStep:false,
   },
   {
-    number: "02",
-    title: "Schedule a free consultation",
-       description:["15-20 minute comfortable, no-pressure conversation", "Talk only about what feels comfortable to share", "Learn about our therapy methods and what to expect", "Start your healing journey with complete confidence"],
-
-    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_2.png",
-    imageAlt: "Illustration of a calendar",
-    isLastStep:false,
-  },
-  {
     number: "03",
     title: "Book your first session",
-       description:["Get clarity on your goals and what you want to achieve", "Begin creating a personalized care plan for your needs", "Focus on your comfort and building trust together", "Start your healing with intention and direction"],
-
-    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_3.png",
+description: [
+  "Complete quick onboarding and choose your preferred session times",
+  "Collaborate with your therapist to define meaningful goals",
+  "Create a tailored plan that honors your pace and priorities"
+],    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_3_v2.webp",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:false,
   },
   {
     number: "04",
     title: "Start feeling more supported",
-    description:["Develop deeper connections with yourself and others", "Notice positive changes in how you feel about yourself", "Create sustainable change that builds over time", "Experience the shift from surviving to thriving"],
-    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_4.png",
+description: [
+  "Navigate challenges with new tools and deeper self-awareness",
+  "Strengthen relationships through authentic connection and communication",
+  "Live with greater confidence as your truest, most empowered self"
+],    imageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_4_v2.webp",
     imageAlt: "Illustration of a cloud character at a laptop",
     isLastStep:true,
   },
