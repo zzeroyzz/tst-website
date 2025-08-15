@@ -55,10 +55,10 @@ const BelowTheFold = () => {
               <div className={`${styles.card}`} id={card.id}>
                 <div className="p-6 flex flex-col h-full">
                   {/* Header section with emoji and title */}
-                  <div className="mb-6 flex flex-col items-center">
+                  <div className="mb-6 flex flex-col items-center">                    <h3 className="text-3xl font-bold text-center">{card.title}</h3>
+
                   <Image src={card.imageLink} alt={card.imageAlt} width={100} height={100} />
 
-                    <h3 className="text-3xl font-bold text-center">{card.title}</h3>
                   </div>
 
                   {/* Tags for this specific card */}
