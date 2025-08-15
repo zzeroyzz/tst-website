@@ -150,10 +150,10 @@ export default function HomePageClient() {
               className="text-5xl lg:text-6xl font-extrabold leading-tight"
               variants={heroItemVariants}
             >
-              For the deep feelers, drained hearts, and healing seekers.
+              Therapy for when the world feels too much
             </motion.h1>
             <motion.p className="text-lg" variants={heroItemVariants}>
-              Specialized therapy in Georgia for complex trauma, neurodivergent minds, and LGBTQ+ identities
+              Trauma-informed therapy for neurodivergent, LGBTQIA+, and BIPOC adults in Georgia. Work with a therapist who gets it because they&apos;ve been there too.
             </motion.p>
 
             <motion.div

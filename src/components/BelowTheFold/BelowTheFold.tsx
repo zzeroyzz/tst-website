@@ -55,10 +55,10 @@ const BelowTheFold = () => {
               <div className={`${styles.card}`} id={card.id}>
                 <div className="p-6 flex flex-col h-full">
                   {/* Header section with emoji and title */}
-                  <div className="mb-6 flex flex-col items-center">
+                  <div className="mb-6 flex flex-col items-center">                    <h3 className="text-3xl font-bold text-center">{card.title}</h3>
+
                   <Image src={card.imageLink} alt={card.imageAlt} width={100} height={100} />
 
-                    <h3 className="text-3xl font-bold text-center">{card.title}</h3>
                   </div>
 
                   {/* Tags for this specific card */}
@@ -93,7 +93,7 @@ const BelowTheFold = () => {
           <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-brutalist border-2 border-black">
             <h2 className="text-3xl font-bold mb-4 text-center">{heroContent.cta.title}</h2>
             <h3 className="text-lg mb-8 text-center">
-              {heroContent.headline.subtitle}
+              {heroContent.cta.description}
             </h3>
             <div className="text-center">
               <Button
