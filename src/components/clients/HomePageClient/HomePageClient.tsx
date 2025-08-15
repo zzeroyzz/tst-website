@@ -153,7 +153,7 @@ export default function HomePageClient() {
               Therapy for when the world feels too much
             </motion.h1>
             <motion.p className="text-lg" variants={heroItemVariants}>
-              Trauma-informed therapy for neurodivergent, LGBTQIA+, and BIPOC adults in Georgia. Work with a therapist who gets it because they've been there too.
+              Trauma-informed therapy for neurodivergent, LGBTQIA+, and BIPOC adults in Georgia. Work with a therapist who gets it because they&apos;ve been there too.
             </motion.p>
 
             <motion.div
