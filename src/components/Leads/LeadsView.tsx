@@ -207,11 +207,14 @@ const LeadsView = () => {
     };
   }, [supabase, fetchLeads]);
 
-  const handleAddLead = async (formData) => {
+ const handleAddLead = async (formData) => {
     const addToast = toast.loading('Adding new lead...');
 
     try {
-      // Create new lead data with default values
+      // Generate a unique questionnaire token (UUID)
+      const questionnaireToken = crypto.randomUUID();
+
+      // Create new lead data with default values including questionnaire token
       const newLeadData = {
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -219,6 +222,7 @@ const LeadsView = () => {
         notes: formData.notes.trim() || null,
         status: 'New',
         questionnaire_completed: false,
+        questionnaire_token: questionnaireToken, // Add the questionnaire token
         created_at: new Date().toISOString()
       };
 
@@ -236,7 +240,7 @@ const LeadsView = () => {
       setLeads(prev => [data, ...prev]);
 
       toast.dismiss(addToast);
-      toast.success('Lead added successfully!');
+      toast.success('Lead added successfully with questionnaire link!');
       return true;
 
     } catch (error: any) {
@@ -244,7 +248,6 @@ const LeadsView = () => {
       return false;
     }
   };
-
   const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
     // Implement optimistic UI update correctly
     const originalLeads = [...leads];
