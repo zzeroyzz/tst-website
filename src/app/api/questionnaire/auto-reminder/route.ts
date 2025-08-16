@@ -22,7 +22,6 @@ const MAX_REMINDERS = 3;
 // Function to send reminder email via Zapier
 const sendReminderEmail = async (contact: any, reminderNumber: number) => {
   if (!process.env.ZAPIER_REMINDER_WEBHOOK_URL) {
-    console.log('No Zapier reminder webhook URL configured');
     return false;
   }
 
