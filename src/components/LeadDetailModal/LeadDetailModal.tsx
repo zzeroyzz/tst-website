@@ -105,28 +105,51 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     }
   };
 
-  const handleSendReminder = async () => {
+ const handleSendReminder = async () => {
+    console.log('🚀 FRONTEND: handleSendReminder called');
+    console.log('🚀 FRONTEND: lead data:', {
+        id: lead.id,
+        name: lead.name,
+        email: lead.email,
+        questionnaire_completed: lead.questionnaire_completed,
+        questionnaire_token: lead.questionnaire_token
+    });
+
     setIsSending(true);
-    const toastId = toast.loading('Sending reminder...');
+    const toastId = toast.loading('Sending questionnaire reminder...');
 
     try {
-        const response = await fetch('/api/leads/send-reminder', {
+        console.log('🚀 FRONTEND: Making API call to /api/questionnaire/reminder');
+
+        // Call the questionnaire reminder API with the lead's contact ID
+        const response = await fetch('/api/questionnaire/reminder', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: lead.email }),
+            body: JSON.stringify({ contactId: lead.id }),
         });
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error);
+        console.log('🚀 FRONTEND: Response status:', response.status);
+        console.log('🚀 FRONTEND: Response ok:', response.ok);
 
-        toast.dismiss(toastId);
+        const result = await response.json();
+        console.log('🚀 FRONTEND: Response data:', result);
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to send reminder');
+        }
+
+        toast.success('Questionnaire reminder sent successfully!', { id: toastId });
+
+        // Update the lead status and add a note about the reminder
+        const currentDate = new Date().toISOString();
+        const reminderNote = `Questionnaire reminder sent on ${format(new Date(), "PPp")}`;
 
         const updatedData = {
             status: 'Reminder Sent',
-            notes: notes,
-            reminder_at: reminderDate ? new Date(reminderDate).toISOString() : null,
-            reminder_message: reminderNote || null
+            notes: notes ? `${notes}\n\n${reminderNote}` : reminderNote,
+            questionnaire_reminder_sent_at: currentDate
         };
+
         const success = await onUpdate(lead.id, updatedData, 'Reminder sent! Lead status updated.');
 
         if (success) {
@@ -134,11 +157,12 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         }
 
     } catch (error: any) {
+        console.error('🚀 FRONTEND: Error:', error);
         toast.error(`Error: ${error.message}`, { id: toastId });
     } finally {
         setIsSending(false);
     }
-  };
+};
 
   const handleCopyQuestionnaireLink = () => {
     if (lead.questionnaire_token) {

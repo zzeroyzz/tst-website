@@ -37,7 +37,10 @@ interface AppointmentRescheduleData {
   googleMeetLink: string;
   cancelToken: string;
 }
-
+interface QuestionnaireReminderData {
+  name: string;
+  questionnaireUrl: string;
+}
 function escapeHtml(unsafe: string): string {
   return unsafe
     .replace(/&/g, "&amp;")
@@ -46,7 +49,15 @@ function escapeHtml(unsafe: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+function formatName(name: string): string {
+  if (!name) return '';
 
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 // Base template with dark mode bypass (reusing your existing styles)
 const getBaseEmailTemplate = (content: string, img: string): string => `
 <!DOCTYPE html>
@@ -227,7 +238,8 @@ const getBaseEmailTemplate = (content: string, img: string): string => `
 
 // Client appointment confirmation email
 export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmationData): string => {
-  const escapedName = escapeHtml(data.name);
+  const formattedName = formatName(data.name);
+  const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
   const escapedMeetLink = escapeHtml(data.googleMeetLink);
@@ -361,7 +373,8 @@ export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmation
 
 // Admin notification email (for Kay)
 export const getAppointmentNotificationTemplate = (data: AppointmentNotificationData): string => {
-  const escapedClientName = escapeHtml(data.clientName);
+  const formattedName = formatName(data.clientName);
+  const escapedClientName = escapeHtml(formattedName);
   const escapedClientEmail = escapeHtml(data.clientEmail);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
@@ -500,7 +513,8 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
 
 // Client appointment cancellation email
 export const getAppointmentCancellationTemplate = (data: AppointmentCancellationData): string => {
-  const escapedName = escapeHtml(data.name);
+    const formattedName = formatName(data.name);
+  const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
 
@@ -612,7 +626,8 @@ export const getAppointmentCancellationTemplate = (data: AppointmentCancellation
 };
 
 export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData): string => {
-  const escapedName = escapeHtml(data.name);
+    const formattedName = formatName(data.name);
+  const escapedName = escapeHtml(formattedName);
   const escapedOldDate = escapeHtml(data.oldAppointmentDate);
   const escapedOldTime = escapeHtml(data.oldAppointmentTime);
   const escapedNewDate = escapeHtml(data.newAppointmentDate);
@@ -668,7 +683,7 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
                         ${escapedNewTime}
                       </p>
                       <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#666666 !important; margin:20px 0 0;">
-                        📍 Virtual meeting via Google Meet
+                        Virtual meeting via Google Meet
                       </p>
                     </div>
 
@@ -746,6 +761,79 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
                       Kay
                     </p>
 
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+          </tr>
+          <tr>
+            <td height="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+            <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+
+  return getBaseEmailTemplate(content, img);
+};
+
+export const getQuestionnaireReminderTemplate = (data: QuestionnaireReminderData): string => {
+  const formattedName = formatName(data.name);
+  const escapedName = escapeHtml(formattedName);
+  const escapedUrl = escapeHtml(data.questionnaireUrl);
+
+  const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
+  const content = `
+    <!-- Main Card with Table-Based Shadow -->
+    <tr>
+      <td style="padding:0 20px 20px 20px; background-color: #F9F5F2 !important;" class="card-wrapper force-light">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background-color:#ffffff !important; border:3px solid #000000;" class="force-white">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:60px 40px; background-color:#ffffff !important;" class="mobile-padding force-white">
+                    <h1 style="font-family:'Work Sans',Arial,sans-serif; font-size:48px; font-weight:900; color:#000000 !important; margin:0 0 40px; line-height:1.2;" class="h1 force-black-text">
+                     Hi, ${escapedName}!
+                    </h1>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
+                      I noticed you started filling out your questionnaire but did not get a chance to finish. No worries, it happens.
+                    </p>
+
+                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:0 0 30px;" class="mobile-text force-black-text">
+                        Just a few quick questions will help me understand your needs so we can make the most of your free consultation.
+                        </p>
+
+                    <!-- CTA Button with table-based shadow -->
+                    <div style="text-align:center; margin:50px 0;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                        <tr>
+                          <td style="background-color:#F7BD01 !important; border:3px solid #000000;" class="force-yellow">
+                            <a href="${escapedUrl}" target="_blank"
+                               style="display:inline-block; padding:20px 40px; font-family:'Work Sans',Arial,sans-serif; font-size:18px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
+                              Finish in 2 Minutes
+                            </a>
+                          </td>
+                          <td width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                        </tr>
+                        <tr>
+                          <td height="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                          <td height="4" width="4" style="font-size:1px; line-height:1px; background-color: #000000;" class="force-shadow">&nbsp;</td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:30px 0 0;" class="mobile-text force-black-text">
+                      Once you finish, you will get the link to schedule your consultation. I look forward to connecting with you.
+                    </p>
+
+                    <p style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; line-height:1.6; color:#000000 !important; margin:40px 0 0;" class="mobile-text force-black-text">
+                      Warmly,<br>
+                      Kay
+                    </p>
                   </td>
                 </tr>
               </table>
