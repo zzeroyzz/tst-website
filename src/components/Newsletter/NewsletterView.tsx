@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/NewsletterView.tsx
 "use client";
@@ -6,7 +7,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { PlusCircle, X } from "lucide-react";
+import { PlusCircle, X, Calendar, Tag } from "lucide-react";
 import Button from "@/components/Button/Button";
 import { Post } from "@/types";
 import { NewsletterViewSkeleton } from "@/components/skeleton";
@@ -115,8 +116,7 @@ const NewsletterView = () => {
   }, [fetchPosts]);
 
   const handleDeleteClick = (e: React.MouseEvent, post: Post) => {
-    e.stopPropagation(); // Prevent row click
-    console.log("Delete button clicked for post:", post.id, post.title); // Debug log
+    e.stopPropagation();
     setDeleteModal({ show: true, post });
   };
 
@@ -127,13 +127,10 @@ const NewsletterView = () => {
     }
 
     const postToDelete = deleteModal.post;
-    console.log("Attempting to delete post:", postToDelete.id, postToDelete.title); // Debug log
-
     setIsDeleting(true);
     const deleteToast = toast.loading('Deleting post...');
 
     try {
-      // First, let's check if the post exists
       const { data: existingPost, error: checkError } = await supabase
         .from("posts")
         .select("id, title")
@@ -145,16 +142,11 @@ const NewsletterView = () => {
         throw new Error(`Post not found: ${checkError.message}`);
       }
 
-      console.log("Post exists, proceeding with deletion:", existingPost); // Debug log
-
-      // Now delete the post
       const { error: deleteError, data: deletedData } = await supabase
         .from("posts")
         .delete()
         .eq("id", postToDelete.id)
-        .select(); // This will return the deleted rows
-
-      console.log("Delete operation result:", { deleteError, deletedData }); // Debug log
+        .select();
 
       if (deleteError) {
         console.error("Delete error:", deleteError);
@@ -165,21 +157,13 @@ const NewsletterView = () => {
         throw new Error("No rows were deleted. Post may not exist or you may not have permission.");
       }
 
-      console.log("Successfully deleted post:", deletedData); // Debug log
-
-      // Update local state to remove the deleted post
-      setPosts(prev => {
-        const updated = prev.filter(p => p.id !== postToDelete.id);
-        console.log("Updated posts array, removed post:", postToDelete.id); // Debug log
-        return updated;
-      });
-
+      setPosts(prev => prev.filter(p => p.id !== postToDelete.id));
       toast.dismiss(deleteToast);
       toast.success(`Post "${postToDelete.title}" deleted successfully!`);
       setDeleteModal({ show: false, post: null });
 
     } catch (error: any) {
-      console.error("Delete operation failed:", error); // Debug log
+      console.error("Delete operation failed:", error);
       toast.dismiss(deleteToast);
       toast.error(`Failed to delete post: ${error.message || 'Unknown error'}`);
     } finally {
@@ -199,17 +183,18 @@ const NewsletterView = () => {
   return (
     <>
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Newsletter Posts</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold">Newsletter Posts</h2>
           <Button
-            className="bg-tst-purple flex items-center"
+            className="bg-tst-purple flex items-center w-full sm:w-auto justify-center"
             onClick={() => router.push('/dashboard/newsletter/create')}
           >
             <PlusCircle className="mr-2 h-4 w-4" /> Create Post
           </Button>
         </div>
 
-        <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b-2 border-black bg-gray-50">
@@ -281,11 +266,69 @@ const NewsletterView = () => {
           </div>
         </div>
 
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-white border-2 border-black rounded-lg shadow-brutalistLg p-4 cursor-pointer hover:bg-tst-yellow transition-colors"
+              onClick={() => handleRowClick(post)}
+            >
+              {/* Card Header */}
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-bold text-lg leading-tight pr-2 flex-1">
+                  {post.title}
+                </h3>
+                <Button
+                  onClick={(e) => handleDeleteClick(e, post)}
+                  className="bg-tst-red text-white rounded-full p-2 transition-colors"
+                  aria-label={`Delete "${post.title}"`}
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+
+              {/* Status Badge */}
+              <div className="mb-3">
+                <span className={`px-3 py-1 text-sm font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}>
+                  {post.status}
+                </span>
+              </div>
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Tag size={16} className="text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700">Tags</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.map((tag, index) => (
+                      <span
+                        key={tag}
+                        className={`px-2 py-1 text-xs font-bold rounded-full text-black ${tagColors[index % tagColors.length]}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Date */}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Calendar size={16} />
+                <span>{format(new Date(post.created_at), "PPP")}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {posts.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            <p>No newsletter posts found.</p>
+            <p className="mb-4">No newsletter posts found.</p>
             <Button
-              className="bg-tst-purple mt-4"
+              className="bg-tst-purple w-full sm:w-auto"
               onClick={() => router.push('/dashboard/newsletter/create')}
             >
               Create Your First Post

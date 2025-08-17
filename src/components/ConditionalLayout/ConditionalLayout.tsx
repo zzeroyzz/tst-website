@@ -12,9 +12,10 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
 
   // Check if we're on a questionnaire page
   const isQuestionnairePage = pathname?.startsWith('/questionnaire/');
-    const isCancellationPage = pathname?.startsWith('/cancel-appointment/');
+  const isCancellationPage = pathname?.startsWith('/cancel-appointment/');
+  const isDashboard = pathname?.startsWith('/dashboard');
 
-  if (isQuestionnairePage || isCancellationPage) {
+  if (isQuestionnairePage || isCancellationPage || isDashboard) {
     // For questionnaire pages, only render the main content (children[1])
     // children[0] = Nav, children[1] = main, children[2] = Footer
     const childrenArray = Array.isArray(children) ? children : [children];
