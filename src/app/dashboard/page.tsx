@@ -32,6 +32,7 @@ import NewsletterView from "@/components/Newsletter/NewsletterView";
 import DashboardView from "@/components/DashboardView/DashboardView";
 import AppointmentsDashboard from "@/components/AppointmentsDashboard/AppointmentsDashboard";
 import BlogView from "@/components/Blog/BlogView";
+import {Notification} from "@/types/notification";
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
@@ -102,7 +103,7 @@ const DashboardPage = () => {
           return;
         }
 
-        const notificationList = [];
+        const notificationList: Notification[] = [];
 
         // Process contacts for various notification types
         contacts?.forEach(contact => {
