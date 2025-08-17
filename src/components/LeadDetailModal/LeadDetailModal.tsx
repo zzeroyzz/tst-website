@@ -265,7 +265,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   )}
                   {!lead.archived && lead.scheduled_appointment_at && status !== 'Consultation Scheduled' && (
                     <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                      💡 <strong>Suggestion:</strong> Appointment scheduled - consider status "Consultation Scheduled"
+                      💡 <strong>Suggestion:</strong> Appointment scheduled - consider status &quot;Consultation Scheduled&quot;
                     </div>
                   )}
                 </div>
