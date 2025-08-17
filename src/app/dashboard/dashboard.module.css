@@ -1,0 +1,34 @@
+/* dashboard.module.css */
+
+.mobileDropdown {
+  position: fixed;
+  top: 5rem; /* 80px - below header */
+  left: 50%;
+  transform: translateX(-50%); /* Perfect centering */
+  width: 20rem; /* 320px */
+  max-width: calc(100vw - 2rem); /* Viewport width minus 2rem margins */
+  margin: 0 1rem; /* Additional side margins */
+  background: white;
+  border: 2px solid black;
+  border-radius: 0.5rem;
+  box-shadow: 8px 8px 0 0 black;
+  z-index: 60;
+  max-height: 24rem; /* 384px */
+  overflow-y: auto;
+}
+
+.desktopDropdown {
+  position: absolute;
+  right: -8rem; /* Offset to center it better relative to bell */
+  top: 100%;
+  margin-top: 0.5rem;
+  width: 20rem; /* 320px */
+  max-width: calc(100vw - 2rem);
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 60;
+  max-height: 24rem; /* 384px */
+  overflow-y: auto;
+}
