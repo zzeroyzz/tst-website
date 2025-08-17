@@ -5,7 +5,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { format, differenceInDays } from "date-fns";
-import { Plus } from "lucide-react";
+import { Plus, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { LeadsViewSkeleton } from "@/components/skeleton";
 import Button from "@/components/Button/Button";
@@ -345,15 +345,15 @@ const LeadsView = () => {
   return (
     <>
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-bold">Leads</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold">Leads</h2>
 
             {/* Tab Navigation */}
-            <div className="flex border-2 border-black rounded-lg overflow-hidden">
+            <div className="flex border-2 border-black rounded-lg overflow-hidden w-full sm:w-auto">
               <button
                 onClick={() => setActiveTab('active')}
-                className={`px-4 py-2 font-bold transition-colors ${
+                className={`px-3 sm:px-4 py-2 font-bold transition-colors flex-1 sm:flex-none text-sm sm:text-base ${
                   activeTab === 'active'
                     ? 'bg-tst-purple text-black'
                     : 'bg-white text-black hover:bg-gray-100'
@@ -363,7 +363,7 @@ const LeadsView = () => {
               </button>
               <button
                 onClick={() => setActiveTab('archived')}
-                className={`px-4 py-2 font-bold transition-colors border-l-2 border-black ${
+                className={`px-3 sm:px-4 py-2 font-bold transition-colors border-l-2 border-black flex-1 sm:flex-none text-sm sm:text-base ${
                   activeTab === 'archived'
                     ? 'bg-tst-purple text-black'
                     : 'bg-white text-black hover:bg-gray-100'
@@ -378,7 +378,7 @@ const LeadsView = () => {
           {activeTab === 'active' && (
             <Button
               onClick={() => setShowAddModal(true)}
-              className="bg-tst-purple text-black flex items-center gap-2"
+              className="bg-tst-purple text-black flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               <Plus size={20} />
               Add Lead
@@ -386,7 +386,8 @@ const LeadsView = () => {
           )}
         </div>
 
-        <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b-2 border-black bg-gray-50">
@@ -409,7 +410,6 @@ const LeadsView = () => {
                 ) : (
                   currentLeads.map((lead) => {
                     const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-                    // FIX: A lead is only "warm" if it's recent AND requires action.
                     const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
                     const isWarm = daysOld <= 7 && isActionableStatus && activeTab === 'active';
 
@@ -467,6 +467,101 @@ const LeadsView = () => {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {currentLeads.length === 0 ? (
+            <div className="bg-white border-2 border-black rounded-lg p-8 text-center text-gray-500">
+              <p className="mb-4">
+                {activeTab === 'active' ? 'No active leads found' : 'No archived leads found'}
+              </p>
+              {activeTab === 'active' && (
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  className="bg-tst-purple text-black"
+                >
+                  Add Your First Lead
+                </Button>
+              )}
+            </div>
+          ) : (
+            currentLeads.map((lead) => {
+              const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
+              const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
+              const isWarm = daysOld <= 7 && isActionableStatus && activeTab === 'active';
+
+              return (
+                <div
+                  key={lead.id}
+                  className="bg-white border-2 border-black rounded-lg shadow-brutalistLg p-4 cursor-pointer hover:bg-tst-yellow transition-colors"
+                  onClick={() => handleRowClick(lead)}
+                >
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
+                      <div>
+                        <h3 className="font-bold text-lg leading-tight">{lead.name}</h3>
+                        {activeTab === 'archived' && (
+                          <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
+                            Archived
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    <span className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ${getStatusClasses(lead.status)}`}>
+                      {lead.status}
+                    </span>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail size={16} className="text-gray-500 flex-shrink-0" />
+                      <span className="break-all">{lead.email}</span>
+                    </div>
+                    {lead.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone size={16} className="text-gray-500 flex-shrink-0" />
+                        <span>{lead.phone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Date and Questionnaire Info */}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Calendar size={16} />
+                      <span>{format(new Date(lead.created_at), "PPP")}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {lead.questionnaire_completed ? (
+                        <div className="flex items-center gap-1">
+                          <CheckCircle size={16} className="text-green-600" />
+                          <span className="text-xs font-medium text-green-800">Questionnaire Done</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          {lead.questionnaire_reminder_sent_at ? (
+                            <AlertCircle size={16} className="text-orange-600" />
+                          ) : (
+                            <Clock size={16} className="text-orange-600" />
+                          )}
+                          <span className="text-xs font-medium text-orange-800">
+                            {lead.questionnaire_reminder_sent_at ? 'Reminder Sent' : 'Pending'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Lead Detail Modal */}

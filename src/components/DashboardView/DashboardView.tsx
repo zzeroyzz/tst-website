@@ -142,49 +142,56 @@ const DashboardView = () => {
     const [loading, setLoading] = useState(true);
     const supabase = createClientComponentClient();
 
-    const fetchDashboardData = useCallback(async () => {
-        setLoading(true);
+   const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
 
-        // --- Fetch Data for Statistics ---
-        const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
+    // --- Fetch Data for Statistics ---
+    const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
 
-        const { data: allContacts, error: totalError } = await supabase
-            .from('contacts')
-            .select('status, created_at');
+    const { data: allContacts, error: totalError } = await supabase
+        .from('contacts')
+        .select('status, created_at, archived');
 
-        if (totalError) {
-            console.error('Error fetching contacts for stats:', totalError);
-        }
+    if (totalError) {
+        console.error('Error fetching contacts for stats:', totalError);
+    }
 
-        if (allContacts) {
-            const totalLeads = allContacts.length;
-            const newLeads = allContacts.filter(c => new Date(c.created_at) > new Date(thirtyDaysAgo)).length;
-            const convertedLeads = allContacts.filter(c => c.status === 'Converted').length;
-            const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
+    if (allContacts) {
+        const totalLeads = allContacts.length; // ALL leads (including archived)
 
-            setStats({
-                totalLeads,
-                newLeads,
-                conversionRate: parseFloat(conversionRate.toFixed(1)),
-                avgResponseTime: "N/A", // To calculate this, a `contacted_at` timestamp column is needed.
-            });
-        }
+        // Filter for NEW leads - only non-archived from last 30 days
+        const newLeads = allContacts.filter(c =>
+            new Date(c.created_at) > new Date(thirtyDaysAgo) &&
+            c.archived !== true
+        ).length;
 
-        // --- Fetch Data for Reminders ---
-        const { data: reminderData, error: reminderError } = await supabase
-            .from('contacts')
-            .select('id, name, reminder_at, status')
-            .not('reminder_at', 'is', null)
-            .order('reminder_at', { ascending: true });
+        const convertedLeads = allContacts.filter(c => c.status === 'Converted').length;
+        const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
 
-        if (reminderError) {
-            console.error('Error fetching reminders:', reminderError);
-        } else {
-            setReminders(reminderData as Reminder[]);
-        }
+        setStats({
+            totalLeads,
+            newLeads,
+            conversionRate: parseFloat(conversionRate.toFixed(1)),
+            avgResponseTime: "N/A", // To calculate this, a `contacted_at` timestamp column is needed.
+        });
+    }
 
-        setLoading(false);
-    }, [supabase]);
+    // --- Fetch Data for Reminders ---
+    const { data: reminderData, error: reminderError } = await supabase
+        .from('contacts')
+        .select('id, name, reminder_at, status')
+        .eq('archived', false)  // Only non-archived for reminders
+        .not('reminder_at', 'is', null)
+        .order('reminder_at', { ascending: true });
+
+    if (reminderError) {
+        console.error('Error fetching reminders:', reminderError);
+    } else {
+        setReminders(reminderData as Reminder[]);
+    }
+
+    setLoading(false);
+}, [supabase]);
 
     useEffect(() => {
         const channel = supabase
@@ -201,12 +208,12 @@ const DashboardView = () => {
         return () => {
           supabase.removeChannel(channel);
         };
-      }, [supabase, fetchDashboardData]);
+    }, [supabase, fetchDashboardData]);
 
     // Show skeleton while loading
-    if (loading) {
-        return <DashboardViewSkeleton />;
-    }
+      if (loading) {
+          return <DashboardViewSkeleton />;
+      }
 
   return (
     <div className="space-y-8">

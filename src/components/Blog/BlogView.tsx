@@ -6,7 +6,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Calendar, Tag, FileText } from "lucide-react";
 import Button from "@/components/Button/Button";
 import { Post } from "@/types";
 import { NewsletterViewSkeleton } from "@/components/skeleton";
@@ -172,15 +172,15 @@ const BlogView = () => {
   return (
     <>
       <div>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <h2 className="text-3xl font-bold">Toasted Insights Blog Posts</h2>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+            <h2 className="text-2xl lg:text-3xl font-bold">Toasted Insights Blog Posts</h2>
 
             {/* Tab Navigation */}
-            <div className="flex border-2 border-black rounded-lg overflow-hidden">
+            <div className="flex border-2 border-black rounded-lg overflow-hidden w-full sm:w-auto">
               <button
                 onClick={() => setActiveTab('active')}
-                className={`px-4 py-2 font-bold transition-colors ${
+                className={`px-3 sm:px-4 py-2 font-bold transition-colors flex-1 sm:flex-none text-sm sm:text-base ${
                   activeTab === 'active'
                     ? 'bg-tst-purple text-black'
                     : 'bg-white text-black hover:bg-gray-100'
@@ -190,7 +190,7 @@ const BlogView = () => {
               </button>
               <button
                 onClick={() => setActiveTab('archived')}
-                className={`px-4 py-2 font-bold transition-colors border-l-2 border-black ${
+                className={`px-3 sm:px-4 py-2 font-bold transition-colors border-l-2 border-black flex-1 sm:flex-none text-sm sm:text-base ${
                   activeTab === 'archived'
                     ? 'bg-tst-purple text-black'
                     : 'bg-white text-black hover:bg-gray-100'
@@ -204,7 +204,7 @@ const BlogView = () => {
           {/* Only show Create Blog Post button on active tab */}
           {activeTab === 'active' && (
             <Button
-              className="bg-tst-purple flex items-center"
+              className="bg-tst-purple flex items-center w-full lg:w-auto justify-center"
               onClick={() => router.push('/dashboard/mental-health-healing-blog/create')}
             >
               <PlusCircle className="mr-2 h-4 w-4" /> Create Blog Post
@@ -212,7 +212,8 @@ const BlogView = () => {
           )}
         </div>
 
-        <div className="bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b-2 border-black bg-gray-50">
@@ -271,6 +272,79 @@ const BlogView = () => {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {currentPosts.length === 0 ? (
+            <div className="bg-white border-2 border-black rounded-lg p-8 text-center text-gray-500">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p className="mb-4">
+                {activeTab === 'active' ? 'No active blog posts found' : 'No archived blog posts found'}
+              </p>
+              {activeTab === 'active' && (
+                <Button
+                  className="bg-tst-purple w-full sm:w-auto text-black"
+                  onClick={() => router.push('/dashboard/mental-health-healing-blog/create')}
+                >
+                  Create Your First Blog Post
+                </Button>
+              )}
+            </div>
+          ) : (
+            currentPosts.map((post) => (
+              <div
+                key={post.id}
+                className="bg-white border-2 border-black rounded-lg shadow-brutalistLg p-4 cursor-pointer hover:bg-tst-yellow transition-colors"
+                onClick={() => handleRowClick(post)}
+              >
+                {/* Card Header */}
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 pr-3">
+                    <h3 className="font-bold text-lg leading-tight mb-2">
+                      {post.title}
+                    </h3>
+                    {activeTab === 'archived' && (
+                      <span className="inline-block px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
+                        Archived
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Status Badge */}
+                  <span className={`px-3 py-1 text-sm font-bold rounded-full capitalize flex-shrink-0 ${statusColors[post.status] || 'bg-gray-100'}`}>
+                    {post.status}
+                  </span>
+                </div>
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Tag size={16} className="text-gray-500" />
+                      <span className="text-sm font-medium text-gray-700">Tags</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag, index) => (
+                        <span
+                          key={tag}
+                          className={`px-2 py-1 text-xs font-bold rounded-full text-black ${tagColors[index % tagColors.length]}`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Date */}
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar size={16} />
+                  <span>{format(new Date(post.created_at), "PPP")}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Blog Detail Modal */}

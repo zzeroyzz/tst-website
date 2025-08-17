@@ -12,4 +12,5 @@ export { NewsletterArchiveSkeleton } from './NewsletterArchiveSkeleton';
 export { NewsletterViewSkeleton } from './NewsletterViewSkeleton';
 export { LeadsViewSkeleton } from './LeadsViewSkeleton';
 export { DashboardViewSkeleton } from './DashboardViewSkeleton';
+export { DashboardSkeleton } from './DashboardSkeleton';
 export { KanbanBoardSkeleton } from './KanbanBoardSkeleton';

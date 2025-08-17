@@ -4,7 +4,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Send, Archive, ArchiveRestore } from 'lucide-react';
+import { X, Send, Archive, ArchiveRestore, User, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle, MapPin, DollarSign, CreditCard, Users } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import Button from '@/components/Button/Button';
 import toast from 'react-hot-toast';
@@ -106,21 +106,10 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
  const handleSendReminder = async () => {
-    console.log('🚀 FRONTEND: handleSendReminder called');
-    console.log('🚀 FRONTEND: lead data:', {
-        id: lead.id,
-        name: lead.name,
-        email: lead.email,
-        questionnaire_completed: lead.questionnaire_completed,
-        questionnaire_token: lead.questionnaire_token
-    });
-
     setIsSending(true);
     const toastId = toast.loading('Sending questionnaire reminder...');
 
     try {
-        console.log('🚀 FRONTEND: Making API call to /api/questionnaire/reminder');
-
         // Call the questionnaire reminder API with the lead's contact ID
         const response = await fetch('/api/questionnaire/reminder', {
             method: 'POST',
@@ -128,11 +117,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
             body: JSON.stringify({ contactId: lead.id }),
         });
 
-        console.log('🚀 FRONTEND: Response status:', response.status);
-        console.log('🚀 FRONTEND: Response ok:', response.ok);
-
         const result = await response.json();
-        console.log('🚀 FRONTEND: Response data:', result);
 
         if (!response.ok) {
             throw new Error(result.error || 'Failed to send reminder');
@@ -157,7 +142,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         }
 
     } catch (error: any) {
-        console.error('🚀 FRONTEND: Error:', error);
+        console.error('Error:', error);
         toast.error(`Error: ${error.message}`, { id: toastId });
     } finally {
         setIsSending(false);
@@ -210,86 +195,111 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl border-2 border-black">
-        <div className="flex justify-between items-start mb-4">
-            <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  {lead.name}
-                  {lead.archived && (
-                    <span className="px-3 py-1 text-sm bg-gray-200 text-gray-600 rounded-full">
-                      Archived
-                    </span>
-                  )}
-                </h2>
-                <p className="text-gray-600">{lead.email} | {lead.phone}</p>
+    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-450 flex flex-col border-2 border-black overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 flex justify-between bg-white border-b border-gray-200 p-4 sm:p-6 relative">
+          <div className="flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                <h2 className="text-lg sm:text-xl font-bold truncate">{lead.name}</h2>
+                {lead.archived && (
+                  <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full self-start flex-shrink-0">
+                    Archived
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                <div className="flex items-center gap-1">
+                  <Mail size={14} />
+                  <span className="break-all">{lead.email}</span>
+                </div>
+                {lead.phone && (
+                  <div className="flex items-center gap-1">
+                    <Phone size={14} />
+                    <span>{lead.phone}</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <Button
-                onClick={onClose}
-                className="p-2 rounded-lg transition-colors bg-tst-red text-white"
-              >
-                <X size={20} />
-              </Button>
+          </div>
+
+          {/* Close button - positioned absolutely in top right */}
+          <Button
+            onClick={onClose}
+            className="bg-tst-red text-white"
+          >
+            <X size={18} />
+          </Button>
         </div>
 
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left side for notes and status */}
-            <div className="space-y-4">
-                <div className="pt-4">
-                    <label className="font-bold block mb-1">Status</label>
-                    <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        className={`w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple ${getStatusClasses(status)}`}
-                        disabled={lead.archived}
-                    >
-                        {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    {lead.archived && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        Status cannot be changed for archived leads
-                      </p>
-                    )}
-                    {/* Status suggestions based on questionnaire/appointment data */}
-                    {!lead.archived && lead.questionnaire_completed && !lead.scheduled_appointment_at && (
-                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-                        💡 <strong>Suggestion:</strong> Questionnaire completed but no appointment scheduled.
-                        Consider status: {lead.qualified_lead === false ? '"Not a Fit"' : '"Contacted"'}
-                      </div>
-                    )}
-                    {!lead.archived && lead.scheduled_appointment_at && status !== 'Consultation Scheduled' && (
-                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                        💡 <strong>Suggestion:</strong> Appointment scheduled - consider status &rdquo;Consultation Scheduled&quot;
-                      </div>
-                    )}
-                </div>
-
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Left Column - Status & Notes */}
+              <div className="space-y-4">
+                {/* Status */}
                 <div>
-                    <label className="font-bold block mb-1">Notes</label>
-                    <textarea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        rows={8}
-                        className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
-                        placeholder="Add notes about your interactions with this lead..."
-                        disabled={lead.archived}
-                    />
-                    {lead.archived && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        Notes cannot be edited for archived leads
-                      </p>
-                    )}
+                  <label className="font-bold block mb-2 text-sm">Status</label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className={`w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple text-sm ${getStatusClasses(status)}`}
+                    disabled={lead.archived}
+                  >
+                    {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                  {lead.archived && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Status cannot be changed for archived leads
+                    </p>
+                  )}
+
+                  {/* Status suggestions */}
+                  {!lead.archived && lead.questionnaire_completed && !lead.scheduled_appointment_at && (
+                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                      💡 <strong>Suggestion:</strong> Questionnaire completed but no appointment scheduled.
+                      Consider status: {lead.qualified_lead === false ? '"Not a Fit"' : '"Contacted"'}
+                    </div>
+                  )}
+                  {!lead.archived && lead.scheduled_appointment_at && status !== 'Consultation Scheduled' && (
+                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                      💡 <strong>Suggestion:</strong> Appointment scheduled - consider status "Consultation Scheduled"
+                    </div>
+                  )}
                 </div>
 
-                {/* Appointment Information */}
+                {/* Notes */}
+                <div>
+                  <label className="font-bold block mb-2 text-sm">Notes</label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={4}
+                    className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple resize-none text-sm"
+                    placeholder="Add notes about your interactions with this lead..."
+                    disabled={lead.archived}
+                  />
+                  {lead.archived && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Notes cannot be edited for archived leads
+                    </p>
+                  )}
+                </div>
+
+                {/* Appointment Information - Mobile */}
                 {lead.scheduled_appointment_at && (
-                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h3 className="font-bold text-lg mb-2 text-purple-800">📅 Scheduled Appointment</h3>
-                    <div className="space-y-2 text-sm">
-                      <p><strong>Date & Time:</strong> {formatAppointmentDate(lead.scheduled_appointment_at)}</p>
-                      <p><strong>Status:</strong>
-                        <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  <div className="lg:hidden bg-purple-50 p-3 rounded-lg border border-purple-200">
+                    <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
+                      <Calendar size={16} />
+                      Scheduled Appointment
+                    </h3>
+                    <div className="space-y-1 text-xs">
+                      <p><strong>Date & Time:</strong><br className="sm:hidden" /> {formatAppointmentDate(lead.scheduled_appointment_at)}</p>
+                      <p className="flex flex-col sm:flex-row sm:items-center gap-1">
+                        <strong>Status:</strong>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           lead.appointment_status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
                           lead.appointment_status === 'completed' ? 'bg-tst-green text-green-800' :
                           lead.appointment_status === 'cancelled' ? 'bg-red-100 text-red-800' :
@@ -298,7 +308,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                           {lead.appointment_status || 'None'}
                         </span>
                       </p>
-
                       {lead.last_appointment_update && (
                         <p className="text-xs text-gray-500">
                           Last updated: {format(new Date(lead.last_appointment_update), "PPp")}
@@ -307,157 +316,229 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                     </div>
                   </div>
                 )}
+              </div>
 
-            </div>
+              {/* Right Column - Lead Information */}
+              <div className="space-y-4">
+                {/* Basic Information */}
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
+                    <User size={16} />
+                    Lead Information
+                  </h3>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="text-gray-500 flex-shrink-0" />
+                      <div>
+                        <strong>Contact Form Submitted:</strong><br className="sm:hidden" />
+                        <span className="text-gray-600">{format(new Date(lead.created_at), "PPp")}</span>
+                      </div>
+                    </div>
 
-            {/* Right side for lead info, questionnaire */}
-            <div className="space-y-2">
-                {/* Lead Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-bold text-lg mb-2">Lead Information</h3>
-                    <div className="space-y-1 text-sm">
-                        <p className="text-base"><strong>Contact Form Submitted:</strong> {format(new Date(lead.created_at), "PPp")}</p>
+                    {/* Questionnaire Status */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        {lead.questionnaire_completed ? (
+                          <CheckCircle size={14} className="text-green-600 flex-shrink-0" />
+                        ) : (
+                          <Clock size={14} className="text-orange-600 flex-shrink-0" />
+                        )}
+                        <strong>Questionnaire Status:</strong>
+                      </div>
 
-                    <p className="text-base"><strong>Questionnaire Status:</strong></p>
-                    {lead.questionnaire_completed ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <p className="text-green-600 font-medium">✓ Completed</p>
-                          {lead.questionnaire_completed_at && (
-                            <span className="text-xs">
-                              on {format(new Date(lead.questionnaire_completed_at), "PPp")}
-                            </span>
+                      {lead.questionnaire_completed ? (
+                        <div className="ml-4 space-y-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                            <span className="text-green-600 font-medium text-xs">✓ Completed</span>
+                            {lead.questionnaire_completed_at && (
+                              <span className="text-xs text-gray-500">
+                                on {format(new Date(lead.questionnaire_completed_at), "PPp")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="ml-4 space-y-1">
+                          <p className="text-orange-600 font-medium text-xs">⏳ Pending completion</p>
+                          <button
+                            onClick={handleCopyQuestionnaireLink}
+                            className="text-xs text-blue-600 underline hover:text-blue-800"
+                            disabled={lead.archived}
+                          >
+                            Copy questionnaire link
+                          </button>
+                          {lead.questionnaire_reminder_sent_at && (
+                            <p className="text-xs text-gray-500">
+                              Reminder sent: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
+                            </p>
                           )}
                         </div>
-
-
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-orange-600 font-medium">⏳ Pending completion</p>
-                        <button
-                          onClick={handleCopyQuestionnaireLink}
-                          className="text-sm text-blue-600 underline hover:text-blue-800"
-                          disabled={lead.archived}
-                        >
-                          Copy questionnaire link
-                        </button>
-                        {lead.questionnaire_reminder_sent_at && (
-                          <p className="text-xs text-gray-500">
-                            Reminder sent: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
-                          </p>
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                        <p className="text-base"><strong>Qualified Lead:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.qualified_lead === true ? 'bg-tst-green text-green-800' :
-                            lead.qualified_lead === false ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {lead.qualified_lead === true ? 'Yes' : lead.qualified_lead === false ? 'No' : 'Unknown'}
-                          </span>
-                        </p>
-                        <p className="text-base"><strong>Located in Georgia:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.located_in_georgia ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.located_in_georgia ? 'Yes' : 'No'}
-                          </span>
-                        </p>
-                        <p className="text-base"><strong>Interested in:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.interested_in ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.interested_in ? lead.interested_in : 'N/A'}
-                          </span>
-                        </p>
-                         <p className="text-base"><strong>Budget works:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.budget_works ? 'bg-tst-teal' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.budget_works ? lead.budget_works : 'N/A'}
-                          </span>
-                        </p>
-                         <p className="text-base"><strong>Scheduling Preference:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.budget_works ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.scheduling_preference ? lead.scheduling_preference : 'N/A'}
-                          </span>
-                        </p>
-                        <p className="text-base"><strong>Payment Method:</strong>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.budget_works ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {lead.payment_method ? lead.payment_method : 'N/A'}
-                          </span>
-                        </p>
+                {/* Qualification Details */}
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <h3 className="font-bold text-sm mb-2">Qualification Details</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Qualified Lead:</span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        lead.qualified_lead === true ? 'bg-tst-green text-green-800' :
+                        lead.qualified_lead === false ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {lead.qualified_lead === true ? 'Yes' : lead.qualified_lead === false ? 'No' : 'Unknown'}
+                      </span>
+                    </div>
 
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <MapPin size={12} />
+                        <span className="font-medium">In Georgia:</span>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        lead.located_in_georgia ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {lead.located_in_georgia ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1">
+                          <Users size={12} />
+                          <span className="font-medium">Interested in:</span>
+                        </div>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-tst-purple text-black break-words text-right">
+                          {lead.interested_in || 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                 <div className="sm:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <DollarSign size={12} />
+                        <span className="font-medium">Budget:</span>
+                      </div>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-tst-teal text-black">
+                        {lead.budget_works || 'N/A'}
+                      </span>
+                    </div>
+                    </div>
+               <div className="sm:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={12} />
+                        <span className="font-medium">Schedule:</span>
+                      </div>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-tst-yellow text-black">
+                        {lead.scheduling_preference || 'N/A'}
+                      </span>
+                    </div>
+</div>
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <CreditCard size={12} />
+                          <span className="font-medium">Payment Method:</span>
+                        </div>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-tst-green text-black">
+                          {lead.payment_method || 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-
-
-
+                {/* Appointment Information - Desktop */}
+                {lead.scheduled_appointment_at && (
+                  <div className="hidden lg:block bg-purple-50 p-3 rounded-lg border border-purple-200">
+                    <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
+                      <Calendar size={16} />
+                      Scheduled Appointment
+                    </h3>
+                    <div className="space-y-1 text-xs">
+                      <p><strong>Date & Time:</strong><br /> {formatAppointmentDate(lead.scheduled_appointment_at)}</p>
+                      <p className="flex items-center gap-2">
+                        <strong>Status:</strong>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          lead.appointment_status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                          lead.appointment_status === 'completed' ? 'bg-tst-green text-green-800' :
+                          lead.appointment_status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {lead.appointment_status || 'None'}
+                        </span>
+                      </p>
+                      {lead.last_appointment_update && (
+                        <p className="text-xs text-gray-500">
+                          Last updated: {format(new Date(lead.last_appointment_update), "PPp")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-between items-center mt-6">
-            <div className="flex gap-3">
-                {/* Send Reminder Button - only for active leads */}
-                {!lead.archived && (
-                  <Button
-                      onClick={handleSendReminder}
-                      disabled={isSending || isSaving || isArchiving || isUnarchiving}
-                      className="flex items-center gap-2 px-4 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  >
-                      <Send size={16} />
-                      {isSending ? 'Sending...' : 'Send Reminder'}
-                  </Button>
-                )}
+        {/* Action Buttons - Fixed Footer */}
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              {/* Send Reminder Button - only for active leads */}
+              {!lead.archived && (
+                <Button
+                  onClick={handleSendReminder}
+                  disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
+                >
+                  <Send size={14} />
+                  {isSending ? 'Sending...' : 'Send Reminder'}
+                </Button>
+              )}
 
-                {/* Archive/Unarchive Button */}
-                {lead.archived && onUnarchive ? (
+              {/* Archive/Unarchive Button */}
+              {lead.archived && onUnarchive ? (
+                <Button
+                  onClick={handleUnarchive}
+                  disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white font-bold rounded-md border-2 border-black hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
+                >
+                  <ArchiveRestore size={14} />
+                  {isUnarchiving ? 'Unarchiving...' : 'Unarchive Lead'}
+                </Button>
+              ) : (
+                !lead.archived && onArchive && (
                   <Button
-                      onClick={handleUnarchive}
-                      disabled={isSending || isSaving || isArchiving || isUnarchiving}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-md border-2 border-black hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    onClick={handleArchive}
+                    disabled={isSending || isSaving || isArchiving || isUnarchiving}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-500 text-white font-bold rounded-md border-2 border-black hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
                   >
-                      <ArchiveRestore size={16} />
-                      {isUnarchiving ? 'Unarchiving...' : 'Unarchive Lead'}
+                    <Archive size={14} />
+                    {isArchiving ? 'Archiving...' : 'Archive Lead'}
                   </Button>
-                ) : (
-                  !lead.archived && onArchive && (
-                    <Button
-                        onClick={handleArchive}
-                        disabled={isSending || isSaving || isArchiving || isUnarchiving}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white font-bold rounded-md border-2 border-black hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    >
-                        <Archive size={16} />
-                        {isArchiving ? 'Archiving...' : 'Archive Lead'}
-                    </Button>
-                  )
-                )}
+                )
+              )}
             </div>
 
             {/* Save Button - only for active leads */}
             {!lead.archived && (
               <Button
-                  onClick={handleSave}
-                  disabled={isSaving || isSending || isArchiving || isUnarchiving}
-                  className="px-6 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black"
+                onClick={handleSave}
+                disabled={isSaving || isSending || isArchiving || isUnarchiving}
+                className="px-4 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90 border-2 border-black text-sm"
               >
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                {isSaving ? 'Saving...' : 'Save Changes'}
               </Button>
             )}
+          </div>
         </div>
       </div>
     </div>
-
   );
 };
 
