@@ -20,27 +20,27 @@ import {
   BookOpen,
   Download,
   House,
-  Bell,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "./dashboard.module.css";
-import {DashboardSkeleton} from "@/components/skeleton";
+import { DashboardSkeleton } from "@/components/skeleton";
 import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
 import LeadsView from "@/components/Leads/LeadsView";
 import NewsletterView from "@/components/Newsletter/NewsletterView";
 import DashboardView from "@/components/DashboardView/DashboardView";
 import AppointmentsDashboard from "@/components/AppointmentsDashboard/AppointmentsDashboard";
 import BlogView from "@/components/Blog/BlogView";
-import {Notification} from "@/types/notification";
+import DashboardNotifications from "@/components/DashboardNotifications/DashboardNotifications";
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
   const [activeView, setActiveView] = useState("Dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  // Shared notification state
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [localReadNotifications, setLocalReadNotifications] = useState<Set<string>>(new Set());
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -68,120 +68,26 @@ const DashboardPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  // Load read notifications from localStorage on component mount
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup function to restore scroll when component unmounts
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
-
-  // Fetch notifications
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        // Get recent contact submissions (last 7 days)
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-        const { data: contacts, error: contactsError } = await supabase
-          .from('contacts')
-          .select('*')
-          .eq('archived', false) // Only get non-archived contacts
-          .gte('created_at', sevenDaysAgo.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (contactsError) {
-          console.error('Error fetching contacts:', contactsError);
-          return;
-        }
-
-        const notificationList: Notification[] = [];
-
-        // Process contacts for various notification types
-        contacts?.forEach(contact => {
-          const createdAt = new Date(contact.created_at);
-          const timeAgo = getTimeAgo(createdAt);
-
-          // Contact form submission
-          notificationList.push({
-            id: `contact-${contact.id}`,
-            type: 'contact',
-            title: 'New Contact Submission',
-            message: `${contact.name} submitted the contact form`,
-            timestamp: createdAt,
-            timeAgo,
-            data: contact,
-            read: false
-          });
-
-          // Questionnaire completion
-          if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
-            notificationList.push({
-              id: `questionnaire-${contact.id}`,
-              type: 'questionnaire',
-              title: 'Questionnaire Completed',
-              message: `${contact.name} completed their questionnaire`,
-              timestamp: new Date(contact.questionnaire_completed_at),
-              timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
-              data: contact,
-              read: false
-            });
-          }
-
-          // Appointment scheduled
-          if (contact.scheduled_appointment_at) {
-            notificationList.push({
-              id: `appointment-${contact.id}`,
-              type: 'appointment',
-              title: 'Appointment Scheduled',
-              message: `${contact.name} scheduled a consultation`,
-              timestamp: new Date(contact.scheduled_appointment_at),
-              timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
-              data: contact,
-              read: false
-            });
-          }
-
-          // Auto-reminder sent
-          if (contact.last_auto_reminder_sent) {
-            notificationList.push({
-              id: `reminder-${contact.id}-${contact.auto_reminder_count || 1}`,
-              type: 'reminder',
-              title: 'Auto-Reminder Sent',
-              message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
-              timestamp: new Date(contact.last_auto_reminder_sent),
-              timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
-              data: contact,
-              read: false
-            });
-          }
-        });
-
-        // Sort by timestamp (newest first)
-        notificationList.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-        setNotifications(notificationList);
-        setUnreadCount(notificationList.length);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
+    try {
+      const savedReadNotifications = localStorage.getItem('readNotifications');
+      if (savedReadNotifications) {
+        setLocalReadNotifications(new Set(JSON.parse(savedReadNotifications)));
       }
-    };
-
-    if (user) {
-      fetchNotifications();
-      // Refresh notifications every 5 minutes
-      const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
-      return () => clearInterval(interval);
+    } catch (error) {
+      console.error('Error loading read notifications from localStorage:', error);
     }
-  }, [user, supabase]);
+  }, []);
+
+  // Save read notifications to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('readNotifications', JSON.stringify([...localReadNotifications]));
+    } catch (error) {
+      console.error('Error saving read notifications to localStorage:', error);
+    }
+  }, [localReadNotifications]);
 
   // Helper function to get time ago
   const getTimeAgo = (date: Date) => {
@@ -200,43 +106,166 @@ const DashboardPage = () => {
     return date.toLocaleDateString();
   };
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'contact': return <Users className="w-4 h-4 text-blue-500" />;
-      case 'questionnaire': return <CheckSquare className="w-4 h-4 text-green-500" />;
-      case 'appointment': return <Calendar className="w-4 h-4 text-purple-500" />;
-      case 'reminder': return <Mail className="w-4 h-4 text-orange-500" />;
-      default: return <Bell className="w-4 h-4 text-gray-500" />;
+  // Fetch notifications - moved from DashboardNotifications component
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        // Get recent notifications from the notifications table
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        // Fetch from notifications table if it exists
+        const { data: notificationData, error: notificationError } = await supabase
+          .from('notifications')
+          .select('*')
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        let notificationList: any[] = [];
+
+        // If notifications table exists and has data, use it
+        if (!notificationError && notificationData && notificationData.length > 0) {
+          notificationList = notificationData.map(notification => ({
+            id: notification.id,
+            type: notification.type,
+            title: notification.title,
+            message: notification.message,
+            timestamp: new Date(notification.created_at),
+            timeAgo: getTimeAgo(new Date(notification.created_at)),
+            data: {
+              contact_id: notification.contact_id,
+              contact_name: notification.contact_name,
+              contact_email: notification.contact_email,
+              reminder_number: notification.reminder_number
+            },
+            read: notification.read || localReadNotifications.has(notification.id)
+          }));
+        }
+
+        // Also get recent contact submissions for backward compatibility
+        const { data: contacts, error: contactsError } = await supabase
+          .from('contacts')
+          .select('*')
+          .eq('archived', false)
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (!contactsError && contacts) {
+          // Process contacts for various notification types
+          contacts.forEach(contact => {
+            const createdAt = new Date(contact.created_at);
+            const timeAgo = getTimeAgo(createdAt);
+
+            // Contact form submission
+            const contactNotificationId = `contact-${contact.id}`;
+            notificationList.push({
+              id: contactNotificationId,
+              type: 'contact',
+              title: 'New Contact Submission',
+              message: `${contact.name} submitted the contact form`,
+              timestamp: createdAt,
+              timeAgo,
+              data: contact,
+              read: localReadNotifications.has(contactNotificationId)
+            });
+
+            // Questionnaire completion
+            if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
+              const questionnaireNotificationId = `questionnaire-${contact.id}`;
+              notificationList.push({
+                id: questionnaireNotificationId,
+                type: 'questionnaire',
+                title: 'Questionnaire Completed',
+                message: `${contact.name} completed their questionnaire`,
+                timestamp: new Date(contact.questionnaire_completed_at),
+                timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
+                data: contact,
+                read: localReadNotifications.has(questionnaireNotificationId)
+              });
+            }
+
+            // Appointment scheduled
+            if (contact.scheduled_appointment_at) {
+              const appointmentNotificationId = `appointment-${contact.id}`;
+              notificationList.push({
+                id: appointmentNotificationId,
+                type: 'appointment',
+                title: 'Appointment Scheduled',
+                message: `${contact.name} scheduled a consultation`,
+                timestamp: new Date(contact.scheduled_appointment_at),
+                timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
+                data: contact,
+                read: localReadNotifications.has(appointmentNotificationId)
+              });
+            }
+
+            // Legacy auto-reminder handling (only if no notifications table data exists)
+            if (notificationData?.length === 0 && contact.last_auto_reminder_sent) {
+              const reminderNotificationId = `reminder-${contact.id}-${contact.auto_reminder_count || 1}`;
+              notificationList.push({
+                id: reminderNotificationId,
+                type: 'reminder_sent',
+                title: 'Auto-Reminder Sent',
+                message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
+                timestamp: new Date(contact.last_auto_reminder_sent),
+                timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
+                data: contact,
+                read: localReadNotifications.has(reminderNotificationId)
+              });
+            }
+          });
+        }
+
+        // Remove duplicates and sort by timestamp (newest first)
+        const uniqueNotifications = notificationList.filter((notification, index, self) =>
+          index === self.findIndex(n => n.id === notification.id)
+        );
+
+        uniqueNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+        setNotifications(uniqueNotifications);
+        setUnreadCount(uniqueNotifications.filter(n => !n.read).length);
+
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
+    if (user) {
+      fetchNotifications();
+      // Refresh notifications every 2 minutes to catch auto-reminders faster
+      const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
+      return () => clearInterval(interval);
     }
-  };
+  }, [user, supabase, localReadNotifications]);
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
 
-  const markAllAsRead = () => {
-    setUnreadCount(0);
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const markNotificationAsRead = (notificationId: string) => {
-    setNotifications(prev => prev.map(n =>
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  };
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   const handleNotificationClick = (notification: any) => {
-    // Mark this notification as read
-    if (!notification.read) {
-      markNotificationAsRead(notification.id);
-    }
-
     // Navigate to relevant section based on notification type
     if (notification.type === 'contact' || notification.type === 'questionnaire') {
       setActiveView('Leads');
     } else if (notification.type === 'appointment') {
       setActiveView('Appointments');
+    } else if (notification.type === 'reminder_sent' || notification.type === 'reminder') {
+      setActiveView('Leads'); // View the leads to see reminder status
     }
 
-    // Close notification dropdown
+    // Close notification dropdown and mobile menu
     setIsNotificationOpen(false);
+    setIsMobileMenuOpen(false);
   };
 
   const handleLogout = async () => {
@@ -284,76 +313,19 @@ const DashboardPage = () => {
     <div className={`${isMobile ? 'h-full' : ''} flex flex-col`}>
       <div className="flex items-center justify-between mb-10">
         <div className="font-bold text-2xl">Admin Panel</div>
+        {/* Only show notifications on desktop sidebar, not mobile sidebar */}
         {!isMobile && (
-          <div className="relative">
-            <button
-              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Desktop Notification Dropdown */}
-            {isNotificationOpen && (
-              <div className={styles.desktopDropdown}>
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900">Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-blue-600 hover:text-blue-800"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-
-                {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    <p>No recent notifications</p>
-                  </div>
-                ) : (
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          !notification.read ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => handleNotificationClick(notification)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-600 truncate">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {notification.timeAgo}
-                            </p>
-                          </div>
-                          {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2"></div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <DashboardNotifications
+            user={user}
+            onNotificationClick={handleNotificationClick}
+            // Pass shared state as props
+            notifications={notifications}
+            setNotifications={setNotifications}
+            unreadCount={unreadCount}
+            setUnreadCount={setUnreadCount}
+            localReadNotifications={localReadNotifications}
+            setLocalReadNotifications={setLocalReadNotifications}
+          />
         )}
       </div>
       <nav className="flex-grow">
@@ -460,75 +432,19 @@ const DashboardPage = () => {
           height={10}
         />
         <div className="flex items-center space-x-2">
-          {/* Notification Bell */}
-          <div className="relative ">
-            <button
-              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Bell className="h-6 w-6" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {isNotificationOpen && (
-              <div className={styles.mobileDropdown}>
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900">Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-blue-600 hover:text-blue-800"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-
-                {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    <p>No recent notifications</p>
-                  </div>
-                ) : (
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          !notification.read ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => handleNotificationClick(notification)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-600 truncate">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {notification.timeAgo}
-                            </p>
-                          </div>
-                          {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2"></div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+          {/* Mobile Notification Bell - Single Instance */}
+          <div className="md:hidden">
+            <DashboardNotifications
+              user={user}
+              onNotificationClick={handleNotificationClick}
+              // Pass shared state as props
+              notifications={notifications}
+              setNotifications={setNotifications}
+              unreadCount={unreadCount}
+              setUnreadCount={setUnreadCount}
+              localReadNotifications={localReadNotifications}
+              setLocalReadNotifications={setLocalReadNotifications}
+            />
           </div>
 
           {/* Hamburger Menu */}
