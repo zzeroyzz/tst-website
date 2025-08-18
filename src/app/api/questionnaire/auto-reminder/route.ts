@@ -195,6 +195,15 @@ export async function GET(request: NextRequest) {
           const emailSent = await sendReminderEmail(contact, reminderNumber);
 
           if (emailSent) {
+            // Create the note text
+            const noteText = `Questionnaire reminder #${reminderNumber} sent on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`;
+
+            // Prepare existing notes (if any) and append new note
+            const existingNotes = contact.notes || '';
+            const updatedNotes = existingNotes
+              ? `${existingNotes}\n${noteText}`
+              : noteText;
+
             // Update the contact record
             const { error: updateError } = await supabase
               .from('contacts')
@@ -202,9 +211,34 @@ export async function GET(request: NextRequest) {
                 auto_reminder_count: reminderCount + 1,
                 last_auto_reminder_sent: now.toISOString(),
                 // Also update the manual reminder field for backwards compatibility
-                questionnaire_reminder_sent_at: now.toISOString()
+                questionnaire_reminder_sent_at: now.toISOString(),
+                // Update status and notes
+                status: 'Reminder Sent',
+                notes: updatedNotes
               })
               .eq('id', contact.id);
+
+            // Create a notification entry for the dashboard
+            if (!updateError) {
+              const { error: notificationError } = await supabase
+                .from('notifications')
+                .insert({
+                  type: 'reminder_sent',
+                  title: 'Auto-Reminder Sent',
+                  message: `Reminder #${reminderNumber} sent to ${contact.name}`,
+                  contact_id: contact.id,
+                  contact_name: contact.name,
+                  contact_email: contact.email,
+                  reminder_number: reminderNumber,
+                  created_at: now.toISOString(),
+                  read: false
+                });
+
+              if (notificationError) {
+                console.error(`⚠️ Failed to create notification for contact ${contact.id}:`, notificationError);
+                // Don't fail the whole process if notification creation fails
+              }
+            }
 
             if (updateError) {
               console.error(`❌ Failed to update contact ${contact.id}:`, updateError);

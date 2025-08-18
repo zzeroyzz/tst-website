@@ -82,94 +82,124 @@ const DashboardPage = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Fetch notifications
+  // Fetch notifications - UPDATED SECTION
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // Get recent contact submissions (last 7 days)
+        // Get recent notifications from the notifications table
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const { data: contacts, error: contactsError } = await supabase
-          .from('contacts')
+        // Fetch from notifications table if it exists
+        const { data: notificationData, error: notificationError } = await supabase
+          .from('notifications')
           .select('*')
-          .eq('archived', false) // Only get non-archived contacts
           .gte('created_at', sevenDaysAgo.toISOString())
           .order('created_at', { ascending: false })
           .limit(50);
 
-        if (contactsError) {
-          console.error('Error fetching contacts:', contactsError);
-          return;
+        let notificationList: Notification[] = [];
+
+        // If notifications table exists and has data, use it
+        if (!notificationError && notificationData && notificationData.length > 0) {
+          notificationList = notificationData.map(notification => ({
+            id: notification.id,
+            type: notification.type,
+            title: notification.title,
+            message: notification.message,
+            timestamp: new Date(notification.created_at),
+            timeAgo: getTimeAgo(new Date(notification.created_at)),
+            data: {
+              contact_id: notification.contact_id,
+              contact_name: notification.contact_name,
+              contact_email: notification.contact_email,
+              reminder_number: notification.reminder_number
+            },
+            read: notification.read || false
+          }));
         }
 
-        const notificationList: Notification[] = [];
+        // Also get recent contact submissions for backward compatibility
+        const { data: contacts, error: contactsError } = await supabase
+          .from('contacts')
+          .select('*')
+          .eq('archived', false)
+          .gte('created_at', sevenDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(50);
 
-        // Process contacts for various notification types
-        contacts?.forEach(contact => {
-          const createdAt = new Date(contact.created_at);
-          const timeAgo = getTimeAgo(createdAt);
+        if (!contactsError && contacts) {
+          // Process contacts for various notification types
+          contacts.forEach(contact => {
+            const createdAt = new Date(contact.created_at);
+            const timeAgo = getTimeAgo(createdAt);
 
-          // Contact form submission
-          notificationList.push({
-            id: `contact-${contact.id}`,
-            type: 'contact',
-            title: 'New Contact Submission',
-            message: `${contact.name} submitted the contact form`,
-            timestamp: createdAt,
-            timeAgo,
-            data: contact,
-            read: false
+            // Contact form submission
+            notificationList.push({
+              id: `contact-${contact.id}`,
+              type: 'contact',
+              title: 'New Contact Submission',
+              message: `${contact.name} submitted the contact form`,
+              timestamp: createdAt,
+              timeAgo,
+              data: contact,
+              read: false
+            });
+
+            // Questionnaire completion
+            if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
+              notificationList.push({
+                id: `questionnaire-${contact.id}`,
+                type: 'questionnaire',
+                title: 'Questionnaire Completed',
+                message: `${contact.name} completed their questionnaire`,
+                timestamp: new Date(contact.questionnaire_completed_at),
+                timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
+                data: contact,
+                read: false
+              });
+            }
+
+            // Appointment scheduled
+            if (contact.scheduled_appointment_at) {
+              notificationList.push({
+                id: `appointment-${contact.id}`,
+                type: 'appointment',
+                title: 'Appointment Scheduled',
+                message: `${contact.name} scheduled a consultation`,
+                timestamp: new Date(contact.scheduled_appointment_at),
+                timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
+                data: contact,
+                read: false
+              });
+            }
+
+            // Legacy auto-reminder handling (only if no notifications table data exists)
+            if (notificationData?.length === 0 && contact.last_auto_reminder_sent) {
+              notificationList.push({
+                id: `reminder-${contact.id}-${contact.auto_reminder_count || 1}`,
+                type: 'reminder_sent',
+                title: 'Auto-Reminder Sent',
+                message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
+                timestamp: new Date(contact.last_auto_reminder_sent),
+                timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
+                data: contact,
+                read: false
+              });
+            }
           });
+        }
 
-          // Questionnaire completion
-          if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
-            notificationList.push({
-              id: `questionnaire-${contact.id}`,
-              type: 'questionnaire',
-              title: 'Questionnaire Completed',
-              message: `${contact.name} completed their questionnaire`,
-              timestamp: new Date(contact.questionnaire_completed_at),
-              timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
-              data: contact,
-              read: false
-            });
-          }
+        // Remove duplicates and sort by timestamp (newest first)
+        const uniqueNotifications = notificationList.filter((notification, index, self) =>
+          index === self.findIndex(n => n.id === notification.id)
+        );
 
-          // Appointment scheduled
-          if (contact.scheduled_appointment_at) {
-            notificationList.push({
-              id: `appointment-${contact.id}`,
-              type: 'appointment',
-              title: 'Appointment Scheduled',
-              message: `${contact.name} scheduled a consultation`,
-              timestamp: new Date(contact.scheduled_appointment_at),
-              timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
-              data: contact,
-              read: false
-            });
-          }
+        uniqueNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
-          // Auto-reminder sent
-          if (contact.last_auto_reminder_sent) {
-            notificationList.push({
-              id: `reminder-${contact.id}-${contact.auto_reminder_count || 1}`,
-              type: 'reminder',
-              title: 'Auto-Reminder Sent',
-              message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
-              timestamp: new Date(contact.last_auto_reminder_sent),
-              timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
-              data: contact,
-              read: false
-            });
-          }
-        });
+        setNotifications(uniqueNotifications);
+        setUnreadCount(uniqueNotifications.filter(n => !n.read).length);
 
-        // Sort by timestamp (newest first)
-        notificationList.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-        setNotifications(notificationList);
-        setUnreadCount(notificationList.length);
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -177,8 +207,8 @@ const DashboardPage = () => {
 
     if (user) {
       fetchNotifications();
-      // Refresh notifications every 5 minutes
-      const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
+      // Refresh notifications every 2 minutes to catch auto-reminders faster
+      const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
       return () => clearInterval(interval);
     }
   }, [user, supabase]);
@@ -205,17 +235,46 @@ const DashboardPage = () => {
       case 'contact': return <Users className="w-4 h-4 text-blue-500" />;
       case 'questionnaire': return <CheckSquare className="w-4 h-4 text-green-500" />;
       case 'appointment': return <Calendar className="w-4 h-4 text-purple-500" />;
-      case 'reminder': return <Mail className="w-4 h-4 text-orange-500" />;
+      case 'reminder_sent': return <Mail className="w-4 h-4 text-orange-500" />;
+      case 'reminder': return <Mail className="w-4 h-4 text-orange-500" />; // Legacy support
       default: return <Bell className="w-4 h-4 text-gray-500" />;
     }
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    // Mark all notifications as read in database
+    try {
+      const notificationIds = notifications
+        .filter(n => !n.read && typeof n.id === 'string' && !n.id.includes('-'))
+        .map(n => n.id);
+
+      if (notificationIds.length > 0) {
+        await supabase
+          .from('notifications')
+          .update({ read: true })
+          .in('id', notificationIds);
+      }
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+
     setUnreadCount(0);
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
-  const markNotificationAsRead = (notificationId: string) => {
+  const markNotificationAsRead = async (notificationId: string) => {
+    // Mark specific notification as read in database
+    try {
+      if (typeof notificationId === 'string' && !notificationId.includes('-')) {
+        await supabase
+          .from('notifications')
+          .update({ read: true })
+          .eq('id', notificationId);
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+
     setNotifications(prev => prev.map(n =>
       n.id === notificationId ? { ...n, read: true } : n
     ));
@@ -233,6 +292,8 @@ const DashboardPage = () => {
       setActiveView('Leads');
     } else if (notification.type === 'appointment') {
       setActiveView('Appointments');
+    } else if (notification.type === 'reminder_sent' || notification.type === 'reminder') {
+      setActiveView('Leads'); // View the leads to see reminder status
     }
 
     // Close notification dropdown
