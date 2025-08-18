@@ -14,19 +14,19 @@ import type { Lead } from '@/types/lead';
 const getStatusClasses = (status: string) => {
   switch (status) {
     case "New":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 ";
     case "Contacted":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 ";
     case "Reminder Sent":
-      return "bg-orange-100 text-orange-800";
+      return "bg-orange-100";
     case "Consultation Scheduled":
-      return "bg-purple-100 text-purple-800";
+      return "bg-purple-100 ";
     case "Converted":
-      return "bg-tst-green text-green-800";
+      return "bg-tst-green";
     case "Not a Fit":
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100";
   }
 };
 
@@ -55,7 +55,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   const [isUnarchiving, setIsUnarchiving] = useState(false);
 
   const statusOptions = ["New", "Contacted", "Reminder Sent", "Consultation Scheduled", "Converted", "Not a Fit"];
-
+console.log(lead, 'lead in modal');
   // Auto-update status based on questionnaire completion and appointment scheduling
   useEffect(() => {
     if (lead.questionnaire_completed) {
@@ -204,13 +204,32 @@ const getReminderHistory = () => {
             throw new Error(result.error || 'Failed to send reminder');
         }
 
+        // 🔥 CREATE NOTIFICATION FOR MANUAL REMINDER
+        try {
+            await fetch('/api/dashboard/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'reminder_sent',
+                    title: 'Manual Reminder Sent',
+                    message: `Manual reminder sent to ${lead.name}`,
+                    contact_id: lead.id,
+                    contact_name: lead.name,
+                    contact_email: lead.email,
+                    reminder_number: 1 // Manual reminders are always "1" since we track separately
+                })
+            });
+        } catch (notificationError) {
+            console.error('Failed to create notification:', notificationError);
+            // Don't fail the whole process if notification creation fails
+        }
+
         toast.success('Questionnaire reminder sent successfully!', { id: toastId });
 
         // Update the lead status and add a note about the reminder
-        // Fix the manual reminder to use local time consistently
-          const now = new Date();
-          const currentDate = now.toISOString();
-          const reminderNote = `Manual questionnaire reminder sent on ${format(now, "PPp")}`;
+        const now = new Date();
+        const currentDate = now.toISOString();
+        const reminderNote = `Manual questionnaire reminder sent on ${format(now, "PPp")}`;
 
         const updatedData = {
             status: 'Reminder Sent',
@@ -517,8 +536,8 @@ const getReminderHistory = () => {
                     <div className="flex items-center justify-between">
                       <span className="font-medium">Qualified Lead:</span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        lead.qualified_lead === true ? 'bg-tst-green text-green-800' :
-                        lead.qualified_lead === false ? 'bg-red-100 text-red-800' :
+                        lead.qualified_lead === true ? 'bg-tst-green' :
+                        lead.qualified_lead === false ? 'bg-red-100' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {lead.qualified_lead === true ? 'Yes' : lead.qualified_lead === false ? 'No' : 'Unknown'}
@@ -531,9 +550,10 @@ const getReminderHistory = () => {
                         <span className="font-medium">In Georgia:</span>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        lead.located_in_georgia ? 'bg-tst-green text-green-800' : 'bg-gray-100 text-gray-800'
+                        lead.located_in_georgia ? 'bg-tst-green' : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {lead.located_in_georgia ? lead.located_in_georgia : 'Unknown'}
+                       {lead.located_in_georgia === true ? 'Yes' : lead.located_in_georgia === false ? 'No' : 'Unknown'}
+
                       </span>
                     </div>
 
@@ -555,7 +575,8 @@ const getReminderHistory = () => {
                         <span className="font-medium">Budget:</span>
                       </div>
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-tst-teal text-black">
-                        {lead.budget_works || 'N/A'}
+                          {lead.budget_works === true ? 'Yes' : lead.budget_works === false ? 'No' : 'N/A'}
+
                       </span>
                     </div>
                     </div>
