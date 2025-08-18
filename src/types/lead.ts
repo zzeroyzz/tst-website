@@ -24,4 +24,6 @@ export interface Lead {
   last_appointment_update?: string;
   appointment_cancel_token?: string;
   archived?: boolean;
+  last_auto_reminder_sent: string | null;
+  auto_reminder_count: number;
 }

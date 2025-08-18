@@ -91,87 +91,94 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
   // Parse reminder history from notes
-  const getReminderHistory = () => {
-    const reminders = [];
+const getReminderHistory = () => {
+  // Define the type for reminder objects
+  interface Reminder {
+    type: 'Manual' | 'Auto';
+    date: Date;
+    note: string;
+  }
 
-    // Manual reminders (from questionnaire_reminder_sent_at)
-    if (lead.questionnaire_reminder_sent_at) {
-      reminders.push({
-        type: 'Manual',
-        date: new Date(lead.questionnaire_reminder_sent_at),
-        note: `Manual questionnaire reminder sent`
-      });
-    }
+  const reminders: Reminder[] = [];
 
-    // Auto reminders (from last_auto_reminder_sent and auto_reminder_count)
-    if (lead.last_auto_reminder_sent && lead.auto_reminder_count) {
-      reminders.push({
-        type: 'Auto',
-        date: new Date(lead.last_auto_reminder_sent),
-        note: `Auto reminder #${lead.auto_reminder_count} sent`
-      });
-    }
+  // Manual reminders (from questionnaire_reminder_sent_at)
+  if (lead.questionnaire_reminder_sent_at) {
+    reminders.push({
+      type: 'Manual',
+      date: new Date(lead.questionnaire_reminder_sent_at),
+      note: `Manual questionnaire reminder sent`
+    });
+  }
 
-    // Parse additional reminders from notes text
-    if (notes) {
-      const noteLines = notes.split('\n');
-      noteLines.forEach(line => {
-        // Look for manual reminder patterns
-        if (line.includes('Questionnaire reminder sent on')) {
-          const match = line.match(/Questionnaire reminder sent on (.+)/);
-          if (match) {
-            try {
-              const date = new Date(match[1]);
-              if (!isNaN(date.getTime())) {
-                reminders.push({
-                  type: 'Manual',
-                  date: date,
-                  note: line.trim()
-                });
-              }
-            } catch (e) {
-              // Skip invalid dates
+  // Auto reminders (from last_auto_reminder_sent and auto_reminder_count)
+  if (lead.last_auto_reminder_sent && lead.auto_reminder_count) {
+    reminders.push({
+      type: 'Auto',
+      date: new Date(lead.last_auto_reminder_sent),
+      note: `Auto reminder #${lead.auto_reminder_count} sent`
+    });
+  }
+
+  // Parse additional reminders from notes text
+  if (notes) {
+    const noteLines = notes.split('\n');
+    noteLines.forEach(line => {
+      // Look for manual reminder patterns
+      if (line.includes('Questionnaire reminder sent on')) {
+        const match = line.match(/Questionnaire reminder sent on (.+)/);
+        if (match) {
+          try {
+            const date = new Date(match[1]);
+            if (!isNaN(date.getTime())) {
+              reminders.push({
+                type: 'Manual',
+                date: date,
+                note: line.trim()
+              });
             }
+          } catch (e) {
+            // Skip invalid dates
           }
         }
+      }
 
-        // Look for auto reminder patterns
-        if (line.includes('Questionnaire reminder #') && line.includes('sent on')) {
-          const match = line.match(/Questionnaire reminder #(\d+) sent on (.+)/);
-          if (match) {
-            try {
-              const date = new Date(match[2]);
-              if (!isNaN(date.getTime())) {
-                reminders.push({
-                  type: 'Auto',
-                  date: date,
-                  note: line.trim()
-                });
-              }
-            } catch (e) {
-              // Skip invalid dates
+      // Look for auto reminder patterns
+      if (line.includes('Questionnaire reminder #') && line.includes('sent on')) {
+        const match = line.match(/Questionnaire reminder #(\d+) sent on (.+)/);
+        if (match) {
+          try {
+            const date = new Date(match[2]);
+            if (!isNaN(date.getTime())) {
+              reminders.push({
+                type: 'Auto',
+                date: date,
+                note: line.trim()
+              });
             }
+          } catch (e) {
+            // Skip invalid dates
           }
         }
-      });
-    }
+      }
+    });
+  }
 
-    // Remove duplicates and sort by date (newest first)
-    const uniqueReminders = reminders.filter((reminder, index, self) =>
-      index === self.findIndex(r => r.date.getTime() === reminder.date.getTime() && r.type === reminder.type)
-    );
+  // Remove duplicates and sort by date (newest first)
+  const uniqueReminders = reminders.filter((reminder, index, self) =>
+    index === self.findIndex(r => r.date.getTime() === reminder.date.getTime() && r.type === reminder.type)
+  );
 
-    return uniqueReminders.sort((a, b) => b.date.getTime() - a.date.getTime());
-  };
+  return uniqueReminders.sort((a, b) => b.date.getTime() - a.date.getTime());
+};
 
   const handleSave = async () => {
     setIsSaving(true);
     const updatedData = {
-        status,
-        notes,
-        reminder_at: reminderDate ? new Date(reminderDate).toISOString() : "",
-       reminder_message: reminderNote ? reminderNote : "",
-    };
+    status,
+    notes,
+    reminder_at: reminderDate ? new Date(reminderDate).toISOString() : null,
+    reminder_message: reminderNote || null,
+};
     const success = await onUpdate(lead.id, updatedData);
     setIsSaving(false);
     if (success) {
@@ -524,9 +531,9 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         <span className="font-medium">In Georgia:</span>
                       </div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        lead.located_in_georgia ? 'bg-tst-green text-green-800' : 'bg-red-100 text-red-800'
+                        lead.located_in_georgia ? 'bg-tst-green text-green-800' : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {lead.located_in_georgia ? 'Yes' : 'No'}
+                        {lead.located_in_georgia ? lead.located_in_georgia : 'Unknown'}
                       </span>
                     </div>
 
