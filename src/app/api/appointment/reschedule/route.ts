@@ -199,6 +199,26 @@ Google Meet Link: ${process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb
       sendEmailViaZapier(adminEmailData)
     ]);
 
+   try {
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        type: 'appointment',
+        title: 'Appointment Rescheduled',
+        message: `${contact.name} rescheduled their consultation to ${format(newAppointmentEastern, 'MMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}`,
+        contact_id: contact.id,
+        contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
+        contact_email: contact.email,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+    if (notificationError) {
+      console.error('Failed to create notification:', notificationError);
+    }
+  } catch (notificationError) {
+    console.error('Failed to create notification:', notificationError);
+}
     return NextResponse.json({
       message: 'Appointment rescheduled successfully',
       contact: data[0],

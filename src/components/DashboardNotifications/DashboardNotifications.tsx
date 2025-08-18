@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/components/DashboardNotifications/DashboardNotifications.tsx
 "use client";
 
@@ -17,30 +18,23 @@ import styles from "./DashboardNotifications.module.css";
 interface DashboardNotificationsProps {
   user: any;
   onNotificationClick: (notification: any) => void;
-  // Shared state props
-  notifications: any[];
-  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
-  unreadCount: number;
-  setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
-  localReadNotifications: Set<string>;
-  setLocalReadNotifications: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
   user,
-  onNotificationClick,
-  // Destructure shared state
-  notifications,
-  setNotifications,
-  unreadCount,
-  setUnreadCount,
-  localReadNotifications,
-  setLocalReadNotifications
+  onNotificationClick
 }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollIntervalRef = useRef<number>(10000); // Start with 10 seconds
+  const noActivityCountRef = useRef<number>(0);
   const supabase = createClientComponentClient();
 
   // Detect mobile screen size
@@ -52,6 +46,171 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Fetch notifications from API
+  const fetchNotifications = async (showNewNotificationAlert = false) => {
+    try {
+      const response = await fetch('/api/dashboard/notifications?limit=50');
+      const data = await response.json();
+
+      if (response.ok) {
+        const newNotifications = data.notifications || [];
+        const newUnreadCount = data.unreadCount || 0;
+
+        // Check for new notifications since last fetch
+        if (showNewNotificationAlert && lastFetchTime && notifications.length > 0) {
+          const newNotificationsSinceLastFetch = newNotifications.filter((notification: any) => {
+            const notificationTime = new Date(notification.created_at);
+            return notificationTime > lastFetchTime && !notification.read;
+          });
+
+          // Reset activity counter if new notifications found
+          if (newNotificationsSinceLastFetch.length > 0) {
+            noActivityCountRef.current = 0;
+          }
+
+          // Show browser notification for new notifications
+          if (newNotificationsSinceLastFetch.length > 0 && Notification.permission === 'granted') {
+            newNotificationsSinceLastFetch.forEach((notification: any) => {
+              new Notification(notification.title, {
+                body: notification.message,
+                icon: '/favicon.ico',
+                tag: `notification-${notification.id}`,
+                silent: false
+              });
+            });
+          }
+
+          // Show visual indicator for new notifications
+          if (newNotificationsSinceLastFetch.length > 0) {
+            console.log(`🔔 ${newNotificationsSinceLastFetch.length} new notification(s) received`);
+          }
+        }
+
+        setNotifications(newNotifications);
+        setUnreadCount(newUnreadCount);
+        setLastFetchTime(new Date());
+
+        if (isLoading) {
+          setIsLoading(false);
+        }
+
+        return true; // Indicate successful fetch
+      } else {
+        console.error('Error fetching notifications:', data.error);
+        setIsLoading(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  // Adaptive polling function
+  const adaptivePolling = async () => {
+    const success = await fetchNotifications(true);
+
+    if (success) {
+      // If no new notifications for a while, slow down polling
+      noActivityCountRef.current++;
+
+      const maxInterval = 60000; // Max 1 minute
+      if (noActivityCountRef.current > 6 && pollIntervalRef.current < maxInterval) {
+        pollIntervalRef.current = Math.min(pollIntervalRef.current * 1.5, maxInterval);
+        console.log(`📡 Slowing down polling to ${pollIntervalRef.current/1000}s`);
+
+        // Restart interval with new timing
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = setInterval(adaptivePolling, pollIntervalRef.current);
+        }
+      }
+    }
+  };
+
+  // Speed up polling when user is active
+  const handleUserActivity = () => {
+    if (pollIntervalRef.current > 10000) {
+      pollIntervalRef.current = 10000;
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = setInterval(adaptivePolling, pollIntervalRef.current);
+      }
+      console.log('🏃 User active - speeding up polling');
+    }
+    noActivityCountRef.current = 0; // Reset activity counter
+  };
+
+  // Set up polling for new notifications
+  useEffect(() => {
+    // Initial fetch
+    fetchNotifications(false);
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Start adaptive polling
+    pollingIntervalRef.current = setInterval(adaptivePolling, pollIntervalRef.current);
+
+    // Listen for user activity to speed up polling
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    activityEvents.forEach(event => {
+      document.addEventListener(event, handleUserActivity, { passive: true });
+    });
+
+    // Fast polling when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchNotifications(true);
+        handleUserActivity(); // Reset to fast polling
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      activityEvents.forEach(event => {
+        document.removeEventListener(event, handleUserActivity);
+      });
+    };
+  }, []);
+
+  // Update timeAgo every minute for existing notifications
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNotifications(prev => prev.map(notification => {
+        const createdAt = new Date(notification.created_at);
+        const now = new Date();
+        const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+
+        let timeAgo;
+        if (diffInMinutes < 1) timeAgo = 'Just now';
+        else if (diffInMinutes < 60) timeAgo = `${diffInMinutes}m ago`;
+        else {
+          const diffInHours = Math.floor(diffInMinutes / 60);
+          if (diffInHours < 24) timeAgo = `${diffInHours}h ago`;
+          else {
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays < 7) timeAgo = `${diffInDays}d ago`;
+            else timeAgo = createdAt.toLocaleDateString();
+          }
+        }
+
+        return { ...notification, timeAgo };
+      }));
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
   }, []);
 
   // Click outside to close dropdown
@@ -88,21 +247,13 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
     };
   }, [isNotificationOpen]);
 
-  // Helper function to get time ago
-  const getTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-
-    return date.toLocaleDateString();
+  // Refresh notifications when dropdown is opened
+  const handleNotificationToggle = () => {
+    if (!isNotificationOpen) {
+      fetchNotifications(false); // Refresh when opening
+      handleUserActivity(); // Speed up polling
+    }
+    setIsNotificationOpen(!isNotificationOpen);
   };
 
   const getNotificationIcon = (type: string) => {
@@ -117,56 +268,47 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
   };
 
   const markAllAsRead = async () => {
-    // Mark all notifications as read locally
-    const allNotificationIds = notifications.map(n => n.id);
-    const updatedReadNotifications = new Set([...localReadNotifications, ...allNotificationIds]);
-    setLocalReadNotifications(updatedReadNotifications);
-
-    // Also mark in database for actual notifications table entries
     try {
-      const databaseNotificationIds = notifications
-        .filter(n => typeof n.id === 'string' && !n.id.includes('-'))
-        .map(n => n.id);
+      const response = await fetch('/api/dashboard/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAllAsRead: true })
+      });
 
-      if (databaseNotificationIds.length > 0) {
-        await supabase
-          .from('notifications')
-          .update({ read: true })
-          .in('id', databaseNotificationIds);
+      if (response.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        setUnreadCount(0);
+      } else {
+        console.error('Error marking all notifications as read');
       }
     } catch (error) {
-      console.error('Error marking notifications as read in database:', error);
+      console.error('Error marking all notifications as read:', error);
     }
-
-    setUnreadCount(0);
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
   const markNotificationAsRead = async (notificationId: string) => {
-    // Mark notification as read locally
-    const updatedReadNotifications = new Set([...localReadNotifications, notificationId]);
-    setLocalReadNotifications(updatedReadNotifications);
-
-    // Also mark in database if it's a database notification
     try {
-      if (typeof notificationId === 'string' && !notificationId.includes('-')) {
-        await supabase
-          .from('notifications')
-          .update({ read: true })
-          .eq('id', notificationId);
+      const response = await fetch('/api/dashboard/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationIds: [notificationId] })
+      });
+
+      if (response.ok) {
+        setNotifications(prev => prev.map(n =>
+          n.id === notificationId ? { ...n, read: true } : n
+        ));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      } else {
+        console.error('Error marking notification as read');
       }
     } catch (error) {
-      console.error('Error marking notification as read in database:', error);
+      console.error('Error marking notification as read:', error);
     }
-
-    setNotifications(prev => prev.map(n =>
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
-    setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const handleNotificationClick = (notification: any) => {
-    // Mark this notification as read
+    // Mark this notification as read if it's unread
     if (!notification.read) {
       markNotificationAsRead(notification.id);
     }
@@ -186,13 +328,13 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
     <div className="relative">
       <button
         ref={buttonRef}
-        onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+        onClick={handleNotificationToggle}
         className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
         aria-label="Notifications"
       >
         <Bell className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'}`} />
         {unreadCount > 0 && (
-          <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium ${
+          <span className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium transition-all duration-200 ${
             isMobile ? 'h-5 w-5' : 'h-4 w-4'
           }`}>
             {unreadCount > 99 ? '99+' : unreadCount > 9 ? '9+' : unreadCount}
@@ -204,7 +346,10 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
       {isNotificationOpen && (
         <div ref={dropdownRef} className={dropdownStyles}>
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <h3 className="font-semibold text-gray-900">
+              Notifications
+
+            </h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
@@ -215,7 +360,12 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
             )}
           </div>
 
-          {notifications.length === 0 ? (
+          {isLoading ? (
+            <div className="p-4 text-center text-gray-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+              <p className="mt-2">Loading notifications...</p>
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
               <p>No recent notifications</p>
@@ -225,7 +375,7 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
                     !notification.read ? 'bg-blue-50' : ''
                   }`}
                   onClick={() => handleNotificationClick(notification)}
@@ -246,7 +396,7 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
                       </p>
                     </div>
                     {!notification.read && (
-                      <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2"></div>
+                      <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2 animate-pulse"></div>
                     )}
                   </div>
                 </div>

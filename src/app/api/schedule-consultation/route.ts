@@ -245,14 +245,14 @@ Google Meet Link: ${googleMeetLink}
       // Include calendar event fields for admin only
       eventTitle: `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
       eventDescription: `
-Therapy session with ${contacts.name} ${contacts.last_name || ''}
-Email: ${contacts.email}
-Phone: ${contacts.phone || 'Not provided'}
-${questionnaireData ? `
-Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
-Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
-Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
-` : ''}
+        Therapy session with ${contacts.name} ${contacts.last_name || ''}
+        Email: ${contacts.email}
+        Phone: ${contacts.phone || 'Not provided'}
+        ${questionnaireData ? `
+        Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
+        Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
+        Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
+        ` : ''}
 
 Google Meet Link: ${googleMeetLink}
       `.trim(),
@@ -268,6 +268,31 @@ Google Meet Link: ${googleMeetLink}
       sendEmailViaZapier(clientEmailData),
       sendEmailViaZapier(adminEmailData)
     ]);
+
+    try {
+      const contactName = name || `${contacts?.name} ${contacts?.last_name || ''}`.trim();
+      const contactEmail = email || contacts?.email;
+      const finalContactId = contactId || contacts?.id;
+
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'appointment',
+          title: 'Appointment Scheduled',
+          message: `${contactName} scheduled a consultation for ${format(appointmentDateEastern, 'MMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}`,
+          contact_id: finalContactId,
+          contact_name: contactName,
+          contact_email: contactEmail,
+          read: false,
+          created_at: new Date().toISOString()
+        });
+
+      if (notificationError) {
+        console.error('Failed to create notification:', notificationError);
+      }
+  } catch (notificationError) {
+    console.error('Failed to create notification:', notificationError);
+  }
 
     // Optional: Send to additional webhook for other integrations
     try {

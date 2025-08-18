@@ -121,7 +121,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Reminder email sent successfully');
+    try {
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'reminder_sent',
+          title: 'Manual Reminder Sent',
+          message: `Manual reminder sent to ${contact.name}`,
+          contact_id: contact.id,
+          contact_name: contact.name,
+          contact_email: contact.email,
+          reminder_number: 1, // Manual reminders are always "1"
+          read: false,
+          created_at: new Date().toISOString()
+        });
+
+      if (notificationError) {
+        console.error('Failed to create manual reminder notification:', notificationError);
+      }
+    } catch (notificationError) {
+      console.error('Failed to create manual reminder notification:', notificationError);
+  }
 
     return NextResponse.json({
       success: true,
