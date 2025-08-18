@@ -37,9 +37,6 @@ const DashboardPage = () => {
   const [activeView, setActiveView] = useState("Dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  // Shared notification state
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [localReadNotifications, setLocalReadNotifications] = useState<Set<string>>(new Set());
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -89,158 +86,143 @@ const DashboardPage = () => {
     }
   }, [localReadNotifications]);
 
-  // Helper function to get time ago
-  const getTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-
-    return date.toLocaleDateString();
-  };
-
   // Fetch notifications - moved from DashboardNotifications component
+  // useEffect(() => {
+  //   const fetchNotifications = async () => {
+  //     try {
+  //       // Get recent notifications from the notifications table
+  //       const sevenDaysAgo = new Date();
+  //       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  //       // Fetch from notifications table if it exists
+  //       const { data: notificationData, error: notificationError } = await supabase
+  //         .from('notifications')
+  //         .select('*')
+  //         .gte('created_at', sevenDaysAgo.toISOString())
+  //         .order('created_at', { ascending: false })
+  //         .limit(50);
+
+  //       let notificationList: any[] = [];
+
+  //       // If notifications table exists and has data, use it
+  //       if (!notificationError && notificationData && notificationData.length > 0) {
+  //         notificationList = notificationData.map(notification => ({
+  //           id: notification.id,
+  //           type: notification.type,
+  //           title: notification.title,
+  //           message: notification.message,
+  //           timestamp: new Date(notification.created_at),
+  //           timeAgo: getTimeAgo(new Date(notification.created_at)),
+  //           data: {
+  //             contact_id: notification.contact_id,
+  //             contact_name: notification.contact_name,
+  //             contact_email: notification.contact_email,
+  //             reminder_number: notification.reminder_number
+  //           },
+  //           read: notification.read || localReadNotifications.has(notification.id)
+  //         }));
+  //       }
+
+  //       // Also get recent contact submissions for backward compatibility
+  //       const { data: contacts, error: contactsError } = await supabase
+  //         .from('contacts')
+  //         .select('*')
+  //         .eq('archived', false)
+  //         .gte('created_at', sevenDaysAgo.toISOString())
+  //         .order('created_at', { ascending: false })
+  //         .limit(50);
+
+  //       if (!contactsError && contacts) {
+  //         // Process contacts for various notification types
+  //         contacts.forEach(contact => {
+  //           const createdAt = new Date(contact.created_at);
+  //           const timeAgo = getTimeAgo(createdAt);
+
+  //           // Contact form submission
+  //           const contactNotificationId = `contact-${contact.id}`;
+  //           notificationList.push({
+  //             id: contactNotificationId,
+  //             type: 'contact',
+  //             title: 'New Contact Submission',
+  //             message: `${contact.name} submitted the contact form`,
+  //             timestamp: createdAt,
+  //             timeAgo,
+  //             data: contact,
+  //             read: localReadNotifications.has(contactNotificationId)
+  //           });
+
+  //           // Questionnaire completion
+  //           if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
+  //             const questionnaireNotificationId = `questionnaire-${contact.id}`;
+  //             notificationList.push({
+  //               id: questionnaireNotificationId,
+  //               type: 'questionnaire',
+  //               title: 'Questionnaire Completed',
+  //               message: `${contact.name} completed their questionnaire`,
+  //               timestamp: new Date(contact.questionnaire_completed_at),
+  //               timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
+  //               data: contact,
+  //               read: localReadNotifications.has(questionnaireNotificationId)
+  //             });
+  //           }
+
+  //           // Appointment scheduled
+  //           if (contact.scheduled_appointment_at) {
+  //             const appointmentNotificationId = `appointment-${contact.id}`;
+  //             notificationList.push({
+  //               id: appointmentNotificationId,
+  //               type: 'appointment',
+  //               title: 'Appointment Scheduled',
+  //               message: `${contact.name} scheduled a consultation`,
+  //               timestamp: new Date(contact.scheduled_appointment_at),
+  //               timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
+  //               data: contact,
+  //               read: localReadNotifications.has(appointmentNotificationId)
+  //             });
+  //           }
+
+  //           // Legacy auto-reminder handling (only if no notifications table data exists)
+  //           if (notificationData?.length === 0 && contact.last_auto_reminder_sent) {
+  //             const reminderNotificationId = `reminder-${contact.id}-${contact.auto_reminder_count || 1}`;
+  //             notificationList.push({
+  //               id: reminderNotificationId,
+  //               type: 'reminder_sent',
+  //               title: 'Auto-Reminder Sent',
+  //               message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
+  //               timestamp: new Date(contact.last_auto_reminder_sent),
+  //               timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
+  //               data: contact,
+  //               read: localReadNotifications.has(reminderNotificationId)
+  //             });
+  //           }
+  //         });
+  //       }
+
+  //       // Remove duplicates and sort by timestamp (newest first)
+  //       const uniqueNotifications = notificationList.filter((notification, index, self) =>
+  //         index === self.findIndex(n => n.id === notification.id)
+  //       );
+
+  //       uniqueNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  //       setNotifications(uniqueNotifications);
+  //       setUnreadCount(uniqueNotifications.filter(n => !n.read).length);
+
+  //     } catch (error) {
+  //       console.error('Error fetching notifications:', error);
+  //     }
+  //   };
+
+  //   if (user) {
+  //     fetchNotifications();
+  //     // Refresh notifications every 2 minutes to catch auto-reminders faster
+  //     const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [user, supabase, localReadNotifications]);
+
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        // Get recent notifications from the notifications table
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        // Fetch from notifications table if it exists
-        const { data: notificationData, error: notificationError } = await supabase
-          .from('notifications')
-          .select('*')
-          .gte('created_at', sevenDaysAgo.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        let notificationList: any[] = [];
-
-        // If notifications table exists and has data, use it
-        if (!notificationError && notificationData && notificationData.length > 0) {
-          notificationList = notificationData.map(notification => ({
-            id: notification.id,
-            type: notification.type,
-            title: notification.title,
-            message: notification.message,
-            timestamp: new Date(notification.created_at),
-            timeAgo: getTimeAgo(new Date(notification.created_at)),
-            data: {
-              contact_id: notification.contact_id,
-              contact_name: notification.contact_name,
-              contact_email: notification.contact_email,
-              reminder_number: notification.reminder_number
-            },
-            read: notification.read || localReadNotifications.has(notification.id)
-          }));
-        }
-
-        // Also get recent contact submissions for backward compatibility
-        const { data: contacts, error: contactsError } = await supabase
-          .from('contacts')
-          .select('*')
-          .eq('archived', false)
-          .gte('created_at', sevenDaysAgo.toISOString())
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (!contactsError && contacts) {
-          // Process contacts for various notification types
-          contacts.forEach(contact => {
-            const createdAt = new Date(contact.created_at);
-            const timeAgo = getTimeAgo(createdAt);
-
-            // Contact form submission
-            const contactNotificationId = `contact-${contact.id}`;
-            notificationList.push({
-              id: contactNotificationId,
-              type: 'contact',
-              title: 'New Contact Submission',
-              message: `${contact.name} submitted the contact form`,
-              timestamp: createdAt,
-              timeAgo,
-              data: contact,
-              read: localReadNotifications.has(contactNotificationId)
-            });
-
-            // Questionnaire completion
-            if (contact.questionnaire_completed && contact.questionnaire_completed_at) {
-              const questionnaireNotificationId = `questionnaire-${contact.id}`;
-              notificationList.push({
-                id: questionnaireNotificationId,
-                type: 'questionnaire',
-                title: 'Questionnaire Completed',
-                message: `${contact.name} completed their questionnaire`,
-                timestamp: new Date(contact.questionnaire_completed_at),
-                timeAgo: getTimeAgo(new Date(contact.questionnaire_completed_at)),
-                data: contact,
-                read: localReadNotifications.has(questionnaireNotificationId)
-              });
-            }
-
-            // Appointment scheduled
-            if (contact.scheduled_appointment_at) {
-              const appointmentNotificationId = `appointment-${contact.id}`;
-              notificationList.push({
-                id: appointmentNotificationId,
-                type: 'appointment',
-                title: 'Appointment Scheduled',
-                message: `${contact.name} scheduled a consultation`,
-                timestamp: new Date(contact.scheduled_appointment_at),
-                timeAgo: getTimeAgo(new Date(contact.scheduled_appointment_at)),
-                data: contact,
-                read: localReadNotifications.has(appointmentNotificationId)
-              });
-            }
-
-            // Legacy auto-reminder handling (only if no notifications table data exists)
-            if (notificationData?.length === 0 && contact.last_auto_reminder_sent) {
-              const reminderNotificationId = `reminder-${contact.id}-${contact.auto_reminder_count || 1}`;
-              notificationList.push({
-                id: reminderNotificationId,
-                type: 'reminder_sent',
-                title: 'Auto-Reminder Sent',
-                message: `Reminder #${contact.auto_reminder_count || 1} sent to ${contact.name}`,
-                timestamp: new Date(contact.last_auto_reminder_sent),
-                timeAgo: getTimeAgo(new Date(contact.last_auto_reminder_sent)),
-                data: contact,
-                read: localReadNotifications.has(reminderNotificationId)
-              });
-            }
-          });
-        }
-
-        // Remove duplicates and sort by timestamp (newest first)
-        const uniqueNotifications = notificationList.filter((notification, index, self) =>
-          index === self.findIndex(n => n.id === notification.id)
-        );
-
-        uniqueNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-        setNotifications(uniqueNotifications);
-        setUnreadCount(uniqueNotifications.filter(n => !n.read).length);
-
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      }
-    };
-
-    if (user) {
-      fetchNotifications();
-      // Refresh notifications every 2 minutes to catch auto-reminders faster
-      const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
-      return () => clearInterval(interval);
-    }
-  }, [user, supabase, localReadNotifications]);
-  useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -318,13 +300,7 @@ const DashboardPage = () => {
           <DashboardNotifications
             user={user}
             onNotificationClick={handleNotificationClick}
-            // Pass shared state as props
-            notifications={notifications}
-            setNotifications={setNotifications}
-            unreadCount={unreadCount}
-            setUnreadCount={setUnreadCount}
-            localReadNotifications={localReadNotifications}
-            setLocalReadNotifications={setLocalReadNotifications}
+
           />
         )}
       </div>
@@ -437,13 +413,6 @@ const DashboardPage = () => {
             <DashboardNotifications
               user={user}
               onNotificationClick={handleNotificationClick}
-              // Pass shared state as props
-              notifications={notifications}
-              setNotifications={setNotifications}
-              unreadCount={unreadCount}
-              setUnreadCount={setUnreadCount}
-              localReadNotifications={localReadNotifications}
-              setLocalReadNotifications={setLocalReadNotifications}
             />
           </div>
 
