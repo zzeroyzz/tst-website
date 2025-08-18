@@ -95,6 +95,28 @@ export async function POST(request: NextRequest) {
     // Send cancellation confirmation email to client
     await sendCancellationEmail(contact);
 
+    try {
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'appointment',
+          title: 'Appointment Cancelled',
+          message: `${contact.name}'s consultation was cancelled by admin`,
+          contact_id: contact.id,
+          contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
+          contact_email: contact.email,
+          read: false,
+          created_at: new Date().toISOString()
+        });
+
+      if (notificationError) {
+        console.error('Failed to create notification:', notificationError);
+      }
+    } catch (notificationError) {
+      console.error('Failed to create notification:', notificationError);
+  }
+
+
     // Notify admin about cancellation
     if (process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
       // Parse the UTC date and convert to Eastern for admin email too
