@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "./dashboard.module.css";
 import { DashboardSkeleton } from "@/components/skeleton";
 import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
 import LeadsView from "@/components/Leads/LeadsView";

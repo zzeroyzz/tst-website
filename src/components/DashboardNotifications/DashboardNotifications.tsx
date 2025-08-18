@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/DashboardNotifications/DashboardNotifications.tsx
 "use client";
@@ -11,7 +12,6 @@ import {
   Mail,
   Bell,
 } from "lucide-react";
-import { Notification } from "@/types/notification";
 import styles from "./DashboardNotifications.module.css";
 
 interface DashboardNotificationsProps {
