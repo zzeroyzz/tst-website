@@ -4,7 +4,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Send, Archive, ArchiveRestore, User, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle, MapPin, DollarSign, CreditCard, Users } from 'lucide-react';
+import { X, Send, Archive, ArchiveRestore, User, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle, MapPin, DollarSign, CreditCard, Users, Bell } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import Button from '@/components/Button/Button';
 import toast from 'react-hot-toast';
@@ -90,6 +90,80 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     }
   };
 
+  // Parse reminder history from notes
+  const getReminderHistory = () => {
+    const reminders = [];
+
+    // Manual reminders (from questionnaire_reminder_sent_at)
+    if (lead.questionnaire_reminder_sent_at) {
+      reminders.push({
+        type: 'Manual',
+        date: new Date(lead.questionnaire_reminder_sent_at),
+        note: `Manual questionnaire reminder sent`
+      });
+    }
+
+    // Auto reminders (from last_auto_reminder_sent and auto_reminder_count)
+    if (lead.last_auto_reminder_sent && lead.auto_reminder_count) {
+      reminders.push({
+        type: 'Auto',
+        date: new Date(lead.last_auto_reminder_sent),
+        note: `Auto reminder #${lead.auto_reminder_count} sent`
+      });
+    }
+
+    // Parse additional reminders from notes text
+    if (notes) {
+      const noteLines = notes.split('\n');
+      noteLines.forEach(line => {
+        // Look for manual reminder patterns
+        if (line.includes('Questionnaire reminder sent on')) {
+          const match = line.match(/Questionnaire reminder sent on (.+)/);
+          if (match) {
+            try {
+              const date = new Date(match[1]);
+              if (!isNaN(date.getTime())) {
+                reminders.push({
+                  type: 'Manual',
+                  date: date,
+                  note: line.trim()
+                });
+              }
+            } catch (e) {
+              // Skip invalid dates
+            }
+          }
+        }
+
+        // Look for auto reminder patterns
+        if (line.includes('Questionnaire reminder #') && line.includes('sent on')) {
+          const match = line.match(/Questionnaire reminder #(\d+) sent on (.+)/);
+          if (match) {
+            try {
+              const date = new Date(match[2]);
+              if (!isNaN(date.getTime())) {
+                reminders.push({
+                  type: 'Auto',
+                  date: date,
+                  note: line.trim()
+                });
+              }
+            } catch (e) {
+              // Skip invalid dates
+            }
+          }
+        }
+      });
+    }
+
+    // Remove duplicates and sort by date (newest first)
+    const uniqueReminders = reminders.filter((reminder, index, self) =>
+      index === self.findIndex(r => r.date.getTime() === reminder.date.getTime() && r.type === reminder.type)
+    );
+
+    return uniqueReminders.sort((a, b) => b.date.getTime() - a.date.getTime());
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     const updatedData = {
@@ -126,8 +200,10 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         toast.success('Questionnaire reminder sent successfully!', { id: toastId });
 
         // Update the lead status and add a note about the reminder
-        const currentDate = new Date().toISOString();
-        const reminderNote = `Questionnaire reminder sent on ${format(new Date(), "PPp")}`;
+        // Fix the manual reminder to use local time consistently
+          const now = new Date();
+          const currentDate = now.toISOString();
+          const reminderNote = `Manual questionnaire reminder sent on ${format(now, "PPp")}`;
 
         const updatedData = {
             status: 'Reminder Sent',
@@ -193,6 +269,8 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
       setIsUnarchiving(false);
     }
   };
+
+  const reminderHistory = getReminderHistory();
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50 p-4">
@@ -270,13 +348,49 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   )}
                 </div>
 
+                {/* Reminder History */}
+                {reminderHistory.length > 0 && (
+                  <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                    <h3 className="font-bold text-sm mb-2 text-orange-800 flex items-center gap-2">
+                      <Bell size={16} />
+                      Reminder History ({reminderHistory.length})
+                    </h3>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {reminderHistory.map((reminder, index) => (
+                        <div key={index} className="flex items-start gap-2 text-xs">
+                          <span className={`px-2 py-1 rounded-full font-medium flex-shrink-0 ${
+                            reminder.type === 'Auto'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {reminder.type}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-gray-600 break-words">{reminder.note}</p>
+                            <p className="text-gray-400 text-xs">
+                              {format(reminder.date, "PPp")}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Notes */}
                 <div>
-                  <label className="font-bold block mb-2 text-sm">Notes</label>
+                  <label className="font-bold block mb-2 text-sm">
+                    Notes
+                    {notes && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({notes.split('\n').filter(line => line.trim()).length} lines)
+                      </span>
+                    )}
+                  </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    rows={4}
+                    rows={6}
                     className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple resize-none text-sm"
                     placeholder="Add notes about your interactions with this lead..."
                     disabled={lead.archived}
@@ -284,6 +398,11 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   {lead.archived && (
                     <p className="text-xs text-gray-500 mt-1">
                       Notes cannot be edited for archived leads
+                    </p>
+                  )}
+                  {notes && !lead.archived && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Notes include manual entries and auto-reminder history
                     </p>
                   )}
                 </div>
@@ -369,7 +488,13 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                           </button>
                           {lead.questionnaire_reminder_sent_at && (
                             <p className="text-xs text-gray-500">
-                              Reminder sent: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
+                              Last manual reminder: {format(new Date(lead.questionnaire_reminder_sent_at), "PPp")}
+                            </p>
+                          )}
+                          {lead.last_auto_reminder_sent && (
+                            <p className="text-xs text-gray-500">
+                              Last auto reminder: {format(new Date(lead.last_auto_reminder_sent), "PPp")}
+                              {lead.auto_reminder_count && ` (${lead.auto_reminder_count})`}
                             </p>
                           )}
                         </div>
@@ -497,7 +622,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   className="flex items-center justify-center gap-2 px-3 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
                 >
                   <Send size={14} />
-                  {isSending ? 'Sending...' : 'Send Reminder'}
+                  {isSending ? 'Sending...' : 'Send Manual Reminder'}
                 </Button>
               )}
 
