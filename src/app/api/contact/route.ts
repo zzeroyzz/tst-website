@@ -18,7 +18,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 1. Check if contact already exists
     const { data: existingContact, error: checkError } = await supabase
       .from('contacts')
       .select('id, email, name')
@@ -29,24 +28,21 @@ export async function POST(request: Request) {
       return NextResponse.json({
         error: 'An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.',
         contactExists: true
-      }, { status: 409 }); // 409 Conflict status code
+      }, { status: 409 });
     }
 
-    // If checkError is not "no rows returned", then it's a real error
     if (checkError && checkError.code !== 'PGRST116') {
       console.error('Database check error:', checkError);
       throw new Error('Failed to check existing contacts');
     }
 
-    // Generate secure token for questionnaire
     const questionnaireToken = randomUUID();
 
-    // 2. Save new contact to database
     const { data: newContact, error: dbError } = await supabase
       .from('contacts')
       .insert([{
         name,
-        email: email.toLowerCase(), // Normalize email to lowercase
+        email: email.toLowerCase(),
         phone,
         questionnaire_token: questionnaireToken,
         questionnaire_completed: false,
@@ -79,10 +75,28 @@ export async function POST(request: Request) {
       });
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
-      // Don't fail the entire request if email fails
     }
 
-    // 4. Return success with questionnaire token for redirect
+   try {
+  const { error: notificationError } = await supabase
+    .from('notifications')
+    .insert({
+      type: 'contact',
+      title: 'New Contact Submission',
+      message: `${name} submitted the contact form`,
+      contact_id: newContact.id,
+      contact_name: name,
+      contact_email: email.toLowerCase(),
+      read: false,
+      created_at: new Date().toISOString()
+    });
+
+  if (notificationError) {
+    console.error('Failed to create notification:', notificationError);
+  }
+} catch (notificationError) {
+  console.error('Failed to create notification:', notificationError);
+}
     return NextResponse.json({
       message: 'Contact saved successfully!',
       questionnaireToken: questionnaireToken,
