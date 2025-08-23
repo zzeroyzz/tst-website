@@ -8,7 +8,13 @@ export interface Contact {
   company?: string;
   position?: string;
   source?: string;
-  status: 'new' | 'contacted' | 'qualified' | 'scheduled' | 'converted' | 'lost';
+  status:
+    | 'new'
+    | 'contacted'
+    | 'qualified'
+    | 'scheduled'
+    | 'converted'
+    | 'lost';
   notes?: string;
   tags?: string[];
   created_at: string;
@@ -16,7 +22,12 @@ export interface Contact {
 
   // New appointment fields
   scheduled_appointment_at?: string | null;
-  appointment_status: 'none' | 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+  appointment_status:
+    | 'none'
+    | 'scheduled'
+    | 'completed'
+    | 'cancelled'
+    | 'no_show';
   appointment_notes?: string | null;
   last_appointment_update?: string;
 }
