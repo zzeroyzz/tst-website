@@ -26,6 +26,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: transform 150ms ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wrapper:hover .button {
