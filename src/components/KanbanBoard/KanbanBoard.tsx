@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/KanbanBoard.tsx
 
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from 'react';
 
 type Column = { name: string; items: any[] };
 type ColumnsMap = Record<string, Column>;
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { PlusCircle, X } from "lucide-react";
-import { KanbanBoardSkeleton } from "@/components/skeleton";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { PlusCircle, X } from 'lucide-react';
+import { KanbanBoardSkeleton } from '@/components/skeleton';
 
 // --- Task Detail Modal Component ---
 const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
   const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description || "");
+  const [description, setDescription] = useState(task.description || '');
 
   useEffect(() => {
     setTitle(task.title);
-    setDescription(task.description || "");
+    setDescription(task.description || '');
   }, [task]);
 
   const handleSave = () => {
@@ -32,8 +32,11 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
       <div className="bg-white rounded-lg p-6 w-full max-w-lg border-2 border-black">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Edit Task</h2>
-          <button onClick={onClose} className="p-1 text-gray-500 hover:text-red-500">
-              <X size={24} />
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-500 hover:text-red-500"
+          >
+            <X size={24} />
           </button>
         </div>
 
@@ -43,7 +46,7 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
             />
           </div>
@@ -51,7 +54,7 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
             <label className="font-bold block mb-1">Description</label>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               rows={4}
               className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
               placeholder="Add a more detailed description..."
@@ -59,18 +62,18 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
           </div>
         </div>
         <div className="flex justify-between items-center mt-6">
-            <button
-                onClick={() => onDelete(task.id)}
-                className="px-4 py-2 bg-red-500 text-white font-bold rounded-md hover:bg-red-600"
-            >
-                Delete Task
-            </button>
-            <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90"
-            >
-                Save Changes
-            </button>
+          <button
+            onClick={() => onDelete(task.id)}
+            className="px-4 py-2 bg-red-500 text-white font-bold rounded-md hover:bg-red-600"
+          >
+            Delete Task
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-tst-purple text-black font-bold rounded-md hover:opacity-90"
+          >
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
@@ -79,45 +82,55 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onDelete }) => {
 
 // --- Add Task Form Component ---
 const AddTaskForm = ({ columnId, onAddTask, onCancel }) => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (title.trim()) {
-            onAddTask(columnId, title, description);
-            setTitle('');
-            setDescription('');
-        }
-    };
+  const handleSubmit = e => {
+    e.preventDefault();
+    if (title.trim()) {
+      onAddTask(columnId, title, description);
+      setTitle('');
+      setDescription('');
+    }
+  };
 
-    return (
-        <form onSubmit={handleSubmit} className="p-2 space-y-2 bg-white rounded-lg border-2 border-black shadow-md mt-2">
-            <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter task title..."
-                className="w-full p-2 border-none rounded focus:outline-none"
-                autoFocus
-            />
-            <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add a description... (optional)"
-                rows={2}
-                className="w-full p-2 border-none rounded focus:outline-none text-sm"
-            />
-            <div className="flex items-center justify-end">
-                <button type="button" onClick={onCancel} className="p-1 text-gray-500 hover:text-red-500">
-                    <X size={20} />
-                </button>
-                <button type="submit" className="px-4 py-1 bg-tst-purple text-black font-bold rounded-md hover:opacity-90">
-                    Add
-                </button>
-            </div>
-        </form>
-    );
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="p-2 space-y-2 bg-white rounded-lg border-2 border-black shadow-md mt-2"
+    >
+      <input
+        type="text"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        placeholder="Enter task title..."
+        className="w-full p-2 border-none rounded focus:outline-none"
+        autoFocus
+      />
+      <textarea
+        value={description}
+        onChange={e => setDescription(e.target.value)}
+        placeholder="Add a description... (optional)"
+        rows={2}
+        className="w-full p-2 border-none rounded focus:outline-none text-sm"
+      />
+      <div className="flex items-center justify-end">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="p-1 text-gray-500 hover:text-red-500"
+        >
+          <X size={20} />
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-1 bg-tst-purple text-black font-bold rounded-md hover:opacity-90"
+        >
+          Add
+        </button>
+      </div>
+    </form>
+  );
 };
 
 // --- Main Kanban Board Component ---
@@ -128,54 +141,56 @@ const KanbanBoard = () => {
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
 
-  const processTasks = useCallback((tasks) => {
+  const processTasks = useCallback(tasks => {
     const initialColumns = {
-      "To-do": { name: "To-do", items: [] },
-      "In Progress": { name: "In Progress", items: [] },
-      "Complete": { name: "Complete", items: [] },
+      'To-do': { name: 'To-do', items: [] },
+      'In Progress': { name: 'In Progress', items: [] },
+      Complete: { name: 'Complete', items: [] },
     };
-    tasks.forEach((task) => {
+    tasks.forEach(task => {
       if (initialColumns[task.status]) {
         initialColumns[task.status].items.push(task);
       }
     });
     for (const columnId in initialColumns) {
-        initialColumns[columnId].items.sort((a, b) => a.position - b.position);
+      initialColumns[columnId].items.sort((a, b) => a.position - b.position);
     }
     setColumns(initialColumns);
     setLoading(false);
   }, []);
 
- useEffect(() => {
-  const fetchTasks = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from("tasks").select("*");
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('tasks').select('*');
 
-    if (error) {
-      console.error("Error fetching tasks:", error);
-      setLoading(false);
-    } else {
-      console.log('Processing tasks...');
-      processTasks(data);
-    }
-  };
-
-  fetchTasks();
-
-  const channel = supabase
-    .channel('realtime-tasks')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' },
-      (payload) => {
-        console.log('Realtime update received:', payload);
-        fetchTasks();
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        setLoading(false);
+      } else {
+        console.log('Processing tasks...');
+        processTasks(data);
       }
-    )
-    .subscribe();
+    };
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [supabase, processTasks]);
+    fetchTasks();
+
+    const channel = supabase
+      .channel('realtime-tasks')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tasks' },
+        payload => {
+          console.log('Realtime update received:', payload);
+          fetchTasks();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, processTasks]);
 
   const handleAddTask = async (columnId, title, description) => {
     setAddingToColumn(null);
@@ -195,25 +210,31 @@ const KanbanBoard = () => {
     };
 
     const newItems = [...column.items, newTask];
-    const newColumns = { ...columns, [columnId]: { ...column, items: newItems } };
+    const newColumns = {
+      ...columns,
+      [columnId]: { ...column, items: newItems },
+    };
     setColumns(newColumns);
 
     // Update database in the background
     await supabase
-        .from('tasks')
-        .insert({ title, description, status: columnId, position: newPosition });
+      .from('tasks')
+      .insert({ title, description, status: columnId, position: newPosition });
   };
 
   const handleUpdateTask = async (taskId, updatedData) => {
     // Optimistic UI Update
     const newColumns = { ...columns };
     for (const columnId in newColumns) {
-        const column = newColumns[columnId];
-        const taskIndex = column.items.findIndex(t => t.id === taskId);
-        if (taskIndex > -1) {
-            column.items[taskIndex] = { ...column.items[taskIndex], ...updatedData };
-            break;
-        }
+      const column = newColumns[columnId];
+      const taskIndex = column.items.findIndex(t => t.id === taskId);
+      if (taskIndex > -1) {
+        column.items[taskIndex] = {
+          ...column.items[taskIndex],
+          ...updatedData,
+        };
+        break;
+      }
     }
     setColumns(newColumns);
 
@@ -221,22 +242,24 @@ const KanbanBoard = () => {
     await supabase.from('tasks').update(updatedData).eq('id', taskId);
   };
 
-  const handleDeleteTask = async (taskId) => {
-    if (confirm("Are you sure you want to delete this task?")) {
-        // Optimistic UI Update
-        const newColumns = { ...columns };
-        for (const columnId in newColumns) {
-            newColumns[columnId].items = newColumns[columnId].items.filter(t => t.id !== taskId);
-        }
-        setColumns(newColumns);
-        setSelectedTask(null);
+  const handleDeleteTask = async taskId => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      // Optimistic UI Update
+      const newColumns = { ...columns };
+      for (const columnId in newColumns) {
+        newColumns[columnId].items = newColumns[columnId].items.filter(
+          t => t.id !== taskId
+        );
+      }
+      setColumns(newColumns);
+      setSelectedTask(null);
 
-        // Update database in the background
-        await supabase.from('tasks').delete().eq('id', taskId);
+      // Update database in the background
+      await supabase.from('tasks').delete().eq('id', taskId);
     }
   };
 
-  const onDragEnd = async (result) => {
+  const onDragEnd = async result => {
     if (!result.destination) return;
     const { source, destination, draggableId } = result;
 
@@ -248,9 +271,9 @@ const KanbanBoard = () => {
     setColumns(newColumns);
 
     await supabase
-        .from('tasks')
-        .update({ status: destination.droppableId })
-        .eq('id', draggableId);
+      .from('tasks')
+      .update({ status: destination.droppableId })
+      .eq('id', draggableId);
   };
 
   // Show skeleton while loading
@@ -270,7 +293,7 @@ const KanbanBoard = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                   className={`flex flex-col p-4 rounded-lg bg-gray-100 transition-colors ${
-                    snapshot.isDraggingOver ? "bg-tst-purple" : ""
+                    snapshot.isDraggingOver ? 'bg-tst-purple' : ''
                   }`}
                 >
                   <h3 className="font-bold mb-4 flex justify-between">
@@ -281,8 +304,12 @@ const KanbanBoard = () => {
                   </h3>
                   <div className="space-y-4 flex-grow min-h-[100px]">
                     {column.items.map((item, index) => (
-                      <Draggable key={item.id} draggableId={String(item.id)} index={index}>
-                        {(provided) => (
+                      <Draggable
+                        key={item.id}
+                        draggableId={String(item.id)}
+                        index={index}
+                      >
+                        {provided => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
@@ -293,7 +320,11 @@ const KanbanBoard = () => {
                             <div className="absolute top-0 left-0 w-full h-full bg-black rounded-lg transform translate-x-1 translate-y-1"></div>
                             <div className="relative bg-white p-4 rounded-lg border-2 border-black">
                               <h4 className="font-bold">{item.title}</h4>
-                              {item.description && <p className="text-sm mt-1 text-gray-600">{item.description}</p>}
+                              {item.description && (
+                                <p className="text-sm mt-1 text-gray-600">
+                                  {item.description}
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
@@ -302,18 +333,18 @@ const KanbanBoard = () => {
                     {provided.placeholder}
                   </div>
                   {addingToColumn === columnId ? (
-                      <AddTaskForm
-                          columnId={columnId}
-                          onAddTask={handleAddTask}
-                          onCancel={() => setAddingToColumn(null)}
-                      />
+                    <AddTaskForm
+                      columnId={columnId}
+                      onAddTask={handleAddTask}
+                      onCancel={() => setAddingToColumn(null)}
+                    />
                   ) : (
-                      <button
-                        onClick={() => setAddingToColumn(columnId)}
-                        className="mt-4 flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors w-full"
-                      >
-                          <PlusCircle className="mr-2 h-4 w-4" /> Add task
-                      </button>
+                    <button
+                      onClick={() => setAddingToColumn(columnId)}
+                      className="mt-4 flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors w-full"
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add task
+                    </button>
                   )}
                 </div>
               )}
@@ -323,10 +354,10 @@ const KanbanBoard = () => {
       </DragDropContext>
       {selectedTask && (
         <TaskDetailModal
-            task={selectedTask}
-            onClose={() => setSelectedTask(null)}
-            onUpdate={handleUpdateTask}
-            onDelete={handleDeleteTask}
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleUpdateTask}
+          onDelete={handleDeleteTask}
         />
       )}
     </div>

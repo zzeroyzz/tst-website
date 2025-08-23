@@ -7,7 +7,7 @@ import PostStats from '../PostStats';
 
 // Mock the usePostInteractions hook
 jest.mock('@/hooks/usePostInteractions', () => ({
-  usePostInteractions: jest.fn()
+  usePostInteractions: jest.fn(),
 }));
 
 // Mock react-hot-toast
@@ -16,7 +16,7 @@ jest.mock('react-hot-toast', () => ({
   default: {
     success: jest.fn(),
     error: jest.fn(),
-  }
+  },
 }));
 
 // Mock navigator.share and navigator.clipboard
@@ -25,23 +25,24 @@ const mockWriteText = jest.fn();
 
 Object.defineProperty(window, 'location', {
   value: {
-    origin: 'https://example.com'
-  }
+    origin: 'https://example.com',
+  },
 });
 
 Object.defineProperty(navigator, 'share', {
   value: mockShare,
-  configurable: true
+  configurable: true,
 });
 
 Object.defineProperty(navigator, 'clipboard', {
   value: {
-    writeText: mockWriteText
+    writeText: mockWriteText,
   },
-  configurable: true
+  configurable: true,
 });
 
-const mockUsePostInteractions = require('@/hooks/usePostInteractions').usePostInteractions as jest.Mock;
+const mockUsePostInteractions = require('@/hooks/usePostInteractions')
+  .usePostInteractions as jest.Mock;
 const mockToast = require('react-hot-toast').default;
 
 describe('PostStats', () => {
@@ -49,11 +50,11 @@ describe('PostStats', () => {
     stats: {
       view_count: 1234,
       like_count: 56,
-      liked: false
+      liked: false,
     },
     loading: false,
     liking: false,
-    toggleLike: jest.fn()
+    toggleLike: jest.fn(),
   };
 
   beforeEach(() => {
@@ -65,7 +66,7 @@ describe('PostStats', () => {
     it('should show loading skeleton when loading is true', () => {
       mockUsePostInteractions.mockReturnValue({
         ...defaultMockData,
-        loading: true
+        loading: true,
       });
 
       render(<PostStats slug="test-slug" />);
@@ -96,7 +97,9 @@ describe('PostStats', () => {
     });
 
     it('should apply custom className', () => {
-      const { container } = render(<PostStats slug="test-slug" className="custom-class" />);
+      const { container } = render(
+        <PostStats slug="test-slug" className="custom-class" />
+      );
 
       expect(container.firstChild).toHaveClass('custom-class');
     });
@@ -107,7 +110,7 @@ describe('PostStats', () => {
       const mockToggleLike = jest.fn();
       mockUsePostInteractions.mockReturnValue({
         ...defaultMockData,
-        toggleLike: mockToggleLike
+        toggleLike: mockToggleLike,
       });
 
       render(<PostStats slug="test-slug" />);
@@ -123,8 +126,8 @@ describe('PostStats', () => {
         ...defaultMockData,
         stats: {
           ...defaultMockData.stats,
-          liked: true
-        }
+          liked: true,
+        },
       });
 
       render(<PostStats slug="test-slug" />);
@@ -136,7 +139,7 @@ describe('PostStats', () => {
     it('should disable like button when liking', () => {
       mockUsePostInteractions.mockReturnValue({
         ...defaultMockData,
-        liking: true
+        liking: true,
       });
 
       render(<PostStats slug="test-slug" />);
@@ -157,13 +160,15 @@ describe('PostStats', () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(mockWriteText).toHaveBeenCalledWith('https://example.com/posts/test-slug');
+        expect(mockWriteText).toHaveBeenCalledWith(
+          'https://example.com/posts/test-slug'
+        );
         expect(mockToast.success).toHaveBeenCalledWith(
           'Link copied to clipboard!',
           expect.objectContaining({
             duration: 3000,
             position: 'top-center',
-            icon: '🔗'
+            icon: '🔗',
           })
         );
       });
@@ -183,14 +188,16 @@ describe('PostStats', () => {
           expect.objectContaining({
             duration: 4000,
             position: 'bottom-center',
-            icon: '❌'
+            icon: '❌',
           })
         );
       });
     });
 
     it('should show sharing state during share operation', async () => {
-      mockWriteText.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+      mockWriteText.mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      );
 
       render(<PostStats slug="test-slug" />);
 
@@ -215,7 +222,9 @@ describe('PostStats', () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(mockWriteText).toHaveBeenCalledWith('https://example.com/posts/test-slug');
+        expect(mockWriteText).toHaveBeenCalledWith(
+          'https://example.com/posts/test-slug'
+        );
         expect(mockToast.success).toHaveBeenCalled();
       });
 
@@ -231,7 +240,9 @@ describe('PostStats', () => {
       fireEvent.click(shareButton);
 
       await waitFor(() => {
-        expect(mockWriteText).toHaveBeenCalledWith('https://example.com/posts/test-slug');
+        expect(mockWriteText).toHaveBeenCalledWith(
+          'https://example.com/posts/test-slug'
+        );
         expect(mockToast.success).toHaveBeenCalledWith(
           'Link copied to clipboard!',
           expect.any(Object)
@@ -252,7 +263,7 @@ describe('PostStats', () => {
       const mockToggleLike = jest.fn();
       mockUsePostInteractions.mockReturnValue({
         ...defaultMockData,
-        toggleLike: mockToggleLike
+        toggleLike: mockToggleLike,
       });
 
       render(<PostStats slug="test-slug" />);

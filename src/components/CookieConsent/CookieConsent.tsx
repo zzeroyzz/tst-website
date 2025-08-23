@@ -1,5 +1,5 @@
 // src/components/CookieConsent/CookieConsent.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
@@ -24,8 +24,8 @@ const CookieConsent: React.FC = () => {
   const enableAnalytics = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'granted',
-        'ad_storage': 'granted',
+        analytics_storage: 'granted',
+        ad_storage: 'granted',
       });
     }
   };
@@ -33,8 +33,8 @@ const CookieConsent: React.FC = () => {
   const disableAnalytics = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
       });
     }
   };
@@ -76,42 +76,55 @@ const CookieConsent: React.FC = () => {
                 <div className="flex flex-col gap-3 md:gap-3">
                   {/* Header - more compact layout */}
                   <div className="flex items-start gap-2 md:gap-3">
-                    <div className="flex-shrink-0 text-sm">
-                      🍪
-                    </div>
+                    <div className="flex-shrink-0 text-sm">🍪</div>
                     <div className="flex-1 min-w-0 text-center md:text-left">
                       <h3 className="text-sm md:text-base font-bold mb-1">
                         We value your privacy
                       </h3>
                       <p className="text-xs md:text-sm text-gray-700 mb-2 leading-tight">
-                        We use cookies to enhance your experience. By clicking &quot;Accept All&quot;, you consent to our use of cookies.
-                        <span className="hidden md:inline"> We use them to serve personalized content and analyze our traffic.</span>
+                        We use cookies to enhance your experience. By clicking
+                        &quot;Accept All&quot;, you consent to our use of
+                        cookies.
+                        <span className="hidden md:inline">
+                          {' '}
+                          We use them to serve personalized content and analyze
+                          our traffic.
+                        </span>
                       </p>
 
                       {showDetails && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
+                          animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           className="border-t border-gray-200 pt-2 md:pt-3 mt-2 md:mt-3"
                         >
                           <div className="space-y-1.5 md:space-y-2">
                             <div>
-                              <h4 className="font-semibold text-xs md:text-sm">Essential Cookies</h4>
+                              <h4 className="font-semibold text-xs md:text-sm">
+                                Essential Cookies
+                              </h4>
                               <p className="text-xs text-gray-600 leading-tight">
-                                Required for basic site functionality. Always enabled.
+                                Required for basic site functionality. Always
+                                enabled.
                               </p>
                             </div>
                             <div>
-                              <h4 className="font-semibold text-xs md:text-sm">Analytics Cookies</h4>
+                              <h4 className="font-semibold text-xs md:text-sm">
+                                Analytics Cookies
+                              </h4>
                               <p className="text-xs text-gray-600 leading-tight">
-                                Help us understand how visitors interact with our website.
+                                Help us understand how visitors interact with
+                                our website.
                               </p>
                             </div>
                             <div>
-                              <h4 className="font-semibold text-xs md:text-sm">Marketing Cookies</h4>
+                              <h4 className="font-semibold text-xs md:text-sm">
+                                Marketing Cookies
+                              </h4>
                               <p className="text-xs text-gray-600 leading-tight">
-                                Used to track visitors across websites to display relevant ads.
+                                Used to track visitors across websites to
+                                display relevant ads.
                               </p>
                             </div>
                           </div>

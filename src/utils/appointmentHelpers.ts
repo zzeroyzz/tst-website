@@ -13,10 +13,10 @@ export const formatAppointmentDate = (dateString: string): string => {
   }
 
   if (isThisWeek(date)) {
-    return format(date, 'EEEE \'at\' h:mm a');
+    return format(date, "EEEE 'at' h:mm a");
   }
 
-  return format(date, 'MMM d \'at\' h:mm a');
+  return format(date, "MMM d 'at' h:mm a");
 };
 
 export const getAppointmentStatus = (
@@ -41,7 +41,9 @@ export const getAppointmentStatus = (
   return 'upcoming';
 };
 
-export const getAppointmentStatusColor = (status: ReturnType<typeof getAppointmentStatus>): string => {
+export const getAppointmentStatusColor = (
+  status: ReturnType<typeof getAppointmentStatus>
+): string => {
   switch (status) {
     case 'upcoming':
       return 'bg-blue-100 text-blue-800';

@@ -6,7 +6,10 @@ interface SkeletonBreadcrumbProps {
   className?: string;
 }
 
-export const SkeletonBreadcrumb = ({ items = 3, className = "" }: SkeletonBreadcrumbProps) => {
+export const SkeletonBreadcrumb = ({
+  items = 3,
+  className = '',
+}: SkeletonBreadcrumbProps) => {
   return (
     <nav className={`mb-8 ${className}`}>
       <div className="flex items-center gap-3">

@@ -19,7 +19,7 @@ interface ResourceCardProps {
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
-  const tagColors = ["bg-tst-purple", "bg-tst-teal", "bg-tst-yellow"];
+  const tagColors = ['bg-tst-purple', 'bg-tst-teal', 'bg-tst-yellow'];
 
   // Type configuration - only blog and newsletter
   const getTypeConfig = (type: string) => {
@@ -27,12 +27,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
       case 'blog':
         return {
           icon: BookOpen,
-          color: 'text-tst-purple'
+          color: 'text-tst-purple',
         };
       case 'newsletter':
         return {
           icon: Mail,
-          color: 'text-tst-green'
+          color: 'text-tst-green',
         };
       default:
         return null; // No icon for unknown types
@@ -48,7 +48,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
       <div className={styles.card}>
         {/* Fixed image container with type badge overlay */}
         <div className="p-3 relative">
-          <div className="relative w-full max-w-[200px] mx-auto border-2 border-black rounded-lg overflow-hidden" style={{ aspectRatio: '3/2' }}>
+          <div
+            className="relative w-full max-w-[200px] mx-auto border-2 border-black rounded-lg overflow-hidden"
+            style={{ aspectRatio: '3/2' }}
+          >
             <Image
               src={card.imageUrl}
               alt={card.title}
@@ -56,8 +59,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 200px"
             />
-
-
           </div>
         </div>
 
@@ -81,7 +82,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ card }) => {
             </div>
           )}
 
-           <div className="flex items-center gap-3 justify-between">
+          <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-black bg-tst-yellow">
                 <Image

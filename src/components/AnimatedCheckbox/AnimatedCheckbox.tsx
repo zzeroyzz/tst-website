@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import clsx from "clsx";
-import styles from "./AnimatedCheckbox.module.css";
+import React, { useState } from 'react';
+import clsx from 'clsx';
+import styles from './AnimatedCheckbox.module.css';
 
 interface AnimatedCheckboxProps {
   id: string;
@@ -13,7 +13,10 @@ const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ id, label }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <label htmlFor={id} className="flex items-center gap-4 cursor-pointer group">
+    <label
+      htmlFor={id}
+      className="flex items-center gap-4 cursor-pointer group"
+    >
       <input
         id={id}
         type="checkbox"
@@ -27,9 +30,9 @@ const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ id, label }) => {
         <div
           className={clsx(
             styles.checkbox,
-            "w-6 h-6 flex items-center justify-center",
-            "bg-tst-cream",
-            isChecked && "bg-tst-purple"
+            'w-6 h-6 flex items-center justify-center',
+            'bg-tst-cream',
+            isChecked && 'bg-tst-purple'
           )}
         >
           {isChecked && (

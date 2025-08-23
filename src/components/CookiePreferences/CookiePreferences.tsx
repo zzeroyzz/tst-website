@@ -1,5 +1,5 @@
 //src/components/CookiePreferences/CookiePreferences.tsx
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
@@ -11,7 +11,10 @@ interface CookiePreferencesProps {
   onClose: () => void;
 }
 
-const CookiePreferences: React.FC<CookiePreferencesProps> = ({ isOpen, onClose }) => {
+const CookiePreferences: React.FC<CookiePreferencesProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const [preferences, setPreferences] = useState({
     essential: true, // Always enabled
     analytics: Cookies.get('cookieConsent') === 'accepted',
@@ -19,14 +22,15 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({ isOpen, onClose }
   });
 
   const handleSave = () => {
-    const consentValue = preferences.analytics || preferences.marketing ? 'accepted' : 'rejected';
+    const consentValue =
+      preferences.analytics || preferences.marketing ? 'accepted' : 'rejected';
     Cookies.set('cookieConsent', consentValue, { expires: 365 });
 
     // Update Google Analytics consent
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': preferences.analytics ? 'granted' : 'denied',
-        'ad_storage': preferences.marketing ? 'granted' : 'denied',
+        analytics_storage: preferences.analytics ? 'granted' : 'denied',
+        ad_storage: preferences.marketing ? 'granted' : 'denied',
       });
     }
 
@@ -66,7 +70,8 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({ isOpen, onClose }
                 </div>
               </div>
               <p className="text-sm text-gray-600 text-left">
-                These cookies are necessary for the website to function <br/>and cannot be disabled.
+                These cookies are necessary for the website to function <br />
+                and cannot be disabled.
               </p>
             </div>
 
@@ -77,12 +82,21 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({ isOpen, onClose }
                   <input
                     type="checkbox"
                     checked={preferences.analytics}
-                    onChange={(e) => setPreferences(prev => ({ ...prev, analytics: e.target.checked }))}
+                    onChange={e =>
+                      setPreferences(prev => ({
+                        ...prev,
+                        analytics: e.target.checked,
+                      }))
+                    }
                     className="sr-only"
                   />
-                  <div className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
-                    preferences.analytics ? 'bg-tst-purple justify-end' : 'bg-gray-300 justify-start'
-                  }`}>
+                  <div
+                    className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
+                      preferences.analytics
+                        ? 'bg-tst-purple justify-end'
+                        : 'bg-gray-300 justify-start'
+                    }`}
+                  >
                     <div className="w-4 h-4 bg-white rounded-full transition-transform"></div>
                   </div>
                 </label>
@@ -99,12 +113,21 @@ const CookiePreferences: React.FC<CookiePreferencesProps> = ({ isOpen, onClose }
                   <input
                     type="checkbox"
                     checked={preferences.marketing}
-                    onChange={(e) => setPreferences(prev => ({ ...prev, marketing: e.target.checked }))}
+                    onChange={e =>
+                      setPreferences(prev => ({
+                        ...prev,
+                        marketing: e.target.checked,
+                      }))
+                    }
                     className="sr-only"
                   />
-                  <div className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
-                    preferences.marketing ? 'bg-tst-purple justify-end' : 'bg-gray-300 justify-start'
-                  }`}>
+                  <div
+                    className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors ${
+                      preferences.marketing
+                        ? 'bg-tst-purple justify-end'
+                        : 'bg-gray-300 justify-start'
+                    }`}
+                  >
                     <div className="w-4 h-4 bg-white rounded-full transition-transform"></div>
                   </div>
                 </label>

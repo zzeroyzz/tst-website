@@ -5,9 +5,7 @@ interface LeadsViewSkeletonProps {
   rowCount?: number;
 }
 
-export const LeadsViewSkeleton = ({
-  rowCount = 5
-}: LeadsViewSkeletonProps) => {
+export const LeadsViewSkeleton = ({ rowCount = 5 }: LeadsViewSkeletonProps) => {
   return (
     <div>
       {/* Header */}
@@ -72,4 +70,3 @@ export const LeadsViewSkeleton = ({
     </div>
   );
 };
-

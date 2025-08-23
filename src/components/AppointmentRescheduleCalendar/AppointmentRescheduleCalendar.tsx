@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -31,19 +31,22 @@ interface AppointmentRescheduleCalendarProps {
   contactName: string;
   contactEmail: string;
   currentAppointmentDate: Date; // UTC
-  onReschedule: (contactId: string | number, newDateTime: Date) => Promise<void>;
+  onReschedule: (
+    contactId: string | number,
+    newDateTime: Date
+  ) => Promise<void>;
 }
 
 interface TimeSlot {
-  time: string;     // label in Eastern (e.g., "9:15 AM")
+  time: string; // label in Eastern (e.g., "9:15 AM")
   available: boolean;
-  dateTime: Date;   // UTC to send to server
+  dateTime: Date; // UTC to send to server
   isCurrent: boolean; // marks the user's current appointment slot
 }
 
 interface BookedSlot {
   startTime: string; // ISO UTC
-  endTime: string;   // ISO UTC
+  endTime: string; // ISO UTC
   contactId?: string | number;
 }
 
@@ -51,7 +54,10 @@ const EASTERN_TIMEZONE = 'America/New_York';
 const APPOINTMENT_DURATION = 15; // minutes
 
 // API: fetch all booked appointments within the month window
-const fetchBookedAppointments = async (startDate: Date, endDate: Date): Promise<BookedSlot[]> => {
+const fetchBookedAppointments = async (
+  startDate: Date,
+  endDate: Date
+): Promise<BookedSlot[]> => {
   try {
     const res = await fetch('/api/appointment/booked-slots', {
       method: 'POST',
@@ -90,7 +96,9 @@ const AVAILABILITY: Record<number, Array<{ start: string; end: string }>> = {
   0: [],
 };
 
-const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps> = ({
+const AppointmentRescheduleCalendar: React.FC<
+  AppointmentRescheduleCalendarProps
+> = ({
   isOpen,
   onClose,
   contactId,
@@ -100,7 +108,10 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
   onReschedule,
 }) => {
   // Convert current appointment to Eastern for header display
-  const currentAppointmentEastern = toZonedTime(new Date(currentAppointmentDate), EASTERN_TIMEZONE);
+  const currentAppointmentEastern = toZonedTime(
+    new Date(currentAppointmentDate),
+    EASTERN_TIMEZONE
+  );
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -135,13 +146,17 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
   // Is *this* UTC slot already booked by someone else?
   // We only block the exact start time (±60s tolerance) to avoid wiping out the whole window.
   const isSlotBooked = (slotStartUTC: Date): boolean => {
-    return bookedSlots.some((b) => {
+    return bookedSlots.some(b => {
       const bookedStart = new Date(b.startTime);
 
       // Allow the client's own current appointment to be selectable
       if (b.contactId && String(b.contactId) === String(contactId)) {
         // If this booked slot is theirs and matches their current appointment start, don't block it
-        if (Math.abs(bookedStart.getTime() - new Date(currentAppointmentDate).getTime()) < 60_000) {
+        if (
+          Math.abs(
+            bookedStart.getTime() - new Date(currentAppointmentDate).getTime()
+          ) < 60_000
+        ) {
           return false;
         }
       }
@@ -167,7 +182,11 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
       const [sh, sm] = start.split(':').map(Number);
       const [eh, em] = end.split(':').map(Number);
 
-      const startOfDayEastern = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const startOfDayEastern = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
 
       let currentSlotEastern = new Date(startOfDayEastern);
       currentSlotEastern.setHours(sh, sm, 0, 0);
@@ -177,14 +196,21 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
 
       while (currentSlotEastern < endTimeEastern) {
         // Eastern label for UI
-        const label = formatTz(currentSlotEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE });
+        const label = formatTz(currentSlotEastern, 'h:mm a', {
+          timeZone: EASTERN_TIMEZONE,
+        });
 
         // Convert the Eastern wall time to UTC for storage/compare
-        const slotStartUTC = fromZonedTime(currentSlotEastern, EASTERN_TIMEZONE);
+        const slotStartUTC = fromZonedTime(
+          currentSlotEastern,
+          EASTERN_TIMEZONE
+        );
 
         // Is this the user's current appointment?
         const isCurrent =
-          Math.abs(slotStartUTC.getTime() - new Date(currentAppointmentDate).getTime()) < 60_000;
+          Math.abs(
+            slotStartUTC.getTime() - new Date(currentAppointmentDate).getTime()
+          ) < 60_000;
 
         // Availability rules:
         // 1) must be ≥ 4 hours from now (compare in Eastern)
@@ -202,7 +228,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
         });
 
         // next 15-min increment
-        currentSlotEastern = new Date(currentSlotEastern.getTime() + APPOINTMENT_DURATION * 60 * 1000);
+        currentSlotEastern = new Date(
+          currentSlotEastern.getTime() + APPOINTMENT_DURATION * 60 * 1000
+        );
       }
     });
 
@@ -257,7 +285,7 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
       toast.error('Please select a date and time');
       return;
     }
-    const selected = timeSlots.find((s) => s.time === selectedTime);
+    const selected = timeSlots.find(s => s.time === selectedTime);
     if (!selected) {
       toast.error('Invalid time slot selected');
       return;
@@ -292,7 +320,10 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={handleClose} />
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        onClick={handleClose}
+      />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -301,9 +332,12 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
           <div className="p-6 border-b-2 border-black bg-tst-yellow">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-bold mb-1">Reschedule Appointment</h2>
+                <h2 className="text-xl font-bold mb-1">
+                  Reschedule Appointment
+                </h2>
                 <p className="text-sm">
-                  <span className="font-medium">{contactName}</span> • {contactEmail}
+                  <span className="font-medium">{contactName}</span> •{' '}
+                  {contactEmail}
                 </p>
                 <p className="text-sm mt-1">
                   <span className="font-medium">Current:</span>{' '}
@@ -335,7 +369,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                 >
                   <ChevronLeft size={20} />
                 </button>
-                <h3 className="text-lg font-bold">{format(currentDate, 'MMMM yyyy')}</h3>
+                <h3 className="text-lg font-bold">
+                  {format(currentDate, 'MMMM yyyy')}
+                </h3>
                 <button
                   onClick={() => setCurrentDate(addMonths(currentDate, 1))}
                   className="p-2 rounded-md border-2 border-black bg-white hover:bg-gray-100 transition-colors"
@@ -345,12 +381,12 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
               </div>
 
               <div className="grid grid-cols-7 gap-1 text-center">
-                {weekdays.map((d) => (
+                {weekdays.map(d => (
                   <div key={d} className="font-bold text-sm text-gray-500 py-2">
                     {d}
                   </div>
                 ))}
-                {days.map((day) => {
+                {days.map(day => {
                   const selectable = isDateSelectable(day);
                   const selected = selectedDate && isSameDay(day, selectedDate);
                   const isCurrent = isSameDay(day, currentAppointmentEastern);
@@ -384,10 +420,10 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                   <div className="w-4 h-4 bg-tst-yellow border border-black rounded" />
                   <span>Today</span>
                 </div>
-                  <div className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-tst-green border border-black rounded"></div>
-                <span>Available</span>
-              </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-4 bg-tst-green border border-black rounded"></div>
+                  <span>Available</span>
+                </div>
                 <div className="flex items-center gap-1">
                   <div className="w-4 h-4 bg-red-100 border border-red-400 rounded" />
                   <span>Current Appt</span>
@@ -405,15 +441,18 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                 <h4 className="font-bold mb-3 flex items-center gap-2">
                   <Clock size={18} />
                   <span>
-                    Available times for {format(selectedDate, 'EEEE, MMM d')} (Eastern Time)
+                    Available times for {format(selectedDate, 'EEEE, MMM d')}{' '}
+                    (Eastern Time)
                   </span>
                 </h4>
 
                 {timeSlots.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No available time slots for this date</p>
+                  <p className="text-gray-500 text-center py-4">
+                    No available time slots for this date
+                  </p>
                 ) : (
                   <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 max-h-48 overflow-y-auto">
-                    {timeSlots.map((slot) => {
+                    {timeSlots.map(slot => {
                       const isSelected = selectedTime === slot.time;
 
                       // Base styles
@@ -421,11 +460,14 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                         'p-3 rounded-lg border-2 font-medium text-sm transition-all duration-200';
 
                       if (isSelected) {
-                        cls += ' bg-tst-green border-black text-black shadow-md';
+                        cls +=
+                          ' bg-tst-green border-black text-black shadow-md';
                       } else if (!slot.available) {
-                        cls += ' border-black bg-white opacity-50 cursor-not-allowed line-through';
+                        cls +=
+                          ' border-black bg-white opacity-50 cursor-not-allowed line-through';
                       } else {
-                        cls += ' border-black bg-white hover:bg-gray-50 cursor-pointer hover:shadow-md';
+                        cls +=
+                          ' border-black bg-white hover:bg-gray-50 cursor-pointer hover:shadow-md';
                       }
 
                       // Apply "current appointment" visual (red outline + light fill)
@@ -442,7 +484,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                           onClick={() => handleTimeSelect(slot.time)}
                           disabled={!slot.available}
                           className={cls}
-                          title={slot.isCurrent ? 'Current appointment' : undefined}
+                          title={
+                            slot.isCurrent ? 'Current appointment' : undefined
+                          }
                         >
                           {slot.time}
                         </button>
@@ -459,7 +503,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
             {selectedDate && selectedTime ? (
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-center sm:text-left">
-                  <p className="text-sm text-gray-600">New appointment time (Eastern):</p>
+                  <p className="text-sm text-gray-600">
+                    New appointment time (Eastern):
+                  </p>
                   <p className="font-bold">
                     {format(selectedDate, 'EEEE, MMMM d')} at {selectedTime}
                   </p>
@@ -475,7 +521,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
                   <Button
                     onClick={handleConfirmReschedule}
                     disabled={confirming}
-                    className={confirming ? 'bg-gray-300 cursor-wait' : 'bg-tst-green'}
+                    className={
+                      confirming ? 'bg-gray-300 cursor-wait' : 'bg-tst-green'
+                    }
                   >
                     {confirming ? 'Rescheduling...' : 'Confirm Reschedule'}
                   </Button>
@@ -483,7 +531,9 @@ const AppointmentRescheduleCalendar: React.FC<AppointmentRescheduleCalendarProps
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-gray-600 mb-4">Select a new date and time for the appointment</p>
+                <p className="text-gray-600 mb-4">
+                  Select a new date and time for the appointment
+                </p>
                 <Button
                   onClick={handleClose}
                   disabled={confirming}

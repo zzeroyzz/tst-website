@@ -1,10 +1,10 @@
-import React from "react";
-import Link from "next/link";
-import Section from "@/components/Section/Section";
-import Image from "next/image";
-import styles from "./LeadMagnet.module.css";
-import clsx from "clsx";
-import { guides } from "@/data/leadData";
+import React from 'react';
+import Link from 'next/link';
+import Section from '@/components/Section/Section';
+import Image from 'next/image';
+import styles from './LeadMagnet.module.css';
+import clsx from 'clsx';
+import { guides } from '@/data/leadData';
 
 interface Guide {
   questions: string[];
@@ -32,7 +32,9 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
       <div className="mb-4 flex-grow">
         <div className="mb-4">
           {guide.questions.map((question, index) => (
-            <p key={index} className="text-lg font-bold mb-1 text-center">{question}</p>
+            <p key={index} className="text-lg font-bold mb-1 text-center">
+              {question}
+            </p>
           ))}
         </div>
 
@@ -40,7 +42,7 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
 
         <ul className="space-y-2">
           {guide.benefits.map((benefit, index) => (
-            <li key={index} className="flex items-start">
+            <li key={index} className="flex justify-center md:items-start md:justify-start">
               <span className="text-md mr-2">•</span>
               <span className="text-md">{benefit}</span>
             </li>
@@ -48,14 +50,14 @@ const LeadMagnetCard: React.FC<LeadMagnetProps> = ({ guide }) => (
         </ul>
       </div>
 
-      <div className="flex justify-between items-end flex-shrink-0">
+      <div className="flex justify-between ml-8 items-end flex-shrink-0 md:ml-0">
         <div className="flex-1">
-          <h4 className="font-bold mb-2 text-left text-sm">Tags</h4>
-          <div className="flex flex-wrap gap-2">
-            {guide.tags.map((tag) => (
+          <h4 className="font-bold mb-2 text-center md:text-left text-sm">Tags</h4>
+          <div className="flex flex-wrap gap-2 ml-px justify-center md:justify-start">
+            {guide.tags.map(tag => (
               <div
                 key={tag}
-                className="bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist"
+                className=" bg-tst-cream text-sm font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist"
               >
                 {tag}
               </div>
@@ -95,11 +97,9 @@ const LeadMagnet = () => {
   return (
     <Section>
       <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-5xl font-extrabold mb-12">
-          Grab Your Free Guides
-        </h2>
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-12">Grab Your Free Guides</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {guides.map((guide) => (
+          {guides.map(guide => (
             <LeadMagnetCard key={guide.id} guide={guide} />
           ))}
         </div>

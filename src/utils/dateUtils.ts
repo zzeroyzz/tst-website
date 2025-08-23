@@ -12,14 +12,18 @@ export function toUtcIsoForSave(input: string | Date): string {
   if (input instanceof Date) {
     // If it's a Date from your UI picker, treat it as EASTERN wall time
     // by formatting to a bare local ISO (no Z), then convert once:
-    const localIso = [
-      input.getFullYear().toString().padStart(4, '0'),
-      (input.getMonth() + 1).toString().padStart(2, '0'),
-      input.getDate().toString().padStart(2, '0'),
-    ].join('-') + 'T' +
-    [input.getHours().toString().padStart(2, '0'),
-     input.getMinutes().toString().padStart(2, '0'),
-     input.getSeconds().toString().padStart(2, '0')].join(':');
+    const localIso =
+      [
+        input.getFullYear().toString().padStart(4, '0'),
+        (input.getMonth() + 1).toString().padStart(2, '0'),
+        input.getDate().toString().padStart(2, '0'),
+      ].join('-') +
+      'T' +
+      [
+        input.getHours().toString().padStart(2, '0'),
+        input.getMinutes().toString().padStart(2, '0'),
+        input.getSeconds().toString().padStart(2, '0'),
+      ].join(':');
 
     // Parse the local ISO string as Eastern time and convert to UTC
     const easternDate = new Date(localIso + ' ' + EASTERN);

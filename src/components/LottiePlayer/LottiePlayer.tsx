@@ -24,7 +24,7 @@ export function LottiePlayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-   const isDecorative = alt === "";
+  const isDecorative = alt === '';
 
   useEffect(() => {
     let isMounted = true;
@@ -53,7 +53,7 @@ export function LottiePlayer({
         player.style.height = `${height}px`;
 
         // Add error handling
-        player.addEventListener('error', (e) => {
+        player.addEventListener('error', e => {
           console.error('DotLottie player error:', e);
           console.error('File path:', `/animations/${file}`);
         });
@@ -65,7 +65,10 @@ export function LottiePlayer({
         });
 
         // Remove old player if it exists
-        if (playerRef.current && playerRef.current.parentNode === containerRef.current) {
+        if (
+          playerRef.current &&
+          playerRef.current.parentNode === containerRef.current
+        ) {
           containerRef.current.removeChild(playerRef.current);
         }
 
@@ -99,7 +102,7 @@ export function LottiePlayer({
       className="flex items-center justify-center"
       role="img"
       aria-label={!isDecorative ? alt : undefined}
-      aria-hidden={isDecorative ? "true" : undefined}
+      aria-hidden={isDecorative ? 'true' : undefined}
     >
       {!isLoaded && (
         <div

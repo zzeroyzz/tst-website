@@ -11,7 +11,7 @@ export const usePostInteractions = (slug: string) => {
   const [stats, setStats] = useState<PostStats>({
     view_count: 0,
     like_count: 0,
-    liked: false
+    liked: false,
   });
   const [loading, setLoading] = useState(true);
   const [liking, setLiking] = useState(false);
@@ -58,7 +58,7 @@ export const usePostInteractions = (slug: string) => {
         setStats(prev => ({
           ...prev,
           like_count: data.like_count,
-          liked: data.liked
+          liked: data.liked,
         }));
       }
     } catch (error) {
@@ -72,6 +72,6 @@ export const usePostInteractions = (slug: string) => {
     stats,
     loading,
     liking,
-    toggleLike
+    toggleLike,
   };
 };

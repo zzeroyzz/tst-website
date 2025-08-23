@@ -1,9 +1,8 @@
-import React from "react";
-import Image from "next/image";
+import React from 'react';
+import Image from 'next/image';
 
 const ProfileImage = () => {
   return (
-
     <div className="max-w-xl mx-auto">
       <Image
         src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png"

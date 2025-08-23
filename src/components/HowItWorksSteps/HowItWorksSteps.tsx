@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React from "react";
-import { motion, useInView } from "framer-motion";
-import Image from "next/image";
-import styles from "./HowItWorksSteps.module.css";
-import clsx from "clsx";
+import React from 'react';
+import { motion, useInView } from 'framer-motion';
+import Image from 'next/image';
+import styles from './HowItWorksSteps.module.css';
+import clsx from 'clsx';
 
 interface HowItWorksStepsProps {
   step: {
     number: string;
     title: string;
-    description: string[];  // Updated to array type
+    description: string[]; // Updated to array type
     imageUrl: string;
     imageAlt: string;
     isLastStep: boolean;
@@ -46,12 +46,9 @@ const HowItWorksSteps: React.FC<HowItWorksStepsProps> = ({
 
         {/* Updated to handle array of descriptions */}
         <ul className="space-y-2">
-          {step.description.map((item, index) => (
-            <li key={index} className="text-md opacity-90 flex items-start">
-              <span className="text-tst-purple mr-3 mt-1 flex-shrink-0">▸</span>
-              <span className="leading-relaxed">{item}</span>
-            </li>
-          ))}
+
+              <span className="leading-relaxed">{step.description}</span>
+
         </ul>
       </div>
     </div>
@@ -72,10 +69,10 @@ const HowItWorksSteps: React.FC<HowItWorksStepsProps> = ({
           height={300}
           sizes="(max-width: 768px) 300px, 350px"
           style={{
-            objectFit: "contain",
-            width: "100%",
-            height: "auto",
-            maxHeight: "300px"
+            objectFit: 'contain',
+            width: '100%',
+            height: 'auto',
+            maxHeight: '300px',
           }}
           priority={index === 0}
         />

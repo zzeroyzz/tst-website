@@ -1,53 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/LeadsView.tsx
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { format, differenceInDays } from "date-fns";
-import { Plus, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle } from "lucide-react";
-import toast from "react-hot-toast";
-import { LeadsViewSkeleton } from "@/components/skeleton";
-import Button from "@/components/Button/Button";
-import LeadDetailModal from "@/components/LeadDetailModal/LeadDetailModal";
+import React, { useEffect, useState, useCallback } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { format, differenceInDays } from 'date-fns';
+import {
+  Plus,
+  Mail,
+  Phone,
+  Calendar,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
+import { LeadsViewSkeleton } from '@/components/skeleton';
+import Button from '@/components/Button/Button';
+import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
 import type { Lead } from '@/types/lead';
-
 
 const getStatusClasses = (status: string) => {
   switch (status) {
-    case "New":
-      return "bg-tst-tel text-blue-800";
-    case "Contacted":
-      return "bg-tst-yellow text-yellow-800";
-    case "Reminder Sent":
-      return "bg-orange-100 text-orange-800";
-    case "Consultation Scheduled":
-      return "bg-tst-purple text-purple-800";
-    case "Converted":
-      return "bg-tst-green text-green-800";
-    case "Not a Fit":
-      return "bg-gray-100 text-gray-800";
+    case 'New':
+      return 'bg-tst-tel text-blue-800';
+    case 'Contacted':
+      return 'bg-tst-yellow text-yellow-800';
+    case 'Reminder Sent':
+      return 'bg-orange-100 text-orange-800';
+    case 'Consultation Scheduled':
+      return 'bg-tst-purple text-purple-800';
+    case 'Converted':
+      return 'bg-tst-green text-green-800';
+    case 'Not a Fit':
+      return 'bg-gray-100 text-gray-800';
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
 // --- Add Lead Modal Component ---
 const AddLeadModal = ({ onClose, onAdd }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    notes: ""
+    name: '',
+    email: '',
+    phone: '',
+    notes: '',
   });
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     // Basic validation
     if (!formData.name.trim() || !formData.email.trim()) {
-      toast.error("Name and email are required");
+      toast.error('Name and email are required');
       return;
     }
 
@@ -60,10 +67,10 @@ const AddLeadModal = ({ onClose, onAdd }) => {
     }
   };
 
-  const handleInputChange = (field) => (e) => {
+  const handleInputChange = field => e => {
     setFormData(prev => ({
       ...prev,
-      [field]: e.target.value
+      [field]: e.target.value,
     }));
   };
 
@@ -163,26 +170,26 @@ const LeadsView = () => {
   const fetchLeads = useCallback(async () => {
     // Fetch active leads
     const { data: activeData, error: activeError } = await supabase
-      .from("contacts")
-      .select("*")
-      .eq("archived", false)
-      .order("created_at", { ascending: false });
+      .from('contacts')
+      .select('*')
+      .eq('archived', false)
+      .order('created_at', { ascending: false });
 
     // Fetch archived leads
     const { data: archivedData, error: archivedError } = await supabase
-      .from("contacts")
-      .select("*")
-      .eq("archived", true)
-      .order("created_at", { ascending: false });
+      .from('contacts')
+      .select('*')
+      .eq('archived', true)
+      .order('created_at', { ascending: false });
 
     if (activeError) {
-      console.error("Error fetching active leads:", activeError);
+      console.error('Error fetching active leads:', activeError);
     } else {
       setLeads(activeData);
     }
 
     if (archivedError) {
-      console.error("Error fetching archived leads:", archivedError);
+      console.error('Error fetching archived leads:', archivedError);
     } else {
       setArchivedLeads(archivedData);
     }
@@ -194,8 +201,10 @@ const LeadsView = () => {
     fetchLeads();
 
     const channel = supabase
-      .channel("realtime-leads")
-      .on("postgres_changes", { event: "*", schema: "public", table: "contacts" },
+      .channel('realtime-leads')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'contacts' },
         () => {
           fetchLeads();
         }
@@ -207,7 +216,7 @@ const LeadsView = () => {
     };
   }, [supabase, fetchLeads]);
 
- const handleAddLead = async (formData) => {
+  const handleAddLead = async formData => {
     const addToast = toast.loading('Adding new lead...');
 
     try {
@@ -223,11 +232,11 @@ const LeadsView = () => {
         status: 'New',
         questionnaire_completed: false,
         questionnaire_token: questionnaireToken, // Add the questionnaire token
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .insert([newLeadData])
         .select()
         .single();
@@ -242,13 +251,16 @@ const LeadsView = () => {
       toast.dismiss(addToast);
       toast.success('Lead added successfully with questionnaire link!');
       return true;
-
     } catch (error: any) {
       toast.error(`Failed to add lead: ${error.message}`, { id: addToast });
       return false;
     }
   };
-  const handleUpdateLead = async (leadId: number, updatedData: Partial<Lead>, successMessage = "Lead updated successfully!") => {
+  const handleUpdateLead = async (
+    leadId: number,
+    updatedData: Partial<Lead>,
+    successMessage = 'Lead updated successfully!'
+  ) => {
     // Implement optimistic UI update correctly
     const originalLeads = [...leads];
     const originalArchivedLeads = [...archivedLeads];
@@ -264,26 +276,29 @@ const LeadsView = () => {
     setLeads(newLeads);
     setArchivedLeads(newArchivedLeads);
 
-    const { error } = await supabase.from("contacts").update(updatedData).eq("id", leadId);
+    const { error } = await supabase
+      .from('contacts')
+      .update(updatedData)
+      .eq('id', leadId);
 
     if (error) {
-        toast.error(`Failed to update lead: ${error.message}`);
-        // Revert on failure
-        setLeads(originalLeads);
-        setArchivedLeads(originalArchivedLeads);
-        return false;
+      toast.error(`Failed to update lead: ${error.message}`);
+      // Revert on failure
+      setLeads(originalLeads);
+      setArchivedLeads(originalArchivedLeads);
+      return false;
     } else {
-        toast.success(successMessage);
-        return true;
+      toast.success(successMessage);
+      return true;
     }
   };
 
   const handleArchiveLead = async (leadId: number) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update({ archived: true })
-        .eq("id", leadId);
+        .eq('id', leadId);
 
       if (error) {
         throw error;
@@ -293,7 +308,10 @@ const LeadsView = () => {
       const leadToArchive = leads.find(l => l.id === leadId);
       if (leadToArchive) {
         setLeads(prev => prev.filter(l => l.id !== leadId));
-        setArchivedLeads(prev => [{ ...leadToArchive, archived: true }, ...prev]);
+        setArchivedLeads(prev => [
+          { ...leadToArchive, archived: true },
+          ...prev,
+        ]);
       }
 
       toast.success('Lead archived successfully!');
@@ -307,9 +325,9 @@ const LeadsView = () => {
   const handleUnarchiveLead = async (leadId: number) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update({ archived: false })
-        .eq("id", leadId);
+        .eq('id', leadId);
 
       if (error) {
         throw error;
@@ -404,14 +422,26 @@ const LeadsView = () => {
                 {currentLeads.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-gray-500">
-                      {activeTab === 'active' ? 'No active leads found' : 'No archived leads found'}
+                      {activeTab === 'active'
+                        ? 'No active leads found'
+                        : 'No archived leads found'}
                     </td>
                   </tr>
                 ) : (
-                  currentLeads.map((lead) => {
-                    const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-                    const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
-                    const isWarm = daysOld <= 7 && isActionableStatus && activeTab === 'active';
+                  currentLeads.map(lead => {
+                    const daysOld = differenceInDays(
+                      new Date(),
+                      new Date(lead.created_at)
+                    );
+                    const isActionableStatus = ![
+                      'Consultation Scheduled',
+                      'Converted',
+                      'Not a Fit',
+                    ].includes(lead.status);
+                    const isWarm =
+                      daysOld <= 7 &&
+                      isActionableStatus &&
+                      activeTab === 'active';
 
                     return (
                       <tr
@@ -420,7 +450,10 @@ const LeadsView = () => {
                         onClick={() => handleRowClick(lead)}
                       >
                         <td className="p-4">
-                          <div className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
+                          <div
+                            className={`w-3 h-3 rounded-full ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`}
+                            title={isWarm ? 'Warm Lead' : 'Cold Lead'}
+                          ></div>
                         </td>
                         <td className="p-4 font-medium">
                           {lead.name}
@@ -431,11 +464,13 @@ const LeadsView = () => {
                           )}
                         </td>
                         <td className="p-4">
-                            <div>{lead.email}</div>
-                            <div className="text-sm text-gray-500">{lead.phone}</div>
+                          <div>{lead.email}</div>
+                          <div className="text-sm text-gray-500">
+                            {lead.phone}
+                          </div>
                         </td>
                         <td className="p-4">
-                          {format(new Date(lead.created_at), "PPP")}
+                          {format(new Date(lead.created_at), 'PPP')}
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
@@ -448,15 +483,18 @@ const LeadsView = () => {
                                 Pending
                               </span>
                             )}
-                            {!lead.questionnaire_completed && lead.questionnaire_reminder_sent_at && (
-                              <span className="text-xs text-gray-500">
-                                (Reminder sent)
-                              </span>
-                            )}
+                            {!lead.questionnaire_completed &&
+                              lead.questionnaire_reminder_sent_at && (
+                                <span className="text-xs text-gray-500">
+                                  (Reminder sent)
+                                </span>
+                              )}
                           </div>
                         </td>
                         <td className="p-4">
-                          <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}>
+                          <span
+                            className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}
+                          >
                             {lead.status}
                           </span>
                         </td>
@@ -474,7 +512,9 @@ const LeadsView = () => {
           {currentLeads.length === 0 ? (
             <div className="bg-white border-2 border-black rounded-lg p-8 text-center text-gray-500">
               <p className="mb-4">
-                {activeTab === 'active' ? 'No active leads found' : 'No archived leads found'}
+                {activeTab === 'active'
+                  ? 'No active leads found'
+                  : 'No archived leads found'}
               </p>
               {activeTab === 'active' && (
                 <Button
@@ -486,10 +526,18 @@ const LeadsView = () => {
               )}
             </div>
           ) : (
-            currentLeads.map((lead) => {
-              const daysOld = differenceInDays(new Date(), new Date(lead.created_at));
-              const isActionableStatus = !['Consultation Scheduled', 'Converted', 'Not a Fit'].includes(lead.status);
-              const isWarm = daysOld <= 7 && isActionableStatus && activeTab === 'active';
+            currentLeads.map(lead => {
+              const daysOld = differenceInDays(
+                new Date(),
+                new Date(lead.created_at)
+              );
+              const isActionableStatus = ![
+                'Consultation Scheduled',
+                'Converted',
+                'Not a Fit',
+              ].includes(lead.status);
+              const isWarm =
+                daysOld <= 7 && isActionableStatus && activeTab === 'active';
 
               return (
                 <div
@@ -500,9 +548,14 @@ const LeadsView = () => {
                   {/* Card Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`} title={isWarm ? 'Warm Lead' : 'Cold Lead'}></div>
+                      <div
+                        className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isWarm ? 'bg-red-500' : 'bg-gray-400'}`}
+                        title={isWarm ? 'Warm Lead' : 'Cold Lead'}
+                      ></div>
                       <div>
-                        <h3 className="font-bold text-lg leading-tight">{lead.name}</h3>
+                        <h3 className="font-bold text-lg leading-tight">
+                          {lead.name}
+                        </h3>
                         {activeTab === 'archived' && (
                           <span className="inline-block mt-1 px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
                             Archived
@@ -512,7 +565,9 @@ const LeadsView = () => {
                     </div>
 
                     {/* Status Badge */}
-                    <span className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ${getStatusClasses(lead.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ${getStatusClasses(lead.status)}`}
+                    >
                       {lead.status}
                     </span>
                   </div>
@@ -525,7 +580,10 @@ const LeadsView = () => {
                     </div>
                     {lead.phone && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Phone size={16} className="text-gray-500 flex-shrink-0" />
+                        <Phone
+                          size={16}
+                          className="text-gray-500 flex-shrink-0"
+                        />
                         <span>{lead.phone}</span>
                       </div>
                     )}
@@ -535,24 +593,31 @@ const LeadsView = () => {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Calendar size={16} />
-                      <span>{format(new Date(lead.created_at), "PPP")}</span>
+                      <span>{format(new Date(lead.created_at), 'PPP')}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       {lead.questionnaire_completed ? (
                         <div className="flex items-center gap-1">
                           <CheckCircle size={16} className="text-green-600" />
-                          <span className="text-xs font-medium text-green-800">Questionnaire Done</span>
+                          <span className="text-xs font-medium text-green-800">
+                            Questionnaire Done
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1">
                           {lead.questionnaire_reminder_sent_at ? (
-                            <AlertCircle size={16} className="text-orange-600" />
+                            <AlertCircle
+                              size={16}
+                              className="text-orange-600"
+                            />
                           ) : (
                             <Clock size={16} className="text-orange-600" />
                           )}
                           <span className="text-xs font-medium text-orange-800">
-                            {lead.questionnaire_reminder_sent_at ? 'Reminder Sent' : 'Pending'}
+                            {lead.questionnaire_reminder_sent_at
+                              ? 'Reminder Sent'
+                              : 'Pending'}
                           </span>
                         </div>
                       )}
@@ -571,7 +636,9 @@ const LeadsView = () => {
             onClose={() => setSelectedLead(null)}
             onUpdate={handleUpdateLead}
             onArchive={selectedLead.archived ? undefined : handleArchiveLead}
-            onUnarchive={selectedLead.archived ? handleUnarchiveLead : undefined}
+            onUnarchive={
+              selectedLead.archived ? handleUnarchiveLead : undefined
+            }
           />
         )}
       </div>

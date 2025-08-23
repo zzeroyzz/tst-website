@@ -8,20 +8,20 @@ interface AnimatedImageProps {
   alt: string;
 }
 
-const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData  }) => {
+const AnimatedImage: React.FC<AnimatedImageProps> = ({ animationData }) => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.shadow} />
       <div className={styles.card}>
-          <LottiePlayer
-        file={animationData}
-        width={400}
-        height={400}
-        loop={true}
-        autoplay={true}
-        speed={1}
-        alt={animationData.alt}
-      />
+        <LottiePlayer
+          file={animationData}
+          width={400}
+          height={400}
+          loop={true}
+          autoplay={true}
+          speed={1}
+          alt={animationData.alt}
+        />
       </div>
     </div>
   );

@@ -1,57 +1,57 @@
 /* src/components/FallingPills.module.css */
 .container {
-    width: 100%;
+  width: 100%;
 }
 
 .title {
-    font-size: 1.5rem; /* 24px */
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 1.5rem; /* 24px */
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem; /* 24px */
 }
 
 .pills_wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem; /* 16px */
-    perspective: 800px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem; /* 16px */
+  perspective: 800px;
 }
 
 .pill_wrapper {
-    position: relative;
-    opacity: 0;
-    transform: translateY(-100px) rotateX(-80deg);
-    animation: fall 0.8s cubic-bezier(0.6, -0.28, 0.74, 1.55) forwards;
+  position: relative;
+  opacity: 0;
+  transform: translateY(-100px) rotateX(-80deg);
+  animation: fall 0.8s cubic-bezier(0.6, -0.28, 0.74, 1.55) forwards;
 }
 
 .shadow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    border-radius: 8px;
-    transform: translate(4px, 4px);
-    transition: transform 150ms ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 8px;
+  transform: translate(4px, 4px);
+  transition: transform 150ms ease-in-out;
 }
 
 .pill {
-    position: relative;
-    background-color: white;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    border: 2px solid black;
-    transition: transform 150ms ease-in-out;
+  position: relative;
+  background-color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid black;
+  transition: transform 150ms ease-in-out;
 }
 
 @keyframes fall {
-    to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
 }
 
 /* The "push in" animation */
@@ -64,5 +64,5 @@
 
 .pill_wrapper:active .pill,
 .pill_wrapper:active .shadow {
-    transform: translate(0, 0);
+  transform: translate(0, 0);
 }

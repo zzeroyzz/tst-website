@@ -18,7 +18,13 @@ const WallOfLoveCard: React.FC<WallOfLoveCardProps> = ({ testimonial }) => {
       <div className={styles.card}>
         <p className={styles.quote}>&quot;{testimonial.quote}&quot;</p>
         <div className={styles.author}>
-          <Image src={testimonial.avatar} alt={testimonial.name} width={40} height={40} className={styles.avatar} />
+          <Image
+            src={testimonial.avatar}
+            alt={testimonial.name}
+            width={40}
+            height={40}
+            className={styles.avatar}
+          />
           <div>
             <p className={styles.name}>{testimonial.name}</p>
             <p className={styles.role}>{testimonial.role}</p>

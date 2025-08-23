@@ -1,14 +1,14 @@
 // components/skeleton/NewsletterArchiveSkeleton.tsx
 import Section from '@/components/Section/Section';
 import { Skeleton } from './SkeletonBase';
-import { SkeletonCard }  from './index';
+import { SkeletonCard } from './index';
 
 interface NewsletterArchiveSkeletonProps {
   cardCount?: number;
 }
 
 export const NewsletterArchiveSkeleton = ({
-  cardCount = 9
+  cardCount = 9,
 }: NewsletterArchiveSkeletonProps) => {
   return (
     <Section>

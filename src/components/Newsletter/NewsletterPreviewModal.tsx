@@ -21,7 +21,9 @@ const NewsletterPreviewModal: React.FC<NewsletterPreviewModalProps> = ({
       <div className="bg-white rounded-lg shadow-brutalistLg w-full max-w-6xl h-full flex flex-col border-2 border-black">
         <div className="flex justify-between items-center p-4 border-b-2 border-black flex-shrink-0">
           <h2 className="text-2xl font-bold">Newsletter Preview</h2>
-          <button onClick={onClose} className="text-2xl font-bold">&times;</button>
+          <button onClick={onClose} className="text-2xl font-bold">
+            &times;
+          </button>
         </div>
         <div className="flex-grow overflow-y-auto">
           <iframe
@@ -31,10 +33,18 @@ const NewsletterPreviewModal: React.FC<NewsletterPreviewModalProps> = ({
           />
         </div>
         <div className="flex justify-end items-center p-4 border-t-2 border-black gap-4 flex-shrink-0">
-          <Button onClick={onClose} className="bg-gray-200" disabled={isSending}>
+          <Button
+            onClick={onClose}
+            className="bg-gray-200"
+            disabled={isSending}
+          >
             Cancel
           </Button>
-          <Button onClick={onSend} className="bg-tst-green" disabled={isSending}>
+          <Button
+            onClick={onSend}
+            className="bg-tst-green"
+            disabled={isSending}
+          >
             {isSending ? 'Sending...' : 'Send Newsletter'}
           </Button>
         </div>

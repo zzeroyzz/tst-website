@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // src/components/PostPageClient.tsx
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -12,13 +12,13 @@ import { marked } from 'marked';
 import Section from '@/components/Section/Section';
 import ResourceCard from '@/components/ResourceCard/ResourceCard';
 import Link from 'next/link';
-import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import CircleIcon from '@/components/CircleIcon/CircleIcon';
 import SubscribeModal from '@/components/SubscribeModal/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
-import Button from "@/components/Button/Button";
+import Button from '@/components/Button/Button';
 import { SinglePostSkeleton } from '@/components/skeleton';
 import PostStats from '@/components/PostStats/PostStats';
-import styles from './PostPageClient.module.css'
+import styles from './PostPageClient.module.css';
 
 // Configure marked with proper options for better parsing
 marked.setOptions({
@@ -45,13 +45,17 @@ const PostPageClient: React.FC = () => {
       setLoading(true);
 
       // Check if user is authenticated
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const isAuthenticated = !!user;
 
       // Build query based on authentication status
       let postQuery = supabase
         .from('posts')
-        .select('id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug, view_count, like_count, type, visible_to_public')
+        .select(
+          'id, title, created_at, sent_at, image_url, tags, body, subject, toasty_take, archive_posts, status, slug, view_count, like_count, type, visible_to_public'
+        )
         .eq('slug', slug as string)
         .eq('archived', false);
 
@@ -75,7 +79,9 @@ const PostPageClient: React.FC = () => {
         if (postData.body && typeof postData.body === 'string') {
           try {
             let bodyToProcess = postData.body.trim();
-            const paragraphs = bodyToProcess.split('\n').filter(line => line.trim() !== '');
+            const paragraphs = bodyToProcess
+              .split('\n')
+              .filter(line => line.trim() !== '');
             bodyToProcess = paragraphs.join('\n\n');
 
             const parsed = await marked.parse(bodyToProcess);
@@ -89,7 +95,9 @@ const PostPageClient: React.FC = () => {
         // Fetch suggestions - prioritize same type, then show mixed content
         let suggestionsQuery = supabase
           .from('posts')
-          .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type')
+          .select(
+            'id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type'
+          )
           .eq('status', 'published')
           .eq('archived', false)
           .eq('type', postData.type) // Same type first
@@ -102,7 +110,8 @@ const PostPageClient: React.FC = () => {
           suggestionsQuery = suggestionsQuery.eq('visible_to_public', true);
         }
 
-        const { data: sameTypeData, error: sameTypeError } = await suggestionsQuery;
+        const { data: sameTypeData, error: sameTypeError } =
+          await suggestionsQuery;
 
         let suggestions = sameTypeData || [];
 
@@ -111,7 +120,9 @@ const PostPageClient: React.FC = () => {
           const remainingCount = 3 - suggestions.length;
           let otherTypeQuery = supabase
             .from('posts')
-            .select('id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type')
+            .select(
+              'id, title, created_at, sent_at, image_url, tags, subject, toasty_take, archive_posts, status, body, slug, type'
+            )
             .eq('status', 'published')
             .eq('archived', false)
             .neq('type', postData.type) // Different type
@@ -142,11 +153,7 @@ const PostPageClient: React.FC = () => {
   // Show skeleton while loading
   if (loading) {
     return (
-      <SinglePostSkeleton
-        showSuggestedPosts
-        showImage
-        contentParagraphs={6}
-      />
+      <SinglePostSkeleton showSuggestedPosts showImage contentParagraphs={6} />
     );
   }
 
@@ -160,15 +167,28 @@ const PostPageClient: React.FC = () => {
 
   // Dynamic breadcrumb and page title based on post type
   const contentTypeLabel = post.type === 'blog' ? 'Blog' : 'Newsletter Archive';
-  const contentTypeUrl = post.type === 'blog' ? '/mental-health-healing-blog' : '/mental-health-healing-blog';
+  const contentTypeUrl =
+    post.type === 'blog'
+      ? '/mental-health-healing-blog'
+      : '/mental-health-healing-blog';
 
   const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {"@type": "ListItem", "position": 2, "name": "Back to posts", "item": `https://toastedsesametherapy.com/mental-health-healing-blog`},
-      {"@type": "ListItem", "position": 3, "name": post.title, "item": `https://toastedsesametherapy.com/posts/${post.slug}`}
-    ]
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Back to posts',
+        item: `https://toastedsesametherapy.com/mental-health-healing-blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `https://toastedsesametherapy.com/posts/${post.slug}`,
+      },
+    ],
   };
 
   return (
@@ -179,16 +199,21 @@ const PostPageClient: React.FC = () => {
       />
 
       <main className="bg-tst-cream min-h-screen">
-        <SubscribeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <SubscribeModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
 
         {/* Article Section */}
         <Section className="pt-16 pb-24">
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 mb-12 font-medium">
-
               <span className="mx-3">›</span>
-              <Link href="/mental-health-healing-blog" className="hover:text-gray-700 transition-colors">
+              <Link
+                href="/mental-health-healing-blog"
+                className="hover:text-gray-700 transition-colors"
+              >
                 Back to posts
               </Link>
               <span className="mx-3">›</span>
@@ -199,11 +224,13 @@ const PostPageClient: React.FC = () => {
             <header className="mb-16">
               {/* Content Type Badge */}
               <div className="mb-4 flex items-center gap-3">
-                <span className={`inline-flex items-center px-3 py-1 text-sm font-bold rounded-full border-2 border-black ${
-                  post.type === 'blog'
-                    ? 'bg-tst-teal text-white'
-                    : 'bg-tst-yellow text-black'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 text-sm font-bold rounded-full border-2 border-black ${
+                    post.type === 'blog'
+                      ? 'bg-tst-teal text-white'
+                      : 'bg-tst-yellow text-black'
+                  }`}
+                >
                   {post.type === 'blog' ? '📝 Blog Post' : '📧 Newsletter'}
                 </span>
 
@@ -230,7 +257,11 @@ const PostPageClient: React.FC = () => {
                   <div>
                     <p className="font-semibold text-gray-900 text-base">Kay</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {format(new Date(post.sent_at || post.created_at), 'MMM d, yyyy')} · 5 min read
+                      {format(
+                        new Date(post.sent_at || post.created_at),
+                        'MMM d, yyyy'
+                      )}{' '}
+                      · 5 min read
                     </p>
                   </div>
                 </div>
@@ -243,8 +274,10 @@ const PostPageClient: React.FC = () => {
             {/* Featured Image - Fixed for 600x400 aspect ratio with smaller desktop size */}
             {post.image_url && (
               <div className="mb-16">
-                <div className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-brutalist border-2 border-black"
-                     style={{ aspectRatio: '3/2' }}>
+                <div
+                  className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-brutalist border-2 border-black"
+                  style={{ aspectRatio: '3/2' }}
+                >
                   <Image
                     src={post.image_url}
                     alt={post.title}
@@ -259,12 +292,15 @@ const PostPageClient: React.FC = () => {
 
             {/* Content */}
             <article className="mb-20">
-               <div className="text-lg leading-relaxed space-y-6 max-w-2xl mx-auto mt-12">
-                {post.body.split('\n').filter(line => line.trim() !== '').map((paragraph, index) => (
-                  <p key={index} className="mb-6">
-                    {paragraph.trim()}
-                  </p>
-                ))}
+              <div className="text-lg leading-relaxed space-y-6 max-w-2xl mx-auto mt-12">
+                {post.body
+                  .split('\n')
+                  .filter(line => line.trim() !== '')
+                  .map((paragraph, index) => (
+                    <p key={index} className="mb-6">
+                      {paragraph.trim()}
+                    </p>
+                  ))}
               </div>
               {post.toasty_take && (
                 <div className="mt-16 p-6 bg-white rounded-lg shadow-brutalist border-2 border-black max-w-2xl mx-auto">
@@ -277,16 +313,13 @@ const PostPageClient: React.FC = () => {
 
               {/* Tags at bottom of article - smaller size */}
               {post.tags && post.tags.length > 0 && (
-                <div className={`${styles.tagsWrapper} mt-12 max-w-2xl mx-auto`}>
+                <div
+                  className={`${styles.tagsWrapper} mt-12 max-w-2xl mx-auto`}
+                >
                   {post.tags.map(tag => (
-                    <div
-                      key={tag}
-                      className={styles.tagWrapper}
-                    >
+                    <div key={tag} className={styles.tagWrapper}>
                       <div className={styles.shadow}></div>
-                      <div className={`${styles.tag} text-xs`}>
-                        {tag}
-                      </div>
+                      <div className={`${styles.tag} text-xs`}>{tag}</div>
                     </div>
                   ))}
                 </div>
@@ -305,7 +338,9 @@ const PostPageClient: React.FC = () => {
                   />
                   <div>
                     <p className="font-semibold text-gray-900 text-base">Kay</p>
-                    <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Therapist & Writer
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -329,22 +364,26 @@ const PostPageClient: React.FC = () => {
                     More content you might enjoy
                   </h2>
                   <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                    Continue your journey with these thoughtful reflections and insights.
+                    Continue your journey with these thoughtful reflections and
+                    insights.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
-                  {suggestedPosts.map((suggestion) => (
+                  {suggestedPosts.map(suggestion => (
                     <div key={suggestion.id} className="group">
                       <ResourceCard
                         card={{
                           title: suggestion.title,
-                          date: suggestion.sent_at ? format(new Date(suggestion.sent_at), "PPP") : format(new Date(suggestion.created_at), "PPP"),
-                          author: "Kay",
-                          authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
-                          imageUrl: suggestion.image_url || "",
+                          date: suggestion.sent_at
+                            ? format(new Date(suggestion.sent_at), 'PPP')
+                            : format(new Date(suggestion.created_at), 'PPP'),
+                          author: 'Kay',
+                          authorImageUrl:
+                            'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg',
+                          imageUrl: suggestion.image_url || '',
                           tags: suggestion.tags,
                           href: `/posts/${suggestion.slug}`,
-                          type: suggestion.type // Pass type to ResourceCard
+                          type: suggestion.type, // Pass type to ResourceCard
                         }}
                       />
                     </div>

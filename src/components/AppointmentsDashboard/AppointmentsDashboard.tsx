@@ -1,18 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/AppointmentsDashboard/AppointmentsDashboard.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, Phone, Mail, MoreVertical, Check, X, Edit, Eye } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Phone,
+  Mail,
+  MoreVertical,
+  Check,
+  X,
+  Edit,
+  Eye,
+} from 'lucide-react';
 import { toZonedTime, format as formatTz } from 'date-fns-tz';
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Contact } from '@/types/contact';
 import Button from '@/components/Button/Button';
 import AppointmentRescheduleCalendar from '@/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar';
 import AppointmentCancelModal from '@/components/AppointmentCancelModal/AppointmentCancelModal';
 import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
 import { useAppointments } from '@/hooks/useAppointments';
-import { getAppointmentStatus, getAppointmentStatusColor } from '@/utils/appointmentHelpers';
+import {
+  getAppointmentStatus,
+  getAppointmentStatusColor,
+} from '@/utils/appointmentHelpers';
 import toast from 'react-hot-toast';
 
 const EASTERN_TIMEZONE = 'America/New_York';
@@ -70,7 +83,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onStatusUpdate,
   onReschedule,
   onCancel,
-  onViewLead
+  onViewLead,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -78,7 +91,10 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowActions(false);
       }
     };
@@ -100,8 +116,11 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
       {/* Header with Status and Actions */}
       <div className="flex justify-between items-start mb-3">
         {/* Status Badge */}
-        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${statusColorClass}`}>
-          {appointmentStatus.charAt(0).toUpperCase() + appointmentStatus.slice(1)}
+        <div
+          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${statusColorClass}`}
+        >
+          {appointmentStatus.charAt(0).toUpperCase() +
+            appointmentStatus.slice(1)}
         </div>
 
         {/* Actions Menu */}
@@ -185,7 +204,8 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
         {contact.company && (
           <p className="text-sm text-gray-500 mt-2 break-words">
-            {contact.position ? `${contact.position} at ` : ''}{contact.company}
+            {contact.position ? `${contact.position} at ` : ''}
+            {contact.company}
           </p>
         )}
       </div>
@@ -202,7 +222,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
       {contact.appointment_notes && (
         <div className="text-sm text-gray-600 mt-auto">
           <p className="font-medium mb-1">Notes:</p>
-          <p className="break-words text-xs leading-relaxed">{contact.appointment_notes}</p>
+          <p className="break-words text-xs leading-relaxed">
+            {contact.appointment_notes}
+          </p>
         </div>
       )}
     </div>
@@ -210,8 +232,11 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 };
 
 const AppointmentsDashboard: React.FC = () => {
-  const { appointments, loading, error, refreshAppointments } = useAppointments();
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past'>('upcoming');
+  const { appointments, loading, error, refreshAppointments } =
+    useAppointments();
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past'>(
+    'upcoming'
+  );
 
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleModalData, setRescheduleModalData] = useState<{
@@ -269,7 +294,7 @@ const AppointmentsDashboard: React.FC = () => {
       contactId,
       contactName: `${contact.name} ${contact.last_name || ''}`.trim(),
       contactEmail: contact.email,
-      appointmentDate: contact.scheduled_appointment_at
+      appointmentDate: contact.scheduled_appointment_at,
     });
     setShowCancelModal(true);
   };
@@ -281,11 +306,12 @@ const AppointmentsDashboard: React.FC = () => {
       const response = await fetch('/api/appointment/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contactId: cancelModalData.contactId })
+        body: JSON.stringify({ contactId: cancelModalData.contactId }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to cancel appointment');
+      if (!response.ok)
+        throw new Error(data.message || 'Failed to cancel appointment');
 
       toast.success('Appointment cancelled successfully');
       setShowCancelModal(false);
@@ -310,26 +336,31 @@ const AppointmentsDashboard: React.FC = () => {
       contactId,
       contactName: `${contact.name} ${contact.last_name || ''}`.trim(),
       contactEmail: contact.email,
-      currentAppointmentDate: utcAppointmentDate
+      currentAppointmentDate: utcAppointmentDate,
     });
     setShowRescheduleModal(true);
   };
 
-  const handleRescheduleConfirm = async (contactId: string | number, newDateTime: Date): Promise<void> => {
+  const handleRescheduleConfirm = async (
+    contactId: string | number,
+    newDateTime: Date
+  ): Promise<void> => {
     // Convert contactId to string if it's a number
-    const contactIdStr = typeof contactId === 'number' ? contactId.toString() : contactId;
+    const contactIdStr =
+      typeof contactId === 'number' ? contactId.toString() : contactId;
 
     const response = await fetch('/api/appointment/reschedule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contactId: contactIdStr,
-        newDateTime: newDateTime.toISOString()
-      })
+        newDateTime: newDateTime.toISOString(),
+      }),
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to reschedule appointment');
+    if (!response.ok)
+      throw new Error(data.message || 'Failed to reschedule appointment');
     refreshAppointments();
   };
 
@@ -337,9 +368,9 @@ const AppointmentsDashboard: React.FC = () => {
     try {
       // Fetch the full lead data from Supabase
       const { data: lead, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .eq("id", contactId)
+        .from('contacts')
+        .select('*')
+        .eq('id', contactId)
         .single();
 
       if (error) {
@@ -354,12 +385,16 @@ const AppointmentsDashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateLead = async (leadId: number, updatedData: any, successMessage = "Lead updated successfully!") => {
+  const handleUpdateLead = async (
+    leadId: number,
+    updatedData: any,
+    successMessage = 'Lead updated successfully!'
+  ) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update(updatedData)
-        .eq("id", leadId);
+        .eq('id', leadId);
 
       if (error) {
         throw error;
@@ -378,9 +413,9 @@ const AppointmentsDashboard: React.FC = () => {
   const handleArchiveLead = async (leadId: number) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update({ archived: true })
-        .eq("id", leadId);
+        .eq('id', leadId);
 
       if (error) {
         throw error;
@@ -403,10 +438,14 @@ const AppointmentsDashboard: React.FC = () => {
       contact.appointment_status
     );
     switch (filter) {
-      case 'upcoming': return status === 'upcoming';
-      case 'today': return status === 'today';
-      case 'past': return status === 'past';
-      default: return true;
+      case 'upcoming':
+        return status === 'upcoming';
+      case 'today':
+        return status === 'today';
+      case 'past':
+        return status === 'past';
+      default:
+        return true;
     }
   });
 
@@ -453,7 +492,7 @@ const AppointmentsDashboard: React.FC = () => {
           { key: 'all', label: 'All' },
           { key: 'upcoming', label: 'Upcoming' },
           { key: 'today', label: 'Today' },
-          { key: 'past', label: 'Past' }
+          { key: 'past', label: 'Past' },
         ].map(({ key, label }) => (
           <Button
             key={key}
@@ -473,21 +512,40 @@ const AppointmentsDashboard: React.FC = () => {
           { label: 'Total', count: appointments.length, color: 'bg-blue-100' },
           {
             label: 'Today',
-            count: appointments.filter(c => c.scheduled_appointment_at && getAppointmentStatus(c.scheduled_appointment_at, c.appointment_status) === 'today').length,
-            color: 'bg-green-100'
+            count: appointments.filter(
+              c =>
+                c.scheduled_appointment_at &&
+                getAppointmentStatus(
+                  c.scheduled_appointment_at,
+                  c.appointment_status
+                ) === 'today'
+            ).length,
+            color: 'bg-green-100',
           },
           {
             label: 'Upcoming',
-            count: appointments.filter(c => c.scheduled_appointment_at && getAppointmentStatus(c.scheduled_appointment_at, c.appointment_status) === 'upcoming').length,
-            color: 'bg-yellow-100'
+            count: appointments.filter(
+              c =>
+                c.scheduled_appointment_at &&
+                getAppointmentStatus(
+                  c.scheduled_appointment_at,
+                  c.appointment_status
+                ) === 'upcoming'
+            ).length,
+            color: 'bg-yellow-100',
           },
           {
             label: 'Completed',
-            count: appointments.filter(c => c.appointment_status === 'completed').length,
-            color: 'bg-purple-100'
-          }
+            count: appointments.filter(
+              c => c.appointment_status === 'completed'
+            ).length,
+            color: 'bg-purple-100',
+          },
         ].map((stat, index) => (
-          <div key={index} className={`${stat.color} border-2 border-black rounded-lg p-4`}>
+          <div
+            key={index}
+            className={`${stat.color} border-2 border-black rounded-lg p-4`}
+          >
             <p className="text-2xl font-bold">{stat.count}</p>
             <p className="text-sm font-medium">{stat.label}</p>
           </div>
@@ -500,12 +558,14 @@ const AppointmentsDashboard: React.FC = () => {
           <Calendar size={48} className="mx-auto mb-4 text-gray-300" />
           <p className="text-lg">No appointments found</p>
           <p className="text-sm">
-            {filter === 'all' ? 'No appointments scheduled yet' : `No ${filter} appointments`}
+            {filter === 'all'
+              ? 'No appointments scheduled yet'
+              : `No ${filter} appointments`}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredAppointments.map((contact) => (
+          {filteredAppointments.map(contact => (
             <AppointmentCard
               key={contact.id}
               contact={contact}

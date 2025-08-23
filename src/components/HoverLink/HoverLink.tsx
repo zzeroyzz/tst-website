@@ -12,11 +12,7 @@ type HoverLinkProps = {
 
 const HoverLink = ({ href, children, className = '', id }: HoverLinkProps) => {
   return (
-    <Link
-      href={href}
-      id={id}
-      className={`${styles.link} ${className}`}
-    >
+    <Link href={href} id={id} className={`${styles.link} ${className}`}>
       <svg
         className={styles.icon}
         xmlns="http://www.w3.org/2000/svg"

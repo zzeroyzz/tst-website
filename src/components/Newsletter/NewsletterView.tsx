@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/NewsletterView.tsx
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { PlusCircle, X, Calendar, Tag } from "lucide-react";
-import Button from "@/components/Button/Button";
-import { Post } from "@/types";
-import { NewsletterViewSkeleton } from "@/components/skeleton";
-import toast from "react-hot-toast";
+import React, { useEffect, useState, useCallback } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { PlusCircle, X, Calendar, Tag } from 'lucide-react';
+import Button from '@/components/Button/Button';
+import { Post } from '@/types';
+import { NewsletterViewSkeleton } from '@/components/skeleton';
+import toast from 'react-hot-toast';
 
 // Delete Confirmation Modal Component
 const DeleteConfirmModal = ({
   post,
   onClose,
   onConfirm,
-  isDeleting
+  isDeleting,
 }: {
   post: Post;
   onClose: () => void;
@@ -46,7 +46,7 @@ const DeleteConfirmModal = ({
           <div className="bg-gray-50 p-3 rounded-lg border">
             <p className="font-medium text-sm">&quot;{post.title}&quot;</p>
             <p className="text-xs text-gray-500 mt-1">
-              {post.status} • {format(new Date(post.created_at), "PPP")}
+              {post.status} • {format(new Date(post.created_at), 'PPP')}
             </p>
           </div>
           <p className="text-red-600 text-sm mt-2">
@@ -78,33 +78,40 @@ const DeleteConfirmModal = ({
 const NewsletterView = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState<{ show: boolean; post: Post | null }>({
+  const [deleteModal, setDeleteModal] = useState<{
+    show: boolean;
+    post: Post | null;
+  }>({
     show: false,
-    post: null
+    post: null,
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
   const statusColors = {
-    draft: "bg-yellow-100 text-yellow-800",
-    published: "bg-green-100 text-green-800",
+    draft: 'bg-yellow-100 text-yellow-800',
+    published: 'bg-green-100 text-green-800',
   };
 
   const tagColors = [
-    "bg-tst-teal", "bg-tst-purple", "bg-tst-yellow", "bg-tst-green", "bg-tst-red"
+    'bg-tst-teal',
+    'bg-tst-purple',
+    'bg-tst-yellow',
+    'bg-tst-green',
+    'bg-tst-red',
   ];
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.error("Error fetching posts:", error);
-      toast.error("Failed to fetch posts");
+      console.error('Error fetching posts:', error);
+      toast.error('Failed to fetch posts');
     } else {
       setPosts(data as Post[]);
     }
@@ -122,7 +129,7 @@ const NewsletterView = () => {
 
   const handleDeleteConfirm = async () => {
     if (!deleteModal.post) {
-      console.error("No post selected for deletion");
+      console.error('No post selected for deletion');
       return;
     }
 
@@ -132,38 +139,39 @@ const NewsletterView = () => {
 
     try {
       const { data: existingPost, error: checkError } = await supabase
-        .from("posts")
-        .select("id, title")
-        .eq("id", postToDelete.id)
+        .from('posts')
+        .select('id, title')
+        .eq('id', postToDelete.id)
         .single();
 
       if (checkError) {
-        console.error("Error checking if post exists:", checkError);
+        console.error('Error checking if post exists:', checkError);
         throw new Error(`Post not found: ${checkError.message}`);
       }
 
       const { error: deleteError, data: deletedData } = await supabase
-        .from("posts")
+        .from('posts')
         .delete()
-        .eq("id", postToDelete.id)
+        .eq('id', postToDelete.id)
         .select();
 
       if (deleteError) {
-        console.error("Delete error:", deleteError);
+        console.error('Delete error:', deleteError);
         throw new Error(deleteError.message);
       }
 
       if (!deletedData || deletedData.length === 0) {
-        throw new Error("No rows were deleted. Post may not exist or you may not have permission.");
+        throw new Error(
+          'No rows were deleted. Post may not exist or you may not have permission.'
+        );
       }
 
       setPosts(prev => prev.filter(p => p.id !== postToDelete.id));
       toast.dismiss(deleteToast);
       toast.success(`Post "${postToDelete.title}" deleted successfully!`);
       setDeleteModal({ show: false, post: null });
-
     } catch (error: any) {
-      console.error("Delete operation failed:", error);
+      console.error('Delete operation failed:', error);
       toast.dismiss(deleteToast);
       toast.error(`Failed to delete post: ${error.message || 'Unknown error'}`);
     } finally {
@@ -207,7 +215,7 @@ const NewsletterView = () => {
                 </tr>
               </thead>
               <tbody>
-                {posts.map((post) => (
+                {posts.map(post => (
                   <tr
                     key={post.id}
                     className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer group"
@@ -218,10 +226,7 @@ const NewsletterView = () => {
                     >
                       {post.title}
                     </td>
-                    <td
-                      className="p-4"
-                      onClick={() => handleRowClick(post)}
-                    >
+                    <td className="p-4" onClick={() => handleRowClick(post)}>
                       <div className="flex flex-wrap gap-2">
                         {(post.tags || []).map((tag, index) => (
                           <span
@@ -233,17 +238,13 @@ const NewsletterView = () => {
                         ))}
                       </div>
                     </td>
-                    <td
-                      className="p-4"
-                      onClick={() => handleRowClick(post)}
-                    >
-                      {format(new Date(post.created_at), "PPP")}
+                    <td className="p-4" onClick={() => handleRowClick(post)}>
+                      {format(new Date(post.created_at), 'PPP')}
                     </td>
-                    <td
-                      className="p-4"
-                      onClick={() => handleRowClick(post)}
-                    >
-                      <span className={`px-2 py-1 text-xs font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}>
+                    <td className="p-4" onClick={() => handleRowClick(post)}>
+                      <span
+                        className={`px-2 py-1 text-xs font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}
+                      >
                         {post.status}
                       </span>
                     </td>
@@ -251,7 +252,7 @@ const NewsletterView = () => {
                       <div className="wrapper relative">
                         <div className="shadow"></div>
                         <Button
-                          onClick={(e) => handleDeleteClick(e, post)}
+                          onClick={e => handleDeleteClick(e, post)}
                           className="button bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors relative z-10"
                           aria-label={`Delete "${post.title}"`}
                         >
@@ -268,7 +269,7 @@ const NewsletterView = () => {
 
         {/* Mobile Card View */}
         <div className="lg:hidden space-y-4">
-          {posts.map((post) => (
+          {posts.map(post => (
             <div
               key={post.id}
               className="bg-white border-2 border-black rounded-lg shadow-brutalistLg p-4 cursor-pointer hover:bg-tst-yellow transition-colors"
@@ -280,7 +281,7 @@ const NewsletterView = () => {
                   {post.title}
                 </h3>
                 <Button
-                  onClick={(e) => handleDeleteClick(e, post)}
+                  onClick={e => handleDeleteClick(e, post)}
                   className="bg-tst-red text-white rounded-full p-2 transition-colors"
                   aria-label={`Delete "${post.title}"`}
                 >
@@ -290,7 +291,9 @@ const NewsletterView = () => {
 
               {/* Status Badge */}
               <div className="mb-3">
-                <span className={`px-3 py-1 text-sm font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}>
+                <span
+                  className={`px-3 py-1 text-sm font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}
+                >
                   {post.status}
                 </span>
               </div>
@@ -300,7 +303,9 @@ const NewsletterView = () => {
                 <div className="mb-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Tag size={16} className="text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">Tags</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Tags
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag, index) => (
@@ -318,7 +323,7 @@ const NewsletterView = () => {
               {/* Date */}
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Calendar size={16} />
-                <span>{format(new Date(post.created_at), "PPP")}</span>
+                <span>{format(new Date(post.created_at), 'PPP')}</span>
               </div>
             </div>
           ))}
