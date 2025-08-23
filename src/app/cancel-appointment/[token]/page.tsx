@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/cancel-appointment/[token]/page.tsx
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -32,7 +32,6 @@ export default function CancelAppointmentPage() {
   const [processing, setProcessing] = useState(false);
   const [cancelled, setCancelled] = useState(false);
   const [error, setError] = useState<string>('');
-
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -117,10 +116,12 @@ export default function CancelAppointmentPage() {
           <Check className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4">Appointment Cancelled</h1>
           <p className="text-lg mb-6">
-            Your consultation has been cancelled successfully. You&apos;ll receive a confirmation email shortly.
+            Your consultation has been cancelled successfully. You&apos;ll
+            receive a confirmation email shortly.
           </p>
           <p className="text-gray-600 mb-6">
-            If you&apos;d like to reschedule, please feel free to reach out to us directly.
+            If you&apos;d like to reschedule, please feel free to reach out to
+            us directly.
           </p>
           <Button
             onClick={() => router.push('/')}
@@ -138,7 +139,10 @@ export default function CancelAppointmentPage() {
       <Section className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center w-full max-w-md bg-white p-6 sm:p-8 rounded-xl border-2 border-black shadow-brutalistLg">
           <h1 className="text-2xl font-bold mb-4">No Appointment Found</h1>
-          <p className="text-lg mb-6">This appointment may have already been cancelled or doesn&apos;t exist.</p>
+          <p className="text-lg mb-6">
+            This appointment may have already been cancelled or doesn&apos;t
+            exist.
+          </p>
           <Button
             onClick={() => router.push('/')}
             className="bg-tst-purple w-full sm:w-auto"
@@ -161,9 +165,12 @@ export default function CancelAppointmentPage() {
           {/* Header */}
           <div className="p-6 sm:p-8 text-center border-b-2 border-black">
             <Calendar className="w-16 h-16 mx-auto mb-4 text-tst-purple" />
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Cancel Appointment</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+              Cancel Appointment
+            </h1>
             <p className="text-gray-600">
-              We understand plans can change. You can cancel your consultation below.
+              We understand plans can change. You can cancel your consultation
+              below.
             </p>
           </div>
 
@@ -189,14 +196,20 @@ export default function CancelAppointmentPage() {
                 </div>
 
                 <div>
-                  <span className="font-medium text-gray-600">Date & Time:</span>
+                  <span className="font-medium text-gray-600">
+                    Date & Time:
+                  </span>
                   <p className="text-lg font-semibold text-tst-purple">
                     {/* CHANGED: Use Eastern timezone for formatting */}
-                    {format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}
+                    {format(appointmentEastern, 'EEEE, MMMM d, yyyy', {
+                      timeZone: EASTERN_TIMEZONE,
+                    })}
                   </p>
                   <p className="text-lg font-semibold text-tst-purple">
                     {/* CHANGED: Use Eastern timezone for formatting */}
-                    {format(appointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE })}
+                    {format(appointmentEastern, 'h:mm a zzz', {
+                      timeZone: EASTERN_TIMEZONE,
+                    })}
                   </p>
                 </div>
               </div>
@@ -204,10 +217,17 @@ export default function CancelAppointmentPage() {
 
             {/* Warning */}
             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-6 sm:mb-8">
-              <h3 className="font-bold text-yellow-800 mb-2">⚠️ Please Note:</h3>
+              <h3 className="font-bold text-yellow-800 mb-2">
+                ⚠️ Please Note:
+              </h3>
               <ul className="text-yellow-700 space-y-1 text-sm">
-                <li>• Cancelling this appointment will remove it from both calendars</li>
-                <li>• You&apos;ll receive a confirmation email once cancelled</li>
+                <li>
+                  • Cancelling this appointment will remove it from both
+                  calendars
+                </li>
+                <li>
+                  • You&apos;ll receive a confirmation email once cancelled
+                </li>
                 <li>• To reschedule, please contact us directly</li>
               </ul>
             </div>

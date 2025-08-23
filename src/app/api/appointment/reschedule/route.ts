@@ -47,7 +47,7 @@ const sendEmailViaZapier = async (emailData: EmailData) => {
     });
 
     if (!response.ok) {
-     return
+      return;
     }
   } catch (error) {
     console.error('Zapier webhook error:', error);
@@ -88,14 +88,23 @@ export async function POST(request: NextRequest) {
 
     // Handle timezone conversion for dates
     const oldAppointmentDate = new Date(contact.scheduled_appointment_at);
-    const oldAppointmentEastern = toZonedTime(oldAppointmentDate, EASTERN_TIMEZONE);
+    const oldAppointmentEastern = toZonedTime(
+      oldAppointmentDate,
+      EASTERN_TIMEZONE
+    );
 
     // Convert new datetime to Eastern time and then to UTC for storage
     const newAppointmentUtc = new Date(newDateTime);
     if (Number.isNaN(newAppointmentUtc.getTime())) {
-      return NextResponse.json({ message: 'Invalid newDateTime' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'Invalid newDateTime' },
+        { status: 400 }
+      );
     }
-    const newAppointmentEastern = toZonedTime(newAppointmentUtc, EASTERN_TIMEZONE);
+    const newAppointmentEastern = toZonedTime(
+      newAppointmentUtc,
+      EASTERN_TIMEZONE
+    );
 
     const newCancelToken = uuidv4(); // Generate new cancellation token
 
@@ -107,9 +116,9 @@ export async function POST(request: NextRequest) {
         appointment_status: 'scheduled', // Ensure it's marked as scheduled
         appointment_cancel_token: newCancelToken, // New cancel token for new appointment
         last_appointment_update: new Date().toISOString(),
-        appointment_notes: contact.appointment_notes ?
-          `${contact.appointment_notes} | Rescheduled from ${format(oldAppointmentEastern, 'yyyy-MM-dd HH:mm', { timeZone: EASTERN_TIMEZONE })}` :
-          `Rescheduled from ${format(oldAppointmentEastern, 'yyyy-MM-dd HH:mm', { timeZone: EASTERN_TIMEZONE })}`
+        appointment_notes: contact.appointment_notes
+          ? `${contact.appointment_notes} | Rescheduled from ${format(oldAppointmentEastern, 'yyyy-MM-dd HH:mm', { timeZone: EASTERN_TIMEZONE })}`
+          : `Rescheduled from ${format(oldAppointmentEastern, 'yyyy-MM-dd HH:mm', { timeZone: EASTERN_TIMEZONE })}`,
       })
       .eq('id', contactId)
       .select();
@@ -136,16 +145,31 @@ export async function POST(request: NextRequest) {
       subject: 'Your consultation has been rescheduled! 📅',
       html: getAppointmentRescheduleTemplate({
         name: `${contact.name} ${contact.last_name || ''}`.trim(),
-        oldAppointmentDate: format(oldAppointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-        oldAppointmentTime: format(oldAppointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
-        newAppointmentDate: format(newAppointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-        newAppointmentTime: format(newAppointmentEastern, 'h:mm a zzz', { timeZone: EASTERN_TIMEZONE }),
-        googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab',
-        cancelToken: newCancelToken
+        oldAppointmentDate: format(
+          oldAppointmentEastern,
+          'EEEE, MMMM d, yyyy',
+          { timeZone: EASTERN_TIMEZONE }
+        ),
+        oldAppointmentTime: format(oldAppointmentEastern, 'h:mm a zzz', {
+          timeZone: EASTERN_TIMEZONE,
+        }),
+        newAppointmentDate: format(
+          newAppointmentEastern,
+          'EEEE, MMMM d, yyyy',
+          { timeZone: EASTERN_TIMEZONE }
+        ),
+        newAppointmentTime: format(newAppointmentEastern, 'h:mm a zzz', {
+          timeZone: EASTERN_TIMEZONE,
+        }),
+        googleMeetLink:
+          process.env.GOOGLE_MEET_LINK ||
+          'https://meet.google.com/orb-dugk-cab',
+        cancelToken: newCancelToken,
       }),
 
       // Calendar update fields
-      eventTitle: `Therapy Session - ${contact.name} ${contact.last_name || ''}`.trim(),
+      eventTitle:
+        `Therapy Session - ${contact.name} ${contact.last_name || ''}`.trim(),
       eventDescription: `RESCHEDULED therapy session with ${contact.name} ${contact.last_name || ''}
 Email: ${contact.email}
 Phone: ${contact.phone || 'Not provided'}
@@ -157,7 +181,8 @@ Google Meet Link: ${process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb
       newEndDateTime: newEndDate.toISOString(),
       attendeeEmail: contact.email,
       attendeeName: `${contact.name} ${contact.last_name || ''}`.trim(),
-      location: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab'
+      location:
+        process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab',
     };
 
     // Send notification email to admin (Kay) (format in Eastern time)
@@ -190,42 +215,41 @@ Google Meet Link: ${process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb
 
           <p>The appointment has been rescheduled and the client has been notified via email.</p>
         </div>
-      `
+      `,
     };
 
     // Send both emails via Zapier
     await Promise.all([
       sendEmailViaZapier(clientEmailData),
-      sendEmailViaZapier(adminEmailData)
+      sendEmailViaZapier(adminEmailData),
     ]);
 
-   try {
-    const { error: notificationError } = await supabase
-      .from('notifications')
-      .insert({
-        type: 'appointment',
-        title: 'Appointment Rescheduled',
-        message: `${contact.name} rescheduled their consultation to ${format(newAppointmentEastern, 'MMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}`,
-        contact_id: contact.id,
-        contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
-        contact_email: contact.email,
-        read: false,
-        created_at: new Date().toISOString()
-      });
+    try {
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          type: 'appointment',
+          title: 'Appointment Rescheduled',
+          message: `${contact.name} rescheduled their consultation to ${format(newAppointmentEastern, 'MMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}`,
+          contact_id: contact.id,
+          contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
+          contact_email: contact.email,
+          read: false,
+          created_at: new Date().toISOString(),
+        });
 
-    if (notificationError) {
+      if (notificationError) {
+        console.error('Failed to create notification:', notificationError);
+      }
+    } catch (notificationError) {
       console.error('Failed to create notification:', notificationError);
     }
-  } catch (notificationError) {
-    console.error('Failed to create notification:', notificationError);
-}
     return NextResponse.json({
       message: 'Appointment rescheduled successfully',
       contact: data[0],
       oldDateTime: oldAppointmentDate.toISOString(),
-      newDateTime: newAppointmentUtc.toISOString()
+      newDateTime: newAppointmentUtc.toISOString(),
     });
-
   } catch (error) {
     console.error('Reschedule appointment error:', error);
     return NextResponse.json(

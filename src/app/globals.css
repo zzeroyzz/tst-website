@@ -3,8 +3,11 @@
 @tailwind utilities;
 /* Critical styles that load immediately */
 .loading-fallback {
-  font-family: system-ui, -apple-system, sans-serif;
-  background-color: #F9F5F2;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: #f9f5f2;
   color: black;
   padding: 20px;
   text-align: center;

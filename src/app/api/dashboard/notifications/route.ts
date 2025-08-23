@@ -26,35 +26,37 @@ export async function GET(request: NextRequest) {
     }
 
     // Add timeAgo calculation
-    const processedNotifications = notifications?.map(notification => {
-      const createdAt = new Date(notification.created_at);
-      const now = new Date();
-      const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+    const processedNotifications =
+      notifications?.map(notification => {
+        const createdAt = new Date(notification.created_at);
+        const now = new Date();
+        const diffInMinutes = Math.floor(
+          (now.getTime() - createdAt.getTime()) / (1000 * 60)
+        );
 
-      let timeAgo;
-      if (diffInMinutes < 1) timeAgo = 'Just now';
-      else if (diffInMinutes < 60) timeAgo = `${diffInMinutes}m ago`;
-      else {
-        const diffInHours = Math.floor(diffInMinutes / 60);
-        if (diffInHours < 24) timeAgo = `${diffInHours}h ago`;
+        let timeAgo;
+        if (diffInMinutes < 1) timeAgo = 'Just now';
+        else if (diffInMinutes < 60) timeAgo = `${diffInMinutes}m ago`;
         else {
-          const diffInDays = Math.floor(diffInHours / 24);
-          if (diffInDays < 7) timeAgo = `${diffInDays}d ago`;
-          else timeAgo = createdAt.toLocaleDateString();
+          const diffInHours = Math.floor(diffInMinutes / 60);
+          if (diffInHours < 24) timeAgo = `${diffInHours}h ago`;
+          else {
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays < 7) timeAgo = `${diffInDays}d ago`;
+            else timeAgo = createdAt.toLocaleDateString();
+          }
         }
-      }
 
-      return {
-        ...notification,
-        timeAgo
-      };
-    }) || [];
+        return {
+          ...notification,
+          timeAgo,
+        };
+      }) || [];
 
     return NextResponse.json({
       notifications: processedNotifications,
-      unreadCount: notifications?.filter(n => !n.read).length || 0
+      unreadCount: notifications?.filter(n => !n.read).length || 0,
     });
-
   } catch (error) {
     console.error('Error in notifications GET:', error);
     return NextResponse.json(
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
       contact_name,
       contact_email,
       reminder_number,
-      read = false
+      read = false,
     } = body;
 
     // Validate required fields
@@ -98,7 +100,7 @@ export async function POST(request: NextRequest) {
         contact_email,
         reminder_number,
         read,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -109,7 +111,6 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ notification: data });
-
   } catch (error) {
     console.error('Error in notifications POST:', error);
     return NextResponse.json(
@@ -137,7 +138,10 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, message: 'All notifications marked as read' });
+      return NextResponse.json({
+        success: true,
+        message: 'All notifications marked as read',
+      });
     }
 
     if (!notificationIds || !Array.isArray(notificationIds)) {
@@ -160,9 +164,8 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `${notificationIds.length} notifications marked as read`
+      message: `${notificationIds.length} notifications marked as read`,
     });
-
   } catch (error) {
     console.error('Error in notifications PATCH:', error);
     return NextResponse.json(
@@ -193,9 +196,8 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Deleted notifications older than ${olderThanDays} days`
+      message: `Deleted notifications older than ${olderThanDays} days`,
     });
-
   } catch (error) {
     console.error('Error in notifications DELETE:', error);
     return NextResponse.json(

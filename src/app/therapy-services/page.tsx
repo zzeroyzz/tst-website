@@ -8,7 +8,8 @@ import { ourApproachData } from '@/data/servicesPageData';
 const canonical = 'https://toastedsesametherapy.com/therapy-services';
 
 export const metadata: Metadata = {
-  title: 'Trauma Therapy in Atlanta | Queer Asian Therapist | Toasted Sesame Therapy',
+  title:
+    'Trauma Therapy in Atlanta | Queer Asian Therapist | Toasted Sesame Therapy',
   description:
     'Identity-centered, trauma-informed therapy in Atlanta and across Georgia via telehealth. Support for complex trauma, C-PTSD, queer and Asian clients, and neurodivergent folks.',
   alternates: { canonical },
@@ -34,9 +35,9 @@ export default function ServicesPage() {
       name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.answer.replace(/<[^>]*>?/gm, ' ')
-      }
-    }))
+        text: item.answer.replace(/<[^>]*>?/gm, ' '),
+      },
+    })),
   };
 
   const serviceSchema = {
@@ -49,12 +50,12 @@ export default function ServicesPage() {
     availableChannel: {
       '@type': 'ServiceChannel',
       serviceUrl: canonical,
-      availableLanguage: ['English']
+      availableLanguage: ['English'],
     },
     provider: {
       '@type': 'Organization',
       name: 'Toasted Sesame Therapy',
-      url: 'https://toastedsesametherapy.com/'
+      url: 'https://toastedsesametherapy.com/',
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -64,10 +65,10 @@ export default function ServicesPage() {
         itemOffered: {
           '@type': 'Service',
           name: s.title,
-          description: s.description
-        }
-      }))
-    }
+          description: s.description,
+        },
+      })),
+    },
   };
 
   const jsonLd = {
@@ -76,23 +77,37 @@ export default function ServicesPage() {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://toastedsesametherapy.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Therapy Services', item: canonical }
-        ]
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://toastedsesametherapy.com/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Therapy Services',
+            item: canonical,
+          },
+        ],
       },
       {
         '@type': 'Organization',
         name: 'Toasted Sesame Therapy',
-        url: 'https://toastedsesametherapy.com/'
+        url: 'https://toastedsesametherapy.com/',
       },
       serviceSchema,
-      faqSchema
-    ]
+      faqSchema,
+    ],
   };
 
   return (
     <>
-      <Script id="services-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="services-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ServicesPageClient />
     </>
   );

@@ -12,7 +12,10 @@ export async function POST(request: Request) {
     const { email, name } = await request.json();
 
     if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Valid email is required.' },
+        { status: 400 }
+      );
     }
 
     // Extract username from email (everything before @)
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
     const response = await fetch(mailchimpUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `apikey ${mailchimpApiKey}`,
+        Authorization: `apikey ${mailchimpApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(mailchimpData),
@@ -45,13 +48,15 @@ export async function POST(request: Request) {
     // Handle existing subscriber
     if (!response.ok && responseData.title === 'Member Exists') {
       // Update existing subscriber
-      const subscriberHash = Buffer.from(email.toLowerCase()).toString('base64').replace(/=/g, '');
+      const subscriberHash = Buffer.from(email.toLowerCase())
+        .toString('base64')
+        .replace(/=/g, '');
       const updateUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members/${subscriberHash}`;
 
       await fetch(updateUrl, {
         method: 'PATCH',
         headers: {
-          'Authorization': `apikey ${mailchimpApiKey}`,
+          Authorization: `apikey ${mailchimpApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -61,15 +66,18 @@ export async function POST(request: Request) {
       });
     } else if (!response.ok) {
       console.error('Mailchimp API Error:', responseData);
-      return NextResponse.json({
-        error: `Subscription failed: ${responseData.detail || responseData.title}`
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Subscription failed: ${responseData.detail || responseData.title}`,
+        },
+        { status: 400 }
+      );
     }
 
     // 2. Send custom welcome email using your beautiful template
 
     const welcomeHtml = getWelcomeEmailTemplate({
-      name: emailUsername || 'friend'
+      name: emailUsername || 'friend',
     });
 
     const emailResult = await sendCustomEmailWithRetry({
@@ -78,21 +86,24 @@ export async function POST(request: Request) {
       subject: 'Welcome! Your free guides are here ☁️',
       htmlContent: welcomeHtml,
       listId: mailchimpAudienceId!,
-      campaignTitle: `New Subscriber Email - ${emailUsername || 'subscriber'} - ${new Date().toISOString()}`
+      campaignTitle: `New Subscriber Email - ${emailUsername || 'subscriber'} - ${new Date().toISOString()}`,
     });
 
     if (!emailResult.success) {
-      return
+      return;
     }
-    return NextResponse.json({
-      message: 'Successfully subscribed to newsletter!',
-      status: 'subscribed',
-      emailSent: emailResult.success
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        message: 'Successfully subscribed to newsletter!',
+        status: 'subscribed',
+        emailSent: emailResult.success,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Newsletter subscription error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unexpected error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -28,9 +28,13 @@ const sendCancellationEmail = async (contact: any) => {
     html: getAppointmentCancellationTemplate({
       name: `${contact.name} ${contact.last_name || ''}`.trim(), // FIXED: Added last_name handling
       // CHANGED: Use Eastern timezone for formatting
-      appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-      appointmentTime: format(appointmentEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) + ' EST'
-    })
+      appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', {
+        timeZone: EASTERN_TIMEZONE,
+      }),
+      appointmentTime:
+        format(appointmentEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) +
+        ' EST',
+    }),
   };
 
   try {
@@ -106,7 +110,7 @@ export async function POST(
       .update({
         appointment_status: 'cancelled',
         appointment_notes: 'Cancelled by client via email link',
-        last_appointment_update: new Date().toISOString()
+        last_appointment_update: new Date().toISOString(),
       })
       .eq('appointment_cancel_token', token)
       .select();
@@ -150,14 +154,18 @@ export async function POST(
               <p style="margin: 0;">The client cancelled their appointment using the cancellation link from their confirmation email.</p>
             </div>
 
-            ${contact.interested_in && contact.interested_in.length > 0 ? `
+            ${
+              contact.interested_in && contact.interested_in.length > 0
+                ? `
             <div style="background-color: #F7BD01; border: 2px solid #000; padding: 15px; margin: 20px 0;">
               <h3 style="margin: 0 0 15px;">Client Background</h3>
               <p style="margin: 5px 0;"><strong>Interested in:</strong> ${contact.interested_in.join(', ')}</p>
               ${contact.scheduling_preference ? `<p style="margin: 5px 0;"><strong>Scheduling preference:</strong> ${contact.scheduling_preference}</p>` : ''}
               ${contact.payment_method ? `<p style="margin: 5px 0;"><strong>Payment method:</strong> ${contact.payment_method}</p>` : ''}
             </div>
-            ` : ''}
+            `
+                : ''
+            }
 
             <div style="background-color: #E0F2FE; border: 1px solid #0891B2; padding: 15px; margin: 20px 0; border-radius: 4px;">
               <p style="margin: 0; font-size: 14px; color: #0F766E;">
@@ -167,7 +175,7 @@ export async function POST(
 
             <p style="margin: 20px 0 0;">The client has been sent a cancellation confirmation email.</p>
           </div>
-        `
+        `,
       };
 
       try {
@@ -183,7 +191,7 @@ export async function POST(
 
     return NextResponse.json({
       message: 'Appointment cancelled successfully',
-      contact: data[0]
+      contact: data[0],
     });
   } catch (error) {
     console.error('Error cancelling appointment:', error);

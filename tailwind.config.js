@@ -1,8 +1,8 @@
 module.exports = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   // Remove the entire 'purge' section - it's deprecated
   // The 'content' array above replaces purge.content
@@ -67,56 +67,62 @@ module.exports = {
     'to-purple-500',
     // Dynamic classes that might be generated
     {
-      pattern: /^(bg|text|border)-(red|yellow|green|blue|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)$/,
+      pattern:
+        /^(bg|text|border)-(red|yellow|green|blue|purple|pink|indigo)-(100|200|300|400|500|600|700|800|900)$/,
     },
     {
       pattern: /^(grid-cols|gap|p|m|px|py|mx|my)-(1|2|3|4|5|6|8|10|12)$/,
-    }
+    },
   ],
 
   theme: {
     extend: {
       colors: {
-        "tst-white": "#FFFFFF",
-        "tst-cream": "#F9F5F2",
-        "tst-yellow": "#F7BD01",
-        "tst-purple": "#C5A1FF",
-        "tst-teal": "#69D4E9",
-        "tst-green": "#7FBC8C",
-        "tst-red": "#FF6B6B",
+        'tst-white': '#FFFFFF',
+        'tst-cream': '#F9F5F2',
+        'tst-yellow': '#F7BD01',
+        'tst-purple': '#C5A1FF',
+        'tst-teal': '#69D4E9',
+        'tst-green': '#7FBC8C',
+        'tst-red': '#FF6B6B',
       },
       fontFamily: {
-        sans: ["var(--font-work-sans)", "system-ui", "-apple-system", "sans-serif"],
+        sans: [
+          'var(--font-work-sans)',
+          'system-ui',
+          '-apple-system',
+          'sans-serif',
+        ],
       },
       boxShadow: {
-        brutalistXs: "2px 3px 0 #000",
-        brutalistSm: "3px 3px 0 #000",
-        brutalist: "4px 4px 0 #000",
-        brutalistLg: "6px 6px 0 #000",
+        brutalistXs: '2px 3px 0 #000',
+        brutalistSm: '3px 3px 0 #000',
+        brutalist: '4px 4px 0 #000',
+        brutalistLg: '6px 6px 0 #000',
       },
-      height:{
-        "96": "24rem",
+      height: {
+        96: '24rem',
       },
-      maxHeight:{
-        "80": "20rem",
-        "90": "24rem",
-        "450": "45rem",
+      maxHeight: {
+        80: '20rem',
+        90: '24rem',
+        450: '45rem',
       },
       minHeight: {
-        '0': '0',
-        '100': '100px',
-        '110': '110px',
-        '250': '250px',
-        '320': '320px',
-        '340': '340px',
-        '400': '400px',
-        '500': '500px',
-        '575': '575px',
-        '1500': '1500px',
+        0: '0',
+        100: '100px',
+        110: '110px',
+        250: '250px',
+        320: '320px',
+        340: '340px',
+        400: '400px',
+        500: '500px',
+        575: '575px',
+        1500: '1500px',
       },
-      minWidth:{
-        '500': '500px'
-      }
+      minWidth: {
+        500: '500px',
+      },
     },
   },
   plugins: [],

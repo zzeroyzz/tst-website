@@ -18,9 +18,9 @@ export async function POST(
 
     // Get user's IP address
     const forwarded = headersList.get('x-forwarded-for');
-    const ip = forwarded ? forwarded.split(',')[0] :
-               headersList.get('x-real-ip') ||
-               '127.0.0.1';
+    const ip = forwarded
+      ? forwarded.split(',')[0]
+      : headersList.get('x-real-ip') || '127.0.0.1';
 
     const userAgent = headersList.get('user-agent') || 'Unknown';
 
@@ -28,18 +28,23 @@ export async function POST(
     const { data, error } = await supabase.rpc('increment_post_views', {
       post_slug: slug,
       viewer_ip_addr: ip,
-      user_agent_str: userAgent
+      user_agent_str: userAgent,
     });
 
     if (error) {
       console.error('Error incrementing views:', error);
-      return NextResponse.json({ error: 'Failed to track view' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to track view' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ view_count: data });
   } catch (error) {
     console.error('Error in view tracking:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
-

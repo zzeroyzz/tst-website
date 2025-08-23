@@ -35,12 +35,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-
 # Testing Setup Guide
 
 ## Quick Start
 
 1. **Install dependencies:**
+
 ```bash
 npm install --save-dev jest @types/jest jest-environment-jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event msw whatwg-fetch ts-jest @jest/globals
 ```
@@ -51,6 +51,7 @@ npm install --save-dev jest @types/jest jest-environment-jsdom @testing-library/
    - `src/__tests__/test-utils.tsx` - Custom test utilities
 
 3. **Add test scripts to package.json:**
+
 ```json
 {
   "scripts": {
@@ -85,3 +86,4 @@ src/
 └── components/
     ├── ContactForm.tsx
     └── ContactForm.test.tsx    # Component
+```

@@ -15,14 +15,14 @@ export const metadata: Metadata = {
     title: 'Queer Asian Therapist in Atlanta | About Kay',
     description:
       'Identity‑centered, trauma‑informed therapy for queer, Asian, and neurodivergent clients. Based in Atlanta. Georgia telehealth available.',
-    type: 'profile'
+    type: 'profile',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Queer Asian Therapist in Atlanta | About Kay',
     description:
-      'Trauma‑informed, identity‑centered therapy for queer, Asian, and neurodivergent clients in Atlanta and across Georgia.'
-  }
+      'Trauma‑informed, identity‑centered therapy for queer, Asian, and neurodivergent clients in Atlanta and across Georgia.',
+  },
 };
 
 export default function AboutPage() {
@@ -36,19 +36,27 @@ export default function AboutPage() {
         image:
           'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png',
         url: canonical,
-        worksFor: { '@type': 'Organization', name: 'Toasted Sesame Therapy', url: 'https://toastedsesametherapy.com/' },
+        worksFor: {
+          '@type': 'Organization',
+          name: 'Toasted Sesame Therapy',
+          url: 'https://toastedsesametherapy.com/',
+        },
         knowsAbout: [
           'Complex trauma',
           'C-PTSD',
           'Neurodivergence',
           'LGBTQ+ affirming therapy',
-          'Asian American mental health'
+          'Asian American mental health',
         ],
         areaServed: {
           '@type': 'City',
           name: 'Atlanta',
-          address: { '@type': 'PostalAddress', addressRegion: 'GA', addressCountry: 'US' }
-        }
+          address: {
+            '@type': 'PostalAddress',
+            addressRegion: 'GA',
+            addressCountry: 'US',
+          },
+        },
       },
       {
         '@type': 'Service',
@@ -59,8 +67,8 @@ export default function AboutPage() {
         availableChannel: {
           '@type': 'ServiceChannel',
           serviceUrl: 'https://toastedsesametherapy.com/therapy-services',
-          availableLanguage: ['English']
-        }
+          availableLanguage: ['English'],
+        },
       },
       {
         '@type': 'FAQPage',
@@ -70,26 +78,29 @@ export default function AboutPage() {
             name: 'Do you work with queer Asian clients in Atlanta?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text:
-                'Yes. I specialize in identity-centered care for queer and Asian clients in Atlanta with virtual sessions available across Georgia.'
-            }
+              text: 'Yes. I specialize in identity-centered care for queer and Asian clients in Atlanta with virtual sessions available across Georgia.',
+            },
           },
           {
             '@type': 'Question',
             name: 'Do you offer virtual therapy across Georgia?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Yes. All sessions are held virtually for clients located anywhere in Georgia.'
-            }
-          }
-        ]
-      }
-    ]
+              text: 'Yes. All sessions are held virtually for clients located anywhere in Georgia.',
+            },
+          },
+        ],
+      },
+    ],
   };
 
   return (
     <>
-      <Script id="about-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="about-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <AboutPageClient />
     </>
   );

@@ -5,14 +5,14 @@ const useRouter = jest.fn(() => ({
   refresh: jest.fn(),
   back: jest.fn(),
   forward: jest.fn(),
-}))
+}));
 
-const usePathname = jest.fn(() => '/')
+const usePathname = jest.fn(() => '/');
 
-const useSearchParams = jest.fn(() => new URLSearchParams())
+const useSearchParams = jest.fn(() => new URLSearchParams());
 
 module.exports = {
   useRouter,
   usePathname,
   useSearchParams,
-}
+};

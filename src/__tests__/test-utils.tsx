@@ -1,5 +1,5 @@
 // src/__tests__/test-utils.js
-import { render } from '@testing-library/react'
+import { render } from '@testing-library/react';
 
 // Create a proper mock chain for Supabase queries
 const createSupabaseQueryChain = () => {
@@ -38,9 +38,9 @@ const createSupabaseQueryChain = () => {
     single: jest.fn().mockResolvedValue({ data: null, error: null }),
     maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
     then: jest.fn().mockResolvedValue({ data: [], error: null }),
-  }
-  return chain
-}
+  };
+  return chain;
+};
 
 // Mock Supabase client with all necessary methods
 export const mockSupabaseClient = {
@@ -52,8 +52,12 @@ export const mockSupabaseClient = {
   removeChannel: jest.fn(),
   auth: {
     getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
-    getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
-    signInWithPassword: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    getSession: jest
+      .fn()
+      .mockResolvedValue({ data: { session: null }, error: null }),
+    signInWithPassword: jest
+      .fn()
+      .mockResolvedValue({ data: { user: null }, error: null }),
     signOut: jest.fn().mockResolvedValue({ error: null }),
   },
   storage: {
@@ -62,10 +66,12 @@ export const mockSupabaseClient = {
       download: jest.fn().mockResolvedValue({ data: null, error: null }),
       remove: jest.fn().mockResolvedValue({ data: null, error: null }),
       list: jest.fn().mockResolvedValue({ data: [], error: null }),
-      getPublicUrl: jest.fn().mockReturnValue({ data: { publicUrl: 'mock-url' } }),
+      getPublicUrl: jest
+        .fn()
+        .mockReturnValue({ data: { publicUrl: 'mock-url' } }),
     }),
   },
-}
+};
 
 // Create mock contact helper (this was missing!)
 export const createMockContact = (overrides = {}) => ({
@@ -79,7 +85,7 @@ export const createMockContact = (overrides = {}) => ({
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   ...overrides,
-})
+});
 
 // Create mock post helper
 export const createMockPost = (overrides = {}) => ({
@@ -95,7 +101,7 @@ export const createMockPost = (overrides = {}) => ({
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   ...overrides,
-})
+});
 
 // Mock API response helpers
 export const mockApiResponse = (data = {}, status = 200) => ({
@@ -103,17 +109,17 @@ export const mockApiResponse = (data = {}, status = 200) => ({
   status,
   json: () => Promise.resolve(data),
   text: () => Promise.resolve(JSON.stringify(data)),
-})
+});
 
 export const mockApiError = (message = 'API Error', status = 500) => ({
   ok: false,
   status,
   json: () => Promise.resolve({ error: message }),
   text: () => Promise.resolve(JSON.stringify({ error: message })),
-})
+});
 
 // Custom render function (if you need providers later)
-export const customRender = (ui, options) => render(ui, options)
+export const customRender = (ui, options) => render(ui, options);
 
 // Re-export everything
-export * from '@testing-library/react'
+export * from '@testing-library/react';
