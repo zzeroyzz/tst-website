@@ -15,14 +15,14 @@ export const metadata: Metadata = {
     url: canonical,
     title: 'Contact a Queer Asian Therapist in Atlanta | Book a Consultation',
     description:
-      'Reach out to Kay for a free 15-minute consult. Identity-centered, trauma-informed therapy in Atlanta and across Georgia via telehealth.'
+      'Reach out to Kay for a free 15-minute consult. Identity-centered, trauma-informed therapy in Atlanta and across Georgia via telehealth.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Contact a Queer Asian Therapist in Atlanta | Book a Consultation',
     description:
-      'Book a 15-minute consult with Kay. Identity-centered, trauma-informed therapy for queer, Asian, and neurodivergent clients in Georgia.'
-  }
+      'Book a 15-minute consult with Kay. Identity-centered, trauma-informed therapy for queer, Asian, and neurodivergent clients in Georgia.',
+  },
 };
 
 export default function ContactPage() {
@@ -33,9 +33,9 @@ export default function ContactPage() {
       name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.answer.replace(/<[^>]*>?/gm, ' ')
-      }
-    }))
+        text: item.answer.replace(/<[^>]*>?/gm, ' '),
+      },
+    })),
   };
 
   const jsonLd = {
@@ -44,9 +44,19 @@ export default function ContactPage() {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://toastedsesametherapy.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Contact', item: canonical }
-        ]
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://toastedsesametherapy.com/',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Contact',
+            item: canonical,
+          },
+        ],
       },
       {
         '@type': 'ContactPage',
@@ -54,19 +64,21 @@ export default function ContactPage() {
         url: canonical,
         about: {
           '@type': 'Person',
-          name: 'Kay'
-        }
+          name: 'Kay',
+        },
       },
       {
         '@type': 'Organization',
         name: 'Toasted Sesame Therapy',
         url: 'https://toastedsesametherapy.com/',
-        contactPoint: [{
-          '@type': 'ContactPoint',
-          contactType: 'customer support',
-          areaServed: 'US-GA',
-          availableLanguage: ['English']
-        }]
+        contactPoint: [
+          {
+            '@type': 'ContactPoint',
+            contactType: 'customer support',
+            areaServed: 'US-GA',
+            availableLanguage: ['English'],
+          },
+        ],
       },
       {
         '@type': 'Service',
@@ -76,16 +88,20 @@ export default function ContactPage() {
         areaServed: 'Georgia',
         availableChannel: {
           '@type': 'ServiceChannel',
-          serviceUrl: 'https://toastedsesametherapy.com/therapy-services'
-        }
+          serviceUrl: 'https://toastedsesametherapy.com/therapy-services',
+        },
       },
-      faqSchema
-    ]
+      faqSchema,
+    ],
   };
 
   return (
     <>
-      <Script id="contact-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="contact-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ContactPageClient />
     </>
   );
