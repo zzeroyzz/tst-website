@@ -43,11 +43,11 @@ interface QuestionnaireReminderData {
 }
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 function formatName(name: string): string {
   if (!name) return '';
@@ -237,7 +237,9 @@ const getBaseEmailTemplate = (content: string, img: string): string => `
 `;
 
 // Client appointment confirmation email
-export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmationData): string => {
+export const getAppointmentConfirmationTemplate = (
+  data: AppointmentConfirmationData
+): string => {
   const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
@@ -372,7 +374,9 @@ export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmation
 };
 
 // Admin notification email (for Kay)
-export const getAppointmentNotificationTemplate = (data: AppointmentNotificationData): string => {
+export const getAppointmentNotificationTemplate = (
+  data: AppointmentNotificationData
+): string => {
   const formattedName = formatName(data.clientName);
   const escapedClientName = escapeHtml(formattedName);
   const escapedClientEmail = escapeHtml(data.clientEmail);
@@ -382,7 +386,8 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
 
   const q = data.questionnaireData;
-  const questionnaireSection = q ? `
+  const questionnaireSection = q
+    ? `
     <!-- Questionnaire Responses -->
     <div style="background-color:#7FBC8C !important; border:3px solid #000000; padding:30px; margin:40px 0;" class="force-green">
       <h2 style="font-family:'Work Sans',Arial,sans-serif; font-size:24px; font-weight:bold; color:#000000 !important; margin:0 0 20px;" class="force-black-text">
@@ -417,7 +422,8 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
         ${q.budgetWorks ? 'Yes' : 'No'}
       </p>
     </div>
-  ` : '';
+  `
+    : '';
 
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -512,8 +518,10 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
 };
 
 // Client appointment cancellation email
-export const getAppointmentCancellationTemplate = (data: AppointmentCancellationData): string => {
-    const formattedName = formatName(data.name);
+export const getAppointmentCancellationTemplate = (
+  data: AppointmentCancellationData
+): string => {
+  const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
@@ -625,8 +633,10 @@ export const getAppointmentCancellationTemplate = (data: AppointmentCancellation
   return getBaseEmailTemplate(content, img);
 };
 
-export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData): string => {
-    const formattedName = formatName(data.name);
+export const getAppointmentRescheduleTemplate = (
+  data: AppointmentRescheduleData
+): string => {
+  const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedOldDate = escapeHtml(data.oldAppointmentDate);
   const escapedOldTime = escapeHtml(data.oldAppointmentTime);
@@ -779,7 +789,9 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
   return getBaseEmailTemplate(content, img);
 };
 
-export const getQuestionnaireReminderTemplate = (data: QuestionnaireReminderData): string => {
+export const getQuestionnaireReminderTemplate = (
+  data: QuestionnaireReminderData
+): string => {
   const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedUrl = escapeHtml(data.questionnaireUrl);
@@ -857,5 +869,5 @@ export type {
   AppointmentConfirmationData,
   AppointmentNotificationData,
   AppointmentCancellationData,
-  AppointmentRescheduleData
+  AppointmentRescheduleData,
 };

@@ -1,0 +1,745 @@
+import { GraphQLError } from 'graphql';
+import { sendZapierEmailWithRetry } from '@/lib/zapier-email-sender';
+import { getContactConfirmationTemplate } from '@/lib/custom-email-templates';
+
+interface Context {
+  supabase: any;
+  user: any;
+  session: any;
+}
+
+export const contactResolvers = {
+  Query: {
+    contacts: async (_: any, { filters }: any, { supabase }: Context) => {
+      try {
+        let query = supabase.from('contacts').select(`
+            *,
+            message_count,
+            last_message_at,
+            contact_status,
+            segments,
+            crm_notes,
+            custom_fields
+          `);
+
+        // Apply filters
+        if (filters) {
+          if (filters.status) {
+            query = query.eq('contact_status', filters.status);
+          }
+          if (filters.segments && filters.segments.length > 0) {
+            query = query.overlaps('segments', filters.segments);
+          }
+          if (filters.hasMessages !== undefined) {
+            if (filters.hasMessages) {
+              query = query.gt('message_count', 0);
+            } else {
+              query = query.eq('message_count', 0);
+            }
+          }
+          if (filters.appointmentStatus) {
+            query = query.eq('appointment_status', filters.appointmentStatus);
+          }
+          if (filters.search) {
+            query = query.or(
+              `name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`
+            );
+          }
+          if (filters.createdAfter) {
+            query = query.gte('created_at', filters.createdAfter);
+          }
+          if (filters.createdBefore) {
+            query = query.lte('created_at', filters.createdBefore);
+          }
+        }
+
+        const { data, error } = await query.order('created_at', {
+          ascending: false,
+        });
+
+        if (error) {
+          throw new GraphQLError(`Failed to fetch contacts: ${error.message}`);
+        }
+
+        return data || [];
+      } catch (error) {
+        throw new GraphQLError(`Error fetching contacts: ${error}`);
+      }
+    },
+
+    contact: async (_: any, { id }: any, { supabase }: Context) => {
+      try {
+        const { data, error } = await supabase
+          .from('contacts')
+          .select(
+            `
+            *,
+            message_count,
+            last_message_at,
+            contact_status,
+            segments,
+            crm_notes,
+            custom_fields
+          `
+          )
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          throw new GraphQLError(`Failed to fetch contact: ${error.message}`);
+        }
+
+        return data;
+      } catch (error) {
+        throw new GraphQLError(`Error fetching contact: ${error}`);
+      }
+    },
+  },
+
+  Mutation: {
+    createContact: async (_: any, { input }: any, { supabase }: Context) => {
+      try {
+        // Check for existing contact first
+        const { data: existingContact, error: checkError } = await supabase
+          .from('contacts')
+          .select('id, email, name')
+          .eq('email', input.email.toLowerCase())
+          .single();
+
+        if (existingContact) {
+          throw new GraphQLError('An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.');
+        }
+
+        // If there's an error other than "no rows found", handle it
+        if (checkError && checkError.code !== 'PGRST116') {
+          console.error('Database check error:', checkError);
+          throw new GraphQLError('Failed to check existing contacts');
+        }
+
+        // Remove questionnaire token generation
+
+        const contactData = {
+          name: input.name,
+          email: input.email.toLowerCase(),
+          phone_number: input.phoneNumber,
+          phone: input.phoneNumber, // For legacy compatibility
+          contact_status: 'ACTIVE',
+          appointment_status: null,
+          segments: input.segments || [],
+          crm_notes: input.crmNotes,
+          custom_fields: input.customFields || {},
+          archived: false,
+          created_at: new Date().toISOString(),
+        };
+
+        const { data, error } = await supabase
+          .from('contacts')
+          .insert([contactData])
+          .select()
+          .single();
+
+        if (error) {
+          // Handle unique constraint violations gracefully
+          if (error.code === '23505') {
+            throw new GraphQLError('An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.');
+          }
+          throw new GraphQLError(`Failed to create contact: ${error.message}`);
+        }
+
+        // Send welcome email if requested
+        if (input.sendWelcomeEmail) {
+          try {
+            const emailTemplate = getContactConfirmationTemplate({ name: input.name });
+            await sendZapierEmailWithRetry({
+              to: input.email,
+              subject: 'Thanks for reaching out! Next steps inside 📝',
+              html: emailTemplate,
+            });
+          } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+            // Don't throw - contact creation succeeded, email is secondary
+          }
+        }
+
+        // Create notification for admin dashboard
+        try {
+          await supabase.from('notifications').insert({
+            type: 'contact',
+            title: 'New Contact Submission',
+            message: `${input.name} submitted the contact form via GraphQL`,
+            contact_id: data.id,
+            contact_name: input.name,
+            contact_email: input.email.toLowerCase(),
+            read: false,
+            created_at: new Date().toISOString(),
+          });
+        } catch (notificationError) {
+          console.error('Failed to create notification:', notificationError);
+          // Don't throw - contact creation succeeded, notification is secondary
+        }
+
+        return data;
+      } catch (error) {
+        if (error instanceof GraphQLError) {
+          throw error;
+        }
+        throw new GraphQLError(`Error creating contact: ${error}`);
+      }
+    },
+
+    updateContact: async (
+      _: any,
+      { id, input }: any,
+      { supabase }: Context
+    ) => {
+      try {
+        const updateData: any = {};
+
+        if (input.name) updateData.name = input.name;
+        if (input.email) updateData.email = input.email.toLowerCase();
+        if (input.phoneNumber !== undefined)
+          updateData.phone_number = input.phoneNumber;
+        if (input.contactStatus)
+          updateData.contact_status = input.contactStatus;
+        if (input.segments !== undefined) updateData.segments = input.segments;
+        if (input.crmNotes !== undefined) updateData.crm_notes = input.crmNotes;
+        if (input.appointmentStatus !== undefined)
+          updateData.appointment_status = input.appointmentStatus;
+        if (input.customFields !== undefined)
+          updateData.custom_fields = input.customFields;
+
+        const { data, error } = await supabase
+          .from('contacts')
+          .update(updateData)
+          .eq('id', id)
+          .select()
+          .single();
+
+        if (error) {
+          throw new GraphQLError(`Failed to update contact: ${error.message}`);
+        }
+
+        return data;
+      } catch (error) {
+        throw new GraphQLError(`Error updating contact: ${error}`);
+      }
+    },
+
+    deleteContact: async (_: any, { id }: any, { supabase }: Context) => {
+      try {
+        const { error } = await supabase.from('contacts').delete().eq('id', id);
+
+        if (error) {
+          throw new GraphQLError(`Failed to delete contact: ${error.message}`);
+        }
+
+        return true;
+      } catch (error) {
+        throw new GraphQLError(`Error deleting contact: ${error}`);
+      }
+    },
+
+    createContactWithAppointment: async (
+      _: any,
+      { input }: any,
+      { supabase }: Context
+    ) => {
+      try {
+        const {
+          name,
+          email,
+          phoneNumber,
+          scheduledAt,
+          timeZone,
+          segments = ['New Lead'],
+          notes,
+          triggerSMSWorkflow = true,
+        } = input;
+
+        const messages: string[] = [];
+
+        // Check if contact already exists
+        const { data: existingContact } = await supabase
+          .from('contacts')
+          .select('id, name, email')
+          .eq('email', email.toLowerCase())
+          .single();
+
+        let contact;
+        if (existingContact) {
+          // Update existing contact
+          const { data: updatedContact, error: updateError } = await supabase
+            .from('contacts')
+            .update({
+              phone_number: phoneNumber,
+              segments,
+              crm_notes: notes || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingContact.id)
+            .select()
+            .single();
+
+          if (updateError) {
+            throw new GraphQLError(
+              `Failed to update existing contact: ${updateError.message}`
+            );
+          }
+
+          contact = updatedContact;
+          messages.push(`Updated existing contact: ${name}`);
+        } else {
+          // Create new contact
+          const contactData = {
+            name,
+            email: email.toLowerCase(),
+            phone_number: phoneNumber,
+            contact_status: 'PROSPECT',
+            appointment_status: null, // Explicitly set to null
+            segments,
+            crm_notes: notes || null,
+            custom_fields: {},
+            questionnaire_completed: false,
+            archived: false,
+          };
+
+          const { data: newContact, error: contactError } = await supabase
+            .from('contacts')
+            .insert([contactData])
+            .select()
+            .single();
+
+          if (contactError) {
+            throw new GraphQLError(
+              `Failed to create contact: ${contactError.message}`
+            );
+          }
+
+          contact = newContact;
+          messages.push(`Created new contact: ${name}`);
+        }
+
+        // Create appointment
+        const appointmentData = {
+          contact_id: contact.id,
+          scheduled_at: scheduledAt,
+          status: 'SCHEDULED',
+          time_zone: timeZone,
+          notes: `Initial consultation scheduled via calendar form`,
+        };
+
+        const { data: appointment, error: appointmentError } = await supabase
+          .from('appointments')
+          .insert([appointmentData])
+          .select()
+          .single();
+
+        if (appointmentError) {
+          throw new GraphQLError(
+            `Failed to create appointment: ${appointmentError.message}`
+          );
+        }
+
+        // Update contact with appointment information
+        const { error: contactUpdateError } = await supabase
+          .from('contacts')
+          .update({
+            scheduled_appointment_at: scheduledAt,
+            appointment_status: 'SCHEDULED',
+          })
+          .eq('id', contact.id);
+
+        if (contactUpdateError) {
+          throw new GraphQLError(
+            `Failed to update contact with appointment info: ${contactUpdateError.message}`
+          );
+        }
+
+        messages.push(
+          `Scheduled appointment for ${new Date(scheduledAt).toLocaleString()}`
+        );
+
+        let smsTriggered = false;
+
+        // Trigger SMS workflow if enabled and phone number provided
+        if (triggerSMSWorkflow && phoneNumber) {
+          try {
+            const { executeNewLeadSMSWorkflow } = await import(
+              '@/lib/sms/workflows'
+            );
+
+            const workflowResult = await executeNewLeadSMSWorkflow({
+              contactId: contact.id,
+              contactName: name,
+              contactEmail: email,
+              phoneNumber: phoneNumber,
+              appointmentDateTime: scheduledAt,
+            });
+
+            smsTriggered = workflowResult.success;
+            messages.push(...workflowResult.messages);
+
+            if (workflowResult.errors.length > 0) {
+              messages.push(
+                ...workflowResult.errors.map(err => `SMS Error: ${err}`)
+              );
+            }
+          } catch (smsError) {
+            console.error('Error executing SMS workflow:', smsError);
+            messages.push(
+              `SMS workflow failed: ${(smsError as Error).message}`
+            );
+          }
+        }
+
+        // Create notification for dashboard
+        await supabase.from('notifications').insert([
+          {
+            type: 'appointment_scheduled',
+            title: 'New Consultation Scheduled',
+            message: `${name} scheduled a consultation for ${new Date(scheduledAt).toLocaleString()}`,
+            contact_id: contact.id,
+            contact_name: name,
+            contact_email: email,
+            read: false,
+          },
+        ]);
+
+        return {
+          contact,
+          appointment,
+          smsTriggered,
+          messages,
+        };
+      } catch (error) {
+        throw new GraphQLError(
+          `Error creating contact with appointment: ${error}`
+        );
+      }
+    },
+
+    createLeadWithAppointment: async (
+      _: any,
+      { input }: any,
+      { supabase }: Context
+    ) => {
+      try {
+        const {
+          name,
+          email,
+          phone,
+          appointmentDateTime,
+          timeZone,
+          segments = ['New Lead'],
+          notes,
+          triggerSMSWorkflow = true,
+        } = input;
+
+        const messages: string[] = [];
+
+        // Check if contact already exists
+        const { data: existingContact } = await supabase
+          .from('contacts')
+          .select('id, name, email')
+          .eq('email', email.toLowerCase())
+          .single();
+
+        let contact;
+        if (existingContact) {
+          // Update existing contact
+          const { data: updatedContact, error: updateError } = await supabase
+            .from('contacts')
+            .update({
+              phone_number: phone,
+              segments,
+              crm_notes: notes || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingContact.id)
+            .select()
+            .single();
+
+          if (updateError) {
+            throw new GraphQLError(
+              `Failed to update existing contact: ${updateError.message}`
+            );
+          }
+
+          contact = updatedContact;
+          messages.push(`Updated existing contact: ${name}`);
+        } else {
+          // Create new contact
+          const contactData = {
+            name,
+            email: email.toLowerCase(),
+            phone_number: phone,
+            contact_status: 'PROSPECT',
+            appointment_status: null, // Explicitly set to null
+            segments,
+            crm_notes: notes || null,
+            custom_fields: {},
+            questionnaire_completed: false,
+            archived: false,
+          };
+
+          const { data: newContact, error: contactError } = await supabase
+            .from('contacts')
+            .insert([contactData])
+            .select()
+            .single();
+
+          if (contactError) {
+            throw new GraphQLError(
+              `Failed to create contact: ${contactError.message}`
+            );
+          }
+
+          contact = newContact;
+          messages.push(`Created new contact: ${name}`);
+        }
+
+        // Create appointment
+        const appointmentData = {
+          contact_id: contact.id,
+          scheduled_at: appointmentDateTime,
+          status: 'SCHEDULED',
+          time_zone: timeZone,
+          notes: `Initial consultation scheduled via calendar form`,
+        };
+
+        const { data: appointment, error: appointmentError } = await supabase
+          .from('appointments')
+          .insert([appointmentData])
+          .select()
+          .single();
+
+        if (appointmentError) {
+          throw new GraphQLError(
+            `Failed to create appointment: ${appointmentError.message}`
+          );
+        }
+
+        // Update contact with appointment information
+        const { error: contactUpdateError } = await supabase
+          .from('contacts')
+          .update({
+            scheduled_appointment_at: appointmentDateTime,
+            appointment_status: 'SCHEDULED',
+          })
+          .eq('id', contact.id);
+
+        if (contactUpdateError) {
+          throw new GraphQLError(
+            `Failed to update contact with appointment info: ${contactUpdateError.message}`
+          );
+        }
+
+        messages.push(
+          `Scheduled appointment for ${new Date(appointmentDateTime).toLocaleString()}`
+        );
+
+        let smsTriggered = false;
+
+        // Trigger SMS workflow if enabled and phone number provided
+        if (triggerSMSWorkflow && phone) {
+          try {
+            const { executeNewLeadSMSWorkflow } = await import(
+              '@/lib/sms/workflows'
+            );
+
+            const workflowResult = await executeNewLeadSMSWorkflow({
+              contactId: contact.id,
+              contactName: name,
+              contactEmail: email,
+              phoneNumber: phone,
+              appointmentDateTime,
+            });
+
+            smsTriggered = workflowResult.success;
+            messages.push(...workflowResult.messages);
+
+            if (workflowResult.errors.length > 0) {
+              messages.push(
+                ...workflowResult.errors.map(err => `SMS Error: ${err}`)
+              );
+            }
+          } catch (smsError) {
+            console.error('Error executing SMS workflow:', smsError);
+            messages.push(
+              `SMS workflow failed: ${(smsError as Error).message}`
+            );
+          }
+        }
+
+        // Create notification for dashboard
+        await supabase.from('notifications').insert([
+          {
+            type: 'appointment_scheduled',
+            title: 'New Consultation Scheduled',
+            message: `${name} scheduled a consultation for ${new Date(appointmentDateTime).toLocaleString()}`,
+            contact_id: contact.id,
+            contact_name: name,
+            contact_email: email,
+            read: false,
+          },
+        ]);
+
+        return {
+          contact,
+          appointment,
+          smsTriggered,
+          messages,
+        };
+      } catch (error) {
+        throw new GraphQLError(
+          `Error creating lead with appointment: ${error}`
+        );
+      }
+    },
+  },
+
+  Subscription: {
+    contactUpdated: {
+      // Implementation would require a real-time subscription service
+      // For now, we'll leave this as a placeholder
+      subscribe: async () => {
+        // Would integrate with Supabase real-time subscriptions
+        throw new GraphQLError('Subscriptions not yet implemented');
+      },
+    },
+  },
+
+  Contact: {
+    contactStatus: (parent: any) => parent.contact_status || 'ACTIVE',
+    phoneNumber: (parent: any) => parent.phone_number,
+    crmNotes: (parent: any) => parent.crm_notes,
+    customFields: (parent: any) => parent.custom_fields || {},
+    lastMessageAt: (parent: any) => parent.last_message_at,
+    messageCount: (parent: any) => parent.message_count || 0,
+    segments: (parent: any) => parent.segments || [],
+
+    // Computed fields
+    messages: async (
+      parent: any,
+      { limit = 10 }: any,
+      { supabase }: Context
+    ) => {
+      try {
+        const { data, error } = await supabase
+          .from('crm_messages')
+          .select('*')
+          .eq('contact_id', parent.id)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+
+        if (error) {
+          throw new GraphQLError(
+            `Failed to fetch contact messages: ${error.message}`
+          );
+        }
+
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching contact messages:', error);
+        return [];
+      }
+    },
+
+    lastMessage: async (parent: any, _: any, { supabase }: Context) => {
+      try {
+        const { data, error } = await supabase
+          .from('crm_messages')
+          .select('*')
+          .eq('contact_id', parent.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 = no rows returned
+          throw new GraphQLError(
+            `Failed to fetch last message: ${error.message}`
+          );
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Error fetching last message:', error);
+        return null;
+      }
+    },
+
+    messagesSent: async (parent: any, _: any, { supabase }: Context) => {
+      try {
+        const { count, error } = await supabase
+          .from('crm_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('contact_id', parent.id)
+          .eq('direction', 'OUTBOUND');
+
+        if (error) {
+          console.error('Error fetching sent message count:', error);
+          return 0;
+        }
+
+        return count || 0;
+      } catch (error) {
+        console.error('Error fetching sent message count:', error);
+        return 0;
+      }
+    },
+
+    messagesReceived: async (parent: any, _: any, { supabase }: Context) => {
+      try {
+        const { count, error } = await supabase
+          .from('crm_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('contact_id', parent.id)
+          .eq('direction', 'INBOUND');
+
+        if (error) {
+          console.error('Error fetching received message count:', error);
+          return 0;
+        }
+
+        return count || 0;
+      } catch (error) {
+        console.error('Error fetching received message count:', error);
+        return 0;
+      }
+    },
+  },
+
+  Appointment: {
+    contactId: (parent: any) => parent.contact_id,
+    scheduledAt: (parent: any) => parent.scheduled_at,
+    timeZone: (parent: any) => parent.time_zone,
+    createdAt: (parent: any) => parent.created_at,
+    updatedAt: (parent: any) => parent.updated_at,
+
+    contact: async (parent: any, _: any, { supabase }: Context) => {
+      try {
+        const { data, error } = await supabase
+          .from('contacts')
+          .select('*')
+          .eq('id', parent.contact_id)
+          .single();
+
+        if (error) {
+          throw new GraphQLError(
+            `Failed to fetch appointment contact: ${error.message}`
+          );
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Error fetching appointment contact:', error);
+        return null;
+      }
+    },
+  },
+
+  LeadAppointmentResult: {
+    // All fields are already properly named, no field resolvers needed
+  },
+};
