@@ -56,7 +56,9 @@ const AVAILABILITY = {
   4: [
     { start: '11:00', end: '19:00' },
   ],
-  5: [],
+  5: [
+    { start: '11:00', end: '18:45' }, // Friday 11am-6:45pm EST
+  ],
   6: [],
   0: [],
 };
@@ -238,11 +240,11 @@ const CalendarStepComponent: React.FC<CalendarStepComponentProps> = ({
 
 
   return (
-    <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
+    <div data-testid="calendar-step" className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-5xl mx-auto">
       {/* Header */}
       <div className="p-6 border-b-2 border-black text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-2">Pick a time → Quick intake → Free consult.</h2>
-        <p className="text-lg text-gray-600">Select a date and time that works best for you. <br/> First full session guaranteed, no charge if you choose not to move forward.</p>
+        <p className="text-xs md:text-lg text-gray-600">Select a date and time that works best for you. <br/> First full session guaranteed, no charge if you choose not to move forward.</p>
       </div>
 
       {/* Calendar Section */}
@@ -344,6 +346,7 @@ const CalendarStepComponent: React.FC<CalendarStepComponentProps> = ({
               {timeSlots.map(slot => (
                 <div key={slot.time} className="relative">
                   <button
+                    data-testid="time-slot"
                     onClick={() => handleTimeSelect(slot.time)}
                     disabled={!slot.available}
                     className={`

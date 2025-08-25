@@ -3,8 +3,7 @@
 import React from 'react';
 import { MapPinCheckInside, Video, Brain, Heart, Rainbow } from 'lucide-react';
 import IconCircle from '@/components/IconCircle/IconCircle';
-import { motion, Variants, useInView } from 'framer-motion';
-
+import { motion, Variants } from 'framer-motion';
 
 interface BookingPageHeaderProps {
   variant: 'nd' | 'affirming' | 'trauma';
@@ -13,15 +12,12 @@ interface BookingPageHeaderProps {
 const TRUST_INDICATORS = [
   { text: 'Licensed in Georgia', icon: MapPinCheckInside },
   { text: 'Secure Telehealth', icon: Video },
-  { text: 'Affirming Care', icon: Heart }
+  { text: 'Affirming Care', icon: Heart },
 ] as const;
 
 const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-  },
+  visible: { y: 0, opacity: 1 },
 };
 
 const getVariantContent = (variant: BookingPageHeaderProps['variant']) => {
@@ -37,19 +33,18 @@ const getVariantContent = (variant: BookingPageHeaderProps['variant']) => {
       return {
         headline: 'All of you is welcome here',
         icon: <Rainbow className="w-6 h-6" />,
-        color: 'bg-pink-100  border-black  text-pink-800',
+        color: 'bg-pink-100 border-black text-pink-800',
         tagText: 'LGBTQIA-Affirming',
       };
     case 'trauma':
       return {
         headline: (
-  <>
-    When life feels heavy,<br/>
-    here’s a calm place to land
-  </>
-),
+          <>
+            When life feels heavy,<br />here’s a calm place to land
+          </>
+        ),
         icon: <Heart className="w-6 h-6" />,
-        color: 'bg-blue-100  border-black  text-blue-800',
+        color: 'bg-blue-100 border-black text-blue-800',
         tagText: 'Trauma-Informed',
       };
   }
@@ -69,30 +64,46 @@ const BookingPageHeader: React.FC<BookingPageHeaderProps> = ({ variant }) => {
           <span className="font-medium">Fit or Free Session</span>
         </div>
 
-        <motion.h1 className="text-4xl md:text-5xl font-extrabold leading-tight"  variants={itemVariants}>
+        <motion.h1
+          className="text-4xl md:text-5xl font-extrabold leading-tight"
+          variants={itemVariants}
+        >
           {content.headline}
         </motion.h1>
 
-        <motion.h3 className="text-xl text-gray-600 max-w-3xl mx-auto"  variants={itemVariants}>
-          Virtual therapy for Georgia adults with a licensed therapist. <span className="font-bold"> Free 15‑minute consult. </span> First full session is on us if it doesn’t feel right.
+        <motion.h3
+          className="text-md md:text-xl text-gray-600 max-w-3xl mx-auto"
+          variants={itemVariants}
+        >
+          Virtual therapy for Georgia adults with a licensed therapist.{' '}
+          <span className="font-bold"> Free 15‑minute consult. </span> First full
+          session is on us if it doesn’t feel right.
         </motion.h3>
       </div>
 
       {/* Trust Strip */}
-        <div
-              className="flex flex-row gap-4 flex-wrap justify-center">
-
-              {TRUST_INDICATORS.map((indicator, index) => (
-            <div key={index} className="flex items-center gap-3 ">
-              <IconCircle
-                icon={<indicator.icon className="w-4 h-4" />}
-                size="xs"
-                bgColor="bg-green-500"
-              />
-              <span className="font-medium ">{indicator.text}</span>
-            </div>
-          ))}
-            </div>
+      <div className="flex flex-wrap gap-2 items-center justify-center">
+        {TRUST_INDICATORS.map((indicator, index) => (
+          <div
+            key={index}
+            className={[
+              // On mobile: first badge spans full row & is centered.
+              index === 0 ? 'col-span-2 justify-self-center' : '',
+              'md:col-span-1',
+              'flex items-center gap-3',
+            ].join(' ')}
+          >
+            <IconCircle
+              icon={<indicator.icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+              size="xs"
+              bgColor="bg-green-500"
+            />
+            <span className="font-medium whitespace-nowrap">
+              {indicator.text}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

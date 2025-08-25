@@ -7,7 +7,7 @@ import { useMutation } from '@apollo/client/react';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
 import LeadCalendar from '@/components/LeadCalendar/LeadCalendar';
-import { MapPinCheckInside, Video, Brain, Heart, Clock, CheckCircle } from 'lucide-react';
+import { MapPinCheckInside, Brain, Heart, CheckCircle } from 'lucide-react';
 import { CREATE_BOOKING_CONTACT, CREATE_LEAD_WITH_APPOINTMENT } from '@/lib/graphql/mutations';
 
 interface BookingPageProps {

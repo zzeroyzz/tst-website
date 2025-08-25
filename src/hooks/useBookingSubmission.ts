@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { CREATE_LEAD_WITH_APPOINTMENT } from '@/lib/graphql/mutations';
+import { formatPhoneNumber, validateBookingForm, getCleanPhoneNumber } from '@/lib/validation';
 
 interface ContactFormData {
   name: string;
@@ -11,21 +12,28 @@ interface ContactFormData {
 }
 
 export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    email: '',
-    phone: '',
-  });
+  const [formData, setFormData] = useState<ContactFormData>({ name: '', email: '', phone: '' });
   const [formError, setFormError] = useState<string | null>(null);
   const [hasConsented, setHasConsented] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // GraphQL mutation
   const [createLeadWithAppointment] = useMutation(CREATE_LEAD_WITH_APPOINTMENT);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      const formattedValue = formatPhoneNumber(value);
+      if (formattedValue === 'INVALID_COUNTRY_CODE') {
+        setFormError('Only US phone numbers are supported. Please remove international country codes except +1.');
+        return;
+      }
+      setFormData({ ...formData, [name]: formattedValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
     if (formError) setFormError(null);
   };
 
@@ -39,6 +47,13 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
     displayDate: string;
     displayTime: string;
   }): Promise<void> => {
+    const validation = validateBookingForm(formData);
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0];
+      setFormError(firstError || 'Please check your information and try again.');
+      throw new Error('Validation failed');
+    }
+
     if (!hasConsented) {
       setFormError('Please consent to being contacted to continue.');
       throw new Error('Consent required');
@@ -48,22 +63,32 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
     setFormError(null);
 
     try {
-      // Use GraphQL mutation to schedule appointment
-      const { data } = await createLeadWithAppointment({
-        variables: {
-          name: formData.name,
-          email: formData.email.toLowerCase(),
-          phone: formData.phone,
-          appointmentDateTime: selectedAppointment.dateTime.toISOString(),
-          timeZone: 'America/New_York',
-          segments: [`${variant} Booking Lead`],
-          notes: `Grounding plan session booked from ${variant} page`,
-          triggerSMSWorkflow: true,
-        },
-      });
+      const variables = {
+        name: formData.name.trim(),
+        email: formData.email.toLowerCase().trim(),
+        phone: getCleanPhoneNumber(formData.phone),
+        appointmentDateTime: selectedAppointment.dateTime.toISOString(),
+        timeZone: 'America/New_York',
+        segments: [`${variant} Booking Lead`],
+        notes: `Grounding plan session booked from ${variant} page`,
+        triggerSMSWorkflow: true,
+      };
 
-      if (!(data as any)?.createLeadWithAppointment) {
-        throw new Error('Failed to schedule appointment');
+      console.log('[useBookingSubmission] Sending GraphQL variables:', variables);
+
+      const { data } = await createLeadWithAppointment({ variables });
+
+      const appointmentResult = (data as any)?.createLeadWithAppointment;
+      console.log('[useBookingSubmission] GraphQL result:', appointmentResult);
+
+      if (!appointmentResult) throw new Error('Failed to schedule appointment');
+
+      // IMPORTANT: This is the UUID we need
+      const contactUuid: string | undefined = appointmentResult.contact?.uuid ?? undefined;
+      console.log('[useBookingSubmission] contactUuid:', contactUuid);
+
+      if (!contactUuid) {
+        console.warn('[useBookingSubmission] Missing contactUuid on result.contact');
       }
 
       // Track successful booking
@@ -82,29 +107,36 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
       setIsSuccess(true);
 
       // Send confirmation emails directly
+      const emailBody = {
+        type: 'APPOINTMENT_BOOKED',
+        clientName: formData.name,
+        clientEmail: formData.email,
+        clientPhone: formData.phone,
+        appointmentDate: selectedAppointment.displayDate,
+        appointmentTime: selectedAppointment.displayTime,
+        appointmentDateTime: selectedAppointment.dateTime.toISOString(),
+        variant,
+        uuid: contactUuid, // <-- ONLY THIS (server expects `uuid`)
+      };
+
+      console.log('[useBookingSubmission] POST /api/send-appointment-emails body:', emailBody);
+
       try {
-        await fetch('/api/send-appointment-emails', {
+        const resp = await fetch('/api/send-appointment-emails', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'APPOINTMENT_BOOKED',
-            clientName: formData.name,
-            clientEmail: formData.email,
-            clientPhone: formData.phone,
-            appointmentDate: selectedAppointment.displayDate,
-            appointmentTime: selectedAppointment.displayTime,
-            appointmentDateTime: selectedAppointment.dateTime.toISOString(),
-            variant,
-          }),
+          body: JSON.stringify(emailBody),
         });
+
+        const json = await resp.json();
+        console.log('[useBookingSubmission] Email API response:', json);
       } catch (emailError) {
         console.warn('Email sending failed:', emailError);
-        // Don't fail the booking if email fails
       }
     } catch (error: any) {
       console.error('Failed to schedule appointment:', error);
-      
-      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+
+      if (error.graphQLErrors?.length > 0) {
         const firstError = error.graphQLErrors[0];
         setFormError(firstError.message || 'Failed to schedule appointment. Please try again.');
       } else if (error.networkError) {
@@ -127,6 +159,6 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
     handleInputChange,
     handleConsentChange,
     submitBooking,
-    setFormError
+    setFormError,
   };
 };

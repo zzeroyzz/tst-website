@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Calendar, User, Clock, CheckCircle } from 'lucide-react';
+import Confetti from 'react-confetti';
 import CalendarStepComponent from './CalendarStepComponent';
 import BookingDetailsForm from './BookingDetailsForm';
 import BookingPageHeader from './BookingPageHeader';
@@ -19,8 +21,44 @@ export interface SelectedAppointment {
 type BookingStep = 'calendar' | 'details' | 'success';
 
 const UnifiedBookingFlow: React.FC<UnifiedBookingFlowProps> = ({ variant }) => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<BookingStep>('calendar');
   const [selectedAppointment, setSelectedAppointment] = useState<SelectedAppointment | null>(null);
+  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Handle window dimensions for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // Set initial dimensions
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle confetti when success step is reached
+  useEffect(() => {
+    if (currentStep === 'success') {
+      setShowConfetti(true);
+      
+      // Stop confetti after 5 seconds
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
 
   // Memoized handlers to prevent infinite re-renders
   const handleTimeSelection = useCallback((dateTime: Date) => {
@@ -51,8 +89,9 @@ const UnifiedBookingFlow: React.FC<UnifiedBookingFlowProps> = ({ variant }) => {
   }, []);
 
   const handleBookingSuccess = useCallback(() => {
-    setCurrentStep('success');
-  }, []);
+    // Redirect to thank you page instead of showing inline success
+    router.push('/thank-you');
+  }, [router]);
 
   // Tab configuration
   const tabs = useMemo(() => [
@@ -135,7 +174,7 @@ const UnifiedBookingFlow: React.FC<UnifiedBookingFlowProps> = ({ variant }) => {
 
   // Success page
   const renderSuccessPage = () => (
-    <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-4xl mx-auto text-center p-12">
+    <div data-testid="success-step" className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-4xl mx-auto text-center p-12">
       <div className="text-6xl mb-6">🎉</div>
       <h2 className="text-3xl font-bold mb-4 text-green-800">
         Session Confirmed!
@@ -167,6 +206,17 @@ const UnifiedBookingFlow: React.FC<UnifiedBookingFlowProps> = ({ variant }) => {
 
   return (
     <div className="space-y-8">
+      {/* Confetti for success celebration */}
+      {showConfetti && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+        />
+      )}
+      
       <BookingPageHeader variant={variant} />
 
       {currentStep !== 'success' && (

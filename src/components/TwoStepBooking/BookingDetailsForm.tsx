@@ -69,11 +69,11 @@ const BookingDetailsForm: React.FC<BookingDetailsFormProps> = ({
   const content = getVariantContent(variant);
 
   return (
-    <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-4xl mx-auto">
+    <div data-testid="details-step" className="bg-white rounded-xl border-2 border-black shadow-brutalistLg max-w-4xl mx-auto">
       {/* Header */}
       <div className="p-6 border-b-2 border-black text-center">
-        <h2 className="text-2xl font-bold mb-2 text-center md:text-center">{content.title}</h2>
-        <p className="text-lg text-gray-600 text-center md:text-center">{content.description}</p>
+        <h2 className="text-2xl font-bold mb-2 text-center md:text-center">Complete Your Booking</h2>
+        <p className="text-sm md:text-lg text-gray-600 text-center md:text-center">Just a few details to confirm your free 15-min consultation</p>
       </div>
 
       {/* Contact Form */}
@@ -88,8 +88,8 @@ const BookingDetailsForm: React.FC<BookingDetailsFormProps> = ({
             <span className="text-xs">pick a new time</span>
           </button>
           <div className="text-center">
-            <p className="font-bold text-2xl text-center md:text-center">{selectedAppointment.displayDate}</p>
-            <p className="text-tst-purple font-semibold text-2xl text-center md:text-center">{selectedAppointment.displayTime}</p>
+            <p className="font-bold text-xl md:text-2xl text-center md:text-center">{selectedAppointment.displayDate}</p>
+            <p className="text-tst-purple font-semibold text-xl md:text-2xl  text-center md:text-center">{selectedAppointment.displayTime}</p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ const BookingDetailsForm: React.FC<BookingDetailsFormProps> = ({
                 type="tel"
                 id="phone"
                 name="phone"
-                placeholder="(555) 123-4567"
+                placeholder="555-555-5555"
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
@@ -158,7 +158,7 @@ const BookingDetailsForm: React.FC<BookingDetailsFormProps> = ({
               className="mt-1 w-4 h-4 text-tst-purple border-gray-300 rounded focus:ring-tst-purple"
               required
             />
-            <label htmlFor="consent" className="text-sm text-gray-700">
+            <label htmlFor="consent" className="text-xs md:text-sm text-gray-700">
               I consent to SMS/email for scheduling and care coordination.
               Reply STOP to opt out. I understand this is not a commitment to
               ongoing therapy services.
@@ -184,17 +184,7 @@ const BookingDetailsForm: React.FC<BookingDetailsFormProps> = ({
           </Button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            Questions? Email us at{' '}
-            <a
-              href="mailto:hello@example.com"
-              className="font-medium text-tst-purple hover:underline"
-            >
-              hello@example.com
-            </a>
-          </p>
-        </div>
+
       </div>
     </div>
   );
