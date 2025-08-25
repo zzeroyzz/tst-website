@@ -523,11 +523,11 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         <strong>Status:</strong>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.appointment_status === 'scheduled'
+                            lead.appointment_status === 'SCHEDULED'
                               ? 'bg-blue-100 text-blue-800'
-                              : lead.appointment_status === 'completed'
+                              : lead.appointment_status === 'COMPLETED'
                                 ? 'bg-tst-green text-green-800'
-                                : lead.appointment_status === 'cancelled'
+                                : lead.appointment_status === 'CANCELLED'
                                   ? 'bg-red-100 text-red-800'
                                   : 'bg-gray-100 text-gray-800'
                           }`}
@@ -757,11 +757,11 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                         <strong>Status:</strong>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.appointment_status === 'scheduled'
+                            lead.appointment_status === 'SCHEDULED'
                               ? 'bg-blue-100 text-blue-800'
-                              : lead.appointment_status === 'completed'
+                              : lead.appointment_status === 'COMPLETED'
                                 ? 'bg-tst-green text-green-800'
-                                : lead.appointment_status === 'cancelled'
+                                : lead.appointment_status === 'CANCELLED'
                                   ? 'bg-red-100 text-red-800'
                                   : 'bg-gray-100 text-gray-800'
                           }`}

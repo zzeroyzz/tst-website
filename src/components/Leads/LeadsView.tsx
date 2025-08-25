@@ -20,6 +20,37 @@ import Button from '@/components/Button/Button';
 import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
 import type { Lead } from '@/types/lead';
 
+const getDisplayStatus = (lead: any): string => {
+  // Map appointment_status and segments to display status
+  if (lead.appointment_status === 'SCHEDULED') {
+    return 'Consultation Scheduled';
+  }
+  if (lead.appointment_status === 'COMPLETED') {
+    return 'Converted';
+  }
+  if (lead.appointment_status === 'CANCELLED' || lead.appointment_status === 'NO_SHOW') {
+    return 'Not a Fit';
+  }
+  
+  // Check segments for status
+  if (lead.segments?.includes('new')) {
+    return 'New';
+  }
+  if (lead.segments?.includes('contacted')) {
+    return 'Contacted';
+  }
+  if (lead.segments?.includes('reminder_sent')) {
+    return 'Reminder Sent';
+  }
+  
+  // Default status based on contact_status
+  if (lead.contact_status === 'PROSPECT') {
+    return 'New';
+  }
+  
+  return 'New'; // Default fallback
+};
+
 const getStatusClasses = (status: string) => {
   switch (status) {
     case 'New':
@@ -406,7 +437,7 @@ const LeadsView = () => {
 
         {/* Desktop Table View */}
         <div className="hidden lg:block bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="max-h-96 overflow-y-auto">
             <table className="w-full text-left">
               <thead className="border-b-2 border-black bg-gray-50">
                 <tr>
@@ -433,11 +464,12 @@ const LeadsView = () => {
                       new Date(),
                       new Date(lead.created_at)
                     );
+                    const leadStatus = getDisplayStatus(lead);
                     const isActionableStatus = ![
                       'Consultation Scheduled',
                       'Converted',
                       'Not a Fit',
-                    ].includes(lead.status);
+                    ].includes(leadStatus);
                     const isWarm =
                       daysOld <= 7 &&
                       isActionableStatus &&
@@ -493,9 +525,9 @@ const LeadsView = () => {
                         </td>
                         <td className="p-4">
                           <span
-                            className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(lead.status)}`}
+                            className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(leadStatus)}`}
                           >
-                            {lead.status}
+                            {leadStatus}
                           </span>
                         </td>
                       </tr>
@@ -508,7 +540,7 @@ const LeadsView = () => {
         </div>
 
         {/* Mobile Card View */}
-        <div className="lg:hidden space-y-4">
+        <div className="lg:hidden space-y-4 max-h-96 overflow-y-auto">
           {currentLeads.length === 0 ? (
             <div className="bg-white border-2 border-black rounded-lg p-8 text-center text-gray-500">
               <p className="mb-4">
@@ -566,9 +598,9 @@ const LeadsView = () => {
 
                     {/* Status Badge */}
                     <span
-                      className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ${getStatusClasses(lead.status)}`}
+                      className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ${getStatusClasses(getDisplayStatus(lead))}`}
                     >
-                      {lead.status}
+                      {getDisplayStatus(lead)}
                     </span>
                   </div>
 
