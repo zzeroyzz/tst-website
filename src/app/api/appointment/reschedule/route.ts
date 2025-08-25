@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
 
     // Update the appointment in database (store as UTC) - handle both contacts and leads
     const tableName = isLead ? 'leads' : 'contacts';
-    const updateFields = {
+    const updateFields: any = {
       scheduled_appointment_at: newAppointmentUtc.toISOString(),
       appointment_status: 'SCHEDULED', // Ensure it's marked as scheduled
       // Keep existing cancel token (contact.uuid) - no need to change it

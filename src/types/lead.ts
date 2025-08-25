@@ -3,6 +3,7 @@ export interface Lead {
   name: string;
   email: string;
   phone_number: string;
+  phone?: string; // Alternative phone field for backwards compatibility
   status: string;
   notes?: string;
   created_at: string;
@@ -19,6 +20,10 @@ export interface Lead {
   appointment_notes?: string;
   last_appointment_update?: string;
   appointment_cancel_token?: string;
+  questionnaire_completed?: boolean;
+  questionnaire_completed_at?: string;
+  questionnaire_reminder_sent_at?: string;
+  questionnaire_token?: string;
   archived?: boolean;
   last_auto_reminder_sent: string | null;
   auto_reminder_count: number;

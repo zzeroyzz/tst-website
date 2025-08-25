@@ -13,43 +13,95 @@ export async function POST(request: NextRequest) {
     const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // 1 hour buffer
 
     // Update contacts table - mark past scheduled appointments as completed
-    const { data: updatedContacts, error: contactsError } = await supabase
+    // First get the contacts to update their notes properly
+    const { data: contactsToUpdate, error: fetchContactsError } = await supabase
       .from('contacts')
-      .update({
-        appointment_status: 'COMPLETED',
-        last_appointment_update: now.toISOString(),
-        appointment_notes: supabase.raw(`COALESCE(appointment_notes, '') || ' | Auto-completed by system'`)
-      })
+      .select('id, name, email, scheduled_appointment_at, appointment_notes')
       .lt('scheduled_appointment_at', oneHourAgo.toISOString())
-      .eq('appointment_status', 'SCHEDULED')
-      .select('id, name, email, scheduled_appointment_at');
+      .eq('appointment_status', 'SCHEDULED');
 
-    if (contactsError) {
-      console.error('[cleanup-past] Error updating contacts:', contactsError);
+    if (fetchContactsError) {
+      console.error('[cleanup-past] Error fetching contacts:', fetchContactsError);
       return NextResponse.json(
-        { error: 'Failed to update contacts', details: contactsError.message },
+        { error: 'Failed to fetch contacts for cleanup', details: fetchContactsError.message },
         { status: 500 }
       );
     }
+
+    let updatedContacts: any[] = [];
+    if (contactsToUpdate && contactsToUpdate.length > 0) {
+      // Update each contact with proper note concatenation
+      for (const contact of contactsToUpdate) {
+        const updatedNote = contact.appointment_notes 
+          ? `${contact.appointment_notes} | Auto-completed by system`
+          : 'Auto-completed by system';
+        
+        const { data, error } = await supabase
+          .from('contacts')
+          .update({
+            appointment_status: 'COMPLETED',
+            last_appointment_update: now.toISOString(),
+            appointment_notes: updatedNote
+          })
+          .eq('id', contact.id)
+          .select('id, name, email, scheduled_appointment_at');
+
+        if (error) {
+          console.error('[cleanup-past] Error updating contact:', contact.id, error);
+          continue;
+        }
+        if (data) {
+          updatedContacts.push(...data);
+        }
+      }
+    }
+
+    // No error handling needed here since we handle errors individually above
 
     // Update leads table - mark past scheduled appointments as completed
-    const { data: updatedLeads, error: leadsError } = await supabase
+    // First get the leads to update their notes properly
+    const { data: leadsToUpdate, error: fetchLeadsError } = await supabase
       .from('leads')
-      .update({
-        appointment_status: 'COMPLETED',
-        appointment_notes: supabase.raw(`COALESCE(appointment_notes, '') || ' | Auto-completed by system'`)
-      })
+      .select('id, name, email, scheduled_appointment_at, appointment_notes')
       .lt('scheduled_appointment_at', oneHourAgo.toISOString())
-      .eq('appointment_status', 'SCHEDULED')
-      .select('id, name, email, scheduled_appointment_at');
+      .eq('appointment_status', 'SCHEDULED');
 
-    if (leadsError) {
-      console.error('[cleanup-past] Error updating leads:', leadsError);
+    if (fetchLeadsError) {
+      console.error('[cleanup-past] Error fetching leads:', fetchLeadsError);
       return NextResponse.json(
-        { error: 'Failed to update leads', details: leadsError.message },
+        { error: 'Failed to fetch leads for cleanup', details: fetchLeadsError.message },
         { status: 500 }
       );
     }
+
+    let updatedLeads: any[] = [];
+    if (leadsToUpdate && leadsToUpdate.length > 0) {
+      // Update each lead with proper note concatenation
+      for (const lead of leadsToUpdate) {
+        const updatedNote = lead.appointment_notes 
+          ? `${lead.appointment_notes} | Auto-completed by system`
+          : 'Auto-completed by system';
+        
+        const { data, error } = await supabase
+          .from('leads')
+          .update({
+            appointment_status: 'COMPLETED',
+            appointment_notes: updatedNote
+          })
+          .eq('id', lead.id)
+          .select('id, name, email, scheduled_appointment_at');
+
+        if (error) {
+          console.error('[cleanup-past] Error updating lead:', lead.id, error);
+          continue;
+        }
+        if (data) {
+          updatedLeads.push(...data);
+        }
+      }
+    }
+
+    // No error handling needed here since we handle errors individually above
 
     const totalUpdated = (updatedContacts?.length || 0) + (updatedLeads?.length || 0);
     
@@ -103,5 +155,6 @@ export async function POST(request: NextRequest) {
 
 // Allow GET for manual testing
 export async function GET() {
-  return POST(new Request('http://localhost/api/appointment/cleanup-past', { method: 'POST' }));
+  const request = new NextRequest('http://localhost/api/appointment/cleanup-past', { method: 'POST' });
+  return POST(request);
 }

@@ -10,7 +10,7 @@ interface HowItWorksStepsProps {
   step: {
     number: string;
     title: string;
-    description: string[]; // Updated to array type
+    description: string;
     imageUrl: string;
     imageAlt: string;
     isLastStep: boolean;
