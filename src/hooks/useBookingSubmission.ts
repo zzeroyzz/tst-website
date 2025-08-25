@@ -74,18 +74,14 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
         triggerSMSWorkflow: true,
       };
 
-      console.log('[useBookingSubmission] Sending GraphQL variables:', variables);
-
       const { data } = await createLeadWithAppointment({ variables });
 
       const appointmentResult = (data as any)?.createLeadWithAppointment;
-      console.log('[useBookingSubmission] GraphQL result:', appointmentResult);
 
       if (!appointmentResult) throw new Error('Failed to schedule appointment');
 
       // IMPORTANT: This is the UUID we need
       const contactUuid: string | undefined = appointmentResult.contact?.uuid ?? undefined;
-      console.log('[useBookingSubmission] contactUuid:', contactUuid);
 
       if (!contactUuid) {
         console.warn('[useBookingSubmission] Missing contactUuid on result.contact');
@@ -119,8 +115,6 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
         uuid: contactUuid, // <-- ONLY THIS (server expects `uuid`)
       };
 
-      console.log('[useBookingSubmission] POST /api/send-appointment-emails body:', emailBody);
-
       try {
         const resp = await fetch('/api/send-appointment-emails', {
           method: 'POST',
@@ -129,7 +123,6 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
         });
 
         const json = await resp.json();
-        console.log('[useBookingSubmission] Email API response:', json);
       } catch (emailError) {
         console.warn('Email sending failed:', emailError);
       }

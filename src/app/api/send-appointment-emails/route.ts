@@ -62,9 +62,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const body: BookingEmailRequest = await request.json();
 
-    console.log('--- /api/send-appointment-emails: incoming body ---');
-    console.log(body);
-
     const {
       type,
       clientName,
@@ -95,16 +92,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         ? `${baseUrl}/cancel-appointment/${encodeURIComponent(cancelToken)}`
         : null;
 
-    console.log('--- /api/send-appointment-emails: link debug ---');
-    console.log({
-      PUBLIC_BASE_URL,
-      originFromHeader,
-      originFromUrl,
-      resolvedBaseUrl: baseUrl,
-      cancelToken,
-      cancelUrl,
-    });
-
     const resend = new Resend(RESEND_API_KEY);
 
     const confirmationData: AppointmentConfirmationData = {
@@ -132,10 +119,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     try {
       const html = getAppointmentConfirmationTemplate(confirmationData);
-      console.log('Confirmation template data:', confirmationData);
       await sendEmail(resend, clientEmail, 'Your consultation is confirmed', html);
       results.clientEmailSent = true;
-      console.log(`✅ Client confirmation email sent to ${clientEmail}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`clientEmail: ${msg}`);
@@ -144,10 +129,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     try {
       const html = getAppointmentNotificationTemplate(notificationData);
-      console.log('Notification template data:', notificationData);
       await sendEmail(resend, ADMIN_EMAIL, 'New consultation scheduled', html);
       results.adminEmailSent = true;
-      console.log(`✅ Admin notification email sent to ${ADMIN_EMAIL}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`adminEmail: ${msg}`);

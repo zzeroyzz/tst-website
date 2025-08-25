@@ -10,8 +10,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[cleanup-cron] Starting scheduled appointment cleanup...');
-
     // Call our cleanup API internally
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const cleanupUrl = `${baseUrl}/api/appointment/cleanup-past`;
@@ -32,8 +30,6 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log('[cleanup-cron] Cleanup completed successfully:', result);
 
     return NextResponse.json({
       success: true,

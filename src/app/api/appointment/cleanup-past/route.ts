@@ -12,8 +12,6 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000)); // 1 hour buffer
 
-    console.log(`[cleanup-past] Starting cleanup for appointments before: ${oneHourAgo.toISOString()}`);
-
     // Update contacts table - mark past scheduled appointments as completed
     const { data: updatedContacts, error: contactsError } = await supabase
       .from('contacts')
@@ -55,11 +53,6 @@ export async function POST(request: NextRequest) {
 
     const totalUpdated = (updatedContacts?.length || 0) + (updatedLeads?.length || 0);
     
-    console.log(`[cleanup-past] Successfully updated ${totalUpdated} appointments:`, {
-      contacts: updatedContacts?.length || 0,
-      leads: updatedLeads?.length || 0
-    });
-
     // Create notifications for significant cleanups
     if (totalUpdated > 0) {
       try {

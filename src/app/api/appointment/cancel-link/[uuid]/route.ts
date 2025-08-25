@@ -17,13 +17,6 @@ export async function GET(
   ) {
   try {
     const { uuid } = await ctx.params;
-    console.log('[cancel-link] incoming uuid:', uuid);
-    console.log('[cancel-link] supabase project:', {
-      url: SUPABASE_URL,
-      urlRefGuess: SUPABASE_URL?.match(/https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1] ?? 'unknown',
-      hasServiceRole: Boolean(SUPABASE_SERVICE_ROLE_KEY),
-    });
-
     const supabase = supabaseServer();
 
     // --- Attempt 1: by contacts.uuid
@@ -76,13 +69,6 @@ export async function GET(
       return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
     }
 
-    console.log('[cancel-link] contact resolved:', {
-      contactId: contact.id,
-      contactUuid: contact.uuid,
-      userId: contact.user_id,
-      email: contact.email,
-    });
-
     // Latest appointment (order by scheduled_at desc; fall back to created_at if you prefer)
     const { data: appointment, error: apptErr } = await supabase
       .from('appointments')
@@ -107,12 +93,6 @@ export async function GET(
     if (apptErr) {
       console.warn('[cancel-link] appointment lookup error (non-fatal):', apptErr);
     }
-
-    console.log('[cancel-link] latest appointment:', {
-      apptId: appointment?.id ?? null,
-      scheduledAt: appointment?.scheduled_at ?? null,
-      status: appointment?.status ?? null,
-    });
 
     return NextResponse.json(
       { contact, appointment },

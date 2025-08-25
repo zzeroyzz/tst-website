@@ -22,7 +22,6 @@ async function sendEmail(
   subject: string,
   html: string
 ): Promise<void> {
-  console.log(`Sending email to ${to} via Resend...`);
   const result = await resend.emails.send({
     from: EMAIL_FROM,
     to: [to],
@@ -33,8 +32,6 @@ async function sendEmail(
   if ((result as any)?.error) {
     throw new Error(`Failed to send email: ${JSON.stringify((result as any).error)}`);
   }
-  
-  console.log(`Email sent successfully to ${to}`);
 }
 
 export async function POST(request: NextRequest) {
@@ -44,7 +41,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { uuid, contactId, newDateTime } = await request.json();
-    console.log('Reschedule request:', { uuid, contactId, newDateTime });
 
     // Support both UUID (new) and contactId (legacy) for backwards compatibility
     const lookupField = uuid ? 'uuid' : 'id';
@@ -75,7 +71,6 @@ export async function POST(request: NextRequest) {
 
     // If UUID lookup failed, try user_id field as fallback (like cancel-link API)
     if ((findError || !contact) && uuid) {
-      console.log('UUID lookup failed, trying user_id field');
       const { data: altContact, error: altError } = await supabase
         .from('contacts')
         .select('*')
@@ -94,7 +89,6 @@ export async function POST(request: NextRequest) {
 
     // If still no contact found, check leads table
     if ((findError || !contact) && uuid) {
-      console.log('Contact lookup failed, trying leads table');
       const { data: leadData, error: leadError } = await supabase
         .from('leads')
         .select('*')
@@ -246,11 +240,6 @@ export async function POST(request: NextRequest) {
     });
 
     // Send both emails via Resend
-    console.log('Sending reschedule emails via Resend to:', {
-      client: contact.email,
-      admin: ADMIN_EMAIL
-    });
-
     try {
       await Promise.all([
         sendEmail(
@@ -266,7 +255,6 @@ export async function POST(request: NextRequest) {
           adminEmailHtml
         ),
       ]);
-      console.log('Reschedule emails sent successfully via Resend');
     } catch (emailError) {
       console.error('Error sending reschedule emails:', emailError);
       // Don't throw - reschedule was successful even if email fails
