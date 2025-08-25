@@ -24,8 +24,35 @@ export const metadata: Metadata = {
     'Toasted Sesame Therapy | Compassionate, Personalized Therapy in Georgia',
   description:
     'A therapy space for the deep feelers, drained hearts, and healing seekers. Neuro-affirming and trauma-informed online therapy for adults in Georgia.',
-  keywords:
-    'online therapy Georgia, virtual therapy Atlanta, anxiety therapy, depression counseling, trauma therapy, ADHD support, highly sensitive person therapy, neuro-affirming therapist, trauma-informed counseling, emotional regulation therapy, mental health counseling Georgia, teletherapy',
+  keywords: [
+    // Location-based keywords
+    'online therapy Georgia',
+    'virtual therapy Atlanta', 
+    'teletherapy Georgia',
+    'therapist Atlanta',
+    'mental health counseling Georgia',
+    
+    // Service-based keywords
+    'anxiety therapy',
+    'trauma therapy', 
+    'ADHD support',
+    'depression counseling',
+    'LGBTQIA therapy',
+    'neurodivergent therapy',
+    
+    // Approach-based keywords
+    'neuro-affirming therapist',
+    'trauma-informed counseling',
+    'identity-affirming therapy',
+    'highly sensitive person therapy',
+    'emotional regulation therapy',
+    
+    // Specialty keywords
+    'queer therapy',
+    'trans-affirming therapy',
+    'complex trauma therapy',
+    'fit-or-free sessions'
+  ].join(', '),
   manifest: '/site.webmanifest',
   icons: {
     icon: [
@@ -57,21 +84,122 @@ export default function RootLayout({
   const medicalBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'MedicalBusiness',
-    '@id': 'https://toastedsesametherapy.com/#medicalbusiness', // Remember to replace this
+    '@id': 'https://toastedsesametherapy.com/#medicalbusiness',
     name: 'Toasted Sesame Therapy',
+    alternateName: 'TST',
+    description: 'Neuro-affirming and trauma-informed online therapy for adults in Georgia. Specializing in anxiety, trauma, ADHD support, and highly sensitive person therapy.',
+    url: 'https://toastedsesametherapy.com',
+    logo: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg',
+    image: 'https://toastedsesametherapy.com/assets/hero-image.png',
+    telephone: '+1-XXX-XXX-XXXX', // Add actual phone number
+    email: 'care@toastedsesametherapy.com',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Atlanta',
+      addressRegion: 'GA',
+      addressCountry: 'US',
+      postalCode: '30309', // Add actual postal code
+    },
+    areaServed: {
+      '@type': 'State',
+      name: 'Georgia',
+    },
+    priceRange: '$$',
+    paymentAccepted: ['Cash', 'Credit Card', 'Insurance'],
+    currenciesAccepted: 'USD',
+    openingHours: 'Mo-Fr 09:00-17:00',
+    serviceType: [
+      'Individual Therapy',
+      'Anxiety Treatment',
+      'Trauma Therapy', 
+      'ADHD Support',
+      'Neurodivergent Therapy'
+    ],
+    medicalSpecialty: 'Psychiatry',
+    availableService: [
+      {
+        '@type': 'MedicalTherapy',
+        name: 'Individual Therapy',
+        description: 'One-on-one therapy sessions for adults'
+      },
+      {
+        '@type': 'MedicalTherapy', 
+        name: 'Trauma Therapy',
+        description: 'Trauma-informed therapy approaches'
+      },
+      {
+        '@type': 'MedicalTherapy',
+        name: 'Anxiety Treatment',
+        description: 'Evidence-based anxiety treatment'
+      }
+    ]
+  };
+
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': 'https://toastedsesametherapy.com/#therapist',
+    name: 'Kay Hernandez',
+    jobTitle: 'Licensed Professional Counselor',
+    worksFor: {
+      '@id': 'https://toastedsesametherapy.com/#medicalbusiness'
+    },
+    url: 'https://toastedsesametherapy.com/about',
+    image: 'https://toastedsesametherapy.com/assets/profile-photo.jpg', // Add actual photo
+    email: 'care@toastedsesametherapy.com',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Atlanta',
       addressRegion: 'GA',
       addressCountry: 'US',
     },
-    url: 'https://toastedsesametherapy.com', // Remember to replace this
+    alumniOf: 'University Name', // Add actual education
+    knowsAbout: [
+      'Trauma Therapy',
+      'Anxiety Treatment', 
+      'ADHD Support',
+      'Neurodivergent-Affirming Therapy',
+      'LGBTQIA-Affirming Therapy',
+      'Highly Sensitive Person Support'
+    ],
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Professional License',
+      name: 'Licensed Professional Counselor',
+      recognizedBy: {
+        '@type': 'Organization',
+        name: 'Georgia Board of Professional Counselors'
+      }
+    }
+  };
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': 'https://toastedsesametherapy.com/#organization',
+    name: 'Toasted Sesame Therapy',
+    url: 'https://toastedsesametherapy.com',
     logo: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg',
+    sameAs: [
+      // Add social media profiles when available
+      // 'https://www.facebook.com/toastedsesametherapy',
+      // 'https://www.instagram.com/toastedsesametherapy',
+      // 'https://www.linkedin.com/company/toasted-sesame-therapy'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+1-XXX-XXX-XXXX', // Add actual phone
+      contactType: 'Customer Service',
+      email: 'care@toastedsesametherapy.com',
+      availableLanguage: 'English'
+    }
   };
 
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-TileColor" content="#F9F5F2" />
 
         {/* connection hints first */}
@@ -103,6 +231,18 @@ export default function RootLayout({
             __html: JSON.stringify(medicalBusinessSchema),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
 
         <Script
           id="gtm-init"
@@ -121,6 +261,15 @@ export default function RootLayout({
       <body
         className={`${workSans.className} bg-tst-cream text-black antialiased`}
       >
+        {/* Skip to main content link for accessibility */}
+        <a 
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-black text-white p-4 z-50 focus:z-[9999]"
+          style={{ clipPath: 'none' }}
+        >
+          Skip to main content
+        </a>
+        
         <NavigationProvider>
           <ApolloProviderWrapper>
             <ToasterClient />
@@ -128,7 +277,7 @@ export default function RootLayout({
 
             <ConditionalLayout>
               <Nav />
-              <main>
+              <main id="main-content" tabIndex={-1}>
                 {children}
                 <Analytics />
                 <SpeedInsights />

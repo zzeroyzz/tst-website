@@ -45,7 +45,7 @@ export default function BookingPage() {
       </Section>
 
       {/* Additional content below the fold */}
-      <AdditionalContent />
+      <AdditionalContent variant="trauma" pageUrl="/book" />
     </div>
   );
 }
