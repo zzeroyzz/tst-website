@@ -27,24 +27,26 @@ export async function POST(request: NextRequest) {
     const end = new Date(endDate);
 
     // Query contacts table for regular appointments (50-minute sessions)
+    // Only include SCHEDULED appointments (exclude COMPLETED, CANCELLED, NO_SHOW)
     const { data: contacts, error: contactsError } = await supabase
       .from('contacts')
       .select('id, scheduled_appointment_at, appointment_status')
       .gte('scheduled_appointment_at', startDate)
       .lte('scheduled_appointment_at', endDate)
       .not('scheduled_appointment_at', 'is', null)
-      .neq('appointment_status', 'cancelled')
+      .eq('appointment_status', 'SCHEDULED')
       .order('scheduled_appointment_at', { ascending: true });
 
     // Query leads table for grounding sessions (15-minute sessions)
+    // Only include scheduled appointments (exclude completed, cancelled)
     const { data: leads, error: leadsError } = await supabase
       .from('leads')
-      .select('id, appointment_date, appointment_time, lead_status')
+      .select('id, appointment_date, appointment_time, appointment_status')
       .gte('appointment_date', start.toISOString().split('T')[0])
       .lte('appointment_date', end.toISOString().split('T')[0])
       .not('appointment_date', 'is', null)
       .not('appointment_time', 'is', null)
-      .eq('lead_status', 'scheduled')
+      .eq('appointment_status', 'SCHEDULED')
       .order('appointment_date', { ascending: true });
 
     if (contactsError || leadsError) {
@@ -122,16 +124,16 @@ export async function GET() {
         .gte('scheduled_appointment_at', start.toISOString())
         .lte('scheduled_appointment_at', end.toISOString())
         .not('scheduled_appointment_at', 'is', null)
-        .neq('appointment_status', 'cancelled')
+        .eq('appointment_status', 'SCHEDULED')
         .order('scheduled_appointment_at', { ascending: true }),
       supabase
         .from('leads')
-        .select('id, appointment_date, appointment_time, lead_status')
+        .select('id, appointment_date, appointment_time, appointment_status')
         .gte('appointment_date', start.toISOString().split('T')[0])
         .lte('appointment_date', end.toISOString().split('T')[0])
         .not('appointment_date', 'is', null)
         .not('appointment_time', 'is', null)
-        .eq('lead_status', 'scheduled')
+        .eq('appointment_status', 'SCHEDULED')
         .order('appointment_date', { ascending: true }),
     ]);
 
