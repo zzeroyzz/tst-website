@@ -21,6 +21,7 @@ import {
   CreditCard,
   Users,
   Bell,
+  Copy,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import Button from '@/components/Button/Button';
@@ -233,6 +234,15 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     }
   };
 
+  const handleCopyPhone = () => {
+    if (lead.phone_number) {
+      navigator.clipboard.writeText(lead.phone_number);
+      toast.success('Phone number copied to clipboard');
+    } else {
+      toast.error('No phone number available');
+    }
+  };
+
   const handleSendReminder = async () => {
     setIsSending(true);
     const toastId = toast.loading('Sending questionnaire reminder...');
@@ -351,7 +361,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
   const reminderHistory = getReminderHistory();
-
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-450 flex flex-col border-2 border-black overflow-hidden">
@@ -374,19 +383,40 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   <Mail size={14} />
                   <span className="break-all">{lead.email}</span>
                 </div>
-                {lead.phone && (
+                {lead.phone_number && (
                   <div className="flex items-center gap-1">
                     <Phone size={14} />
-                    <span>{lead.phone}</span>
+                    <a
+                      href={`tel:${lead.phone_number}`}
+                      className="hover:underline underline-offset-2"
+                    >
+                      {lead.phone_number}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyPhone}
+                      title="Copy phone number"
+                      aria-label="Copy phone number"
+                      className="ml-1 inline-flex items-center justify-center p-1 bg-white hover:bg-gray-100 active:translate-y-[1px]"
+                    >
+                      <Copy size={12} />
+                    </button>
                   </div>
                 )}
+              </div>
+              <div>
+                <strong>Contact Form Submitted: </strong>
+                <br className="sm:hidden" />
+                <span className="text-gray-600">
+                  {format(new Date(lead.created_at), 'PPp')}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Close button - positioned absolutely in top right */}
           <Button onClick={onClose} className="bg-tst-red text-white">
-            <X size={18} />
+            <X size={16} />
           </Button>
         </div>
 
@@ -551,14 +581,53 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
 
               {/* Right Column - Lead Information */}
               <div className="space-y-4">
-                {/* Basic Information */}
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
+                  {lead.scheduled_appointment_at && (
+                    <div className="hidden lg:block bg-purple-50 p-3 rounded-lg border border-purple-200">
+                      <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
+                        <Calendar size={16} />
+                        Scheduled Appointment
+                      </h3>
+                      <div className="space-y-1 text-xs">
+                        <p>
+                          <strong>Date & Time:</strong>
+                          <br />{' '}
+                          {formatAppointmentDate(lead.scheduled_appointment_at)}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <strong>Status:</strong>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              lead.appointment_status === 'SCHEDULED'
+                                ? 'bg-blue-100 text-blue-800'
+                                : lead.appointment_status === 'COMPLETED'
+                                  ? 'bg-tst-green text-green-800'
+                                  : lead.appointment_status === 'CANCELLED'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {lead.appointment_status || 'None'}
+                          </span>
+                        </p>
+                        {lead.last_appointment_update && (
+                          <p className="text-xs text-gray-500">
+                            Last updated:{' '}
+                            {format(
+                              new Date(lead.last_appointment_update),
+                              'PPp'
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {/* <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
                     <User size={16} />
                     Lead Information
-                  </h3>
+                  </h3> */}
                   <div className="space-y-2 text-xs">
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <Calendar
                         size={14}
                         className="text-gray-500 flex-shrink-0"
@@ -570,11 +639,11 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                           {format(new Date(lead.created_at), 'PPp')}
                         </span>
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Questionnaire Status */}
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      {/* <div className="flex items-center gap-2 mb-1">
                         {lead.questionnaire_completed ? (
                           <CheckCircle
                             size={14}
@@ -587,9 +656,9 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                           />
                         )}
                         <strong>Questionnaire Status:</strong>
-                      </div>
+                      </div> */}
 
-                      {lead.questionnaire_completed ? (
+                      {/* {lead.questionnaire_completed ? (
                         <div className="ml-4 space-y-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1">
                             <span className="text-green-600 font-medium text-xs">
@@ -639,13 +708,13 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                             </p>
                           )}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
 
                 {/* Qualification Details */}
-                <div className="bg-blue-50 p-3 rounded-lg">
+                {/* <div className="bg-blue-50 p-3 rounded-lg">
                   <h3 className="font-bold text-sm mb-2">
                     Qualification Details
                   </h3>
@@ -738,49 +807,9 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Appointment Information - Desktop */}
-                {lead.scheduled_appointment_at && (
-                  <div className="hidden lg:block bg-purple-50 p-3 rounded-lg border border-purple-200">
-                    <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
-                      <Calendar size={16} />
-                      Scheduled Appointment
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <p>
-                        <strong>Date & Time:</strong>
-                        <br />{' '}
-                        {formatAppointmentDate(lead.scheduled_appointment_at)}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <strong>Status:</strong>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.appointment_status === 'SCHEDULED'
-                              ? 'bg-blue-100 text-blue-800'
-                              : lead.appointment_status === 'COMPLETED'
-                                ? 'bg-tst-green text-green-800'
-                                : lead.appointment_status === 'CANCELLED'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {lead.appointment_status || 'None'}
-                        </span>
-                      </p>
-                      {lead.last_appointment_update && (
-                        <p className="text-xs text-gray-500">
-                          Last updated:{' '}
-                          {format(
-                            new Date(lead.last_appointment_update),
-                            'PPp'
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -790,20 +819,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
             <div className="flex flex-col sm:flex-row gap-2">
-              {/* Send Reminder Button - only for active leads */}
-              {!lead.archived && (
-                <Button
-                  onClick={handleSendReminder}
-                  disabled={
-                    isSending || isSaving || isArchiving || isUnarchiving
-                  }
-                  className="flex items-center justify-center gap-2 px-3 py-2 bg-tst-yellow text-black font-bold rounded-md border-2 border-black hover:bg-yellow-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
-                >
-                  <Send size={14} />
-                  {isSending ? 'Sending...' : 'Send Manual Reminder'}
-                </Button>
-              )}
-
               {/* Archive/Unarchive Button */}
               {lead.archived && onUnarchive ? (
                 <Button
