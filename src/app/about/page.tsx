@@ -6,22 +6,39 @@ import AboutPageClient from '@/components/clients/AboutPageClient/AboutPageClien
 const canonical = 'https://toastedsesametherapy.com/about';
 
 export const metadata: Metadata = {
-  title: 'Queer Asian Therapist in Atlanta | About Kay',
+  title: 'About Kay - Licensed Therapist in Atlanta, GA | Trauma-Informed Care',
   description:
-    'Kay (she/they) is a queer Korean American therapist in Atlanta providing trauma‑informed, identity‑centered therapy. Virtual sessions across Georgia.',
+    'Meet Kay, LPC - Licensed Professional Counselor specializing in trauma-informed, LGBTQIA+-affirming therapy for adults in Georgia. Korean American therapist providing virtual sessions statewide.',
+  keywords: [
+    'Kay therapist',
+    'licensed professional counselor Atlanta',
+    'Korean American therapist',
+    'queer therapist Atlanta',
+    'trauma-informed therapist Georgia',
+    'LGBTQIA+ affirming therapist',
+    'Asian American mental health',
+    'neurodivergent therapist Atlanta',
+    'virtual therapy Georgia',
+    'LPC013996 Georgia'
+  ].join(', '),
   alternates: { canonical },
   openGraph: {
     url: canonical,
-    title: 'Queer Asian Therapist in Atlanta | About Kay',
+    title: 'About Kay - Licensed Therapist in Atlanta, GA | Trauma-Informed Care',
     description:
-      'Identity‑centered, trauma‑informed therapy for queer, Asian, and neurodivergent clients. Based in Atlanta. Georgia telehealth available.',
+      'Meet Kay, LPC - Korean American therapist providing LGBTQIA+-affirming, trauma-informed therapy for adults across Georgia via telehealth.',
     type: 'profile',
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Queer Asian Therapist in Atlanta | About Kay',
+    title: 'About Kay - Licensed Therapist in Atlanta, GA',
     description:
-      'Trauma‑informed, identity‑centered therapy for queer, Asian, and neurodivergent clients in Atlanta and across Georgia.',
+      'Korean American therapist specializing in trauma-informed, LGBTQIA+-affirming therapy for adults in Georgia.',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -31,32 +48,85 @@ export default function AboutPage() {
     '@graph': [
       {
         '@type': 'Person',
+        '@id': 'https://toastedsesametherapy.com/about#kay',
         name: 'Kay',
+        additionalName: 'Kahlor Lutz',
         jobTitle: 'Licensed Professional Counselor',
-        image:
-          'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png',
+        description: 'Licensed Professional Counselor specializing in trauma-informed, LGBTQIA+-affirming therapy for adults in Georgia.',
+        image: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png',
         url: canonical,
+        email: 'care@toastedsesametherapy.com',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Atlanta',
+          addressRegion: 'GA',
+          addressCountry: 'US'
+        },
         worksFor: {
-          '@type': 'Organization',
+          '@type': 'MedicalBusiness',
           name: 'Toasted Sesame Therapy',
           url: 'https://toastedsesametherapy.com/',
         },
+        hasCredential: [
+          {
+            '@type': 'EducationalOccupationalCredential',
+            name: 'Licensed Professional Counselor',
+            credentialCategory: 'Professional License',
+            recognizedBy: {
+              '@type': 'Organization',
+              name: 'Georgia Board of Professional Counselors'
+            }
+          },
+          {
+            '@type': 'EducationalOccupationalCredential',
+            name: 'Master of Science in Clinical Mental Health Counseling',
+            educationalLevel: 'Graduate',
+            recognizedBy: {
+              '@type': 'CollegeOrUniversity',
+              name: 'Mercer University Atlanta'
+            }
+          },
+          {
+            '@type': 'EducationalOccupationalCredential',
+            name: 'Integrative Somatic Trauma Therapy Training',
+            educationalLevel: '60 hours',
+            recognizedBy: {
+              '@type': 'Organization',
+              name: 'The Embody Lab'
+            }
+          }
+        ],
         knowsAbout: [
           'Complex trauma',
           'C-PTSD',
-          'Neurodivergence',
-          'LGBTQ+ affirming therapy',
+          'Neurodivergent-affirming therapy',
+          'LGBTQIA+ affirming therapy',
+          'Korean American mental health',
           'Asian American mental health',
+          'Integrative Somatic Trauma Therapy',
+          'Gender-affirming therapy',
+          'Highly sensitive person support',
+          'Caregiver support',
+          'Creative professional therapy'
         ],
         areaServed: {
-          '@type': 'City',
-          name: 'Atlanta',
-          address: {
-            '@type': 'PostalAddress',
-            addressRegion: 'GA',
-            addressCountry: 'US',
-          },
+          '@type': 'State',
+          name: 'Georgia',
+          containsPlace: {
+            '@type': 'City',
+            name: 'Atlanta'
+          }
         },
+        nationality: {
+          '@type': 'Country',
+          name: 'United States'
+        },
+        ethnicity: 'Korean American',
+        gender: 'Non-binary (she/they)',
+        performerIn: {
+          '@type': 'Service',
+          name: 'Individual Therapy Sessions'
+        }
       },
       {
         '@type': 'Service',

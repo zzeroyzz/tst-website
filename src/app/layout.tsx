@@ -27,26 +27,26 @@ export const metadata: Metadata = {
   keywords: [
     // Location-based keywords
     'online therapy Georgia',
-    'virtual therapy Atlanta', 
+    'virtual therapy Atlanta',
     'teletherapy Georgia',
     'therapist Atlanta',
     'mental health counseling Georgia',
-    
+
     // Service-based keywords
     'anxiety therapy',
-    'trauma therapy', 
+    'trauma therapy',
     'ADHD support',
     'depression counseling',
     'LGBTQIA therapy',
     'neurodivergent therapy',
-    
+
     // Approach-based keywords
     'neuro-affirming therapist',
     'trauma-informed counseling',
     'identity-affirming therapy',
     'highly sensitive person therapy',
     'emotional regulation therapy',
-    
+
     // Specialty keywords
     'queer therapy',
     'trans-affirming therapy',
@@ -111,7 +111,7 @@ export default function RootLayout({
     serviceType: [
       'Individual Therapy',
       'Anxiety Treatment',
-      'Trauma Therapy', 
+      'Trauma Therapy',
       'ADHD Support',
       'Neurodivergent Therapy'
     ],
@@ -123,7 +123,7 @@ export default function RootLayout({
         description: 'One-on-one therapy sessions for adults'
       },
       {
-        '@type': 'MedicalTherapy', 
+        '@type': 'MedicalTherapy',
         name: 'Trauma Therapy',
         description: 'Trauma-informed therapy approaches'
       },
@@ -139,13 +139,13 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': 'https://toastedsesametherapy.com/#therapist',
-    name: 'Kay Hernandez',
+    name: 'Kay',
     jobTitle: 'Licensed Professional Counselor',
     worksFor: {
       '@id': 'https://toastedsesametherapy.com/#medicalbusiness'
     },
     url: 'https://toastedsesametherapy.com/about',
-    image: 'https://toastedsesametherapy.com/assets/profile-photo.jpg', // Add actual photo
+    image: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/MYT-v3.png', // Add actual photo
     email: 'care@toastedsesametherapy.com',
     address: {
       '@type': 'PostalAddress',
@@ -156,7 +156,7 @@ export default function RootLayout({
     alumniOf: 'University Name', // Add actual education
     knowsAbout: [
       'Trauma Therapy',
-      'Anxiety Treatment', 
+      'Anxiety Treatment',
       'ADHD Support',
       'Neurodivergent-Affirming Therapy',
       'LGBTQIA-Affirming Therapy',
@@ -262,14 +262,14 @@ export default function RootLayout({
         className={`${workSans.className} bg-tst-cream text-black antialiased`}
       >
         {/* Skip to main content link for accessibility */}
-        <a 
+        <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-black text-white p-4 z-50 focus:z-[9999]"
           style={{ clipPath: 'none' }}
         >
           Skip to main content
         </a>
-        
+
         <NavigationProvider>
           <ApolloProviderWrapper>
             <ToasterClient />
