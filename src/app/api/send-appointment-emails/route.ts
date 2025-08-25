@@ -5,7 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { createId } from '@paralleldrive/cuid2';
 import {
   getAppointmentConfirmationTemplate,
   getAppointmentNotificationTemplate,
@@ -13,29 +12,31 @@ import {
   type AppointmentNotificationData,
 } from '@/lib/appointment-email-templates';
 
-// Environment configuration
 const RESEND_API_KEY = process.env.RESEND_API_KEY!;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Toasted Sesame <no-reply@mail.toastedsesametherapy.com>';
-const GOOGLE_MEET_LINK = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab';
+const EMAIL_FROM =
+  process.env.EMAIL_FROM || 'Toasted Sesame <kato@toastedsesametherapy.com>';
+const GOOGLE_MEET_LINK =
+  process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab';
+
+// Prefer a canonical public URL if available
+const PUBLIC_BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  '';
 
 interface BookingEmailRequest {
   type: 'APPOINTMENT_BOOKED';
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  appointmentDate: string; // Display format: "Monday, January 15, 2024"
-  appointmentTime: string; // Display format: "2:00 PM EST"
-  appointmentDateTime: string; // ISO string
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentDateTime: string;
   variant: 'nd' | 'affirming' | 'trauma';
+  uuid?: string; // ONLY token we will use
 }
 
-// Generate a unique cancel token
-function generateCancelToken(): string {
-  return createId();
-}
-
-// Send email using Resend
 async function sendEmail(
   resend: Resend,
   to: string,
@@ -48,61 +49,71 @@ async function sendEmail(
     subject,
     html,
   });
-
-  if (result.error) {
-    throw new Error(`Failed to send email: ${JSON.stringify(result.error)}`);
+  if ((result as any)?.error) {
+    throw new Error(`Failed to send email: ${JSON.stringify((result as any).error)}`);
   }
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // Validate environment variables
     if (!RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: 'RESEND_API_KEY not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
-    // Parse request body
     const body: BookingEmailRequest = await request.json();
-    
-    // Validate required fields
-    const { 
-      type, 
-      clientName, 
-      clientEmail, 
-      clientPhone,
-      appointmentDate, 
-      appointmentTime, 
-      appointmentDateTime,
-      variant 
+
+    console.log('--- /api/send-appointment-emails: incoming body ---');
+    console.log(body);
+
+    const {
+      type,
+      clientName,
+      clientEmail,
+      appointmentDate,
+      appointmentTime,
+      variant,
+      uuid, // THE cancel token
     } = body;
 
     if (!type || !clientName || !clientEmail || !appointmentDate || !appointmentTime || !variant) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+    if (type !== 'APPOINTMENT_BOOKED') {
+      return NextResponse.json({ error: 'Unsupported email type' }, { status: 400 });
     }
 
-    if (type !== 'APPOINTMENT_BOOKED') {
-      return NextResponse.json(
-        { error: 'Unsupported email type' },
-        { status: 400 }
-      );
-    }
+    // Only uuid is allowed as the cancel token
+    const cancelToken = uuid;
+
+    // Build base URL reliably
+    const originFromHeader = request.headers.get('origin') || '';
+    const originFromUrl = request.nextUrl?.origin || '';
+    const baseUrl = (PUBLIC_BASE_URL || originFromHeader || originFromUrl).replace(/\/+$/, '');
+
+    const cancelUrl =
+      cancelToken && baseUrl
+        ? `${baseUrl}/cancel-appointment/${encodeURIComponent(cancelToken)}`
+        : null;
+
+    console.log('--- /api/send-appointment-emails: link debug ---');
+    console.log({
+      PUBLIC_BASE_URL,
+      originFromHeader,
+      originFromUrl,
+      resolvedBaseUrl: baseUrl,
+      cancelToken,
+      cancelUrl,
+    });
 
     const resend = new Resend(RESEND_API_KEY);
-    const cancelToken = generateCancelToken();
 
-    // Prepare email data
     const confirmationData: AppointmentConfirmationData = {
       name: clientName,
       appointmentDate,
       appointmentTime,
       googleMeetLink: GOOGLE_MEET_LINK,
-      cancelToken,
+      cancelToken: cancelToken ?? undefined,
+      cancelUrl: cancelUrl ?? undefined,
     };
 
     const notificationData: AppointmentNotificationData = {
@@ -112,60 +123,51 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       appointmentTime,
     };
 
-    // Send emails concurrently
-    const emailPromises = [
-      // Client confirmation email
-      sendEmail(
-        resend,
-        clientEmail,
-        'Your consultation is confirmed',
-        getAppointmentConfirmationTemplate(confirmationData)
-      ),
-      // Admin notification email
-      sendEmail(
-        resend,
-        ADMIN_EMAIL,
-        'New consultation scheduled',
-        getAppointmentNotificationTemplate(notificationData)
-      ),
-    ];
+    const results = {
+      clientEmailSent: false,
+      adminEmailSent: false,
+      errors: [] as string[],
+      debug: { cancelUrl, cancelToken, baseUrl },
+    };
 
-    await Promise.all(emailPromises);
+    try {
+      const html = getAppointmentConfirmationTemplate(confirmationData);
+      console.log('Confirmation template data:', confirmationData);
+      await sendEmail(resend, clientEmail, 'Your consultation is confirmed', html);
+      results.clientEmailSent = true;
+      console.log(`✅ Client confirmation email sent to ${clientEmail}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      results.errors.push(`clientEmail: ${msg}`);
+      console.error('❌ Client email failed:', msg);
+    }
 
-    console.log(`Successfully sent appointment emails for ${clientName} (${clientEmail}) - ${appointmentDate} at ${appointmentTime}`);
+    try {
+      const html = getAppointmentNotificationTemplate(notificationData);
+      console.log('Notification template data:', notificationData);
+      await sendEmail(resend, ADMIN_EMAIL, 'New consultation scheduled', html);
+      results.adminEmailSent = true;
+      console.log(`✅ Admin notification email sent to ${ADMIN_EMAIL}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      results.errors.push(`adminEmail: ${msg}`);
+      console.error('❌ Admin email failed:', msg);
+    }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Appointment emails sent successfully',
-      emails: {
-        confirmation: clientEmail,
-        notification: ADMIN_EMAIL,
-      },
-      cancelToken, // Return for potential future use
-    });
-
+    const ok = results.clientEmailSent || results.adminEmailSent;
+    return NextResponse.json(
+      ok
+        ? { success: true, ...results }
+        : { success: false, ...results },
+      { status: ok ? 200 : 500 }
+    );
   } catch (error) {
     console.error('Failed to send appointment emails:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to send appointment emails',
-      details: errorMessage,
-    }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }
 
-// Only allow POST requests
-export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
-}
-
-export async function PUT() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
-}
-
-export async function DELETE() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
-}
+export async function GET() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
+export async function PUT() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
+export async function DELETE() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }

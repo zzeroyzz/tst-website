@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       .from('contacts')
       .update({
         scheduled_appointment_at: null,
-        appointment_status: 'cancelled',
+        appointment_status: 'CANCELLED',
         appointment_notes: 'Appointment cancelled by user',
         last_appointment_update: new Date().toISOString(),
       })

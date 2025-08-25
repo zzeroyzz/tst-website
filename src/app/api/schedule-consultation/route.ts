@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     // Prepare the update data object
     const updateData = {
       scheduled_appointment_at: appointmentUtc.toISOString(),
-      appointment_status: 'scheduled',
+      appointment_status: 'SCHEDULED',
       appointment_notes: 'Scheduled via questionnaire',
       appointment_cancel_token: cancelToken,
       last_appointment_update: new Date().toISOString(),
