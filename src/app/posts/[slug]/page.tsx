@@ -45,11 +45,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const canonical = `https://toastedsesametherapy.com/posts/${slug}`;
-  
+
   return {
     title: `${post.title} | Toasted Sesame Therapy Blog`,
     description:
-      post.subtext || 'Mental health insights and reflections from licensed therapist Kay Hernandez at Toasted Sesame Therapy.',
+      post.subtext || 'Mental health insights and reflections from licensed therapist Kay at Toasted Sesame Therapy.',
     keywords: [
       'mental health blog',
       'therapy insights',
@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: post.image_url ? [{ url: post.image_url }] : undefined,
       publishedTime: post.created_at,
       modifiedTime: post.sent_at || post.created_at,
-      authors: ['Kay Hernandez']
+      authors: ['Kay']
     },
     twitter: {
       card: 'summary_large_image',
@@ -97,7 +97,7 @@ export default async function PostPage({ params }: Props) {
   }
 
   const canonical = `https://toastedsesametherapy.com/posts/${slug}`;
-  
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -108,7 +108,7 @@ export default async function PostPage({ params }: Props) {
     },
     headline: post.title,
     name: post.title,
-    description: post.subtext || 'Mental health insights and reflections from licensed therapist Kay Hernandez.',
+    description: post.subtext || 'Mental health insights and reflections from licensed therapist Kay.',
     image: {
       '@type': 'ImageObject',
       url: post.image_url || 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png',
@@ -118,7 +118,7 @@ export default async function PostPage({ params }: Props) {
     author: {
       '@type': 'Person',
       '@id': 'https://toastedsesametherapy.com/about#kay',
-      name: 'Kay Hernandez',
+      name: 'Kay',
       jobTitle: 'Licensed Professional Counselor',
       url: 'https://toastedsesametherapy.com/about',
       worksFor: {
