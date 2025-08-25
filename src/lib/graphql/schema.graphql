@@ -34,6 +34,8 @@ type Subscription {
 
 type Contact {
   id: ID!
+  user_id: String!
+  uuid: ID
   name: String!
   email: String!
   phoneNumber: String

@@ -59,6 +59,8 @@ export const typeDefs = gql`
 
   type Contact {
     id: ID!
+    uuid: ID
+    user_id: String!
     name: String!
     email: String!
     phoneNumber: String

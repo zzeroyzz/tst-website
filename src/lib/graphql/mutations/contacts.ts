@@ -114,6 +114,7 @@ export const CREATE_LEAD_WITH_APPOINTMENT = gql`
     ) {
       contact {
         id
+        uuid
         name
         email
         phoneNumber
