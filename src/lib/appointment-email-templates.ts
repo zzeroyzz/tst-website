@@ -14,6 +14,7 @@ interface AppointmentConfirmationData {
 interface AppointmentNotificationData {
   clientName: string;
   clientEmail: string;
+  clientPhone?: string;
   appointmentDate: string;
   appointmentTime: string;
   questionnaireData?: {
@@ -397,6 +398,9 @@ export const getAppointmentNotificationTemplate = (
                       <p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; color:#000000 !important; margin:10px 0;" class="force-black-text">
                         <strong>Email:</strong> ${escapedClientEmail}
                       </p>
+                      ${data.clientPhone ? `<p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; color:#000000 !important; margin:10px 0;" class="force-black-text">
+                        <strong>Phone:</strong> ${escapeHtml(data.clientPhone)}
+                      </p>` : ''}
                     </div>
 
                     <!-- Appointment Details Box -->

@@ -305,6 +305,21 @@ const AppointmentRescheduleCalendar: React.FC<
     }
   }, [isOpen, currentAppointmentDate]);
 
+  // Prevent body scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save original body overflow style
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      // Prevent scrolling
+      document.body.style.overflow = 'hidden';
+      
+      // Cleanup function to restore original state
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen]);
+
   const handleDateClick = (date: Date) => {
     if (isDateSelectable(date) && !loadingSlots) {
       setSelectedDate(date);
@@ -471,7 +486,7 @@ const AppointmentRescheduleCalendar: React.FC<
 
             {/* Time Slots */}
             {selectedDate && (
-              <div className="p-3 sm:p-6 overflow-scroll h-14 md:h-full">
+              <div className="p-3 sm:p-6 overflow-scroll h-14 md:h-56">
                 <h4 className="font-bold mb-3 flex items-center gap-2 text-sm sm:text-base">
                   <Clock size={16} className="sm:w-[18px] sm:h-[18px]" />
                   <span>

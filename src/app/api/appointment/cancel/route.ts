@@ -105,9 +105,10 @@ export async function POST(request: NextRequest) {
         });
 
         // Admin notification email
+        console.log('📧 Sending cancellation admin email...');
         await resend.emails.send({
           from: EMAIL_FROM,
-          to: [ADMIN_EMAIL],
+          to: [ADMIN_EMAIL, 'kato@toastedsesametherapy.com'],
           subject: `🚫 Appointment Cancelled - ${contact.name}`,
           html: `
             <div style="font-family:Arial,sans-serif">
@@ -123,9 +124,10 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         });
+        console.log('✅ Cancellation admin email sent successfully');
       }
     } catch (emailErr) {
-      console.warn('Cancellation emails failed (continuing):', emailErr);
+      console.error('❌ Cancellation emails failed:', emailErr);
     }
 
     // 4) Insert dashboard notification (non-blocking)

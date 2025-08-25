@@ -7,6 +7,7 @@ import {
   getAppointmentNotificationTemplate,
 } from '@/lib/appointment-email-templates';
 import { v4 as uuidv4 } from 'uuid';
+import { Resend } from 'resend';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,43 +16,41 @@ const supabase = createClient(
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
-// Enhanced interface for Zapier with calendar fields
-interface ZapierEmailData {
-  type: string;
-  to: string;
-  subject: string;
-  html: string;
+// Email configuration constants
+const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Toasted Sesame <kato@toastedsesametherapy.com>';
 
-  // Calendar event fields (for appointment confirmations)
-  eventTitle?: string;
-  eventDescription?: string;
-  startDateTime?: string; // ISO format for Google Calendar
-  endDateTime?: string; // ISO format for Google Calendar
-  attendeeEmail?: string;
-  attendeeName?: string;
-  location?: string;
-}
-
-// Function to send emails via Zapier webhook
-const sendEmailViaZapier = async (emailData: ZapierEmailData) => {
-  if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
-    return;
+// Function to send emails via Resend
+const sendEmail = async (to: string, subject: string, html: string) => {
+  if (!RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY not configured');
+    return false;
   }
 
   try {
-    const response = await fetch(process.env.ZAPIER_EMAIL_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(emailData),
+    const resend = new Resend(RESEND_API_KEY);
+    
+    // Split comma-separated emails
+    const recipients = to.split(',').map(email => email.trim());
+    
+    const result = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: recipients,
+      subject,
+      html,
     });
 
-    if (!response.ok) {
-      return;
+    if ((result as any)?.error) {
+      console.error('❌ Resend error:', (result as any).error);
+      return false;
     }
+
+    console.log('✅ Email sent successfully to:', recipients.join(', '));
+    return true;
   } catch (error) {
-    console.error('Zapier webhook error:', error);
+    console.error('❌ Email send error:', error);
+    return false;
   }
 };
 
@@ -133,80 +132,51 @@ export async function POST(request: NextRequest) {
         process.env.GOOGLE_MEET_LINK ||
         'https://meet.google.com/your-meeting-link';
 
-      // Send confirmation email to client (NO CALENDAR DATA - just the email)
-      const clientEmailData: ZapierEmailData = {
-        type: 'appointment_confirmation',
-        to: email || contact.email,
-        subject: 'Your consultation is confirmed! 📅',
-        html: getAppointmentConfirmationTemplate({
-          name: name || `${contact.name} ${contact.last_name || ''}`.trim(),
-          appointmentDate: format(
-            appointmentDateEastern,
-            'EEEE, MMMM d, yyyy',
-            { timeZone: EASTERN_TIMEZONE }
-          ),
-          appointmentTime:
-            format(appointmentDateEastern, 'h:mm a', {
-              timeZone: EASTERN_TIMEZONE,
-            }) + 'EST',
-          googleMeetLink,
-          cancelToken,
-        }),
-        // REMOVED: All calendar event fields to prevent duplicate calendar invites
-      };
+      // Send confirmation email to client
+      const clientHtml = getAppointmentConfirmationTemplate({
+        name: name || `${contact.name} ${contact.last_name || ''}`.trim(),
+        appointmentDate: format(
+          appointmentDateEastern,
+          'EEEE, MMMM d, yyyy',
+          { timeZone: EASTERN_TIMEZONE }
+        ),
+        appointmentTime:
+          format(appointmentDateEastern, 'h:mm a', {
+            timeZone: EASTERN_TIMEZONE,
+          }) + 'EST',
+        googleMeetLink,
+        cancelToken,
+      });
 
-      // Send notification email to admin (WITH calendar data so it creates an event)
-      const adminEmailData: ZapierEmailData = {
-        type: 'appointment_notification',
-        to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
-        subject: `🎉 New Consultation Scheduled - ${name || contact.name}`,
-        html: getAppointmentNotificationTemplate({
-          clientName:
-            name || `${contact.name} ${contact.last_name || ''}`.trim(),
-          clientEmail: email || contact.email,
-          appointmentDate: format(
-            appointmentDateEastern,
-            'EEEE, MMMM d, yyyy',
-            { timeZone: EASTERN_TIMEZONE }
-          ),
-          appointmentTime:
-            format(appointmentDateEastern, 'h:mm a', {
-              timeZone: EASTERN_TIMEZONE,
-            }) + 'EST',
-          questionnaireData: questionnaireData,
-        }),
+      // Send notification email to admin
+      const adminHtml = getAppointmentNotificationTemplate({
+        clientName:
+          name || `${contact.name} ${contact.last_name || ''}`.trim(),
+        clientEmail: email || contact.email,
+        appointmentDate: format(
+          appointmentDateEastern,
+          'EEEE, MMMM d, yyyy',
+          { timeZone: EASTERN_TIMEZONE }
+        ),
+        appointmentTime:
+          format(appointmentDateEastern, 'h:mm a', {
+            timeZone: EASTERN_TIMEZONE,
+          }) + 'EST',
+        questionnaireData: questionnaireData,
+      });
 
-        // Include calendar event fields for admin only
-        eventTitle:
-          `Therapy Session - ${name || contact.name} ${contact.last_name || ''}`.trim(),
-        eventDescription: `
-Therapy session with ${name || contact.name} ${contact.last_name || ''}
-Email: ${email || contact.email}
-Phone: ${contact.phone || 'Not provided'}
-${
-  questionnaireData
-    ? `
-Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
-Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
-Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
-`
-    : ''
-}
-
-Google Meet Link: ${googleMeetLink}
-        `.trim(),
-        startDateTime: appointmentUtc.toISOString(),
-        endDateTime: endTimeUtc.toISOString(),
-        attendeeEmail: email || contact.email,
-        attendeeName:
-          `${name || contact.name} ${contact.last_name || ''}`.trim(),
-        location: googleMeetLink,
-      };
-
-      // Send both emails via Zapier
+      // Send both emails via Resend
       await Promise.all([
-        sendEmailViaZapier(clientEmailData),
-        sendEmailViaZapier(adminEmailData),
+        sendEmail(
+          email || contact.email,
+          'Your consultation is confirmed! 📅',
+          clientHtml
+        ),
+        sendEmail(
+          `${ADMIN_EMAIL}, kato@toastedsesametherapy.com`,
+          `🎉 New Consultation Scheduled - ${name || contact.name}`,
+          adminHtml
+        ),
       ]);
 
       return NextResponse.json({
@@ -249,74 +219,46 @@ Google Meet Link: ${googleMeetLink}
       process.env.GOOGLE_MEET_LINK ||
       'https://meet.google.com/your-meeting-link';
 
-    // Send confirmation email to client (NO CALENDAR DATA - just the email)
-    const clientEmailData: ZapierEmailData = {
-      type: 'appointment_confirmation',
-      to: contacts.email,
-      subject: 'Your consultation is confirmed! 📅',
-      html: getAppointmentConfirmationTemplate({
-        name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
-        appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', {
-          timeZone: EASTERN_TIMEZONE,
-        }),
-        appointmentTime:
-          format(appointmentDateEastern, 'h:mm a', {
-            timeZone: EASTERN_TIMEZONE,
-          }) + 'EST',
-        googleMeetLink,
-        cancelToken,
+    // Send confirmation email to client
+    const clientHtml = getAppointmentConfirmationTemplate({
+      name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
+      appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', {
+        timeZone: EASTERN_TIMEZONE,
       }),
-      // REMOVED: All calendar event fields to prevent duplicate calendar invites
-    };
-
-    // Send notification email to admin (WITH calendar data so it creates an event)
-    const adminEmailData: ZapierEmailData = {
-      type: 'appointment_notification',
-      to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
-      subject: `🎉 New Consultation Scheduled - ${contacts.name}`,
-      html: getAppointmentNotificationTemplate({
-        clientName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
-        clientEmail: contacts.email,
-        appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', {
+      appointmentTime:
+        format(appointmentDateEastern, 'h:mm a', {
           timeZone: EASTERN_TIMEZONE,
-        }),
-        appointmentTime:
-          format(appointmentDateEastern, 'h:mm a', {
-            timeZone: EASTERN_TIMEZONE,
-          }) + 'EST',
-        questionnaireData: questionnaireData,
+        }) + 'EST',
+      googleMeetLink,
+      cancelToken,
+    });
+
+    // Send notification email to admin
+    const adminHtml = getAppointmentNotificationTemplate({
+      clientName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
+      clientEmail: contacts.email,
+      appointmentDate: format(appointmentDateEastern, 'EEEE, MMMM d, yyyy', {
+        timeZone: EASTERN_TIMEZONE,
       }),
+      appointmentTime:
+        format(appointmentDateEastern, 'h:mm a', {
+          timeZone: EASTERN_TIMEZONE,
+        }) + 'EST',
+      questionnaireData: questionnaireData,
+    });
 
-      // Include calendar event fields for admin only
-      eventTitle:
-        `Therapy Session - ${contacts.name} ${contacts.last_name || ''}`.trim(),
-      eventDescription: `
-        Therapy session with ${contacts.name} ${contacts.last_name || ''}
-        Email: ${contacts.email}
-        Phone: ${contacts.phone || 'Not provided'}
-        ${
-          questionnaireData
-            ? `
-        Interested in: ${questionnaireData.interestedIn?.join(', ') || 'Not specified'}
-        Scheduling preference: ${questionnaireData.schedulingPreference || 'Not specified'}
-        Payment method: ${questionnaireData.paymentMethod || 'Not specified'}
-        `
-            : ''
-        }
-
-Google Meet Link: ${googleMeetLink}
-      `.trim(),
-      startDateTime: appointmentUtc.toISOString(),
-      endDateTime: endTimeUtc.toISOString(),
-      attendeeEmail: contacts.email,
-      attendeeName: `${contacts.name} ${contacts.last_name || ''}`.trim(),
-      location: googleMeetLink,
-    };
-
-    // Send both emails via Zapier
+    // Send both emails via Resend
     await Promise.all([
-      sendEmailViaZapier(clientEmailData),
-      sendEmailViaZapier(adminEmailData),
+      sendEmail(
+        contacts.email,
+        'Your consultation is confirmed! 📅',
+        clientHtml
+      ),
+      sendEmail(
+        `${ADMIN_EMAIL}, kato@toastedsesametherapy.com`,
+        `🎉 New Consultation Scheduled - ${contacts.name}`,
+        adminHtml
+      ),
     ]);
 
     try {
@@ -345,28 +287,6 @@ Google Meet Link: ${googleMeetLink}
       console.error('Failed to create notification:', notificationError);
     }
 
-    // Optional: Send to additional webhook for other integrations
-    try {
-      if (process.env.ZAPIER_APPOINTMENT_WEBHOOK_URL) {
-        await fetch(process.env.ZAPIER_APPOINTMENT_WEBHOOK_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: `${contacts.name} ${contacts.last_name || ''}`.trim(),
-            email: contacts.email,
-            dateTime: appointmentUtc.toISOString(),
-            token,
-            action: 'appointment_scheduled',
-            cancelToken,
-            questionnaireData, // Include questionnaire data in webhook
-          }),
-        });
-      }
-    } catch (webhookError) {
-      console.error('Secondary webhook error (non-fatal):', webhookError);
-    }
 
     return NextResponse.json({
       message: 'Appointment scheduled successfully',
