@@ -235,13 +235,13 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   };
 
   const handleCopyPhone = () => {
-  if (lead.phone_number) {
-    navigator.clipboard.writeText(lead.phone_number);
-    toast.success('Phone number copied to clipboard');
-  } else {
-    toast.error('No phone number available');
-  }
-};
+    if (lead.phone_number) {
+      navigator.clipboard.writeText(lead.phone_number);
+      toast.success('Phone number copied to clipboard');
+    } else {
+      toast.error('No phone number available');
+    }
+  };
 
   const handleSendReminder = async () => {
     setIsSending(true);
@@ -384,34 +384,33 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                   <span className="break-all">{lead.email}</span>
                 </div>
                 {lead.phone_number && (
-  <div className="flex items-center gap-1">
-    <Phone size={14} />
-    <a
-      href={`tel:${lead.phone_number}`}
-      className="hover:underline underline-offset-2"
-    >
-      {lead.phone_number}
-    </a>
-    <button
-      type="button"
-      onClick={handleCopyPhone}
-      title="Copy phone number"
-      aria-label="Copy phone number"
-      className="ml-1 inline-flex items-center justify-center p-1 bg-white hover:bg-gray-100 active:translate-y-[1px]"
-    >
-      <Copy size={12} />
-    </button>
-  </div>
-)}
-
+                  <div className="flex items-center gap-1">
+                    <Phone size={14} />
+                    <a
+                      href={`tel:${lead.phone_number}`}
+                      className="hover:underline underline-offset-2"
+                    >
+                      {lead.phone_number}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyPhone}
+                      title="Copy phone number"
+                      aria-label="Copy phone number"
+                      className="ml-1 inline-flex items-center justify-center p-1 bg-white hover:bg-gray-100 active:translate-y-[1px]"
+                    >
+                      <Copy size={12} />
+                    </button>
+                  </div>
+                )}
               </div>
-                <div>
-                        <strong>Contact Form Submitted: </strong>
-                        <br className="sm:hidden" />
-                        <span className="text-gray-600">
-                          {format(new Date(lead.created_at), 'PPp')}
-                        </span>
-                      </div>
+              <div>
+                <strong>Contact Form Submitted: </strong>
+                <br className="sm:hidden" />
+                <span className="text-gray-600">
+                  {format(new Date(lead.created_at), 'PPp')}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -583,46 +582,46 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
               {/* Right Column - Lead Information */}
               <div className="space-y-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                   {lead.scheduled_appointment_at && (
-                  <div className="hidden lg:block bg-purple-50 p-3 rounded-lg border border-purple-200">
-                    <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
-                      <Calendar size={16} />
-                      Scheduled Appointment
-                    </h3>
-                    <div className="space-y-1 text-xs">
-                      <p>
-                        <strong>Date & Time:</strong>
-                        <br />{' '}
-                        {formatAppointmentDate(lead.scheduled_appointment_at)}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <strong>Status:</strong>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            lead.appointment_status === 'SCHEDULED'
-                              ? 'bg-blue-100 text-blue-800'
-                              : lead.appointment_status === 'COMPLETED'
-                                ? 'bg-tst-green text-green-800'
-                                : lead.appointment_status === 'CANCELLED'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {lead.appointment_status || 'None'}
-                        </span>
-                      </p>
-                      {lead.last_appointment_update && (
-                        <p className="text-xs text-gray-500">
-                          Last updated:{' '}
-                          {format(
-                            new Date(lead.last_appointment_update),
-                            'PPp'
-                          )}
+                  {lead.scheduled_appointment_at && (
+                    <div className="hidden lg:block bg-purple-50 p-3 rounded-lg border border-purple-200">
+                      <h3 className="font-bold text-sm mb-2 text-purple-800 flex items-center gap-2">
+                        <Calendar size={16} />
+                        Scheduled Appointment
+                      </h3>
+                      <div className="space-y-1 text-xs">
+                        <p>
+                          <strong>Date & Time:</strong>
+                          <br />{' '}
+                          {formatAppointmentDate(lead.scheduled_appointment_at)}
                         </p>
-                      )}
+                        <p className="flex items-center gap-2">
+                          <strong>Status:</strong>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              lead.appointment_status === 'SCHEDULED'
+                                ? 'bg-blue-100 text-blue-800'
+                                : lead.appointment_status === 'COMPLETED'
+                                  ? 'bg-tst-green text-green-800'
+                                  : lead.appointment_status === 'CANCELLED'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {lead.appointment_status || 'None'}
+                          </span>
+                        </p>
+                        {lead.last_appointment_update && (
+                          <p className="text-xs text-gray-500">
+                            Last updated:{' '}
+                            {format(
+                              new Date(lead.last_appointment_update),
+                              'PPp'
+                            )}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
                   {/* <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
                     <User size={16} />
                     Lead Information
@@ -811,7 +810,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                 </div> */}
 
                 {/* Appointment Information - Desktop */}
-
               </div>
             </div>
           </div>
@@ -821,8 +819,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
         <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
             <div className="flex flex-col sm:flex-row gap-2">
-
-
               {/* Archive/Unarchive Button */}
               {lead.archived && onUnarchive ? (
                 <Button
