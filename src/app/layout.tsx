@@ -10,6 +10,8 @@ import ConditionalLayout from '@/components/ConditionalLayout/ConditionalLayout'
 import ToasterClient from '@/components/clients/ToasterClient/ToasterClient';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import ApolloProviderWrapper from '@/lib/apollo/client';
+import { NavigationProvider } from '@/contexts/NavigationContext';
+import NavigationLoadingIndicator from '@/components/NavigationLoadingIndicator/NavigationLoadingIndicator';
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -119,19 +121,22 @@ export default function RootLayout({
       <body
         className={`${workSans.className} bg-tst-cream text-black antialiased`}
       >
-        <ApolloProviderWrapper>
-          <ToasterClient />
+        <NavigationProvider>
+          <ApolloProviderWrapper>
+            <ToasterClient />
+            <NavigationLoadingIndicator />
 
-          <ConditionalLayout>
-            <Nav />
-            <main>
-              {children}
-              <Analytics />
-              <SpeedInsights />
-            </main>
-            <Footer />
-          </ConditionalLayout>
-        </ApolloProviderWrapper>
+            <ConditionalLayout>
+              <Nav />
+              <main>
+                {children}
+                <Analytics />
+                <SpeedInsights />
+              </main>
+              <Footer />
+            </ConditionalLayout>
+          </ApolloProviderWrapper>
+        </NavigationProvider>
 
         <CookieConsent />
         <noscript>
