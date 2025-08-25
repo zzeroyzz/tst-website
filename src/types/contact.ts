@@ -1,10 +1,11 @@
 // src/types/contact.ts
 export interface Contact {
   id: string;
+  uuid: string;
   name: string;
   last_name: string;
   email: string;
-  phone?: string;
+  phone_number?: string;
   company?: string;
   position?: string;
   source?: string;
@@ -23,11 +24,11 @@ export interface Contact {
   // New appointment fields
   scheduled_appointment_at?: string | null;
   appointment_status:
-    | 'none'
-    | 'scheduled'
-    | 'completed'
-    | 'cancelled'
-    | 'no_show';
+    | 'PENDING'
+    | 'SCHEDULED'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'NO_SHOW';
   appointment_notes?: string | null;
   last_appointment_update?: string;
 }
@@ -36,7 +37,7 @@ export interface CreateContactData {
   name: string;
   last_name: string;
   email: string;
-  phone?: string;
+  phone_number?: string;
   company?: string;
   position?: string;
   source?: string;
