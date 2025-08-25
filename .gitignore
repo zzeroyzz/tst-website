@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# debug/test files
+debug-*.html
+debug-*.js
+fix-view.js
+manual-migration.js
+run-migrations.js
+test-final-fix.js
