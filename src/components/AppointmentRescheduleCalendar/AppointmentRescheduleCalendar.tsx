@@ -471,7 +471,7 @@ const AppointmentRescheduleCalendar: React.FC<
 
             {/* Time Slots */}
             {selectedDate && (
-              <div className="p-3 sm:p-6 overflow-scroll max-h-80 md:h-full">
+              <div className="p-3 sm:p-6 overflow-scroll h-14 md:h-full">
                 <h4 className="font-bold mb-3 flex items-center gap-2 text-sm sm:text-base">
                   <Clock size={16} className="sm:w-[18px] sm:h-[18px]" />
                   <span>
