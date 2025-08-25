@@ -28,7 +28,7 @@ async function sendEmail(
     subject,
     html,
   });
-  
+
   if ((result as any)?.error) {
     throw new Error(`Failed to send email: ${JSON.stringify((result as any).error)}`);
   }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         .select('*')
         .eq('user_id', uuid)
         .single();
-      
+
       if (altContact) {
         contact = altContact;
         findError = null;
@@ -94,11 +94,12 @@ export async function POST(request: NextRequest) {
         .select('*')
         .eq('id', uuid)
         .single();
-      
+
       if (leadData) {
+        console.log('Rescheduling appointment for lead:', leadData);
         isLead = true;
         findError = null;
-        
+
         // Convert lead to contact-like structure for processing
         contact = {
           id: leadData.id,
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
     if (findError || !contact) {
       console.error('Contact/Lead lookup failed:', findError, 'for lookup:', lookupField, lookupValue);
       return NextResponse.json(
-        { 
+        {
           message: 'Contact not found. The appointment link may have expired or is invalid.',
           details: process.env.NODE_ENV === 'development' ? `Lookup failed for ${lookupField}: ${lookupValue}` : undefined
         },
