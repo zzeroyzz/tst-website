@@ -7,7 +7,7 @@
     "email": "test@example.com",
     "phone": "4044042244",
     "scheduled_appointment_at": "2024-12-15T15:00:00.000Z",
-    "appointment_status": "scheduled",
+    "appointment_status": "SCHEDULED",
     "appointment_cancel_token": "test-cancel-token-456",
     "interested_in": ["Anxiety", "Depression"],
     "scheduling_preference": "Weekly",
