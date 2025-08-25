@@ -56,11 +56,15 @@ async function sendEmail(
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    console.log('📧 Email API called at:', new Date().toISOString());
+    
     if (!RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY not configured');
       return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
     const body: BookingEmailRequest = await request.json();
+    console.log('📧 Email request body:', body);
 
     const {
       type,
@@ -121,20 +125,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const html = getAppointmentConfirmationTemplate(confirmationData);
       await sendEmail(resend, clientEmail, 'Your consultation is confirmed', html);
       results.clientEmailSent = true;
+      console.log('✅ Client email sent to:', clientEmail);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`clientEmail: ${msg}`);
-      console.error('❌ Client email failed:', msg);
+      console.error('❌ Client email failed:', {
+        to: clientEmail,
+        error: msg,
+        confirmationData
+      });
     }
 
     try {
       const html = getAppointmentNotificationTemplate(notificationData);
       await sendEmail(resend, ADMIN_EMAIL, 'New consultation scheduled', html);
       results.adminEmailSent = true;
+      console.log('✅ Admin email sent to:', ADMIN_EMAIL);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`adminEmail: ${msg}`);
-      console.error('❌ Admin email failed:', msg);
+      console.error('❌ Admin email failed:', {
+        to: ADMIN_EMAIL,
+        error: msg,
+        notificationData
+      });
     }
 
     const ok = results.clientEmailSent || results.adminEmailSent;

@@ -123,8 +123,20 @@ export const useBookingSubmission = (variant: 'nd' | 'affirming' | 'trauma') => 
         });
 
         const json = await resp.json();
+        
+        if (!resp.ok) {
+          console.error('Email API error:', {
+            status: resp.status,
+            statusText: resp.statusText,
+            response: json
+          });
+        } else if (!json.success) {
+          console.error('Email sending failed:', json);
+        } else {
+          console.log('✅ Emails sent successfully:', json);
+        }
       } catch (emailError) {
-        console.warn('Email sending failed:', emailError);
+        console.error('Email sending failed:', emailError);
       }
     } catch (error: any) {
       console.error('Failed to schedule appointment:', error);
