@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
-import { sendZapierEmailWithRetry } from '@/lib/zapier-email-sender';
 import { getContactConfirmationTemplate } from '@/lib/custom-email-templates';
+import { Resend } from 'resend';
 
 interface Context {
   supabase: any;
@@ -169,14 +169,22 @@ export const contactResolvers = {
         // Send welcome email if requested
         if (input.sendWelcomeEmail) {
           try {
-            const emailTemplate = getContactConfirmationTemplate({
-              name: input.name,
-            });
-            await sendZapierEmailWithRetry({
-              to: input.email,
-              subject: 'Thanks for reaching out! Next steps inside 📝',
-              html: emailTemplate,
-            });
+            const RESEND_API_KEY = process.env.RESEND_API_KEY;
+            if (RESEND_API_KEY) {
+              const resend = new Resend(RESEND_API_KEY);
+              const EMAIL_FROM = process.env.EMAIL_FROM || 'Toasted Sesame <kato@toastedsesametherapy.com>';
+              
+              const emailTemplate = getContactConfirmationTemplate({
+                name: input.name,
+              });
+              
+              await resend.emails.send({
+                from: EMAIL_FROM,
+                to: [input.email],
+                subject: 'Thanks for reaching out! Next steps inside 📝',
+                html: emailTemplate,
+              });
+            }
           } catch (emailError) {
             console.error('Failed to send welcome email:', emailError);
             // don't throw – contact creation succeeded

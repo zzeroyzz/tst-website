@@ -46,7 +46,7 @@ export default function NeurodivergentBookingPage() {
       </Section>
 
       {/* Additional content below the fold */}
-      <AdditionalContent />
+      <AdditionalContent variant="nd" pageUrl="/book/nd" />
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default function TraumaBookingPage() {
       </Section>
 
       {/* Additional content below the fold */}
-      <AdditionalContent />
+      <AdditionalContent variant="trauma" pageUrl="/book/trauma" />
     </div>
   );
 }

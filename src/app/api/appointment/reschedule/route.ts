@@ -18,13 +18,15 @@ const EMAIL_FROM = process.env.EMAIL_FROM || 'Toasted Sesame <kato@toastedsesame
 // Function to send emails via Resend
 async function sendEmail(
   resend: Resend,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<void> {
+  const recipients = Array.isArray(to) ? to : to.split(',').map(email => email.trim());
+  
   const result = await resend.emails.send({
     from: EMAIL_FROM,
-    to: [to],
+    to: recipients,
     subject,
     html,
   });
@@ -242,6 +244,7 @@ export async function POST(request: NextRequest) {
 
     // Send both emails via Resend
     try {
+      console.log('📧 Sending reschedule emails...');
       await Promise.all([
         sendEmail(
           resend,
@@ -251,13 +254,14 @@ export async function POST(request: NextRequest) {
         ),
         sendEmail(
           resend,
-          ADMIN_EMAIL,
+          `${ADMIN_EMAIL}, kato@toastedsesametherapy.com`,
           `📅 Appointment Rescheduled - ${contact.name}`,
           adminEmailHtml
         ),
       ]);
+      console.log('✅ Reschedule emails sent successfully');
     } catch (emailError) {
-      console.error('Error sending reschedule emails:', emailError);
+      console.error('❌ Error sending reschedule emails:', emailError);
       // Don't throw - reschedule was successful even if email fails
     }
 

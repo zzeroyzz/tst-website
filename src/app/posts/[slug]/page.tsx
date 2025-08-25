@@ -44,10 +44,46 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const canonical = `https://toastedsesametherapy.com/posts/${slug}`;
+
   return {
-    title: `${post.title} | Toasted Sesame Therapy`,
+    title: `${post.title} | Toasted Sesame Therapy Blog`,
     description:
-      post.subtext || 'A reflection from the Toasty Tidbits newsletter.',
+      post.subtext || 'Mental health insights and reflections from licensed therapist Kay at Toasted Sesame Therapy.',
+    keywords: [
+      'mental health blog',
+      'therapy insights',
+      'trauma recovery',
+      'self-care tips',
+      'anxiety support',
+      'neurodivergent support',
+      'LGBTQIA+ mental health',
+      'Korean American therapist',
+      'Atlanta therapy'
+    ].join(', '),
+    alternates: { canonical },
+    openGraph: {
+      title: post.title,
+      description: post.subtext || 'Mental health insights from Toasted Sesame Therapy',
+      url: canonical,
+      type: 'article',
+      locale: 'en_US',
+      siteName: 'Toasted Sesame Therapy',
+      images: post.image_url ? [{ url: post.image_url }] : undefined,
+      publishedTime: post.created_at,
+      modifiedTime: post.sent_at || post.created_at,
+      authors: ['Kay']
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.subtext || 'Mental health insights from Toasted Sesame Therapy',
+      images: post.image_url ? [post.image_url] : undefined
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
@@ -60,29 +96,65 @@ export default async function PostPage({ params }: Props) {
     return <PostPageClient />;
   }
 
+  const canonical = `https://toastedsesametherapy.com/posts/${slug}`;
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    '@id': `${canonical}#blogpost`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonical
+    },
     headline: post.title,
-    description:
-      post.subtext || 'A reflection from the Toasty Tidbits newsletter.',
-    image:
-      post.image_url ||
-      'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png',
+    name: post.title,
+    description: post.subtext || 'Mental health insights and reflections from licensed therapist Kay.',
+    image: {
+      '@type': 'ImageObject',
+      url: post.image_url || 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png',
+      width: 1200,
+      height: 630
+    },
     author: {
       '@type': 'Person',
+      '@id': 'https://toastedsesametherapy.com/about#kay',
       name: 'Kay',
+      jobTitle: 'Licensed Professional Counselor',
+      url: 'https://toastedsesametherapy.com/about',
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Toasted Sesame Therapy'
+      }
     },
     publisher: {
       '@type': 'Organization',
+      '@id': 'https://toastedsesametherapy.com/#organization',
       name: 'Toasted Sesame Therapy',
+      url: 'https://toastedsesametherapy.com',
       logo: {
         '@type': 'ImageObject',
         url: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg',
+        width: 300,
+        height: 100
       },
     },
     datePublished: post.created_at,
     dateModified: post.sent_at || post.created_at,
+    inLanguage: 'en-US',
+    about: [
+      'Mental Health',
+      'Therapy',
+      'Self-Care',
+      'Trauma Recovery',
+      'Anxiety Management'
+    ],
+    keywords: 'mental health, therapy, self-care, trauma recovery, anxiety, depression, neurodivergent, LGBTQ',
+    isPartOf: {
+      '@type': 'Blog',
+      '@id': 'https://toastedsesametherapy.com/mental-health-healing-blog#blog',
+      name: 'Toasted Insights: Mental Health & Healing Blog'
+    },
+    url: canonical
   };
 
   return (

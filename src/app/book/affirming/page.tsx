@@ -48,7 +48,7 @@ export default function AffirmingBookingPage() {
       </Section>
 
       {/* Additional content below the fold */}
-      <AdditionalContent />
+      <AdditionalContent variant="affirming" pageUrl="/book/affirming" />
     </div>
   );
 }

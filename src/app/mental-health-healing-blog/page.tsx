@@ -1,5 +1,6 @@
 // src/app/mental-health-healing-blog/page.tsx
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import BlogPageClient from '@/components/clients/BlogPageClient/BlogPageClient';
 
 const canonical = 'https://toastedsesametherapy.com/mental-health-healing-blog';
@@ -57,5 +58,55 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
-  return <BlogPageClient />;
+  // Blog schema for better SEO
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': `${canonical}#blog`,
+    name: 'Toasted Insights: Mental Health & Healing Blog',
+    description: 'Mental health articles, therapy reflections, and self-care guides from licensed therapists',
+    url: canonical,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Toasted Sesame Therapy',
+      url: 'https://toastedsesametherapy.com',
+      logo: 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg'
+    },
+    author: {
+      '@type': 'Person',
+      name: 'Kay',
+      jobTitle: 'Licensed Professional Counselor',
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Toasted Sesame Therapy'
+      }
+    },
+    about: [
+      'Mental Health',
+      'Trauma Recovery',
+      'Therapy',
+      'Self-Care',
+      'Anxiety Management',
+      'Relationship Health',
+      'Neurodiversity',
+      'LGBTQIA+ Mental Health'
+    ],
+    keywords: 'mental health, therapy, trauma recovery, self-care, anxiety, relationships, neurodiversity, LGBTQ mental health',
+    inLanguage: 'en-US',
+    copyrightHolder: {
+      '@type': 'Organization',
+      name: 'Toasted Sesame Therapy'
+    }
+  };
+
+  return (
+    <>
+      <Script
+        id="blog-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
+      <BlogPageClient />
+    </>
+  );
 }

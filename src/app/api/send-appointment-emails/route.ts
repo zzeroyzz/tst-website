@@ -39,13 +39,14 @@ interface BookingEmailRequest {
 
 async function sendEmail(
   resend: Resend,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<void> {
+  const recipients = Array.isArray(to) ? to : to.split(',').map(email => email.trim());
   const result = await resend.emails.send({
     from: EMAIL_FROM,
-    to: [to],
+    to: recipients,
     subject,
     html,
   });
@@ -56,20 +57,19 @@ async function sendEmail(
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    console.log('📧 Email API called at:', new Date().toISOString());
-    
+
     if (!RESEND_API_KEY) {
       console.error('❌ RESEND_API_KEY not configured');
       return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
     const body: BookingEmailRequest = await request.json();
-    console.log('📧 Email request body:', body);
 
     const {
       type,
       clientName,
       clientEmail,
+      clientPhone,
       appointmentDate,
       appointmentTime,
       variant,
@@ -110,6 +110,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const notificationData: AppointmentNotificationData = {
       clientName,
       clientEmail,
+      clientPhone,
       appointmentDate,
       appointmentTime,
     };
@@ -125,7 +126,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const html = getAppointmentConfirmationTemplate(confirmationData);
       await sendEmail(resend, clientEmail, 'Your consultation is confirmed', html);
       results.clientEmailSent = true;
-      console.log('✅ Client email sent to:', clientEmail);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`clientEmail: ${msg}`);
@@ -138,9 +138,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     try {
       const html = getAppointmentNotificationTemplate(notificationData);
-      await sendEmail(resend, ADMIN_EMAIL, 'New consultation scheduled', html);
+      await sendEmail(resend, `${ADMIN_EMAIL}, kato@toastedsesametherapy.com`, 'New consultation scheduled', html);
       results.adminEmailSent = true;
-      console.log('✅ Admin email sent to:', ADMIN_EMAIL);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       results.errors.push(`adminEmail: ${msg}`);

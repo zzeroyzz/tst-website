@@ -4,6 +4,12 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Section from '@/components/Section/Section';
 import FAQ from '@/components/FAQ/FAQ';
+import { 
+  generalBookingFaqs, 
+  affirmingBookingFaqs, 
+  neurodivergentBookingFaqs, 
+  traumaBookingFaqs 
+} from '@/data/bookingFaqData';
 import {
   howFitFreeWorksSteps,
   stepSection,
@@ -16,7 +22,15 @@ import FocusAreaBanner from '@/components/FocusAreaBanner/FocusAreaBanner';
 import TestimonialCardBooking from '@/components/TestimonialCardBooking/TestimonialCardBooking';
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
-const AdditionalContent: React.FC = () => {
+interface AdditionalContentProps {
+  variant?: 'trauma' | 'affirming' | 'nd';
+  pageUrl?: string;
+}
+
+const AdditionalContent: React.FC<AdditionalContentProps> = ({ 
+  variant = 'trauma', 
+  pageUrl = '/book' 
+}) => {
   // Create individual refs for each step (copied exactly from HomePageClient)
   const step0Ref = useRef<HTMLDivElement>(null);
   const step1Ref = useRef<HTMLDivElement>(null);
@@ -34,6 +48,20 @@ const AdditionalContent: React.FC = () => {
 
   // Create array of refs for easy access in the map
   const stepRefs = [step0Ref, step1Ref, step2Ref, step3Ref];
+  
+  // Select FAQs based on variant
+  const getFaqsForVariant = () => {
+    const baseFaqs = generalBookingFaqs;
+    switch (variant) {
+      case 'affirming':
+        return [...baseFaqs, ...affirmingBookingFaqs];
+      case 'nd':
+        return [...baseFaqs, ...neurodivergentBookingFaqs];
+      case 'trauma':
+      default:
+        return [...baseFaqs, ...traumaBookingFaqs];
+    }
+  };
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -211,7 +239,11 @@ const AdditionalContent: React.FC = () => {
 </Section>
       </Section>
       <Section className="bg-tst-teal border-t-2 border-black">
-        <FAQ />
+        <FAQ 
+          customFaqs={getFaqsForVariant()}
+          pageUrl={pageUrl}
+          className="py-8"
+        />
       </Section>
     </div>
   );

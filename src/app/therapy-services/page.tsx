@@ -8,22 +8,39 @@ import { ourApproachData } from '@/data/servicesPageData';
 const canonical = 'https://toastedsesametherapy.com/therapy-services';
 
 export const metadata: Metadata = {
-  title:
-    'Trauma Therapy in Atlanta | Queer Asian Therapist | Toasted Sesame Therapy',
+  title: 'Therapy Services in Atlanta, GA | Trauma-Informed & LGBTQIA+ Affirming',
   description:
-    'Identity-centered, trauma-informed therapy in Atlanta and across Georgia via telehealth. Support for complex trauma, C-PTSD, queer and Asian clients, and neurodivergent folks.',
+    'Comprehensive therapy services in Atlanta and across Georgia. Specializing in trauma therapy, LGBTQIA+ affirming care, neurodivergent support, and Asian American mental health. Virtual sessions available statewide.',
+  keywords: [
+    'therapy services Atlanta',
+    'trauma therapy Georgia', 
+    'LGBTQIA+ therapy Atlanta',
+    'neurodivergent therapy services',
+    'Asian American therapy Atlanta',
+    'complex trauma therapy',
+    'virtual therapy Georgia',
+    'individual therapy Atlanta',
+    'affirming therapy services',
+    'identity-centered therapy'
+  ].join(', '),
   alternates: { canonical },
   openGraph: {
     url: canonical,
-    title: 'Trauma Therapy in Atlanta | Toasted Sesame Therapy',
+    title: 'Therapy Services in Atlanta, GA | Trauma-Informed & LGBTQIA+ Affirming',
     description:
-      'Trauma-informed, identity-centered therapy for adults in Atlanta and across Georgia.',
+      'Comprehensive trauma-informed, identity-centered therapy services for adults in Atlanta and across Georgia via telehealth.',
+    type: 'website',
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Trauma Therapy in Atlanta | Toasted Sesame Therapy',
+    title: 'Therapy Services in Atlanta, GA | Trauma-Informed Care',
     description:
-      'Identity-centered, trauma-informed therapy for adults in Atlanta and across Georgia.',
+      'Trauma-informed, LGBTQIA+ affirming therapy services for adults in Atlanta and across Georgia.',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
