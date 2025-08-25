@@ -33,7 +33,6 @@
   font-weight: 500;
 }
 
-
 .wrapper:active .input {
   transform: translate(0, 0);
 }

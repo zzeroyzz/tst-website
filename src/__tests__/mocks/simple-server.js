@@ -11,61 +11,64 @@ const setupFetchMocks = () => {
       json: () => Promise.resolve({ message: 'Success' }),
       text: () => Promise.resolve('Success'),
       status: 200,
-    }
+    };
 
     // Handle specific endpoints
     if (url.includes('/api/contact')) {
       return Promise.resolve({
         ...defaultResponse,
-        json: () => Promise.resolve({
-          message: 'Successfully submitted!',
-          emailSent: true,
-        }),
-      })
+        json: () =>
+          Promise.resolve({
+            message: 'Successfully submitted!',
+            emailSent: true,
+          }),
+      });
     }
 
     if (url.includes('/api/leads/send-reminder')) {
       return Promise.resolve({
         ...defaultResponse,
-        json: () => Promise.resolve({
-          message: 'Reminder email sent successfully!',
-          contactName: 'Test User',
-          emailSent: true,
-        }),
-      })
+        json: () =>
+          Promise.resolve({
+            message: 'Reminder email sent successfully!',
+            contactName: 'Test User',
+            emailSent: true,
+          }),
+      });
     }
 
     if (url.includes('/api/newsletter/subscribe')) {
       return Promise.resolve({
         ...defaultResponse,
-        json: () => Promise.resolve({
-          message: 'Successfully subscribed to newsletter!',
-          status: 'subscribed',
-          emailSent: true,
-        }),
-      })
+        json: () =>
+          Promise.resolve({
+            message: 'Successfully subscribed to newsletter!',
+            status: 'subscribed',
+            emailSent: true,
+          }),
+      });
     }
 
     // Return default for any other URL
-    return Promise.resolve(defaultResponse)
-  })
-}
+    return Promise.resolve(defaultResponse);
+  });
+};
 
 // Setup function to call in tests
 export const setupMocks = () => {
-  setupFetchMocks()
-}
+  setupFetchMocks();
+};
 
 // Cleanup function
 export const cleanupMocks = () => {
-  jest.restoreAllMocks()
-}
+  jest.restoreAllMocks();
+};
 
 // Auto-setup for all tests
 beforeEach(() => {
-  setupMocks()
-})
+  setupMocks();
+});
 
 afterEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});

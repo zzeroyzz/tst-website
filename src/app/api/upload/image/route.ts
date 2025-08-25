@@ -19,19 +19,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+    ];
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({
-        error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.'
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.',
+        },
+        { status: 400 }
+      );
     }
 
     // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      return NextResponse.json({
-        error: 'File too large. Please upload an image smaller than 5MB.'
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'File too large. Please upload an image smaller than 5MB.',
+        },
+        { status: 400 }
+      );
     }
 
     // Generate unique filename
@@ -49,13 +62,16 @@ export async function POST(request: NextRequest) {
       .from('tst-assets')
       .upload(`newsletter-images/${fileName}`, buffer, {
         contentType: file.type,
-        upsert: false
+        upsert: false,
       });
 
     if (error) {
-      return NextResponse.json({
-        error: `Storage upload failed: ${error.message || 'Unknown error'}`
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: `Storage upload failed: ${error.message || 'Unknown error'}`,
+        },
+        { status: 500 }
+      );
     }
 
     // Get public URL
@@ -66,13 +82,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       url: publicUrlData.publicUrl,
       fileName: fileName,
-      message: 'Upload successful'
+      message: 'Upload successful',
     });
-
   } catch (error) {
-    return NextResponse.json({
-      error: 'An unexpected error occurred during upload',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'An unexpected error occurred during upload',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }

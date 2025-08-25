@@ -6,7 +6,7 @@ interface NewsletterViewSkeletonProps {
 }
 
 export const NewsletterViewSkeleton = ({
-  rowCount = 5
+  rowCount = 5,
 }: NewsletterViewSkeletonProps) => {
   return (
     <div>

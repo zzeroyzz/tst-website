@@ -18,9 +18,9 @@ export async function POST(
 
     // Get user's IP address
     const forwarded = headersList.get('x-forwarded-for');
-    const ip = forwarded ? forwarded.split(',')[0] :
-               headersList.get('x-real-ip') ||
-               '127.0.0.1';
+    const ip = forwarded
+      ? forwarded.split(',')[0]
+      : headersList.get('x-real-ip') || '127.0.0.1';
 
     const userAgent = headersList.get('user-agent') || 'Unknown';
 
@@ -28,18 +28,24 @@ export async function POST(
     const { data, error } = await supabase.rpc('toggle_post_like', {
       post_slug: slug,
       user_ip_addr: ip,
-      user_agent_str: userAgent
+      user_agent_str: userAgent,
     });
 
     if (error) {
       console.error('Error toggling like:', error);
-      return NextResponse.json({ error: 'Failed to toggle like' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to toggle like' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error in like toggle:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -54,9 +60,9 @@ export async function GET(
 
     // Get user's IP address
     const forwarded = headersList.get('x-forwarded-for');
-    const ip = forwarded ? forwarded.split(',')[0] :
-               headersList.get('x-real-ip') ||
-               '127.0.0.1';
+    const ip = forwarded
+      ? forwarded.split(',')[0]
+      : headersList.get('x-real-ip') || '127.0.0.1';
 
     // Get post data with counts
     const { data: post, error: postError } = await supabase
@@ -80,10 +86,13 @@ export async function GET(
     return NextResponse.json({
       view_count: post.view_count || 0,
       like_count: post.like_count || 0,
-      liked: !likeError && !!likeData
+      liked: !likeError && !!likeData,
     });
   } catch (error) {
     console.error('Error getting post stats:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

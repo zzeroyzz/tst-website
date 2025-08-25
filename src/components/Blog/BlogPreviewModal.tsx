@@ -1,12 +1,12 @@
 // src/components/BlogPreviewModal.tsx
-"use client";
+'use client';
 
 import React from 'react';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Button from '@/components/Button/Button';
-import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import CircleIcon from '@/components/CircleIcon/CircleIcon';
 
 interface BlogPreviewModalProps {
   title: string;
@@ -32,7 +32,6 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-brutalistLg w-full max-w-6xl h-full flex flex-col border-2 border-black">
-
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b-2 border-black flex-shrink-0">
           <h2 className="text-2xl font-bold">Blog Post Preview</h2>
@@ -48,7 +47,6 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
         {/* Preview Content - Scrollable */}
         <div className="flex-grow overflow-y-auto bg-tst-cream">
           <div className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
-
             {/* Post Header */}
             <header className="mb-16">
               {/* Content Type Badge */}
@@ -83,8 +81,10 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
             {/* Featured Image */}
             {imageUrl && (
               <div className="mb-16">
-                <div className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-brutalist border-2 border-black"
-                     style={{ aspectRatio: '3/2' }}>
+                <div
+                  className="relative w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-brutalist border-2 border-black"
+                  style={{ aspectRatio: '3/2' }}
+                >
                   <Image
                     src={imageUrl}
                     alt={title}
@@ -99,11 +99,14 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
             {/* Content */}
             <article className="mb-20">
               <div className="text-lg leading-relaxed space-y-6 max-w-2xl mx-auto mt-12">
-                {body.split('\n').filter(line => line.trim() !== '').map((paragraph, index) => (
-                  <p key={index} className="mb-6">
-                    {paragraph.trim()}
-                  </p>
-                ))}
+                {body
+                  .split('\n')
+                  .filter(line => line.trim() !== '')
+                  .map((paragraph, index) => (
+                    <p key={index} className="mb-6">
+                      {paragraph.trim()}
+                    </p>
+                  ))}
               </div>
 
               {toastyTake && (
@@ -144,7 +147,9 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
                   />
                   <div>
                     <p className="font-semibold text-gray-900 text-base">Kay</p>
-                    <p className="text-sm text-gray-500 mt-1">Therapist & Writer</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Therapist & Writer
+                    </p>
                   </div>
                 </div>
               </div>

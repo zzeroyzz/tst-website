@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import React from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface MobileMenuProps {
   onClose: () => void;
@@ -17,23 +17,23 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
     e.preventDefault();
     onClose();
     setTimeout(() => {
-      if (pathname === "/") {
-        const contactForm = document.getElementById("contact-form");
+      if (pathname === '/') {
+        const contactForm = document.getElementById('contact-form');
         if (contactForm) {
-          contactForm.scrollIntoView({ behavior: "smooth" });
+          contactForm.scrollIntoView({ behavior: 'smooth' });
         }
       } else {
-        router.push("/#contact-form");
+        router.push('/#contact-form');
       }
     }, 200);
   };
 
   return (
     <motion.div
-      initial={{ y: "-100%", opacity: 0 }}
-      animate={{ y: "0%", opacity: 1 }}
-      exit={{ y: "-100%", opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeInOut" }}
+      initial={{ y: '-100%', opacity: 0 }}
+      animate={{ y: '0%', opacity: 1 }}
+      exit={{ y: '-100%', opacity: 0 }}
+      transition={{ duration: 0.4, ease: 'easeInOut' }}
       className="fixed inset-0 bg-tst-cream md:hidden z-40"
     >
       {/* Background overlay */}
@@ -48,7 +48,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
           {/* Menu card */}
           <div className="relative bg-tst-purple border-2 border-black rounded-lg p-8 shadow-brutalistLg">
             <ul className="flex flex-col items-center gap-8 text-xl font-bold text-center ">
-               <li>
+              <li>
                 <Link
                   href="/therapy-services"
                   onClick={onClose}
@@ -57,7 +57,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
                   Therapy Services
                 </Link>
               </li>
-                <li>
+              <li>
                 <Link
                   href="/about"
                   onClick={onClose}
@@ -66,7 +66,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
                   About
                 </Link>
               </li>
-               <li>
+              <li>
                 <Link
                   href="/mental-health-healing-blog"
                   onClick={onClose}
@@ -90,7 +90,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ onClose }) => {
                   onClick={handleBookConsultationClick}
                   className="text-white hover:text-tst-yellow transition-colors"
                 >
-                  Book a Free Consultation
+                  Book a Free 15-min Consultation
                 </a>
               </li>
             </ul>

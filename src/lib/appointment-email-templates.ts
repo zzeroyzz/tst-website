@@ -5,7 +5,10 @@ interface AppointmentConfirmationData {
   appointmentDate: string; // e.g., "Monday, January 15, 2024"
   appointmentTime: string; // e.g., "2:00 PM EST"
   googleMeetLink: string;
-  cancelToken: string; // Unique token for cancellation
+  // NEW: we prefer a fully-formed cancel URL from the server
+  cancelUrl?: string;
+  // Fallback if cancelUrl isn't provided
+  cancelToken?: string;
 }
 
 interface AppointmentNotificationData {
@@ -26,6 +29,9 @@ interface AppointmentCancellationData {
   appointmentDate: string;
   appointmentTime: string;
   reason?: string;
+  // Add missing fields for reschedule functionality
+  cancelUrl?: string;
+  cancelToken?: string;
 }
 
 interface AppointmentRescheduleData {
@@ -35,29 +41,60 @@ interface AppointmentRescheduleData {
   newAppointmentDate: string;
   newAppointmentTime: string;
   googleMeetLink: string;
-  cancelToken: string;
+  // Prefer a fully-formed cancel URL; else build from token
+  cancelUrl?: string;
+  cancelToken?: string;
 }
+
 interface QuestionnaireReminderData {
   name: string;
   questionnaireUrl: string;
 }
+
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
+
 function formatName(name: string): string {
   if (!name) return '';
-
   return name
     .toLowerCase()
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
+
+// Build a base URL from env with sensible fallbacks
+function getPublicBaseUrl(): string {
+  const base =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    '';
+  return base.replace(/\/+$/, ''); // trim trailing slash
+}
+
+function buildCancelUrl(cancelUrl?: string, cancelToken?: string): string | null {
+  if (cancelUrl) return cancelUrl; // server provided the full URL — use it
+  if (!cancelToken) return null;
+  const base = getPublicBaseUrl();
+  if (!base) return null;
+  return `${base}/cancel-appointment/${encodeURIComponent(cancelToken)}`;
+}
+
+function buildRescheduleUrl(cancelUrl?: string, cancelToken?: string): string | null {
+  if (cancelUrl) return cancelUrl; // server provided the full URL — use it
+  if (!cancelToken) return null;
+  const base = getPublicBaseUrl();
+  if (!base) return null;
+  return `${base}/reschedule/${encodeURIComponent(cancelToken)}`;
+}
+
 // Base template with dark mode bypass (reusing your existing styles)
 const getBaseEmailTemplate = (content: string, img: string): string => `
 <!DOCTYPE html>
@@ -87,80 +124,32 @@ const getBaseEmailTemplate = (content: string, img: string): string => `
 
     /* Dark mode media query overrides */
     @media (prefers-color-scheme: dark) {
-      .force-light {
-        background-color: #F9F5F2 !important;
-        color: #000000 !important;
-      }
-      .force-white {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-      }
-      .force-black-text {
-        color: #000000 !important;
-      }
-      .force-yellow {
-        background-color: #F7BD01 !important;
-      }
-      .force-purple {
-        background-color: #C5A1FF !important;
-      }
-      .force-green {
-        background-color: #7FBC8C !important;
-      }
-      .force-shadow {
-        background-color: #000000 !important;
-      }
+      .force-light { background-color: #F9F5F2 !important; color: #000000 !important; }
+      .force-white { background-color: #ffffff !important; color: #000000 !important; }
+      .force-black-text { color: #000000 !important; }
+      .force-yellow { background-color: #F7BD01 !important; }
+      .force-purple { background-color: #C5A1FF !important; }
+      .force-green { background-color: #7FBC8C !important; }
+      .force-shadow { background-color: #000000 !important; }
     }
 
     /* Gmail dark mode specific */
-    [data-ogsc] .force-light {
-      background-color: #F9F5F2 !important;
-      color: #000000 !important;
-    }
-    [data-ogsc] .force-white {
-      background-color: #ffffff !important;
-      color: #000000 !important;
-    }
-    [data-ogsc] .force-black-text {
-      color: #000000 !important;
-    }
-    [data-ogsc] .force-yellow {
-      background-color: #F7BD01 !important;
-    }
-    [data-ogsc] .force-purple {
-      background-color: #C5A1FF !important;
-    }
-    [data-ogsc] .force-green {
-      background-color: #7FBC8C !important;
-    }
-    [data-ogsc] .force-shadow {
-      background-color: #000000 !important;
-    }
+    [data-ogsc] .force-light { background-color: #F9F5F2 !important; color: #000000 !important; }
+    [data-ogsc] .force-white { background-color: #ffffff !important; color: #000000 !important; }
+    [data-ogsc] .force-black-text { color: #000000 !important; }
+    [data-ogsc] .force-yellow { background-color: #F7BD01 !important; }
+    [data-ogsc] .force-purple { background-color: #C5A1FF !important; }
+    [data-ogsc] .force-green { background-color: #7FBC8C !important; }
+    [data-ogsc] .force-shadow { background-color: #000000 !important; }
 
     /* Outlook dark mode */
-    [data-ogsb] .force-light {
-      background-color: #F9F5F2 !important;
-      color: #000000 !important;
-    }
-    [data-ogsb] .force-white {
-      background-color: #ffffff !important;
-      color: #000000 !important;
-    }
-    [data-ogsb] .force-black-text {
-      color: #000000 !important;
-    }
-    [data-ogsb] .force-yellow {
-      background-color: #F7BD01 !important;
-    }
-    [data-ogsb] .force-purple {
-      background-color: #C5A1FF !important;
-    }
-    [data-ogsb] .force-green {
-      background-color: #7FBC8C !important;
-    }
-    [data-ogsb] .force-shadow {
-      background-color: #000000 !important;
-    }
+    [data-ogsb] .force-light { background-color: #F9F5F2 !important; color: #000000 !important; }
+    [data-ogsb] .force-white { background-color: #ffffff !important; color: #000000 !important; }
+    [data-ogsb] .force-black-text { color: #000000 !important; }
+    [data-ogsb] .force-yellow { background-color: #F7BD01 !important; }
+    [data-ogsb] .force-purple { background-color: #C5A1FF !important; }
+    [data-ogsb] .force-green { background-color: #7FBC8C !important; }
+    [data-ogsb] .force-shadow { background-color: #000000 !important; }
 
     html, body {
       margin: 0 auto !important;
@@ -181,26 +170,17 @@ const getBaseEmailTemplate = (content: string, img: string): string => `
       margin: 0 auto !important;
     }
 
-    img {
-      -ms-interpolation-mode: bicubic;
-      max-width: 100%;
-      height: auto;
-      display: block;
-      border: 0;
-    }
+    img { -ms-interpolation-mode: bicubic; max-width: 100%; height: auto; display: block; border: 0; }
 
-    a {
-      text-decoration: none;
-      color: #000000 !important;
-    }
+    a { text-decoration: none; color: #000000 !important; }
 
     @media screen and (max-width: 680px) {
-        .email-container { width: 100% !important; }
-        .card-wrapper { padding: 0 10px 20px 10px !important; }
-        .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
-        .h1 { font-size: 36px !important; line-height: 1.2 !important; }
-        .mobile-text { font-size: 18px !important; }
-        .mobile-button { padding: 15px !important; font-size: 16px !important; }
+      .email-container { width: 100% !important; }
+      .card-wrapper { padding: 0 10px 20px 10px !important; }
+      .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+      .h1 { font-size: 36px !important; line-height: 1.2 !important; }
+      .mobile-text { font-size: 18px !important; }
+      .mobile-button { padding: 15px !important; font-size: 16px !important; }
     }
   </style>
 </head>
@@ -237,13 +217,17 @@ const getBaseEmailTemplate = (content: string, img: string): string => `
 `;
 
 // Client appointment confirmation email
-export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmationData): string => {
+export const getAppointmentConfirmationTemplate = (
+  data: AppointmentConfirmationData
+): string => {
   const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
   const escapedMeetLink = escapeHtml(data.googleMeetLink);
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/cancel-appointment/${data.cancelToken}`;
+
+  const resolvedCancelUrl = buildCancelUrl(data.cancelUrl, data.cancelToken);
+  const escapedCancelUrl = resolvedCancelUrl ? escapeHtml(resolvedCancelUrl) : '#';
 
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
 
@@ -329,7 +313,7 @@ export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmation
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                         <tr>
                           <td style="background-color:#C5A1FF !important; border:3px solid #000000;" class="force-purple">
-                            <a href="${cancelUrl}" target="_blank"
+                            <a href="${escapedCancelUrl}" target="_blank"
                                style="display:inline-block; padding:15px 30px; font-family:'Work Sans',Arial,sans-serif; font-size:16px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
                               Cancel or Reschedule
                             </a>
@@ -372,7 +356,9 @@ export const getAppointmentConfirmationTemplate = (data: AppointmentConfirmation
 };
 
 // Admin notification email (for Kay)
-export const getAppointmentNotificationTemplate = (data: AppointmentNotificationData): string => {
+export const getAppointmentNotificationTemplate = (
+  data: AppointmentNotificationData
+): string => {
   const formattedName = formatName(data.clientName);
   const escapedClientName = escapeHtml(formattedName);
   const escapedClientEmail = escapeHtml(data.clientEmail);
@@ -381,43 +367,8 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
 
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
 
-  const q = data.questionnaireData;
-  const questionnaireSection = q ? `
-    <!-- Questionnaire Responses -->
-    <div style="background-color:#7FBC8C !important; border:3px solid #000000; padding:30px; margin:40px 0;" class="force-green">
-      <h2 style="font-family:'Work Sans',Arial,sans-serif; font-size:24px; font-weight:bold; color:#000000 !important; margin:0 0 20px;" class="force-black-text">
-        Questionnaire Responses
-      </h2>
-
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:15px 0 5px;" class="force-black-text">
-        <strong>Interested in working on:</strong>
-      </p>
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:0 0 15px;" class="force-black-text">
-        ${q.interestedIn.join(', ')}
-      </p>
-
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:15px 0 5px;" class="force-black-text">
-        <strong>Scheduling preference:</strong>
-      </p>
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:0 0 15px;" class="force-black-text">
-        ${escapeHtml(q.schedulingPreference)}
-      </p>
-
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:15px 0 5px;" class="force-black-text">
-        <strong>Payment method:</strong>
-      </p>
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:0 0 15px;" class="force-black-text">
-        ${escapeHtml(q.paymentMethod)}
-      </p>
-
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:15px 0 5px;" class="force-black-text">
-        <strong>Budget works ($150/session):</strong>
-      </p>
-      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:0;" class="force-black-text">
-        ${q.budgetWorks ? 'Yes' : 'No'}
-      </p>
-    </div>
-  ` : '';
+  const adminAppBase = getPublicBaseUrl() || process.env.NEXT_PUBLIC_APP_URL || '';
+  const adminAppUrl = adminAppBase ? `${adminAppBase}/admin/appointments` : '#';
 
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -461,8 +412,6 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
                       </p>
                     </div>
 
-                    ${questionnaireSection}
-
                     <!-- Next Steps -->
                     <h3 style="font-family:'Work Sans',Arial,sans-serif; font-size:20px; font-weight:bold; color:#000000 !important; margin:40px 0 20px;" class="force-black-text">
                       Next Steps:
@@ -479,7 +428,7 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                         <tr>
                           <td style="background-color:#F7BD01 !important; border:3px solid #000000;" class="force-yellow">
-                            <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/appointments" target="_blank"
+                            <a href="${adminAppUrl}" target="_blank"
                                style="display:inline-block; padding:20px 40px; font-family:'Work Sans',Arial,sans-serif; font-size:18px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
                               View in Admin Dashboard
                             </a>
@@ -512,11 +461,15 @@ export const getAppointmentNotificationTemplate = (data: AppointmentNotification
 };
 
 // Client appointment cancellation email
-export const getAppointmentCancellationTemplate = (data: AppointmentCancellationData): string => {
-    const formattedName = formatName(data.name);
+export const getAppointmentCancellationTemplate = (
+  data: AppointmentCancellationData
+  ): string => {
+  const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedDate = escapeHtml(data.appointmentDate);
   const escapedTime = escapeHtml(data.appointmentTime);
+  const resolvedCancelUrl = buildRescheduleUrl(data.cancelUrl, data.cancelToken);
+  const escapedReschedulelUrl = resolvedCancelUrl ? escapeHtml(resolvedCancelUrl) : '#';
 
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
 
@@ -573,7 +526,7 @@ export const getAppointmentCancellationTemplate = (data: AppointmentCancellation
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                         <tr>
                           <td style="background-color:#C5A1FF !important; border:3px solid #000000;" class="force-purple">
-                            <a href="mailto:care@toastedsesametherapy.com?subject=Reschedule My Consultation&body=Hi Kay, I'd like to reschedule my consultation appointment. Thank you!" target="_blank"
+                            <a href="${escapedReschedulelUrl}" target="_blank"
                                style="display:inline-block; padding:20px 40px; font-family:'Work Sans',Arial,sans-serif; font-size:18px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
                               Reschedule My Consultation
                             </a>
@@ -625,15 +578,20 @@ export const getAppointmentCancellationTemplate = (data: AppointmentCancellation
   return getBaseEmailTemplate(content, img);
 };
 
-export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData): string => {
-    const formattedName = formatName(data.name);
+export const getAppointmentRescheduleTemplate = (
+  data: AppointmentRescheduleData
+): string => {
+  const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedOldDate = escapeHtml(data.oldAppointmentDate);
   const escapedOldTime = escapeHtml(data.oldAppointmentTime);
   const escapedNewDate = escapeHtml(data.newAppointmentDate);
   const escapedNewTime = escapeHtml(data.newAppointmentTime);
   const escapedMeetLink = escapeHtml(data.googleMeetLink);
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/cancel-appointment/${data.cancelToken}`;
+
+  // FIX: use server-provided URL if present; else build from token
+  const resolvedCancelUrl = buildCancelUrl(data.cancelUrl, data.cancelToken);
+  const escapedCancelUrl = resolvedCancelUrl ? escapeHtml(resolvedCancelUrl) : '#';
 
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
 
@@ -717,16 +675,6 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
                       </table>
                     </div>
 
-                    <!-- Supportive Note -->
-                    <div style="background-color:#F7BD01 !important; border:3px solid #000000; padding:20px; margin:40px 0;" class="force-yellow">
-                      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; font-weight:bold; color:#000000 !important; margin:0 0 10px;" class="force-black-text">
-                        💡 Quick reminder:
-                      </p>
-                      <p style="font-family:'Work Sans',Arial,sans-serif; font-size:16px; color:#000000 !important; margin:0;" class="force-black-text">
-                        Life happens, and I completely understand when schedules need to change. Thanks for giving me a heads up!
-                      </p>
-                    </div>
-
                     <!-- Need to Reschedule Again -->
                     <p style="font-family:'Work Sans',Arial,sans-serif; font-size:18px; line-height:1.6; color:#000000 !important; margin:40px 0 20px;" class="force-black-text">
                       Need to make another change? No worries at all - just click below:
@@ -737,7 +685,7 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                         <tr>
                           <td style="background-color:#C5A1FF !important; border:3px solid #000000;" class="force-purple">
-                            <a href="${cancelUrl}" target="_blank"
+                            <a href="${escapedCancelUrl}" target="_blank"
                                style="display:inline-block; padding:15px 30px; font-family:'Work Sans',Arial,sans-serif; font-size:16px; font-weight:bold; text-decoration:none; color:#000000 !important;" class="mobile-button force-black-text">
                               Cancel or Reschedule Again
                             </a>
@@ -779,7 +727,9 @@ export const getAppointmentRescheduleTemplate = (data: AppointmentRescheduleData
   return getBaseEmailTemplate(content, img);
 };
 
-export const getQuestionnaireReminderTemplate = (data: QuestionnaireReminderData): string => {
+export const getQuestionnaireReminderTemplate = (
+  data: QuestionnaireReminderData
+): string => {
   const formattedName = formatName(data.name);
   const escapedName = escapeHtml(formattedName);
   const escapedUrl = escapeHtml(data.questionnaireUrl);
@@ -857,5 +807,5 @@ export type {
   AppointmentConfirmationData,
   AppointmentNotificationData,
   AppointmentCancellationData,
-  AppointmentRescheduleData
+  AppointmentRescheduleData,
 };

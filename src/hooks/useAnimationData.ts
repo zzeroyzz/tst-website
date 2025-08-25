@@ -4,22 +4,26 @@ import { useState, useEffect } from 'react';
 
 // Lazy loading functions for each animation
 export const loadTiredAnimation = () =>
-  import("../../public/assets/Tired.json").then(module => module.default);
+  import('../../public/assets/Tired.json').then(module => module.default);
 
 export const loadSomaticAnimation = () =>
-  import("../../public/assets/Somatic-Animation.json").then(module => module.default);
+  import('../../public/assets/Somatic-Animation.json').then(
+    module => module.default
+  );
 
 export const loadTraumaAnimation = () =>
-  import("../../public/assets/Trauma.json").then(module => module.default);
+  import('../../public/assets/Trauma.json').then(module => module.default);
 
 export const loadNeuroAnimation = () =>
-  import("../../public/assets/neuro.json").then(module => module.default);
+  import('../../public/assets/neuro.json').then(module => module.default);
 
 export const loadIdentityAnimation = () =>
-  import("../../public/assets/identity.json").then(module => module.default);
+  import('../../public/assets/identity.json').then(module => module.default);
 
 export const loadToastyTidbitsAnimation = () =>
-  import("../../public/assets/TT-Animation.json").then(module => module.default);
+  import('../../public/assets/TT-Animation.json').then(
+    module => module.default
+  );
 
 // Animation loader type
 type AnimationLoader = () => Promise<any>;

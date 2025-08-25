@@ -36,5 +36,5 @@
 
 .wrapper:active .pill,
 .wrapper:active .shadow {
-    transform: translate(0, 0);
+  transform: translate(0, 0);
 }

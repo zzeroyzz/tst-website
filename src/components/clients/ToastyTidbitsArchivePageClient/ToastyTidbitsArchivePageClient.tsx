@@ -1,13 +1,13 @@
 // src/app/toasty-tidbits-archives/page.tsx
-"use client";
+'use client';
 
-import React, { useState, useEffect, useMemo } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { format } from "date-fns";
-import Section from "@/components/Section/Section";
-import ResourceCard from "@/components/ResourceCard/ResourceCard";
-import { Post } from "@/types";
-import { coreTags } from "@/data/tagData";
+import React, { useState, useEffect, useMemo } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { format } from 'date-fns';
+import Section from '@/components/Section/Section';
+import ResourceCard from '@/components/ResourceCard/ResourceCard';
+import { Post } from '@/types';
+import { coreTags } from '@/data/tagData';
 import SubscribeModal from '@/components/SubscribeModal/SubscribeModal';
 import { useSubscribeModalTrigger } from '@/hooks/useSubscribeModalTrigger';
 import { NewsletterArchiveSkeleton } from '@/components/skeleton';
@@ -16,8 +16,12 @@ const ToastyTidbitsArchivePageClient = () => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedType, setSelectedType] = useState<'all' | 'newsletter' | 'blog'>('all');
-  const [sortOrder, setSortOrder] = useState<"new-to-old" | "old-to-new">("new-to-old");
+  const [selectedType, setSelectedType] = useState<
+    'all' | 'newsletter' | 'blog'
+  >('all');
+  const [sortOrder, setSortOrder] = useState<'new-to-old' | 'old-to-new'>(
+    'new-to-old'
+  );
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
@@ -28,15 +32,15 @@ const ToastyTidbitsArchivePageClient = () => {
     const fetchAllPosts = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("posts")
-        .select("id, title, created_at, sent_at, image_url, tags, slug, type")
-        .eq("status", "published")
-        .eq("archived", false) // Only show non-archived posts
-        .eq("visible_to_public", true) // Only show posts marked as visible to public
-        .order("sent_at", { ascending: false });
+        .from('posts')
+        .select('id, title, created_at, sent_at, image_url, tags, slug, type')
+        .eq('status', 'published')
+        .eq('archived', false) // Only show non-archived posts
+        .eq('visible_to_public', true) // Only show posts marked as visible to public
+        .order('sent_at', { ascending: false });
 
       if (error) {
-        console.error("Error fetching posts:", error);
+        console.error('Error fetching posts:', error);
         setAllPosts([]);
       } else {
         setAllPosts(data as Post[]);
@@ -79,7 +83,7 @@ const ToastyTidbitsArchivePageClient = () => {
     return filtered.sort((a, b) => {
       const dateA = new Date(a.sent_at || a.created_at).getTime();
       const dateB = new Date(b.sent_at || b.created_at).getTime();
-      return sortOrder === "new-to-old" ? dateB - dateA : dateA - dateB;
+      return sortOrder === 'new-to-old' ? dateB - dateA : dateA - dateB;
     });
   }, [allPosts, selectedTags, selectedType, sortOrder]);
 
@@ -116,16 +120,18 @@ const ToastyTidbitsArchivePageClient = () => {
       <Section>
         <div className="text-center mb-12">
           <h1 className="text-5xl font-extrabold">Content Archive</h1>
-          <p className="text-lg mt-4">Browse all of our newsletters and blog posts.</p>
+          <p className="text-lg mt-4">
+            Browse all of our newsletters and blog posts.
+          </p>
           <div className="mt-2 text-sm text-gray-600">
-            {postCounts.newsletter} newsletters • {postCounts.blog} blog posts • {postCounts.total} total
+            {postCounts.newsletter} newsletters • {postCounts.blog} blog posts •{' '}
+            {postCounts.total} total
           </div>
         </div>
 
         {/* Filtering and Sorting Controls */}
         <div className="bg-white p-6 rounded-lg border-2 border-black shadow-brutalistLg mb-12">
           <div className="grid md:grid-cols-3 gap-6 items-start">
-
             {/* Content Type Filter */}
             <div className="relative">
               <h3 className="font-bold mb-2">Content Type:</h3>
@@ -140,8 +146,11 @@ const ToastyTidbitsArchivePageClient = () => {
                 className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
               >
                 <span className="text-gray-700">
-                  {selectedType === 'all' ? 'All Content' :
-                   selectedType === 'newsletter' ? 'Newsletters Only' : 'Blog Posts Only'}
+                  {selectedType === 'all'
+                    ? 'All Content'
+                    : selectedType === 'newsletter'
+                      ? 'Newsletters Only'
+                      : 'Blog Posts Only'}
                 </span>
                 <svg
                   className={`w-4 h-4 transition-transform ${isTypeDropdownOpen ? 'rotate-180' : ''}`}
@@ -149,26 +158,50 @@ const ToastyTidbitsArchivePageClient = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
               {/* Type Dropdown Menu */}
               {isTypeDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                <div
+                  className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden"
+                  style={{ boxShadow: '4px 4px 0 0 black' }}
+                >
                   {[
-                    { value: 'all', label: 'All Content', count: postCounts.total },
-                    { value: 'newsletter', label: 'Newsletters', count: postCounts.newsletter },
-                    { value: 'blog', label: 'Blog Posts', count: postCounts.blog }
+                    {
+                      value: 'all',
+                      label: 'All Content',
+                      count: postCounts.total,
+                    },
+                    {
+                      value: 'newsletter',
+                      label: 'Newsletters',
+                      count: postCounts.newsletter,
+                    },
+                    {
+                      value: 'blog',
+                      label: 'Blog Posts',
+                      count: postCounts.blog,
+                    },
                   ].map(option => (
                     <button
                       key={option.value}
                       onClick={() => {
-                        setSelectedType(option.value as 'all' | 'newsletter' | 'blog');
+                        setSelectedType(
+                          option.value as 'all' | 'newsletter' | 'blog'
+                        );
                         setIsTypeDropdownOpen(false);
                       }}
                       className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors ${
-                        selectedType === option.value ? 'bg-tst-purple text-white' : 'text-gray-900'
+                        selectedType === option.value
+                          ? 'bg-tst-purple text-white'
+                          : 'text-gray-900'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -228,8 +261,7 @@ const ToastyTidbitsArchivePageClient = () => {
                 <span className="text-gray-700">
                   {selectedTags.length > 0
                     ? `${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''} selected`
-                    : 'Select tags to filter...'
-                  }
+                    : 'Select tags to filter...'}
                 </span>
                 <svg
                   className={`w-4 h-4 transition-transform ${isTagDropdownOpen ? 'rotate-180' : ''}`}
@@ -237,19 +269,29 @@ const ToastyTidbitsArchivePageClient = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
               {/* Dropdown Menu */}
               {isTagDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg max-h-60 overflow-y-auto" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                <div
+                  className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg max-h-60 overflow-y-auto"
+                  style={{ boxShadow: '4px 4px 0 0 black' }}
+                >
                   {coreTags.map(tag => (
                     <button
                       key={tag}
                       onClick={() => handleTagToggle(tag)}
                       className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0 transition-colors ${
-                        selectedTags.includes(tag) ? 'bg-tst-purple text-white' : 'text-gray-900'
+                        selectedTags.includes(tag)
+                          ? 'bg-tst-purple text-white'
+                          : 'text-gray-900'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -278,7 +320,9 @@ const ToastyTidbitsArchivePageClient = () => {
                 className="w-full p-3 text-left bg-white border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-tst-purple flex items-center justify-between"
               >
                 <span className="text-gray-700">
-                  {sortOrder === "new-to-old" ? "Newest to Oldest" : "Oldest to Newest"}
+                  {sortOrder === 'new-to-old'
+                    ? 'Newest to Oldest'
+                    : 'Oldest to Newest'}
                 </span>
                 <svg
                   className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`}
@@ -286,41 +330,53 @@ const ToastyTidbitsArchivePageClient = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
               {/* Sort Dropdown Menu */}
               {isSortDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden" style={{ boxShadow: '4px 4px 0 0 black' }}>
+                <div
+                  className="absolute z-10 w-full mt-1 bg-white border-2 border-black rounded-lg overflow-hidden"
+                  style={{ boxShadow: '4px 4px 0 0 black' }}
+                >
                   <button
                     onClick={() => {
-                      setSortOrder("new-to-old");
+                      setSortOrder('new-to-old');
                       setIsSortDropdownOpen(false);
                     }}
                     className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-200 transition-colors ${
-                      sortOrder === "new-to-old" ? 'bg-tst-purple text-white' : 'text-gray-900'
+                      sortOrder === 'new-to-old'
+                        ? 'bg-tst-purple text-white'
+                        : 'text-gray-900'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">Newest to Oldest</span>
-                      {sortOrder === "new-to-old" && (
+                      {sortOrder === 'new-to-old' && (
                         <span className="text-sm">✓</span>
                       )}
                     </div>
                   </button>
                   <button
                     onClick={() => {
-                      setSortOrder("old-to-new");
+                      setSortOrder('old-to-new');
                       setIsSortDropdownOpen(false);
                     }}
                     className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
-                      sortOrder === "old-to-new" ? 'bg-tst-purple text-white' : 'text-gray-900'
+                      sortOrder === 'old-to-new'
+                        ? 'bg-tst-purple text-white'
+                        : 'text-gray-900'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">Oldest to Newest</span>
-                      {sortOrder === "old-to-new" && (
+                      {sortOrder === 'old-to-new' && (
                         <span className="text-sm">✓</span>
                       )}
                     </div>
@@ -336,7 +392,13 @@ const ToastyTidbitsArchivePageClient = () => {
           <p className="text-gray-600">
             Showing {filteredAndSortedPosts.length} of {allPosts.length} posts
             {selectedType !== 'all' && (
-              <span> • {selectedType === 'newsletter' ? 'Newsletters' : 'Blog Posts'} only</span>
+              <span>
+                {' '}
+                • {selectedType === 'newsletter'
+                  ? 'Newsletters'
+                  : 'Blog Posts'}{' '}
+                only
+              </span>
             )}
             {selectedTags.length > 0 && (
               <span> • filtered by: {selectedTags.join(', ')}</span>
@@ -346,18 +408,23 @@ const ToastyTidbitsArchivePageClient = () => {
 
         {/* Post Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredAndSortedPosts.map((post) => (
+          {filteredAndSortedPosts.map(post => (
             <div key={post.id} className="group">
               <ResourceCard
                 card={{
                   title: post.title,
-                  date: post.sent_at ? format(new Date(post.sent_at), "PPP") : format(new Date(post.created_at), "PPP"),
-                  author: "Kay",
-                  authorImageUrl: "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
-                  imageUrl: post.image_url || "https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg",
+                  date: post.sent_at
+                    ? format(new Date(post.sent_at), 'PPP')
+                    : format(new Date(post.created_at), 'PPP'),
+                  author: 'Kay',
+                  authorImageUrl:
+                    'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg',
+                  imageUrl:
+                    post.image_url ||
+                    'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/author-kay-icon.svg',
                   tags: post.tags,
                   href: `/posts/${post.slug}`,
-                  type: post.type // Pass type to ResourceCard if it supports it
+                  type: post.type, // Pass type to ResourceCard if it supports it
                 }}
               />
             </div>

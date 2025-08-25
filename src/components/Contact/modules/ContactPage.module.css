@@ -1,4 +1,6 @@
 .animatedItem {
   /* This transition will apply to the changes in `y` and `opacity` from the variants */
-  transition: transform 600ms ease-out, opacity 600ms ease-out;
+  transition:
+    transform 600ms ease-out,
+    opacity 600ms ease-out;
 }

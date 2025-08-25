@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/BlogView.tsx
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { PlusCircle, Calendar, Tag, FileText } from "lucide-react";
-import Button from "@/components/Button/Button";
-import { Post } from "@/types";
-import { NewsletterViewSkeleton } from "@/components/skeleton";
-import toast from "react-hot-toast";
-import BlogDetailModal from "@/components/Blog/BlogDetailModal";
+import React, { useEffect, useState, useCallback } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { PlusCircle, Calendar, Tag, FileText } from 'lucide-react';
+import Button from '@/components/Button/Button';
+import { Post } from '@/types';
+import { NewsletterViewSkeleton } from '@/components/skeleton';
+import toast from 'react-hot-toast';
+import BlogDetailModal from '@/components/Blog/BlogDetailModal';
 
 const BlogView = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -23,12 +23,16 @@ const BlogView = () => {
   const router = useRouter();
 
   const statusColors = {
-    draft: "bg-yellow-100 text-yellow-800",
-    published: "bg-green-100 text-green-800",
+    draft: 'bg-yellow-100 text-yellow-800',
+    published: 'bg-green-100 text-green-800',
   };
 
   const tagColors = [
-    "bg-tst-teal", "bg-tst-purple", "bg-tst-yellow", "bg-tst-green", "bg-tst-red"
+    'bg-tst-teal',
+    'bg-tst-purple',
+    'bg-tst-yellow',
+    'bg-tst-green',
+    'bg-tst-red',
   ];
 
   const fetchPosts = useCallback(async () => {
@@ -36,30 +40,30 @@ const BlogView = () => {
 
     // Fetch active blog posts
     const { data: activeData, error: activeError } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("type", "blog")
-      .eq("archived", false)
-      .order("created_at", { ascending: false });
+      .from('posts')
+      .select('*')
+      .eq('type', 'blog')
+      .eq('archived', false)
+      .order('created_at', { ascending: false });
 
     // Fetch archived blog posts
     const { data: archivedData, error: archivedError } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("type", "blog")
-      .eq("archived", true)
-      .order("created_at", { ascending: false });
+      .from('posts')
+      .select('*')
+      .eq('type', 'blog')
+      .eq('archived', true)
+      .order('created_at', { ascending: false });
 
     if (activeError) {
-      console.error("Error fetching active blog posts:", activeError);
-      toast.error("Failed to fetch active blog posts");
+      console.error('Error fetching active blog posts:', activeError);
+      toast.error('Failed to fetch active blog posts');
     } else {
       setPosts(activeData as Post[]);
     }
 
     if (archivedError) {
-      console.error("Error fetching archived blog posts:", archivedError);
-      toast.error("Failed to fetch archived blog posts");
+      console.error('Error fetching archived blog posts:', archivedError);
+      toast.error('Failed to fetch archived blog posts');
     } else {
       setArchivedPosts(archivedData as Post[]);
     }
@@ -75,7 +79,11 @@ const BlogView = () => {
     setSelectedPost(post);
   };
 
-  const handleUpdatePost = async (postId: string, updatedData: Partial<Post>, successMessage = "Blog post updated successfully!") => {
+  const handleUpdatePost = async (
+    postId: string,
+    updatedData: Partial<Post>,
+    successMessage = 'Blog post updated successfully!'
+  ) => {
     // Implement optimistic UI update
     const originalPosts = [...posts];
     const originalArchivedPosts = [...archivedPosts];
@@ -91,26 +99,29 @@ const BlogView = () => {
     setPosts(newPosts);
     setArchivedPosts(newArchivedPosts);
 
-    const { error } = await supabase.from("posts").update(updatedData).eq("id", postId);
+    const { error } = await supabase
+      .from('posts')
+      .update(updatedData)
+      .eq('id', postId);
 
     if (error) {
-        toast.error(`Failed to update blog post: ${error.message}`);
-        // Revert on failure
-        setPosts(originalPosts);
-        setArchivedPosts(originalArchivedPosts);
-        return false;
+      toast.error(`Failed to update blog post: ${error.message}`);
+      // Revert on failure
+      setPosts(originalPosts);
+      setArchivedPosts(originalArchivedPosts);
+      return false;
     } else {
-        toast.success(successMessage);
-        return true;
+      toast.success(successMessage);
+      return true;
     }
   };
 
   const handleArchivePost = async (postId: string) => {
     try {
       const { error } = await supabase
-        .from("posts")
+        .from('posts')
         .update({ archived: true })
-        .eq("id", postId);
+        .eq('id', postId);
 
       if (error) {
         throw error;
@@ -120,7 +131,10 @@ const BlogView = () => {
       const postToArchive = posts.find(p => p.id === postId);
       if (postToArchive) {
         setPosts(prev => prev.filter(p => p.id !== postId));
-        setArchivedPosts(prev => [{ ...postToArchive, archived: true }, ...prev]);
+        setArchivedPosts(prev => [
+          { ...postToArchive, archived: true },
+          ...prev,
+        ]);
       }
 
       toast.success('Blog post archived successfully!');
@@ -134,9 +148,9 @@ const BlogView = () => {
   const handleUnarchivePost = async (postId: string) => {
     try {
       const { error } = await supabase
-        .from("posts")
+        .from('posts')
         .update({ archived: false })
-        .eq("id", postId);
+        .eq('id', postId);
 
       if (error) {
         throw error;
@@ -174,7 +188,9 @@ const BlogView = () => {
       <div>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
-            <h2 className="text-2xl lg:text-3xl font-bold">Toasted Insights Blog Posts</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold">
+              Toasted Insights Blog Posts
+            </h2>
 
             {/* Tab Navigation */}
             <div className="flex border-2 border-black rounded-lg overflow-hidden w-full sm:w-auto">
@@ -205,7 +221,9 @@ const BlogView = () => {
           {activeTab === 'active' && (
             <Button
               className="bg-tst-purple flex items-center w-full lg:w-auto justify-center"
-              onClick={() => router.push('/dashboard/mental-health-healing-blog/create')}
+              onClick={() =>
+                router.push('/dashboard/mental-health-healing-blog/create')
+              }
             >
               <PlusCircle className="mr-2 h-4 w-4" /> Create Blog Post
             </Button>
@@ -228,11 +246,13 @@ const BlogView = () => {
                 {currentPosts.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="p-8 text-center text-gray-500">
-                      {activeTab === 'active' ? 'No active blog posts found' : 'No archived blog posts found'}
+                      {activeTab === 'active'
+                        ? 'No active blog posts found'
+                        : 'No archived blog posts found'}
                     </td>
                   </tr>
                 ) : (
-                  currentPosts.map((post) => (
+                  currentPosts.map(post => (
                     <tr
                       key={post.id}
                       className="border-b border-gray-200 hover:bg-tst-yellow cursor-pointer group"
@@ -259,10 +279,12 @@ const BlogView = () => {
                         </div>
                       </td>
                       <td className="p-4">
-                        {format(new Date(post.created_at), "PPP")}
+                        {format(new Date(post.created_at), 'PPP')}
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 text-xs font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-bold rounded-full capitalize ${statusColors[post.status] || 'bg-gray-100'}`}
+                        >
                           {post.status}
                         </span>
                       </td>
@@ -280,19 +302,23 @@ const BlogView = () => {
             <div className="bg-white border-2 border-black rounded-lg p-8 text-center text-gray-500">
               <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p className="mb-4">
-                {activeTab === 'active' ? 'No active blog posts found' : 'No archived blog posts found'}
+                {activeTab === 'active'
+                  ? 'No active blog posts found'
+                  : 'No archived blog posts found'}
               </p>
               {activeTab === 'active' && (
                 <Button
                   className="bg-tst-purple w-full sm:w-auto text-black"
-                  onClick={() => router.push('/dashboard/mental-health-healing-blog/create')}
+                  onClick={() =>
+                    router.push('/dashboard/mental-health-healing-blog/create')
+                  }
                 >
                   Create Your First Blog Post
                 </Button>
               )}
             </div>
           ) : (
-            currentPosts.map((post) => (
+            currentPosts.map(post => (
               <div
                 key={post.id}
                 className="bg-white border-2 border-black rounded-lg shadow-brutalistLg p-4 cursor-pointer hover:bg-tst-yellow transition-colors"
@@ -312,7 +338,9 @@ const BlogView = () => {
                   </div>
 
                   {/* Status Badge */}
-                  <span className={`px-3 py-1 text-sm font-bold rounded-full capitalize flex-shrink-0 ${statusColors[post.status] || 'bg-gray-100'}`}>
+                  <span
+                    className={`px-3 py-1 text-sm font-bold rounded-full capitalize flex-shrink-0 ${statusColors[post.status] || 'bg-gray-100'}`}
+                  >
                     {post.status}
                   </span>
                 </div>
@@ -322,7 +350,9 @@ const BlogView = () => {
                   <div className="mb-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Tag size={16} className="text-gray-500" />
-                      <span className="text-sm font-medium text-gray-700">Tags</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Tags
+                      </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {post.tags.map((tag, index) => (
@@ -340,7 +370,7 @@ const BlogView = () => {
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Calendar size={16} />
-                  <span>{format(new Date(post.created_at), "PPP")}</span>
+                  <span>{format(new Date(post.created_at), 'PPP')}</span>
                 </div>
               </div>
             ))
@@ -354,7 +384,9 @@ const BlogView = () => {
             onClose={() => setSelectedPost(null)}
             onUpdate={handleUpdatePost}
             onArchive={selectedPost.archived ? undefined : handleArchivePost}
-            onUnarchive={selectedPost.archived ? handleUnarchivePost : undefined}
+            onUnarchive={
+              selectedPost.archived ? handleUnarchivePost : undefined
+            }
             onEdit={handleEditPost}
           />
         )}

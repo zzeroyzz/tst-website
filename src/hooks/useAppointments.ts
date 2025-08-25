@@ -38,6 +38,6 @@ export const useAppointments = () => {
     appointments,
     loading,
     error,
-    refreshAppointments
+    refreshAppointments,
   };
 };

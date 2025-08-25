@@ -26,11 +26,12 @@ export default function NotFound() {
             Oops! This page seems to have wandered off
           </h2>
           <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
-            Don&apos;t worry—even the most organized among us lose track of things sometimes.
-            Let&apos;s get you back to somewhere more familiar and supportive.
+            Don&apos;t worry—even the most organized among us lose track of
+            things sometimes. Let&apos;s get you back to somewhere more familiar
+            and supportive.
           </p>
         </div>
-         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link href="/">
             <Button className="bg-tst-purple">Go to Homepage</Button>
           </Link>

@@ -18,11 +18,11 @@ interface QuestionnaireReminderData {
 
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // Base template with dark mode bypass
@@ -328,8 +328,10 @@ export const getWelcomeEmailTemplate = (data: WelcomeEmailData): string => {
   return getBaseEmailTemplate(content, img);
 };
 // Contact confirmation email - Using table-based shadow like email-template.ts
-export const getContactConfirmationTemplate = (data: ContactConfirmationData): string => {
-   const escapedName = escapeHtml(data.name);
+export const getContactConfirmationTemplate = (
+  data: ContactConfirmationData
+): string => {
+  const escapedName = escapeHtml(data.name);
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
   const content = `
     <!-- Main Card with Table-Based Shadow -->
@@ -395,7 +397,7 @@ export const getContactConfirmationTemplate = (data: ContactConfirmationData): s
 };
 
 export const getContactWarmupTemplate = (data: ContactWarmupData): string => {
-     const escapedName = escapeHtml(data.name);
+  const escapedName = escapeHtml(data.name);
 
   const img = `<img src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO.png" alt="Toasted Sesame Therapy Logo" style="max-width: 250px; margin: 0 auto 20px auto; display: block;">`;
   const content = `
@@ -464,7 +466,9 @@ export const getContactWarmupTemplate = (data: ContactWarmupData): string => {
 
   return getBaseEmailTemplate(content, img);
 };
-export const getQuestionnaireReminderTemplate = (data: QuestionnaireReminderData): string => {
+export const getQuestionnaireReminderTemplate = (
+  data: QuestionnaireReminderData
+): string => {
   const escapedName = escapeHtml(data.name);
   const escapedUrl = escapeHtml(data.questionnaireUrl);
 

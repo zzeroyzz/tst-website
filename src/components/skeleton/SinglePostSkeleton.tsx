@@ -19,7 +19,7 @@ interface SinglePostSkeletonProps {
 export const SinglePostSkeleton = ({
   showSuggestedPosts = true,
   showImage = true,
-  contentParagraphs = 6
+  contentParagraphs = 6,
 }: SinglePostSkeletonProps) => {
   return (
     <main className="bg-tst-cream">
@@ -154,7 +154,7 @@ export const SinglePostSkeleton = ({
 
               {/* Posts Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                {[1, 2, 3].map((index) => (
+                {[1, 2, 3].map(index => (
                   <SkeletonCard
                     key={index}
                     hasImage={true}

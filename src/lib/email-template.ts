@@ -5,11 +5,11 @@
 function escapeHtml(unsafe: string): string {
   if (!unsafe) return '';
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // NEW: Function to sanitize HTML content while preserving safe tags
@@ -99,7 +99,8 @@ export const getEmailHtml = (data: any): string => {
     'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'
   );
 
-  const archiveHtml = data.archive_posts?.map(createArchiveItemHtml).join('') || '';
+  const archiveHtml =
+    data.archive_posts?.map(createArchiveItemHtml).join('') || '';
 
   return `
   <!DOCTYPE html>
@@ -335,4 +336,3 @@ export const getEmailHtml = (data: any): string => {
     </html>
   `;
 };
-

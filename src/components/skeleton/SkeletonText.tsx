@@ -9,17 +9,17 @@ interface SkeletonTextProps {
 
 export const SkeletonText = ({
   lines = 3,
-  className = "",
-  lastLineWidth = '3/4'
+  className = '',
+  lastLineWidth = '3/4',
 }: SkeletonTextProps) => {
   const widthClasses = {
-    'full': 'w-full',
+    full: 'w-full',
     '3/4': 'w-3/4',
     '1/2': 'w-1/2',
     '1/3': 'w-1/3',
     '2/3': 'w-2/3',
     '4/5': 'w-4/5',
-    '5/6': 'w-5/6'
+    '5/6': 'w-5/6',
   };
 
   return (
@@ -48,14 +48,14 @@ export const SkeletonCard = ({
   hasImage = true,
   hasTags = true,
   hasAuthor = true,
-  className = ""
+  className = '',
 }: SkeletonCardProps) => {
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden ${className}`}>
+    <div
+      className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden ${className}`}
+    >
       {/* Image skeleton */}
-      {hasImage && (
-        <Skeleton className="h-48 w-full rounded-none" />
-      )}
+      {hasImage && <Skeleton className="h-48 w-full rounded-none" />}
 
       {/* Content skeleton */}
       <div className="p-6">

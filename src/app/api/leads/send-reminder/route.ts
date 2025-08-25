@@ -21,7 +21,10 @@ export async function POST(request: Request) {
   }
 
   if (!mailchimpAudienceId) {
-    return NextResponse.json({ error: 'Mailchimp Audience ID is not configured.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Mailchimp Audience ID is not configured.' },
+      { status: 500 }
+    );
   }
 
   try {
@@ -34,18 +37,20 @@ export async function POST(request: Request) {
 
     if (contactError || !contact) {
       console.error('Contact not found:', contactError);
-      return NextResponse.json({
-        error: 'Contact not found in database.'
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: 'Contact not found in database.',
+        },
+        { status: 404 }
+      );
     }
-
 
     // 2. Extract first name from full name
     const firstName = contact.name.split(' ')[0] || 'there';
 
     // 3. Send custom warmup email
     const warmupHtml = getContactWarmupTemplate({
-      name: firstName
+      name: firstName,
     });
 
     const emailResult = await sendCustomEmailWithRetry({
@@ -54,15 +59,18 @@ export async function POST(request: Request) {
       subject: 'Still interested in connecting? - Toasted Sesame Therapy',
       htmlContent: warmupHtml,
       listId: mailchimpAudienceId!,
-      campaignTitle: `Contact Warmup - ${firstName} - ${new Date().toISOString()}`
+      campaignTitle: `Contact Warmup - ${firstName} - ${new Date().toISOString()}`,
     });
 
     if (!emailResult.success) {
       console.error('Failed to send warmup email:', emailResult.error);
-      return NextResponse.json({
-        error: 'Failed to send reminder email.',
-        details: emailResult.error
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: 'Failed to send reminder email.',
+          details: emailResult.error,
+        },
+        { status: 500 }
+      );
     }
 
     // 4. Update the contact's status in the database (optional)
@@ -70,7 +78,7 @@ export async function POST(request: Request) {
       .from('contacts')
       .update({
         status: 'Reminder Sent',
-        reminder_at: new Date().toISOString()
+        reminder_at: new Date().toISOString(),
       })
       .eq('email', email.toLowerCase().trim());
 
@@ -79,13 +87,14 @@ export async function POST(request: Request) {
       // Don't fail the request for this, just log it
     }
 
-
-    return NextResponse.json({
-      message: 'Reminder email sent successfully!',
-      contactName: firstName,
-      emailSent: true
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        message: 'Reminder email sent successfully!',
+        contactName: firstName,
+        emailSent: true,
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error('Send reminder error:', error);
     const errorMessage = error.message || 'Failed to send reminder email.';

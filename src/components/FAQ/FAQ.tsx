@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { faqData } from "@/data/faqData";
-import AccordionItem from "./AccordionItem";
+import React, { useState } from 'react';
+import { faqData } from '@/data/faqData';
+import AccordionItem from './AccordionItem';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);

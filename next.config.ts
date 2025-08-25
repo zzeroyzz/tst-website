@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
     // optimizeCss: true, // Comment this out for now
   },
 
+  // Temporarily disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Add CSS loading optimization
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

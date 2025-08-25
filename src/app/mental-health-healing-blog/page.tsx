@@ -3,10 +3,12 @@ import type { Metadata } from 'next';
 import BlogPageClient from '@/components/clients/BlogPageClient/BlogPageClient';
 
 const canonical = 'https://toastedsesametherapy.com/mental-health-healing-blog';
-const ogImage = 'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'; // replace with your real OG image
+const ogImage =
+  'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero.png'; // replace with your real OG image
 
 export const metadata: Metadata = {
-  title: 'Toasted Insights: Mental Health & Healing Blog | Toasted Sesame Therapy',
+  title:
+    'Toasted Insights: Mental Health & Healing Blog | Toasted Sesame Therapy',
   description:
     'Articles and resources on mental health, therapy, trauma recovery, and self‑care. Read practical guides, reflections, and our newsletter archive from Toasted Sesame Therapy.',
   keywords: [
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
     'relationship mental health',
     'neurodiversity affirming',
     'Georgia online therapy',
-    'Toasted Sesame Therapy'
+    'Toasted Sesame Therapy',
   ],
   alternates: { canonical },
   openGraph: {
@@ -28,14 +30,14 @@ export const metadata: Metadata = {
     title: 'Toasted Insights: Mental Health & Healing Blog',
     description:
       'Mental health articles, therapy reflections, and self‑care guides from Toasted Sesame Therapy.',
-    images: [{ url: ogImage }]
+    images: [{ url: ogImage }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Toasted Insights: Mental Health & Healing Blog',
     description:
       'Mental health articles, therapy reflections, and self‑care guides from Toasted Sesame Therapy.',
-    images: [ogImage]
+    images: [ogImage],
   },
   robots: {
     index: true,
@@ -47,8 +49,8 @@ export const metadata: Metadata = {
       follow: true,
       'max-snippet': -1,
       'max-image-preview': 'large',
-      'max-video-preview': -1
-    }
+      'max-video-preview': -1,
+    },
   },
   // Optional: language hint if your app doesn't already set it globally
   // metadataBase can also be defined in layout.tsx for consistent absolute URLs

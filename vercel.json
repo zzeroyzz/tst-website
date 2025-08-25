@@ -1,8 +1,12 @@
 {
-  "crons": [
-    {
-      "path": "/api/questionnaire/auto-reminder",
-      "schedule": "0 */12 * * *"
-    }
-  ]
-}
+    "crons": [
+      {
+        "path": "/api/cron/emails",
+        "schedule": "0 */6 * * *"
+      },
+      {
+        "path": "/api/cron/cleanup-appointments",
+        "schedule": "0 */2 * * *"
+      }
+    ]
+  }

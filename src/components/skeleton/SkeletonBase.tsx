@@ -7,14 +7,17 @@ interface SkeletonProps {
   children?: React.ReactNode;
 }
 
-export const Skeleton = ({ className, children, ...props }: SkeletonProps & React.HTMLAttributes<HTMLDivElement>) => {
+export const Skeleton = ({
+  className,
+  children,
+  ...props
+}: SkeletonProps & React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn("bg-gray-200 animate-pulse rounded", className)}
+      className={cn('bg-gray-200 animate-pulse rounded', className)}
       {...props}
     >
       {children}
     </div>
   );
 };
-

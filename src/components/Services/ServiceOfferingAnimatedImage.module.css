@@ -21,7 +21,7 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 1 / 1;
-  background-color: #69D4E9; /* bg-tst-teal */
+  background-color: #69d4e9; /* bg-tst-teal */
   border-radius: 8px; /* Corresponds to rounded-lg */
   border: 2px solid black;
   overflow: hidden;

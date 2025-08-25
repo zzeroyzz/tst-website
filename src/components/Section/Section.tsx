@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface SectionProps {
   children: React.ReactNode;
@@ -6,7 +6,11 @@ interface SectionProps {
   minHeight?: string;
 }
 
-const Section: React.FC<SectionProps> = ({ children, className = "", minHeight }) => {
+const Section: React.FC<SectionProps> = ({
+  children,
+  className = '',
+  minHeight,
+}) => {
   const sectionClasses = `w-full py-16 sm:py-20 lg:py-24 ${className}`;
   const style = minHeight ? { minHeight } : undefined;
 

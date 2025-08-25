@@ -1,5 +1,5 @@
 //src/components/CookieSettings/CookieSettings.tsx
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import CookiePreferences from '@/components/CookiePreferences/CookiePreferences';

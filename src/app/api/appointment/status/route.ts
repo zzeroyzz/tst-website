@@ -22,7 +22,10 @@ export async function PATCH(request: NextRequest) {
     const validStatuses = ['scheduled', 'completed', 'cancelled', 'no-show'];
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
-        { message: 'Invalid status. Must be one of: ' + validStatuses.join(', ') },
+        {
+          message:
+            'Invalid status. Must be one of: ' + validStatuses.join(', '),
+        },
         { status: 400 }
       );
     }
@@ -34,9 +37,10 @@ export async function PATCH(request: NextRequest) {
         appointment_status: status,
         last_appointment_update: new Date().toISOString(),
         // Add completion note if marking as completed
-        appointment_notes: status === 'completed'
-          ? 'Appointment completed - marked by admin'
-          : undefined
+        appointment_notes:
+          status === 'completed'
+            ? 'Appointment completed - marked by admin'
+            : undefined,
       })
       .eq('id', contactId)
       .select();
@@ -44,7 +48,10 @@ export async function PATCH(request: NextRequest) {
     if (error) {
       console.error('Database error updating status:', error);
       return NextResponse.json(
-        { message: 'Failed to update appointment status', error: error.message },
+        {
+          message: 'Failed to update appointment status',
+          error: error.message,
+        },
         { status: 500 }
       );
     }
@@ -58,9 +65,8 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       message: 'Appointment status updated successfully',
-      contact: data[0]
+      contact: data[0],
     });
-
   } catch (error) {
     console.error('Update appointment status error:', error);
     return NextResponse.json(

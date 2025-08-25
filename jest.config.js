@@ -10,12 +10,12 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
 
   transformIgnorePatterns: [
-    'node_modules/(?!(jose|@supabase|@testing-library|isows)/)'
+    'node_modules/(?!(jose|@supabase|@testing-library|isows)/)',
   ],
 
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
 
   testPathIgnorePatterns: [
@@ -23,8 +23,8 @@ const customJestConfig = {
     '<rootDir>/node_modules/',
     '<rootDir>/src/__tests__/test-utils.js',
     '<rootDir>/src/__tests__/test-utils.tsx',
-    '<rootDir>/src/__tests__/mocks/'
-  ]
+    '<rootDir>/src/__tests__/mocks/',
+  ],
 };
 
 module.exports = createJestConfig(customJestConfig);

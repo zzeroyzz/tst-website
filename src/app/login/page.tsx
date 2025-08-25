@@ -1,17 +1,17 @@
 // src/app/login/page.tsx
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-import Section from "@/components/Section/Section";
-import Input from "@/components/Input/Input";
-import Button from "@/components/Button/Button";
-import Image from "next/image";
+import React, { useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import Section from '@/components/Section/Section';
+import Input from '@/components/Input/Input';
+import Button from '@/components/Button/Button';
+import Image from 'next/image';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClientComponentClient();
@@ -28,7 +28,7 @@ const LoginPage = () => {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   };
 
@@ -48,14 +48,14 @@ const LoginPage = () => {
             type="email"
             name="email"
             placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             required
           />
           <Input
             type="password"
             name="password"
             placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             required
           />
           <Button type="submit" className="bg-tst-purple">

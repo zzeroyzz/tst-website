@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // src/components/LeadCalendar/LeadCalendar.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -48,7 +48,7 @@ interface ScheduleAppointmentData {
 
 interface BookedSlot {
   startTime: string; // ISO string
-  endTime: string;   // ISO string
+  endTime: string; // ISO string
 }
 
 const EASTERN_TIMEZONE = 'America/New_York';
@@ -58,28 +58,35 @@ const EASTERN_TIMEZONE = 'America/New_York';
 // Your availability configuration
 const AVAILABILITY = {
   // 0 = Sunday, 1 = Monday, etc.
-  1: [ // Monday
+  1: [
+    // Monday
     { start: '09:00', end: '10:45' }, // 9:00 AM - 10:45 AM
-    { start: '18:00', end: '19:00' }  // 6:00 PM - 7:00 PM
+    { start: '18:00', end: '19:00' }, // 6:00 PM - 7:00 PM
   ],
-  2: [ // Tuesday
+  2: [
+    // Tuesday
     { start: '09:00', end: '10:45' }, // 9:00 AM - 10:45 AM
-    { start: '18:00', end: '19:00' }  // 6:00 PM - 7:00 PM
+    { start: '18:00', end: '19:00' }, // 6:00 PM - 7:00 PM
   ],
-  3: [ // Wednesday
+  3: [
+    // Wednesday
     { start: '09:00', end: '10:45' }, // 9:00 AM - 10:45 AM
-    { start: '18:00', end: '19:00' }  // 6:00 PM - 7:00 PM
+    { start: '18:00', end: '19:00' }, // 6:00 PM - 7:00 PM
   ],
-  4: [ // Thursday
-    { start: '11:00', end: '19:00' }  // 11:00 AM - 7:00 PM
+  4: [
+    // Thursday
+    { start: '11:00', end: '19:00' }, // 11:00 AM - 7:00 PM
   ],
   5: [], // Friday - Unavailable
   6: [], // Saturday - Unavailable
-  0: []  // Sunday - Unavailable
+  0: [], // Sunday - Unavailable
 };
 
 // API function to fetch booked appointments
-const fetchBookedAppointments = async (startDate: Date, endDate: Date): Promise<BookedSlot[]> => {
+const fetchBookedAppointments = async (
+  startDate: Date,
+  endDate: Date
+): Promise<BookedSlot[]> => {
   try {
     const response = await fetch('/api/appointment/booked-slots', {
       method: 'POST',
@@ -106,7 +113,9 @@ const fetchBookedAppointments = async (startDate: Date, endDate: Date): Promise<
 };
 
 // API function to schedule appointment
-const scheduleAppointment = async (data: ScheduleAppointmentData): Promise<void> => {
+const scheduleAppointment = async (
+  data: ScheduleAppointmentData
+): Promise<void> => {
   const response = await fetch('/api/schedule-consultation', {
     method: 'POST',
     headers: {
@@ -132,7 +141,7 @@ const scheduleAppointment = async (data: ScheduleAppointmentData): Promise<void>
 const LeadCalendar: React.FC<LeadCalendarProps> = ({
   onSchedule,
   contactId,
-  existingAppointment = null
+  existingAppointment = null,
 }) => {
   // Convert existing appointment to Eastern time for display
   const existingAppointmentEastern = existingAppointment
@@ -144,7 +153,11 @@ const LeadCalendar: React.FC<LeadCalendarProps> = ({
     existingAppointmentEastern ? new Date(existingAppointmentEastern) : null
   );
   const [selectedTime, setSelectedTime] = useState<string | null>(
-    existingAppointmentEastern ? formatTz(existingAppointmentEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }) : null
+    existingAppointmentEastern
+      ? formatTz(existingAppointmentEastern, 'h:mm a', {
+          timeZone: EASTERN_TIMEZONE,
+        })
+      : null
   );
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [confirming, setConfirming] = useState(false);
@@ -173,11 +186,11 @@ const LeadCalendar: React.FC<LeadCalendarProps> = ({
     fetchBookedSlotsForMonth();
   }, [currentDate]); // Refetch when month changes
 
- // Only block the exact booked start time, not overlapping windows
-const isSlotBooked = (slotStartUTC: Date): boolean => {
-  const t = slotStartUTC.getTime();
-  return bookedSlots.some(b => new Date(b.startTime).getTime() === t);
-};
+  // Only block the exact booked start time, not overlapping windows
+  const isSlotBooked = (slotStartUTC: Date): boolean => {
+    const t = slotStartUTC.getTime();
+    return bookedSlots.some(b => new Date(b.startTime).getTime() === t);
+  };
 
   // Generate time slots for a selected date in Eastern Time
   const generateTimeSlots = (date: Date): TimeSlot[] => {
@@ -199,7 +212,11 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
       const [endHour, endMin] = end.split(':').map(Number);
 
       // Create the date in Eastern time
-      const startOfDayEastern = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const startOfDayEastern = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
 
       let currentSlotEastern = new Date(startOfDayEastern);
       currentSlotEastern.setHours(startHour, startMin, 0, 0);
@@ -212,12 +229,18 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
         const slotDateTimeEastern = new Date(currentSlotEastern);
 
         // Convert to UTC for storage/API calls
-        const slotDateTimeUTC = fromZonedTime(slotDateTimeEastern, EASTERN_TIMEZONE);
+        const slotDateTimeUTC = fromZonedTime(
+          slotDateTimeEastern,
+          EASTERN_TIMEZONE
+        );
 
         // Check if the slot is available:
         // 1. Must be at least 4 hours in the future
         // 2. Must not conflict with any booked appointments
-        const isFutureAvailable = isAfter(slotDateTimeEastern, fourHoursFromNowEastern);
+        const isFutureAvailable = isAfter(
+          slotDateTimeEastern,
+          fourHoursFromNowEastern
+        );
         const isNotBooked = !isSlotBooked(slotDateTimeUTC);
 
         // For rescheduling, exclude the current appointment from conflict check
@@ -226,19 +249,26 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
         // If this is the user's existing appointment slot during rescheduling, mark it as available
         if (isRescheduling && existingAppointment) {
           const existingUTC = new Date(existingAppointment);
-          if (Math.abs(slotDateTimeUTC.getTime() - existingUTC.getTime()) < 60000) { // Within 1 minute
+          if (
+            Math.abs(slotDateTimeUTC.getTime() - existingUTC.getTime()) < 60000
+          ) {
+            // Within 1 minute
             available = isFutureAvailable; // Only check future availability, not booking conflict
           }
         }
 
         slots.push({
-          time: formatTz(slotDateTimeEastern, 'h:mm a', { timeZone: EASTERN_TIMEZONE }),
+          time: formatTz(slotDateTimeEastern, 'h:mm a', {
+            timeZone: EASTERN_TIMEZONE,
+          }),
           available,
-          dateTime: slotDateTimeUTC // This will be sent to the API as UTC
+          dateTime: slotDateTimeUTC, // This will be sent to the API as UTC
         });
 
         // Add 15 minutes for next slot
-        currentSlotEastern = new Date(currentSlotEastern.getTime() + 15 * 60 * 1000);
+        currentSlotEastern = new Date(
+          currentSlotEastern.getTime() + 15 * 60 * 1000
+        );
       }
     });
 
@@ -273,7 +303,8 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
 
     // Check if it's a weekday with availability
     const dayOfWeek = getDay(checkDate);
-    const hasAvailability = AVAILABILITY[dayOfWeek] && AVAILABILITY[dayOfWeek].length > 0;
+    const hasAvailability =
+      AVAILABILITY[dayOfWeek] && AVAILABILITY[dayOfWeek].length > 0;
     if (!hasAvailability) return false;
 
     // Count business days between today (exclusive) and the target date (inclusive)
@@ -294,7 +325,10 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
       // If this is our target date and we're within 3 business days, it's valid
       if (isSameDay(currentDate, checkDate)) {
         // Final check: does this date actually have available slots?
-        return businessDaysAhead <= 3 && (!loadingSlots ? dateHasAvailableSlots(checkDate) : true);
+        return (
+          businessDaysAhead <= 3 &&
+          (!loadingSlots ? dateHasAvailableSlots(checkDate) : true)
+        );
       }
 
       currentDate = addDays(currentDate, 1);
@@ -345,7 +379,9 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
 
     // Double-check availability before scheduling
     if (!selectedSlot.available && !isRescheduling) {
-      toast.error('This time slot is no longer available. Please select another time.');
+      toast.error(
+        'This time slot is no longer available. Please select another time.'
+      );
       // Refresh the slots
       const newSlots = generateTimeSlots(selectedDate);
       setTimeSlots(newSlots);
@@ -366,7 +402,9 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
           contactId,
           appointmentDateTime: selectedSlot.dateTime,
           status: 'scheduled',
-          notes: isRescheduling ? 'Appointment rescheduled' : 'Initial appointment scheduled'
+          notes: isRescheduling
+            ? 'Appointment rescheduled'
+            : 'Initial appointment scheduled',
         });
       } else {
         throw new Error('No contact ID or callback provided');
@@ -483,7 +521,13 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
             </button>
           </div>
           <p className="text-sm mt-1">
-            Current: {existingAppointmentEastern && formatTz(existingAppointmentEastern, 'EEEE, MMM d \'at\' h:mm a zzz', { timeZone: EASTERN_TIMEZONE })}
+            Current:{' '}
+            {existingAppointmentEastern &&
+              formatTz(
+                existingAppointmentEastern,
+                "EEEE, MMM d 'at' h:mm a zzz",
+                { timeZone: EASTERN_TIMEZONE }
+              )}
           </p>
         </div>
       )}
@@ -519,7 +563,10 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
         {/* Calendar Grid */}
         <div className="grid grid-cols-7 gap-1 text-center">
           {weekdays.map(day => (
-            <div key={day} className="font-bold text-xs md:text-sm text-gray-500 py-1 md:py-2">
+            <div
+              key={day}
+              className="font-bold text-xs md:text-sm text-gray-500 py-1 md:py-2"
+            >
               {day}
             </div>
           ))}
@@ -556,7 +603,7 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
             <div className="w-4 h-4 bg-tst-yellow border border-black rounded"></div>
             <span>Today</span>
           </div>
-           <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1">
             <div className="w-4 h-4 bg-tst-green border border-black rounded"></div>
             <span>Available</span>
           </div>
@@ -576,7 +623,10 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
         <div className="p-4">
           <h3 className="font-bold mb-3 flex items-center gap-2">
             <Clock size={18} />
-            <span>Available times for {format(selectedDate, 'EEEE, MMM d')} (Eastern Time)</span>
+            <span>
+              Available times for {format(selectedDate, 'EEEE, MMM d')} (Eastern
+              Time)
+            </span>
           </h3>
 
           {timeSlots.length === 0 ? (
@@ -585,7 +635,7 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
             </p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto">
-              {timeSlots.map((slot) => (
+              {timeSlots.map(slot => (
                 <button
                   key={slot.time}
                   onClick={() => handleTimeSelect(slot.time)}
@@ -594,13 +644,15 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
                   className={`
                     p-2 md:p-3 rounded-lg border-2 font-medium text-sm md:text-base
                     transition-all duration-200
-                    ${selectedTime === slot.time
-                      ? 'bg-tst-green border-black text-black shadow-md'
-                      : 'border-black bg-white hover:bg-gray-50'
+                    ${
+                      selectedTime === slot.time
+                        ? 'bg-tst-green border-black text-black shadow-md'
+                        : 'border-black bg-white hover:bg-gray-50'
                     }
-                    ${!slot.available && !isRescheduling
-                      ? 'opacity-50 cursor-not-allowed line-through'
-                      : 'cursor-pointer hover:shadow-md'
+                    ${
+                      !slot.available && !isRescheduling
+                        ? 'opacity-50 cursor-not-allowed line-through'
+                        : 'cursor-pointer hover:shadow-md'
                     }
                   `}
                 >
@@ -618,7 +670,10 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
               <p className="text-sm text-gray-600">
-                {isRescheduling ? 'New appointment time:' : 'Selected appointment:'} (Eastern Time)
+                {isRescheduling
+                  ? 'New appointment time:'
+                  : 'Selected appointment:'}{' '}
+                (Eastern Time)
               </p>
               <p className="font-bold">
                 {format(selectedDate, 'EEEE, MMMM d')} at {selectedTime}
@@ -628,16 +683,16 @@ const isSlotBooked = (slotStartUTC: Date): boolean => {
               onClick={handleSchedule}
               disabled={confirming}
               className={`
-                ${confirming
-                  ? 'bg-gray-300 cursor-wait'
-                  : 'bg-tst-green'
-                }
+                ${confirming ? 'bg-gray-300 cursor-wait' : 'bg-tst-green'}
               `}
             >
               {confirming
-                ? (isRescheduling ? 'Rescheduling...' : 'Scheduling...')
-                : (isRescheduling ? 'Confirm Reschedule' : 'Confirm Appointment')
-              }
+                ? isRescheduling
+                  ? 'Rescheduling...'
+                  : 'Scheduling...'
+                : isRescheduling
+                  ? 'Confirm Reschedule'
+                  : 'Confirm Appointment'}
             </Button>
           </div>
         </div>

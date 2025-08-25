@@ -25,7 +25,10 @@ export async function POST(request: Request) {
   try {
     const postData = await request.json();
     if (!postData) {
-      return NextResponse.json({ error: 'Post data is required.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Post data is required.' },
+        { status: 400 }
+      );
     }
 
     // 1. Save post to Supabase and set status to 'published'
@@ -42,16 +45,25 @@ export async function POST(request: Request) {
     if (postError) throw new Error(`Error saving post: ${postError.message}`);
 
     // 2. Fetch archive posts for email template
-    const { data: archivePosts, error: archiveError } = await supabase.from('posts').select('title, image_url, slug, subtext').in('id', savedPost.archive_posts || []);
-    if (archiveError) throw new Error(`Error fetching archive posts: ${archiveError.message}`);
+    const { data: archivePosts, error: archiveError } = await supabase
+      .from('posts')
+      .select('title, image_url, slug, subtext')
+      .in('id', savedPost.archive_posts || []);
+    if (archiveError)
+      throw new Error(`Error fetching archive posts: ${archiveError.message}`);
 
-    const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(now));
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(now));
 
     // 3. Prepare data for email template
     const emailData = {
       header_title: savedPost.title || 'A note on healing',
       formatted_date: formattedDate,
-      main_image_url: savedPost.image_url || 'https://placehold.co/640x360/F9F5F2/000000?text=Main+Article+Image',
+      main_image_url:
+        savedPost.image_url ||
+        'https://placehold.co/640x360/F9F5F2/000000?text=Main+Article+Image',
       main_title: savedPost.title,
       main_body: marked.parse(savedPost.body || ''),
       toasty_take: marked.parse(savedPost.toasty_take || ''),
@@ -73,8 +85,14 @@ export async function POST(request: Request) {
     });
 
     // Type guard to check if the response has an id property
-    if (!campaignResponse || typeof campaignResponse !== 'object' || !('id' in campaignResponse)) {
-      throw new Error('Failed to create campaign: Invalid response from Mailchimp');
+    if (
+      !campaignResponse ||
+      typeof campaignResponse !== 'object' ||
+      !('id' in campaignResponse)
+    ) {
+      throw new Error(
+        'Failed to create campaign: Invalid response from Mailchimp'
+      );
     }
 
     const campaign = campaignResponse as { id: string };
@@ -87,13 +105,19 @@ export async function POST(request: Request) {
       message: 'Campaign sent successfully!',
       campaignId: campaign.id,
       postId: savedPost.id,
-      slug: savedPost.slug // Include the slug for redirection to public post page
+      slug: savedPost.slug, // Include the slug for redirection to public post page
     });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('API Error:', error.response?.body || error.message);
-    const errorMessage = error.response?.body?.detail || error.message || 'An unexpected error occurred.';
-    return NextResponse.json({ error: `Mailchimp API Error: ${errorMessage}` }, { status: 500 });
+    const errorMessage =
+      error.response?.body?.detail ||
+      error.message ||
+      'An unexpected error occurred.';
+    return NextResponse.json(
+      { error: `Mailchimp API Error: ${errorMessage}` },
+      { status: 500 }
+    );
   }
 }

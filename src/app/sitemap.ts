@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   };
 
   const postUrls: MetadataRoute.Sitemap =
-    (posts as Post[] | null)?.map((post) => ({
+    (posts as Post[] | null)?.map(post => ({
       url: `${baseUrl}/posts/${post.slug}`,
       lastModified: safeIso(post.sent_at ?? post.created_at),
       changeFrequency: 'monthly',
@@ -50,13 +50,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })) ?? [];
 
   const staticUrls: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/`, lastModified: nowIso, changeFrequency: 'monthly', priority: 1.0 },
-    { url: `${baseUrl}/about`, lastModified: nowIso, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/therapy-services`, lastModified: nowIso, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/contact`, lastModified: nowIso, changeFrequency: 'yearly', priority: 0.7 },
-    { url: `${baseUrl}/guides`, lastModified: nowIso, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/mental-health-healing-blog`, lastModified: nowIso, changeFrequency: 'weekly', priority: 0.85 },
-    { url: `${baseUrl}/policy`, lastModified: nowIso, changeFrequency: 'yearly', priority: 0.3 },
+    {
+      url: `${baseUrl}/`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/therapy-services`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: nowIso,
+      changeFrequency: 'yearly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/mental-health-healing-blog`,
+      lastModified: nowIso,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/policy`,
+      lastModified: nowIso,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ];
 
   return [...staticUrls, ...postUrls];

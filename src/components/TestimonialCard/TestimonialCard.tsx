@@ -1,5 +1,5 @@
-import React from "react";
-import CircleIcon from "@/components/CircleIcon/CircleIcon";
+import React from 'react';
+import CircleIcon from '@/components/CircleIcon/CircleIcon';
 
 interface TestimonialCardProps {
   quote: string;

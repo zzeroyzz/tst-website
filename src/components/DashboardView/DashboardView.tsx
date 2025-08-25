@@ -1,5 +1,5 @@
 // src/components/DashboardView.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -17,7 +17,13 @@ import {
   parseISO,
   subDays,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, BarChart2, Users, Clock } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  BarChart2,
+  Users,
+  Clock,
+} from 'lucide-react';
 import { DashboardViewSkeleton } from '@/components/skeleton';
 
 // Define the type for a reminder
@@ -68,10 +74,10 @@ const ReminderCalendar = ({ reminders }) => {
   }, {});
 
   const statusColors = {
-    New: "bg-blue-200",
-    Contacted: "bg-yellow-200",
-    "Reminder Sent": "bg-orange-200",
-    "Consultation Scheduled": "bg-purple-200",
+    New: 'bg-blue-200',
+    Contacted: 'bg-yellow-200',
+    'Reminder Sent': 'bg-orange-200',
+    'Consultation Scheduled': 'bg-purple-200',
   };
 
   return (
@@ -98,7 +104,9 @@ const ReminderCalendar = ({ reminders }) => {
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1 text-center">
         {weekdays.map(day => (
-          <div key={day} className="font-bold text-sm text-gray-500 py-2">{day}</div>
+          <div key={day} className="font-bold text-sm text-gray-500 py-2">
+            {day}
+          </div>
         ))}
         {days.map(day => {
           const dayKey = format(day, 'yyyy-MM-dd');
@@ -132,98 +140,128 @@ const ReminderCalendar = ({ reminders }) => {
 
 // --- Main Dashboard View ---
 const DashboardView = () => {
-    const [stats, setStats] = useState({
-        totalLeads: 0,
-        newLeads: 0,
-        conversionRate: 0,
-        avgResponseTime: "N/A", // Default to N/A
-    });
-    const [reminders, setReminders] = useState<Reminder[]>([]);
-    const [loading, setLoading] = useState(true);
-    const supabase = createClientComponentClient();
+  const [stats, setStats] = useState({
+    totalLeads: 0,
+    newLeads: 0,
+    conversionRate: 0,
+    avgResponseTime: 'N/A', // Default to N/A
+  });
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClientComponentClient();
 
-   const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async () => {
     setLoading(true);
 
     // --- Fetch Data for Statistics ---
     const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
 
     const { data: allContacts, error: totalError } = await supabase
-        .from('contacts')
-        .select('status, created_at, archived');
+      .from('contacts')
+      .select('status, created_at, archived');
 
     if (totalError) {
-        console.error('Error fetching contacts for stats:', totalError);
+      console.error('Error fetching contacts for stats:', totalError);
     }
 
     if (allContacts) {
-        const totalLeads = allContacts.length; // ALL leads (including archived)
+      const totalLeads = allContacts.length; // ALL leads (including archived)
 
-        // Filter for NEW leads - only non-archived from last 30 days
-        const newLeads = allContacts.filter(c =>
-            new Date(c.created_at) > new Date(thirtyDaysAgo) &&
-            c.archived !== true
-        ).length;
+      // Filter for NEW leads - only non-archived from last 30 days
+      const newLeads = allContacts.filter(
+        c =>
+          new Date(c.created_at) > new Date(thirtyDaysAgo) &&
+          c.archived !== true
+      ).length;
 
-        const convertedLeads = allContacts.filter(c => c.status === 'Converted').length;
-        const conversionRate = totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
+      const convertedLeads = allContacts.filter(
+        c => c.status === 'Converted'
+      ).length;
+      const conversionRate =
+        totalLeads > 0 ? (convertedLeads / totalLeads) * 100 : 0;
 
-        setStats({
-            totalLeads,
-            newLeads,
-            conversionRate: parseFloat(conversionRate.toFixed(1)),
-            avgResponseTime: "N/A", // To calculate this, a `contacted_at` timestamp column is needed.
-        });
+      setStats({
+        totalLeads,
+        newLeads,
+        conversionRate: parseFloat(conversionRate.toFixed(1)),
+        avgResponseTime: 'N/A', // To calculate this, a `contacted_at` timestamp column is needed.
+      });
     }
 
     // --- Fetch Data for Reminders ---
     const { data: reminderData, error: reminderError } = await supabase
-        .from('contacts')
-        .select('id, name, reminder_at, status')
-        .eq('archived', false)  // Only non-archived for reminders
-        .not('reminder_at', 'is', null)
-        .order('reminder_at', { ascending: true });
+      .from('contacts')
+      .select('id, name, reminder_at, status')
+      .eq('archived', false) // Only non-archived for reminders
+      .not('reminder_at', 'is', null)
+      .order('reminder_at', { ascending: true });
 
     if (reminderError) {
-        console.error('Error fetching reminders:', reminderError);
+      console.error('Error fetching reminders:', reminderError);
     } else {
-        setReminders(reminderData as Reminder[]);
+      setReminders(reminderData as Reminder[]);
     }
 
     setLoading(false);
-}, [supabase]);
+  }, [supabase]);
 
-    useEffect(() => {
-        const channel = supabase
-          .channel('realtime-dashboard')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' },
-            () => {
-              fetchDashboardData();
-            }
-          )
-          .subscribe();
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'contacts' },
+        () => {
+          fetchDashboardData();
+        }
+      )
+      .subscribe();
 
-        fetchDashboardData();
+    fetchDashboardData();
 
-        return () => {
-          supabase.removeChannel(channel);
-        };
-    }, [supabase, fetchDashboardData]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, fetchDashboardData]);
 
-    // Show skeleton while loading
-      if (loading) {
-          return <DashboardViewSkeleton />;
-      }
+  // Show skeleton while loading
+  if (loading) {
+    return <DashboardViewSkeleton />;
+  }
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-bold mb-4">Statistics</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Leads" value={stats.totalLeads} change={null} icon={Users} color="bg-green-100 text-green-800" />
-          <StatCard title="New Leads (30d)" value={stats.newLeads} change={null} icon={Users} color="bg-green-100 text-green-800" />
-          <StatCard title="Conversion Rate" value={`${stats.conversionRate}%`} change={null} icon={BarChart2} color="bg-red-100 text-red-800" />
-          <StatCard title="Avg. Response (hr)" value={stats.avgResponseTime} change={null} icon={Clock} color="bg-yellow-100 text-yellow-800" />
+          <StatCard
+            title="Total Leads"
+            value={stats.totalLeads}
+            change={null}
+            icon={Users}
+            color="bg-green-100 text-green-800"
+          />
+          <StatCard
+            title="New Leads (30d)"
+            value={stats.newLeads}
+            change={null}
+            icon={Users}
+            color="bg-green-100 text-green-800"
+          />
+          <StatCard
+            title="Conversion Rate"
+            value={`${stats.conversionRate}%`}
+            change={null}
+            icon={BarChart2}
+            color="bg-red-100 text-red-800"
+          />
+          <StatCard
+            title="Avg. Response (hr)"
+            value={stats.avgResponseTime}
+            change={null}
+            icon={Clock}
+            color="bg-yellow-100 text-yellow-800"
+          />
         </div>
       </div>
       <div>

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/dashboard/page.tsx
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   CheckSquare,
@@ -20,34 +20,40 @@ import {
   BookOpen,
   Download,
   House,
-} from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { DashboardSkeleton } from "@/components/skeleton";
-import KanbanBoard from "@/components/KanbanBoard/KanbanBoard";
-import LeadsView from "@/components/Leads/LeadsView";
-import NewsletterView from "@/components/Newsletter/NewsletterView";
-import DashboardView from "@/components/DashboardView/DashboardView";
-import AppointmentsDashboard from "@/components/AppointmentsDashboard/AppointmentsDashboard";
-import BlogView from "@/components/Blog/BlogView";
-import DashboardNotifications from "@/components/DashboardNotifications/DashboardNotifications";
+  MessageCircle,
+} from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { DashboardSkeleton } from '@/components/skeleton';
+import KanbanBoard from '@/components/KanbanBoard/KanbanBoard';
+import LeadsView from '@/components/Leads/LeadsView';
+import NewsletterView from '@/components/Newsletter/NewsletterView';
+import DashboardView from '@/components/DashboardView/DashboardView';
+import AppointmentsDashboard from '@/components/AppointmentsDashboard/AppointmentsDashboard';
+import BlogView from '@/components/Blog/BlogView';
+import DashboardNotifications from '@/components/DashboardNotifications/DashboardNotifications';
+import CRMView from '@/components/CRM/CRMView';
 
 const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
-  const [activeView, setActiveView] = useState("Dashboard");
+  const [activeView, setActiveView] = useState('Dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [localReadNotifications, setLocalReadNotifications] = useState<Set<string>>(new Set());
+  const [localReadNotifications, setLocalReadNotifications] = useState<
+    Set<string>
+  >(new Set());
   const supabase = createClientComponentClient();
   const router = useRouter();
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
       } else {
-        router.push("/login");
+        router.push('/login');
       }
     };
     getUser();
@@ -73,14 +79,20 @@ const DashboardPage = () => {
         setLocalReadNotifications(new Set(JSON.parse(savedReadNotifications)));
       }
     } catch (error) {
-      console.error('Error loading read notifications from localStorage:', error);
+      console.error(
+        'Error loading read notifications from localStorage:',
+        error
+      );
     }
   }, []);
 
   // Save read notifications to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('readNotifications', JSON.stringify([...localReadNotifications]));
+      localStorage.setItem(
+        'readNotifications',
+        JSON.stringify([...localReadNotifications])
+      );
     } catch (error) {
       console.error('Error saving read notifications to localStorage:', error);
     }
@@ -222,7 +234,6 @@ const DashboardPage = () => {
   // }, [user, supabase, localReadNotifications]);
 
   useEffect(() => {
-
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -237,11 +248,17 @@ const DashboardPage = () => {
 
   const handleNotificationClick = (notification: any) => {
     // Navigate to relevant section based on notification type
-    if (notification.type === 'contact' || notification.type === 'questionnaire') {
+    if (
+      notification.type === 'contact' ||
+      notification.type === 'questionnaire'
+    ) {
       setActiveView('Leads');
     } else if (notification.type === 'appointment') {
       setActiveView('Appointments');
-    } else if (notification.type === 'reminder_sent' || notification.type === 'reminder') {
+    } else if (
+      notification.type === 'reminder_sent' ||
+      notification.type === 'reminder'
+    ) {
       setActiveView('Leads'); // View the leads to see reminder status
     }
 
@@ -252,7 +269,7 @@ const DashboardPage = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/");
+    router.push('/');
   };
 
   const handleMenuItemClick = (viewName: string) => {
@@ -262,17 +279,19 @@ const DashboardPage = () => {
 
   const renderView = () => {
     switch (activeView) {
-      case "Tasks":
+      case 'Tasks':
         return <KanbanBoard />;
-      case "Newsletter":
+      case 'Newsletter':
         return <NewsletterView />;
-      case "Blogs":
+      case 'Blogs':
         return <BlogView />;
-      case "Leads":
+      case 'Leads':
         return <LeadsView />;
-      case "Appointments":
+      case 'Appointments':
         return <AppointmentsDashboard />;
-      case "Dashboard":
+      case 'CRM':
+        return <CRMView />;
+      case 'Dashboard':
       default:
         return <DashboardView />;
     }
@@ -283,12 +302,13 @@ const DashboardPage = () => {
   }
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard },
-    { name: "Tasks", icon: CheckSquare },
-    { name: "Newsletter", icon: Mail },
-    { name: "Blogs", icon: Newspaper },
-    { name: "Leads", icon: Users },
-    { name: "Appointments", icon: Calendar },
+    { name: 'Dashboard', icon: LayoutDashboard },
+    { name: 'Tasks', icon: CheckSquare },
+    { name: 'Newsletter', icon: Mail },
+    { name: 'Blogs', icon: Newspaper },
+    { name: 'Leads', icon: Users },
+    { name: 'Appointments', icon: Calendar },
+    { name: 'CRM', icon: MessageCircle },
   ];
 
   const SidebarContent = ({ isMobile = false }) => (
@@ -300,20 +320,19 @@ const DashboardPage = () => {
           <DashboardNotifications
             user={user}
             onNotificationClick={handleNotificationClick}
-
           />
         )}
       </div>
       <nav className="flex-grow">
         <ul>
-          {menuItems.map((item) => (
+          {menuItems.map(item => (
             <li key={item.name} className="mb-2">
               <button
                 onClick={() => handleMenuItemClick(item.name)}
                 className={`w-full flex items-center p-3 rounded-lg transition-colors text-left ${
                   activeView === item.name
-                    ? "bg-tst-purple text-black"
-                    : "hover:bg-gray-100"
+                    ? 'bg-tst-purple text-black'
+                    : 'hover:bg-gray-100'
                 }`}
               >
                 <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -458,9 +477,7 @@ const DashboardPage = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Add top padding on mobile to account for fixed header */}
-        <div className="p-4 md:p-10 pt-20 md:pt-10">
-          {renderView()}
-        </div>
+        <div className="p-4 md:p-10 pt-20 md:pt-10">{renderView()}</div>
       </main>
     </div>
   );

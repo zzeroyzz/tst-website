@@ -46,9 +46,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       appointments: appointments || [],
-      count: appointments?.length || 0
+      count: appointments?.length || 0,
     });
-
   } catch (error) {
     console.error('Fetch appointments error:', error);
     return NextResponse.json(

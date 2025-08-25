@@ -1,40 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/AppointmentsDashboard/AppointmentsDashboard.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, Phone, Mail, MoreVertical, Check, X, Edit, Eye } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Phone,
+  Mail,
+  MoreVertical,
+  Check,
+  X,
+  Edit,
+  Eye,
+} from 'lucide-react';
 import { toZonedTime, format as formatTz } from 'date-fns-tz';
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Contact } from '@/types/contact';
 import Button from '@/components/Button/Button';
 import AppointmentRescheduleCalendar from '@/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar';
 import AppointmentCancelModal from '@/components/AppointmentCancelModal/AppointmentCancelModal';
 import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
 import { useAppointments } from '@/hooks/useAppointments';
-import { getAppointmentStatus, getAppointmentStatusColor } from '@/utils/appointmentHelpers';
+import {
+  getAppointmentStatus,
+  getAppointmentStatusColor,
+} from '@/utils/appointmentHelpers';
 import toast from 'react-hot-toast';
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
-// Helper: robustly parse various UTC-ish strings to a Date
+// Robust UTC parser
 const parseUtc = (val: string): Date => {
   let s = (val || '').trim();
-
-  // If there's a space between date and time, normalize to 'T'
-  if (/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) {
-    s = s.replace(' ', 'T');
-  }
-
-  // If there's no explicit timezone (no Z or ±hh:mm), assume UTC
-  if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
-    s += 'Z';
-  }
-
+  if (/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s)) s = s.replace(' ', 'T');
+  if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) s += 'Z';
   return new Date(s);
 };
 
-// Helper function to format appointment date in Eastern time
+// ET formatter
 const formatAppointmentDateEastern = (utcDateString: string): string => {
   try {
     const utcDate = parseUtc(utcDateString);
@@ -43,14 +47,9 @@ const formatAppointmentDateEastern = (utcDateString: string): string => {
       return utcDateString ?? '';
     }
     const easternDate = toZonedTime(utcDate, EASTERN_TIMEZONE);
-
-    const formatted = formatTz(
-      easternDate,
-      "EEEE, MMMM d, yyyy 'at' h:mm a zzz",
-      { timeZone: EASTERN_TIMEZONE }
-    );
-
-    return formatted;
+    return formatTz(easternDate, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", {
+      timeZone: EASTERN_TIMEZONE,
+    });
   } catch (e) {
     console.error('formatAppointmentDateEastern error:', e);
     return utcDateString ?? '';
@@ -59,10 +58,10 @@ const formatAppointmentDateEastern = (utcDateString: string): string => {
 
 interface AppointmentCardProps {
   contact: Contact;
-  onStatusUpdate: (contactId: string, status: string) => void;
-  onReschedule: (contactId: string) => void;
-  onCancel: (contactId: string) => void;
-  onViewLead: (contactId: string) => void;
+  onStatusUpdate: (uuid: string, status: string) => void;
+  onReschedule: (uuid: string) => void;
+  onCancel: (uuid: string) => void;
+  onViewLead: (uuid: string) => void;
 }
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -70,19 +69,21 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onStatusUpdate,
   onReschedule,
   onCancel,
-  onViewLead
+  onViewLead,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // close actions on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowActions(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -97,14 +98,14 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
   return (
     <div className="bg-white border-2 border-black rounded-lg p-4 shadow-brutalist transition-shadow relative min-h-[200px] flex flex-col">
-      {/* Header with Status and Actions */}
+      {/* header */}
       <div className="flex justify-between items-start mb-3">
-        {/* Status Badge */}
-        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${statusColorClass}`}>
+        <div
+          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${statusColorClass}`}
+        >
           {appointmentStatus.charAt(0).toUpperCase() + appointmentStatus.slice(1)}
         </div>
 
-        {/* Actions Menu */}
         <div className="relative" ref={dropdownRef}>
           <Button
             onClick={() => setShowActions(!showActions)}
@@ -117,7 +118,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
             <div className="absolute right-0 top-full mt-1 bg-white border-2 border-black rounded-lg shadow-brutalistLg z-20 min-w-[160px] overflow-hidden">
               <div
                 onClick={() => {
-                  onViewLead(contact.id);
+                  onViewLead(contact.uuid);
                   setShowActions(false);
                 }}
                 className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
@@ -128,7 +129,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               <div className="border-t border-gray-200"></div>
               <div
                 onClick={() => {
-                  onStatusUpdate(contact.id, 'completed');
+                  onStatusUpdate(contact.uuid, 'completed');
                   setShowActions(false);
                 }}
                 className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
@@ -139,7 +140,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               <div className="border-t border-gray-200"></div>
               <div
                 onClick={() => {
-                  onReschedule(contact.id);
+                  onReschedule(contact.uuid);
                   setShowActions(false);
                 }}
                 className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
@@ -150,7 +151,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
               <div className="border-t border-gray-200"></div>
               <div
                 onClick={() => {
-                  onCancel(contact.id);
+                  onCancel(contact.uuid);
                   setShowActions(false);
                 }}
                 className="w-full px-4 py-3 text-left flex items-center gap-3 text-red-600 hover:bg-tst-red cursor-pointer text-sm font-medium transition-colors"
@@ -163,34 +164,34 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
         </div>
       </div>
 
-      {/* Contact Info */}
+      {/* contact info */}
       <div className="mb-3 flex-grow">
         <h3 className="font-bold text-lg mb-2 break-words leading-tight">
           {contact.name}
         </h3>
 
-        {/* Contact Details */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Mail size={14} className="flex-shrink-0" />
             <span className="truncate">{contact.email}</span>
           </div>
-          {contact.phone && (
+          {contact.phone_number && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Phone size={14} className="flex-shrink-0" />
-              <span>{contact.phone}</span>
+              <span>{contact.phone_number}</span>
             </div>
           )}
         </div>
 
         {contact.company && (
           <p className="text-sm text-gray-500 mt-2 break-words">
-            {contact.position ? `${contact.position} at ` : ''}{contact.company}
+            {contact.position ? `${contact.position} at ` : ''}
+            {contact.company}
           </p>
         )}
       </div>
 
-      {/* Appointment Details */}
+      {/* appt */}
       <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded border mb-3">
         <Clock size={14} className="flex-shrink-0" />
         <span className="font-medium break-words">
@@ -198,11 +199,13 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
         </span>
       </div>
 
-      {/* Notes */}
+      {/* notes */}
       {contact.appointment_notes && (
         <div className="text-sm text-gray-600 mt-auto">
           <p className="font-medium mb-1">Notes:</p>
-          <p className="break-words text-xs leading-relaxed">{contact.appointment_notes}</p>
+          <p className="break-words text-xs leading-relaxed">
+            {contact.appointment_notes}
+          </p>
         </div>
       )}
     </div>
@@ -211,11 +214,13 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
 const AppointmentsDashboard: React.FC = () => {
   const { appointments, loading, error, refreshAppointments } = useAppointments();
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past'>('upcoming');
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past'>(
+    'upcoming'
+  );
 
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleModalData, setRescheduleModalData] = useState<{
-    contactId: string;
+    uuid: string;
     contactName: string;
     contactEmail: string;
     currentAppointmentDate: Date;
@@ -223,7 +228,7 @@ const AppointmentsDashboard: React.FC = () => {
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelModalData, setCancelModalData] = useState<{
-    contactId: string;
+    uuid: string;
     contactName: string;
     contactEmail: string;
     appointmentDate: string;
@@ -236,7 +241,9 @@ const AppointmentsDashboard: React.FC = () => {
 
   const supabase = createClientComponentClient();
 
-  const handleStatusUpdate = async (contactId: string, status: string) => {
+  // --- Actions (all by UUID) ---
+
+  const handleStatusUpdate = async (uuid: string, status: string) => {
     if (status !== 'completed') {
       toast.error('Invalid status update');
       return;
@@ -246,30 +253,30 @@ const AppointmentsDashboard: React.FC = () => {
       const response = await fetch(`/api/appointment/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contactId, status }),
+        body: JSON.stringify({ uuid, status }),
       });
 
       if (!response.ok) throw new Error('Failed to update appointment status');
 
       toast.success('Appointment marked as completed');
       refreshAppointments();
-    } catch (error) {
+    } catch (e) {
       toast.error('Failed to update appointment');
-      console.error('Update error:', error);
+      console.error('Update error:', e);
     }
   };
 
-  const handleCancel = (contactId: string) => {
-    const contact = appointments.find(c => c.id === contactId);
+  const handleCancel = (uuid: string) => {
+    const contact = appointments.find(c => c.uuid === uuid);
     if (!contact || !contact.scheduled_appointment_at) {
       toast.error('Contact or appointment not found');
       return;
     }
     setCancelModalData({
-      contactId,
+      uuid,
       contactName: `${contact.name} ${contact.last_name || ''}`.trim(),
       contactEmail: contact.email,
-      appointmentDate: contact.scheduled_appointment_at
+      appointmentDate: contact.scheduled_appointment_at,
     });
     setShowCancelModal(true);
   };
@@ -281,11 +288,12 @@ const AppointmentsDashboard: React.FC = () => {
       const response = await fetch('/api/appointment/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contactId: cancelModalData.contactId })
+        body: JSON.stringify({ uuid: cancelModalData.uuid }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to cancel appointment');
+      if (!response.ok)
+        throw new Error(data.message || 'Failed to cancel appointment');
 
       toast.success('Appointment cancelled successfully');
       setShowCancelModal(false);
@@ -299,52 +307,53 @@ const AppointmentsDashboard: React.FC = () => {
     }
   };
 
-  const handleReschedule = (contactId: string) => {
-    const contact = appointments.find(c => c.id === contactId);
+  const handleReschedule = (uuid: string) => {
+    const contact = appointments.find(c => c.uuid === uuid);
     if (!contact || !contact.scheduled_appointment_at) {
       toast.error('Contact or appointment not found');
       return;
     }
     const utcAppointmentDate = new Date(contact.scheduled_appointment_at);
     setRescheduleModalData({
-      contactId,
+      uuid,
       contactName: `${contact.name} ${contact.last_name || ''}`.trim(),
       contactEmail: contact.email,
-      currentAppointmentDate: utcAppointmentDate
+      currentAppointmentDate: utcAppointmentDate,
     });
     setShowRescheduleModal(true);
   };
 
-  const handleRescheduleConfirm = async (contactId: string | number, newDateTime: Date): Promise<void> => {
-    // Convert contactId to string if it's a number
-    const contactIdStr = typeof contactId === 'number' ? contactId.toString() : contactId;
+  const handleRescheduleConfirm = async (
+    uuid: string | number,
+    newDateTime: Date
+  ): Promise<void> => {
+    // Accept both, but send UUID
+    const uuidStr = typeof uuid === 'number' ? String(uuid) : uuid;
 
     const response = await fetch('/api/appointment/reschedule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contactId: contactIdStr,
-        newDateTime: newDateTime.toISOString()
-      })
+        uuid: uuidStr,
+        newDateTime: newDateTime.toISOString(),
+      }),
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to reschedule appointment');
+    if (!response.ok)
+      throw new Error(data.message || 'Failed to reschedule appointment');
     refreshAppointments();
   };
 
-  const handleViewLead = async (contactId: string) => {
+  const handleViewLead = async (uuid: string) => {
     try {
-      // Fetch the full lead data from Supabase
       const { data: lead, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .eq("id", contactId)
+        .from('contacts')
+        .select('*')
+        .eq('uuid', uuid)
         .single();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setSelectedLead(lead);
       setShowLeadModal(true);
@@ -354,19 +363,21 @@ const AppointmentsDashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateLead = async (leadId: number, updatedData: any, successMessage = "Lead updated successfully!") => {
+  // Update/archive helpers by UUID (we'll wrap them when passing to the modal).
+  const updateLeadByUuid = async (
+    leadUuid: string,
+    updatedData: any,
+    successMessage = 'Lead updated successfully!'
+  ) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update(updatedData)
-        .eq("id", leadId);
+        .eq('uuid', leadUuid);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       toast.success(successMessage);
-      // Refresh appointments to reflect any changes
       refreshAppointments();
       return true;
     } catch (error: any) {
@@ -375,19 +386,16 @@ const AppointmentsDashboard: React.FC = () => {
     }
   };
 
-  const handleArchiveLead = async (leadId: number) => {
+  const archiveLeadByUuid = async (leadUuid: string) => {
     try {
       const { error } = await supabase
-        .from("contacts")
+        .from('contacts')
         .update({ archived: true })
-        .eq("id", leadId);
+        .eq('uuid', leadUuid);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       toast.success('Lead archived successfully!');
-      // Refresh appointments since the archived lead should no longer appear
       refreshAppointments();
       return true;
     } catch (error: any) {
@@ -396,6 +404,7 @@ const AppointmentsDashboard: React.FC = () => {
     }
   };
 
+  // Filtering
   const filteredAppointments = appointments.filter(contact => {
     if (!contact.scheduled_appointment_at) return false;
     const status = getAppointmentStatus(
@@ -403,10 +412,14 @@ const AppointmentsDashboard: React.FC = () => {
       contact.appointment_status
     );
     switch (filter) {
-      case 'upcoming': return status === 'upcoming';
-      case 'today': return status === 'today';
-      case 'past': return status === 'past';
-      default: return true;
+      case 'upcoming':
+        return status === 'upcoming';
+      case 'today':
+        return status === 'today';
+      case 'past':
+        return status === 'past';
+      default:
+        return true;
     }
   });
 
@@ -453,7 +466,7 @@ const AppointmentsDashboard: React.FC = () => {
           { key: 'all', label: 'All' },
           { key: 'upcoming', label: 'Upcoming' },
           { key: 'today', label: 'Today' },
-          { key: 'past', label: 'Past' }
+          { key: 'past', label: 'Past' },
         ].map(({ key, label }) => (
           <Button
             key={key}
@@ -473,21 +486,40 @@ const AppointmentsDashboard: React.FC = () => {
           { label: 'Total', count: appointments.length, color: 'bg-blue-100' },
           {
             label: 'Today',
-            count: appointments.filter(c => c.scheduled_appointment_at && getAppointmentStatus(c.scheduled_appointment_at, c.appointment_status) === 'today').length,
-            color: 'bg-green-100'
+            count: appointments.filter(
+              c =>
+                c.scheduled_appointment_at &&
+                getAppointmentStatus(
+                  c.scheduled_appointment_at,
+                  c.appointment_status
+                ) === 'today'
+            ).length,
+            color: 'bg-green-100',
           },
           {
             label: 'Upcoming',
-            count: appointments.filter(c => c.scheduled_appointment_at && getAppointmentStatus(c.scheduled_appointment_at, c.appointment_status) === 'upcoming').length,
-            color: 'bg-yellow-100'
+            count: appointments.filter(
+              c =>
+                c.scheduled_appointment_at &&
+                getAppointmentStatus(
+                  c.scheduled_appointment_at,
+                  c.appointment_status
+                ) === 'upcoming'
+            ).length,
+            color: 'bg-yellow-100',
           },
           {
             label: 'Completed',
-            count: appointments.filter(c => c.appointment_status === 'completed').length,
-            color: 'bg-purple-100'
-          }
+            count: appointments.filter(
+              c => c.appointment_status === 'COMPLETED'
+            ).length,
+            color: 'bg-purple-100',
+          },
         ].map((stat, index) => (
-          <div key={index} className={`${stat.color} border-2 border-black rounded-lg p-4`}>
+          <div
+            key={index}
+            className={`${stat.color} border-2 border-black rounded-lg p-4`}
+          >
             <p className="text-2xl font-bold">{stat.count}</p>
             <p className="text-sm font-medium">{stat.label}</p>
           </div>
@@ -500,14 +532,16 @@ const AppointmentsDashboard: React.FC = () => {
           <Calendar size={48} className="mx-auto mb-4 text-gray-300" />
           <p className="text-lg">No appointments found</p>
           <p className="text-sm">
-            {filter === 'all' ? 'No appointments scheduled yet' : `No ${filter} appointments`}
+            {filter === 'all'
+              ? 'No appointments scheduled yet'
+              : `No ${filter} appointments`}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredAppointments.map((contact) => (
+          {filteredAppointments.map(contact => (
             <AppointmentCard
-              key={contact.id}
+              key={contact.uuid}
               contact={contact}
               onStatusUpdate={handleStatusUpdate}
               onReschedule={handleReschedule}
@@ -522,11 +556,11 @@ const AppointmentsDashboard: React.FC = () => {
         <AppointmentRescheduleCalendar
           isOpen={showRescheduleModal}
           onClose={() => setShowRescheduleModal(false)}
-          contactId={rescheduleModalData.contactId}
+          contactId={rescheduleModalData.uuid} // prop name unchanged, value is UUID
           contactName={rescheduleModalData.contactName}
           contactEmail={rescheduleModalData.contactEmail}
           currentAppointmentDate={rescheduleModalData.currentAppointmentDate}
-          onReschedule={handleRescheduleConfirm}
+          onReschedule={handleRescheduleConfirm} // receives uuid from us
         />
       )}
 
@@ -550,8 +584,12 @@ const AppointmentsDashboard: React.FC = () => {
             setShowLeadModal(false);
             setSelectedLead(null);
           }}
-          onUpdate={handleUpdateLead}
-          onArchive={handleArchiveLead}
+          // Keep the same callback signature expected by the modal,
+          // but ignore its id param and use our selected lead UUID.
+          onUpdate={(_leadId: any, updatedData: any, msg?: string) =>
+            updateLeadByUuid(selectedLead?.uuid, updatedData, msg)
+          }
+          onArchive={(_leadId: any) => archiveLeadByUuid(selectedLead?.uuid)}
         />
       )}
     </div>

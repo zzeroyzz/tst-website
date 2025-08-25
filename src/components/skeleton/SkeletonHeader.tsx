@@ -13,7 +13,7 @@ export const SkeletonHeader = ({
   hasTags = true,
   hasAuthor = true,
   titleLines = 2,
-  className = ""
+  className = '',
 }: SkeletonHeaderProps) => {
   return (
     <header className={`mb-12 ${className}`}>

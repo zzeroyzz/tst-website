@@ -27,7 +27,9 @@ interface EmailResult {
   details?: any;
 }
 
-export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult> => {
+export const sendCustomEmail = async (
+  emailData: EmailData
+): Promise<EmailResult> => {
   try {
     const campaignResponse = await mailchimp.campaigns.create({
       type: 'regular',
@@ -35,13 +37,15 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
         list_id: emailData.listId,
         segment_opts: {
           match: 'any',
-          conditions: [{
-            condition_type: 'EmailAddress',
-            field: 'EMAIL',
-            op: 'is',
-            value: emailData.recipientEmail
-          }]
-        }
+          conditions: [
+            {
+              condition_type: 'EmailAddress',
+              field: 'EMAIL',
+              op: 'is',
+              value: emailData.recipientEmail,
+            },
+          ],
+        },
       },
       settings: {
         subject_line: emailData.subject,
@@ -56,7 +60,7 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
         opens: true,
         html_clicks: true,
         text_clicks: false,
-      }
+      },
     });
 
     // Type assertion to handle the response properly
@@ -66,16 +70,15 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
       throw new Error('Campaign creation failed - no ID returned');
     }
     await mailchimp.campaigns.setContent(campaign.id, {
-      html: emailData.htmlContent
+      html: emailData.htmlContent,
     });
     await mailchimp.campaigns.send(campaign.id);
 
     return {
       success: true,
       campaignId: campaign.id,
-      message: 'Email sent successfully'
+      message: 'Email sent successfully',
     };
-
   } catch (error: any) {
     console.error('Email sending error:', error);
 
@@ -84,11 +87,14 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
       const errorDetail = error.response?.body?.detail || '';
 
       // No members in segment (timing issue)
-      if (errorDetail.includes('no members') || errorDetail.includes('0 members')) {
+      if (
+        errorDetail.includes('no members') ||
+        errorDetail.includes('0 members')
+      ) {
         return {
           success: false,
           error: 'Recipient not found in audience - likely timing issue',
-          shouldRetry: true
+          shouldRetry: true,
         };
       }
 
@@ -97,7 +103,7 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
         return {
           success: false,
           error: 'Campaign already sent',
-          shouldRetry: false
+          shouldRetry: false,
         };
       }
     }
@@ -105,7 +111,7 @@ export const sendCustomEmail = async (emailData: EmailData): Promise<EmailResult
     return {
       success: false,
       error: error.message || 'Failed to send email',
-      details: error.response?.body
+      details: error.response?.body,
     };
   }
 };
@@ -116,9 +122,7 @@ export const sendCustomEmailWithRetry = async (
   maxRetries = 3,
   baseDelay = 1000
 ): Promise<EmailResult> => {
-
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-
     const result = await sendCustomEmail(emailData);
 
     if (result.success) {
@@ -134,13 +138,16 @@ export const sendCustomEmailWithRetry = async (
     }
 
     // If we're out of retries or it's a different error
-    console.error(`Failed to send email after ${attempt} attempts:`, result.error);
+    console.error(
+      `Failed to send email after ${attempt} attempts:`,
+      result.error
+    );
     return result;
   }
 
   // This should never be reached, but TypeScript requires it
   return {
     success: false,
-    error: 'Maximum retries exceeded'
+    error: 'Maximum retries exceeded',
   };
 };

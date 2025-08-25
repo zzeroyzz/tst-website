@@ -1,0 +1,373 @@
+type Query {
+  contacts(filters: ContactFilters): [Contact!]!
+  contact(id: ID!): Contact
+  messages(contactId: ID!, limit: Int = 50, offset: Int = 0): MessageConnection!
+  messageTemplates(category: TemplateCategory): [MessageTemplate!]!
+  messageStats: MessageStats!
+  contactSegments: [ContactSegment!]!
+  workflows: [Workflow!]!
+}
+
+type Mutation {
+  createContact(input: CreateContactInput!): Contact!
+  updateContact(id: ID!, input: UpdateContactInput!): Contact!
+  deleteContact(id: ID!): Boolean!
+  createContactWithAppointment(
+    input: CreateContactWithAppointmentInput!
+  ): LeadAppointmentResult!
+  createLeadWithAppointment(
+    input: CreateLeadWithAppointmentInput!
+  ): LeadAppointmentResult!
+  sendMessage(input: SendMessageInput!): Message!
+  createMessageTemplate(input: CreateMessageTemplateInput!): MessageTemplate!
+  updateMessageTemplate(
+    id: ID!
+    input: UpdateMessageTemplateInput!
+  ): MessageTemplate!
+  deleteMessageTemplate(id: ID!): Boolean!
+}
+
+type Subscription {
+  messageReceived(contactId: ID!): Message!
+  contactUpdated(contactId: ID!): Contact!
+}
+
+type Contact {
+  id: ID!
+  user_id: String!
+  uuid: ID
+  name: String!
+  email: String!
+  phoneNumber: String
+  contactStatus: ContactStatus!
+  segments: [String!]!
+  notes: String
+  crmNotes: String
+  createdAt: String!
+  updatedAt: String!
+  lastMessageAt: String
+  messageCount: Int!
+  customFields: JSON!
+
+  # Integration with existing lead system
+  questionnaireCompleted: Boolean!
+  questionnaireCompletedAt: String
+  scheduledAppointmentAt: String
+  appointmentStatus: AppointmentStatus
+  status: String # Legacy status field
+  # Related data
+  messages(limit: Int = 10): [Message!]!
+  lastMessage: Message
+  messagesSent: Int!
+  messagesReceived: Int!
+}
+
+type Message {
+  id: ID!
+  contactId: ID!
+  content: String!
+  direction: MessageDirection!
+  messageStatus: MessageStatus!
+  messageType: MessageType!
+  createdAt: String!
+  updatedAt: String!
+  twilioSid: String
+  errorMessage: String
+  templateId: ID
+
+  # Relations
+  contact: Contact!
+  template: MessageTemplate
+}
+
+type MessageTemplate {
+  id: ID!
+  name: String!
+  content: String!
+  category: TemplateCategory!
+  variables: [String!]!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+
+  # Usage stats
+  usageCount: Int!
+  lastUsed: String
+}
+
+type MessageStats {
+  totalSent: Int!
+  totalReceived: Int!
+  totalContacts: Int!
+  deliveryRate: Float!
+  responseRate: Float!
+  sentToday: Int!
+  receivedToday: Int!
+
+  # Trends (last 7 days)
+  dailyStats: [DailyStat!]!
+}
+
+type ContactSegment {
+  id: ID!
+  name: String!
+  description: String
+  color: String!
+  createdAt: String!
+
+  # Stats
+  contactCount: Int!
+}
+
+type Workflow {
+  id: ID!
+  name: String!
+  description: String
+  triggerType: WorkflowTrigger!
+  triggerConditions: JSON!
+  actions: JSON!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+
+  # Stats
+  executionCount: Int!
+  lastExecuted: String
+}
+
+type WorkflowExecution {
+  id: ID!
+  workflowId: ID!
+  contactId: ID!
+  status: WorkflowExecutionStatus!
+  executedActions: JSON!
+  errorMessage: String
+  executedAt: String!
+
+  # Relations
+  workflow: Workflow!
+  contact: Contact!
+}
+
+type DailyStat {
+  date: String!
+  sent: Int!
+  received: Int!
+  delivered: Int!
+}
+
+type CustomField {
+  key: String!
+  value: String!
+  type: FieldType!
+}
+
+type LeadAppointmentResult {
+  contact: Contact!
+  appointment: Appointment
+  smsTriggered: Boolean!
+  messages: [String!]!
+}
+
+type Appointment {
+  id: ID!
+  contactId: ID!
+  scheduledAt: String!
+  status: AppointmentStatus!
+  timeZone: String!
+  createdAt: String!
+  updatedAt: String!
+  notes: String
+
+  # Relations
+  contact: Contact!
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  PROSPECT
+  CLIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  QUEUED
+  SENDING
+  SENT
+  DELIVERED
+  FAILED
+  RECEIVED
+}
+
+enum MessageType {
+  SMS
+  WHATSAPP
+  VOICE
+}
+
+enum TemplateCategory {
+  APPOINTMENT_REMINDER
+  FOLLOW_UP
+  WELCOME
+  QUESTIONNAIRE
+  GENERAL
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  DATE
+  BOOLEAN
+  EMAIL
+  PHONE
+}
+
+input CreateContactInput {
+  name: String!
+  email: String!
+  phone: String
+  segments: [String!]
+  notes: String
+  leadId: String
+  customFields: [CustomFieldInput!]
+}
+
+input CreateContactWithAppointmentInput {
+  name: String!
+  email: String!
+  phoneNumber: String!
+  scheduledAt: String!
+  timeZone: String!
+  segments: [String!]
+  notes: String
+  triggerSMSWorkflow: Boolean = true
+}
+
+input CreateLeadWithAppointmentInput {
+  name: String!
+  email: String!
+  phone: String!
+  appointmentDateTime: String!
+  timeZone: String!
+  segments: [String!]
+  notes: String
+  triggerSMSWorkflow: Boolean = true
+}
+
+input UpdateContactInput {
+  name: String
+  email: String
+  phone: String
+  status: ContactStatus
+  segments: [String!]
+  notes: String
+  appointmentStatus: AppointmentStatus
+  questionnaireCompleted: Boolean
+  customFields: [CustomFieldInput!]
+}
+
+input SendMessageInput {
+  contactId: ID!
+  content: String!
+  messageType: MessageType!
+  templateId: ID
+  templateVariables: [TemplateVariableInput!]
+}
+
+input CreateMessageTemplateInput {
+  name: String!
+  content: String!
+  category: TemplateCategory!
+  variables: [String!]
+}
+
+input UpdateMessageTemplateInput {
+  name: String
+  content: String
+  category: TemplateCategory
+  variables: [String!]
+  isActive: Boolean
+}
+
+input CustomFieldInput {
+  key: String!
+  value: String!
+  type: FieldType!
+}
+
+input TemplateVariableInput {
+  key: String!
+  value: String!
+}
+
+enum WorkflowTrigger {
+  CONTACT_CREATED
+  QUESTIONNAIRE_COMPLETED
+  APPOINTMENT_SCHEDULED
+  APPOINTMENT_MISSED
+  DAYS_SINCE_CONTACT
+}
+
+enum WorkflowExecutionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+input ContactFilters {
+  status: ContactStatus
+  segments: [String!]
+  hasMessages: Boolean
+  questionnaireCompleted: Boolean
+  appointmentStatus: AppointmentStatus
+  search: String
+  createdAfter: String
+  createdBefore: String
+}
+
+input CreateContactSegmentInput {
+  name: String!
+  description: String
+  color: String!
+}
+
+input UpdateContactSegmentInput {
+  name: String
+  description: String
+  color: String
+}
+
+input CreateWorkflowInput {
+  name: String!
+  description: String
+  triggerType: WorkflowTrigger!
+  triggerConditions: JSON!
+  actions: JSON!
+}
+
+input UpdateWorkflowInput {
+  name: String
+  description: String
+  triggerType: WorkflowTrigger
+  triggerConditions: JSON
+  actions: JSON
+  isActive: Boolean
+}
+
+# Custom scalar for JSON data
+scalar JSON

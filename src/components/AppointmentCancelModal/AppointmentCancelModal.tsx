@@ -29,7 +29,7 @@ const formatAppointmentForModal = (utcDateString: string): string => {
   const easternDate = toZonedTime(utcDate, EASTERN_TIMEZONE);
 
   return formatTz(easternDate, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", {
-    timeZone: EASTERN_TIMEZONE
+    timeZone: EASTERN_TIMEZONE,
   });
 };
 
@@ -40,7 +40,7 @@ const AppointmentCancelModal: React.FC<AppointmentCancelModalProps> = ({
   contactName,
   contactEmail,
   appointmentDate,
-  isLoading = false
+  isLoading = false,
 }) => {
   if (!isOpen) return null;
 
@@ -54,7 +54,7 @@ const AppointmentCancelModal: React.FC<AppointmentCancelModalProps> = ({
         {/* Modal */}
         <div
           className="bg-white rounded-xl border-4 border-black shadow-2xl max-w-md w-full mx-4"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b-2 border-black">

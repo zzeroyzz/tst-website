@@ -1,11 +1,13 @@
 // Update src/components/Contact/ContactForm.tsx
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import Confetti from "react-confetti";
-import Button from "@/components/Button/Button";
-import FAQ from "@/components/FAQ/FAQ";
-import Input from "@/components/Input/Input";
+import React, { useState, useEffect } from 'react';
+import Confetti from 'react-confetti';
+import { useMutation } from '@apollo/client/react';
+import Button from '@/components/Button/Button';
+import FAQ from '@/components/FAQ/FAQ';
+import Input from '@/components/Input/Input';
+import { CREATE_CONTACT, CREATE_NOTIFICATION } from '@/lib/graphql/mutations';
 
 interface ContactFormProps {
   isContactPage?: boolean;
@@ -15,10 +17,11 @@ interface ContactFormProps {
 const useWindowSize = () => {
   const [size, setSize] = useState({ width: 0, height: 0 });
   useEffect(() => {
-    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    const handleResize = () =>
+      setSize({ width: window.innerWidth, height: window.innerHeight });
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   return size;
 };
@@ -30,6 +33,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [error, setError] = useState<string | null>(null);
   const [contactExists, setContactExists] = useState(false);
   const { width, height } = useWindowSize();
+
+  // GraphQL mutations
+  const [createContact] = useMutation(CREATE_CONTACT);
+  const [createNotification] = useMutation(CREATE_NOTIFICATION);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,49 +53,66 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
     setContactExists(false);
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      // Create contact via GraphQL
+      const { data } = await createContact({
+        variables: {
+          input: {
+            name: formData.name,
+            email: formData.email.toLowerCase(),
+            phoneNumber: formData.phone,
+            segments: ['Contact Form Lead'],
+            crmNotes: `Contact form submission on ${new Date().toLocaleDateString()}`,
+            customFields: {
+              source: 'contact_form',
+              submittedAt: new Date().toISOString()
+            },
+            sendWelcomeEmail: true // Send welcome email via GraphQL
+          }
+        }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle duplicate contact error (409 status)
-        if (response.status === 409 && data.contactExists) {
-          setContactExists(true);
-          setError(data.error);
-          return;
-        }
-
-        // Handle other errors
-        throw new Error(data.error || 'Something went wrong. Please try again.');
+      if (!(data as any)?.createContact) {
+        throw new Error('Failed to create contact');
       }
+
+      const newContact = (data as any).createContact;
 
       // Track the lead generation
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
-        event: "generate_lead_form_start",
-        page_source: isContactPage ? "contact" : "homepage",
+        event: 'generate_lead_form_start',
+        page_source: isContactPage ? 'contact' : 'homepage',
         form_location: window.location.pathname,
-        form_type: isContactPage ? "contact" : "homepage",
+        form_type: isContactPage ? 'contact' : 'homepage',
       });
 
-      // Redirect to questionnaire
-      if (data.questionnaireToken) {
-        window.location.href = `/questionnaire/${data.questionnaireToken}`;
+      // Show success state directly (no questionnaire redirect)
+      setIsSubmitted(true);
+    } catch (err: any) {
+      console.error('Contact form submission error:', err);
+      
+      // Handle duplicate contact GraphQL error
+      if (err.message && err.message.includes('already exists')) {
+        setContactExists(true);
+        setError(err.message);
         return;
       }
 
-      // Fallback to success state if no token (shouldn't happen)
-      setIsSubmitted(true);
-
-    } catch (err: unknown) {
-      if (err instanceof Error) {
+      // Handle other GraphQL errors
+      if (err.graphQLErrors && err.graphQLErrors.length > 0) {
+        const firstError = err.graphQLErrors[0];
+        if (firstError.message.includes('already exists')) {
+          setContactExists(true);
+          setError(firstError.message);
+          return;
+        }
+        setError(firstError.message);
+      } else if (err.networkError) {
+        setError('Network error. Please check your connection and try again.');
+      } else if (err.message) {
         setError(err.message);
       } else {
-        setError("An unexpected error occurred.");
+        setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
@@ -100,11 +124,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       <div className="space-y-16">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-4xl font-extrabold mb-6">Thank You!</h2>
-          <h3 className="text-3xl font-bold mb-4">Here&apos;s what to expect next:</h3>
+          <h3 className="text-3xl font-bold mb-4">
+            Here&apos;s what to expect next:
+          </h3>
           <ul className="list-disc list-inside space-y-3 text-lg text-left">
-            <li>You&apos;ll receive a personal email from me within 1-2 business days.</li>
-            <li>In the email, I&apos;ll provide a link to schedule your free 15-minute video consultation.</li>
-            <li>We&apos;ll use that time to chat, see if it&apos;s a good fit, and answer any questions you have.</li>
+            <li>
+              You&apos;ll receive a personal email from me within 1-2 business
+              days.
+            </li>
+            <li>
+              In the email, I&apos;ll provide a link to schedule your free
+              15-minute video consultation.
+            </li>
+            <li>
+              We&apos;ll use that time to chat, see if it&apos;s a good fit, and
+              answer any questions you have.
+            </li>
           </ul>
         </div>
 
@@ -116,24 +151,32 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
       </div>
     );
   };
-const handleEmailClick = () => {
-  window.location.href = `mailto:hello@example.com?subject=${encodeURIComponent(
-    "Follow-up on My Therapy Inquiry"
-  )}&body=${encodeURIComponent(
-    "Hi Kay,\n\nI’ve connected with you before and would like to follow up regarding scheduling or questions I have about starting therapy.\n\nMy details are:\n• Name:\n• Best contact number:\n• Preferred availability:\n• What I am interested in working on in therapy:\n• My budget:\n• My location (city/state):\n\nThank you, and I look forward to hearing from you.\n\nBest,\n[Your Name]"
-  )}`;
-};
+  const handleEmailClick = () => {
+    window.location.href = `mailto:hello@example.com?subject=${encodeURIComponent(
+      'Follow-up on My Therapy Inquiry'
+    )}&body=${encodeURIComponent(
+      'Hi Kay,\n\nI’ve connected with you before and would like to follow up regarding scheduling or questions I have about starting therapy.\n\nMy details are:\n• Name:\n• Best contact number:\n• Preferred availability:\n• What I am interested in working on in therapy:\n• My budget:\n• My location (city/state):\n\nThank you, and I look forward to hearing from you.\n\nBest,\n[Your Name]'
+    )}`;
+  };
   const renderContactExistsMessage = () => {
     return (
       <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6 text-center">
         <div className="text-4xl mb-4">👋</div>
-        <h3 className="text-2xl font-bold mb-4 text-yellow-800">We&apos;ve connected before!</h3>
+        <h3 className="text-2xl font-bold mb-4 text-yellow-800">
+          We&apos;ve connected before!
+        </h3>
         <p className="text-lg text-yellow-700 mb-6">
-          It looks like we already have your information in our system. For personalized assistance with scheduling or any questions, please reach out directly.
+          It looks like we already have your information in our system. For
+          personalized assistance with scheduling or any questions, please reach
+          out directly.
         </p>
         <div className="space-y-4">
-
-            <Button onClick={handleEmailClick} className=" bg-tst-purple text-black">Contact Us</Button>
+          <Button
+            onClick={handleEmailClick}
+            className=" bg-tst-purple text-black"
+          >
+            Contact Us
+          </Button>
 
           <p className="text-sm text-yellow-600">
             We&apos;ll get back to you within 1 business day
@@ -152,7 +195,7 @@ const handleEmailClick = () => {
           recycle={false}
           numberOfPieces={500}
           tweenDuration={8000}
-          style={{ position: "fixed", top: 0, left: 0, zIndex: 9999 }}
+          style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999 }}
         />
       )}
 
@@ -198,7 +241,12 @@ const handleEmailClick = () => {
                 />
               </div>
               <div className="mt-4">
-                <Button type="submit" className="bg-tst-yellow py-3" wrapperClassName="w-full" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="bg-tst-yellow py-3"
+                  wrapperClassName="w-full"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? 'Processing...' : 'Next →'}
                 </Button>
               </div>

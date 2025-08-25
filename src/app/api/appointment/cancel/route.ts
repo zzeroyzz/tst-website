@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/api/appointment/cancel/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { format, toZonedTime } from 'date-fns-tz';
 import { getAppointmentCancellationTemplate } from '@/lib/appointment-email-templates';
+import { Resend } from 'resend';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,178 +12,142 @@ const supabase = createClient(
 
 const EASTERN_TIMEZONE = 'America/New_York';
 
-// Function to send cancellation email via Zapier
-const sendCancellationEmail = async (contact: any) => {
-  if (!process.env.ZAPIER_EMAIL_WEBHOOK_URL) return;
-
-  // Parse the UTC date and convert to Eastern - FIX APPLIED HERE
-  const appointmentUtc = new Date(contact.scheduled_appointment_at);
-  const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
-
-  const emailData = {
-    type: 'appointment_cancellation',
-    to: contact.email,
-    subject: 'Your consultation has been cancelled - Toasted Sesame Therapy',
-    html: getAppointmentCancellationTemplate({
-      name: `${contact.name} ${contact.last_name || ''}`.trim(),
-      // FIX: Use the Eastern timezone converted date for formatting
-      appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', { timeZone: EASTERN_TIMEZONE }),
-      appointmentTime: format(appointmentEastern, 'h:mm a zzzz', { timeZone: EASTERN_TIMEZONE })
-    })
-  };
-
-  try {
-    await fetch(process.env.ZAPIER_EMAIL_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(emailData),
-    });
-  } catch (error) {
-    console.error('Failed to send cancellation email:', error);
-  }
-};
-
-// POST - Cancel appointment by contact ID (admin function)
 export async function POST(request: NextRequest) {
   try {
-    const { contactId } = await request.json();
+    const { uuid } = await request.json();
 
-    if (!contactId) {
+    if (!uuid) {
       return NextResponse.json(
-        { message: 'Contact ID is required' },
+        { message: 'UUID is required' },
         { status: 400 }
       );
     }
 
-    // First, get the contact details before cancelling
+    // 1) Fetch the contact with scheduled appointment
     const { data: contact, error: fetchError } = await supabase
       .from('contacts')
       .select('*')
-      .eq('id', contactId)
-      .eq('appointment_status', 'scheduled')
+      .eq('uuid', uuid)
+      .eq('appointment_status', 'SCHEDULED')
       .single();
 
     if (fetchError || !contact) {
-      console.error('Error finding contact:', fetchError);
+      console.error('Error finding contact by uuid:', fetchError);
       return NextResponse.json(
         { message: 'Appointment not found or already cancelled' },
         { status: 404 }
       );
     }
 
-    // Cancel the appointment
-    const { data, error } = await supabase
+    // 2) Cancel appointment
+    const { data: updatedRows, error: updateError } = await supabase
       .from('contacts')
       .update({
-        appointment_status: 'cancelled',
+        appointment_status: 'CANCELLED',
         appointment_notes: contact.appointment_notes
-          ? `${contact.appointment_notes} | Cancelled by admin`
-          : 'Cancelled by admin',
-        last_appointment_update: new Date().toISOString()
+          ? `${contact.appointment_notes} | Cancelled`
+          : 'Cancelled by client',
+        last_appointment_update: new Date().toISOString(),
       })
-      .eq('id', contactId)
+      .eq('uuid', uuid)
       .select();
 
-    if (error) {
-      console.error('Database error:', error);
+    if (updateError) {
+      console.error('Database error while cancelling:', updateError);
       return NextResponse.json(
         { message: 'Failed to cancel appointment' },
         { status: 500 }
       );
     }
 
-    // Send cancellation confirmation email to client
-    await sendCancellationEmail(contact);
+    const cancelled = updatedRows?.[0] ?? contact;
 
+    // 3) Send cancellation emails via Resend
     try {
-      const { error: notificationError } = await supabase
-        .from('notifications')
-        .insert({
-          type: 'appointment',
-          title: 'Appointment Cancelled',
-          message: `${contact.name}'s consultation was cancelled by admin`,
-          contact_id: contact.id,
-          contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
-          contact_email: contact.email,
-          read: false,
-          created_at: new Date().toISOString()
+      const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+      const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com';
+      const EMAIL_FROM = process.env.EMAIL_FROM || 'Toasted Sesame <kato@toastedsesametherapy.com>';
+
+      if (!RESEND_API_KEY) {
+        console.warn('RESEND_API_KEY not configured; skipping emails.');
+      } else {
+        const resend = new Resend(RESEND_API_KEY);
+
+        // Convert UTC -> Eastern for email body
+        const appointmentUtc = new Date(contact.scheduled_appointment_at);
+        const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
+
+        // Build base URL for reschedule links
+        const originFromHeader = request.headers.get('origin') || '';
+        const originFromUrl = request.nextUrl?.origin || '';
+        const PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || '';
+        const baseUrl = (PUBLIC_BASE_URL || originFromHeader || originFromUrl).replace(/\/+$/, '');
+        const rescheduleUrl = baseUrl ? `${baseUrl}/reschedule/${encodeURIComponent(contact.uuid)}` : undefined;
+
+        const clientHtml = getAppointmentCancellationTemplate({
+          name: `${contact.name} ${contact.last_name || ''}`.trim(),
+          appointmentDate: format(appointmentEastern, 'EEEE, MMMM d, yyyy', {
+            timeZone: EASTERN_TIMEZONE,
+          }),
+          appointmentTime: format(appointmentEastern, 'h:mm a zzzz', {
+            timeZone: EASTERN_TIMEZONE,
+          }),
+          cancelUrl: rescheduleUrl,
+          cancelToken: contact.uuid,
         });
 
-      if (notificationError) {
-        console.error('Failed to create notification:', notificationError);
+        // Client email
+        await resend.emails.send({
+          from: EMAIL_FROM,
+          to: [contact.email],
+          subject: 'Your consultation has been cancelled',
+          html: clientHtml,
+        });
+
+        // Admin notification email
+        await resend.emails.send({
+          from: EMAIL_FROM,
+          to: [ADMIN_EMAIL],
+          subject: `🚫 Appointment Cancelled - ${contact.name}`,
+          html: `
+            <div style="font-family:Arial,sans-serif">
+              <h2>Appointment Cancelled</h2>
+              <p><strong>Client:</strong> ${contact.name} ${contact.last_name || ''}</p>
+              <p><strong>Email:</strong> ${contact.email}</p>
+              <p><strong>Original time (ET):</strong> ${format(
+                appointmentEastern,
+                "EEEE, MMMM d, yyyy 'at' h:mm a zzz",
+                { timeZone: EASTERN_TIMEZONE }
+              )}</p>
+              <p>Status updated to <b>CANCELLED</b>.</p>
+            </div>
+          `,
+        });
       }
+    } catch (emailErr) {
+      console.warn('Cancellation emails failed (continuing):', emailErr);
+    }
+
+    // 4) Insert dashboard notification (non-blocking)
+    try {
+      await supabase.from('notifications').insert({
+        type: 'appointment',
+        title: 'Appointment Cancelled',
+        message: `${contact.name}'s consultation was cancelled`,
+        contact_id: contact.id,
+        contact_uuid: contact.uuid,
+        contact_name: `${contact.name} ${contact.last_name || ''}`.trim(),
+        contact_email: contact.email,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
     } catch (notificationError) {
-      console.error('Failed to create notification:', notificationError);
-  }
-
-
-    // Notify admin about cancellation
-    if (process.env.ZAPIER_EMAIL_WEBHOOK_URL) {
-      // Parse the UTC date and convert to Eastern for admin email too
-      const appointmentUtc = new Date(contact.scheduled_appointment_at);
-      const appointmentEastern = toZonedTime(appointmentUtc, EASTERN_TIMEZONE);
-
-      const adminNotification = {
-        type: 'appointment_cancelled_notification',
-        to: process.env.ADMIN_EMAIL || 'care@toastedsesametherapy.com',
-        subject: `🚫 Appointment Cancelled by Admin - ${contact.name}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2 style="color: #C5A1FF;">Appointment Cancelled by Admin</h2>
-
-            <div style="background-color: #FFF3F3; border-left: 4px solid #FF6B6B; padding: 15px; margin: 20px 0;">
-              <h3 style="color: #FF6B6B; margin: 0 0 15px;">Cancelled Appointment Details</h3>
-              <p style="margin: 5px 0;"><strong>Client:</strong> ${contact.name} ${contact.last_name || ''}</p>
-              <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${contact.email}">${contact.email}</a></p>
-              ${contact.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${contact.phone}</p>` : ''}
-              <p style="margin: 5px 0;"><strong>Original appointment:</strong><br>
-              ${format(appointmentEastern, "EEEE, MMMM d, yyyy 'at' h:mm a zzz", { timeZone: EASTERN_TIMEZONE })}</p>
-            </div>
-
-            <div style="background-color: #F0F9FF; border-left: 4px solid #3B82F6; padding: 15px; margin: 20px 0;">
-              <h3 style="color: #3B82F6; margin: 0 0 15px;">Actions Taken</h3>
-              <ul style="margin: 10px 0; padding-left: 20px;">
-                <li>Appointment status updated to "cancelled"</li>
-                <li>Client notified via cancellation email</li>
-                <li>Calendar slot now available for new bookings</li>
-                <li>Appointment notes updated with cancellation reason</li>
-              </ul>
-            </div>
-
-            ${contact.interested_in && contact.interested_in.length > 0 ? `
-            <div style="background-color: #F7BD01; border: 2px solid #000; padding: 15px; margin: 20px 0;">
-              <h3 style="margin: 0 0 15px;">Client Background</h3>
-              <p style="margin: 5px 0;"><strong>Interested in:</strong> ${contact.interested_in.join(', ')}</p>
-              ${contact.scheduling_preference ? `<p style="margin: 5px 0;"><strong>Scheduling preference:</strong> ${contact.scheduling_preference}</p>` : ''}
-              ${contact.payment_method ? `<p style="margin: 5px 0;"><strong>Payment method:</strong> ${contact.payment_method}</p>` : ''}
-            </div>
-            ` : ''}
-
-            <div style="background-color: #E0F2FE; border: 1px solid #0891B2; padding: 15px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0; font-size: 14px; color: #0F766E;">
-                <strong>💡 Follow-up suggestion:</strong> Consider reaching out to the client in a few days to see if they'd like to reschedule, unless this was a mutual decision.
-              </p>
-            </div>
-
-            <p style="margin: 20px 0 0;">The appointment cancellation has been processed successfully.</p>
-          </div>
-        `
-      };
-
-      try {
-        await fetch(process.env.ZAPIER_EMAIL_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(adminNotification),
-        });
-      } catch (error) {
-        console.error('Failed to send admin notification:', error);
-      }
+      console.warn('Failed to create notification:', notificationError);
     }
 
     return NextResponse.json({
       message: 'Appointment cancelled successfully',
-      contact: data[0]
+      contact: cancelled,
     });
   } catch (error) {
     console.error('Error cancelling appointment:', error);

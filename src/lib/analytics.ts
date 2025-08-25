@@ -2,7 +2,7 @@
 
 // Add a utility to check if gtag is ready
 const waitForGtag = (timeout = 5000): Promise<boolean> => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       resolve(true);
       return;
@@ -23,7 +23,10 @@ const waitForGtag = (timeout = 5000): Promise<boolean> => {
 };
 
 // Track custom events with better error handling
-export const trackEvent = async (eventName: string, parameters?: Record<string, any>) => {
+export const trackEvent = async (
+  eventName: string,
+  parameters?: Record<string, any>
+) => {
   if (typeof window === 'undefined') return;
 
   const gtagReady = await waitForGtag();
@@ -35,7 +38,7 @@ export const trackEvent = async (eventName: string, parameters?: Record<string, 
   try {
     window.gtag('event', eventName, {
       debug_mode: process.env.NODE_ENV === 'development',
-      ...parameters
+      ...parameters,
     });
   } catch (error) {
     console.error('❌ GA4 event failed:', eventName, error);
@@ -68,7 +71,10 @@ export const trackPageView = (url: string, title?: string) => {
 };
 
 // Track form submissions
-export const trackFormSubmission = (formName: string, success: boolean = true) => {
+export const trackFormSubmission = (
+  formName: string,
+  success: boolean = true
+) => {
   trackEvent('form_submit', {
     form_name: formName,
     success: success,

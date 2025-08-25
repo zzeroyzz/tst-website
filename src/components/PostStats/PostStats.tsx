@@ -7,19 +7,25 @@ import { usePostInteractions } from '@/hooks/usePostInteractions';
 import toast from 'react-hot-toast';
 
 interface PostStatsProps {
-  slug: string | "";
+  slug: string | '';
   title?: string;
   className?: string;
 }
 
-const PostStats: React.FC<PostStatsProps> = ({ slug, title, className = '' }) => {
+const PostStats: React.FC<PostStatsProps> = ({
+  slug,
+  title,
+  className = '',
+}) => {
   const { stats, loading, liking, toggleLike } = usePostInteractions(slug);
   const [sharing, setSharing] = useState(false);
 
   const handleShare = async () => {
     setSharing(true);
     const url = `${window.location.origin}/posts/${slug}`;
-    const shareText = title ? `Check out this article: ${title}` : 'Check out this article';
+    const shareText = title
+      ? `Check out this article: ${title}`
+      : 'Check out this article';
 
     try {
       // Always try clipboard first for better UX
@@ -46,10 +52,9 @@ const PostStats: React.FC<PostStatsProps> = ({ slug, title, className = '' }) =>
             url: url,
           });
         } catch (shareError) {
-          return
+          return;
         }
       }
-
     } catch (error) {
       console.error('Error sharing:', error);
 
@@ -120,16 +125,14 @@ const PostStats: React.FC<PostStatsProps> = ({ slug, title, className = '' }) =>
         onClick={toggleLike}
         disabled={liking}
         className={`flex items-center gap-2 transition-colors duration-200 hover:scale-105 transform ${
-          stats.liked
-            ? 'text-red-600'
-            : 'text-gray-600 hover:text-red-600'
+          stats.liked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
         } ${liking ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         <svg
           width="20"
           height="20"
           viewBox="0 0 24 24"
-          fill={stats.liked ? "currentColor" : "none"}
+          fill={stats.liked ? 'currentColor' : 'none'}
           xmlns="http://www.w3.org/2000/svg"
           className="transition-all duration-200"
         >

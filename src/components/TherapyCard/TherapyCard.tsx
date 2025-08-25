@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { LottiePlayer } from "@/components/LottiePlayer/LottiePlayer";
-import styles from "./TherapyCard.module.css";
-import { therapyCards } from "@/data/therapyCardData";
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { LottiePlayer } from '@/components/LottiePlayer/LottiePlayer';
+import styles from './TherapyCard.module.css';
+import { therapyCards } from '@/data/therapyCardData';
 
 // Animation variants for a staggered reveal effect
 const containerVariants = {
@@ -38,7 +38,7 @@ const TherapyCard = () => {
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
     >
-      {therapyCards.map((card) => (
+      {therapyCards.map(card => (
         <motion.div key={card.title} variants={itemVariants}>
           <Link href="/therapy-services" className={styles.wrapper}>
             <div className={styles.shadow}></div>
@@ -57,9 +57,20 @@ const TherapyCard = () => {
                 {/* Updated to use checkmark bullet points with better text wrapping */}
                 <ul className="flex-grow space-y-2 mb-4">
                   {card.description.map((item, index) => (
-                    <li key={index} className="text-md opacity-90 flex items-start">
-                      <span className="text-green-500 mr-3 mt-1 flex-shrink-0">✓</span>
-                      <span className="leading-relaxed hyphens-none break-words" style={{ wordBreak: 'normal', overflowWrap: 'break-word' }}>
+                    <li
+                      key={index}
+                      className="text-md opacity-90 flex items-start"
+                    >
+                      <span className="text-green-500 mr-3 mt-1 flex-shrink-0">
+                        ✓
+                      </span>
+                      <span
+                        className="leading-relaxed hyphens-none break-words"
+                        style={{
+                          wordBreak: 'normal',
+                          overflowWrap: 'break-word',
+                        }}
+                      >
                         {item}
                       </span>
                     </li>

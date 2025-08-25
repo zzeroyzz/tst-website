@@ -24,9 +24,9 @@ export async function POST(request: NextRequest) {
       .from('contacts')
       .update({
         scheduled_appointment_at: null,
-        appointment_status: 'cancelled',
+        appointment_status: 'CANCELLED',
         appointment_notes: 'Appointment cancelled by user',
-        last_appointment_update: new Date().toISOString()
+        last_appointment_update: new Date().toISOString(),
       })
       .eq('id', contactId)
       .select();
@@ -51,9 +51,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: 'Appointment cancelled successfully',
-      contact: data[0]
+      contact: data[0],
     });
-
   } catch (error) {
     console.error('Cancel appointment error:', error);
     return NextResponse.json(

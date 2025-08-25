@@ -1,48 +1,59 @@
-"use client";
+'use client';
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import Section from "@/components/Section/Section";
-import TestimonialCard from "@/components/TestimonialCard/TestimonialCard";
-import Image from "next/image";
-import Button from "@/components/Button/Button";
-import CircleIcon from "@/components/CircleIcon/CircleIcon";
-import BelowTheFold from "@/components/BelowTheFold/BelowTheFold";
-import ProfileImage from "@/components/ProfileImage/ProfileImage";
+import Section from '@/components/Section/Section';
+import TestimonialCard from '@/components/TestimonialCard/TestimonialCard';
+import Image from 'next/image';
+import Button from '@/components/Button/Button';
+import CircleIcon from '@/components/CircleIcon/CircleIcon';
+import BelowTheFold from '@/components/BelowTheFold/BelowTheFold';
+import ProfileImage from '@/components/ProfileImage/ProfileImage';
 import HoverLink from '@/components/HoverLink/HoverLink';
+import { MapPinCheckInside, Video, Heart } from 'lucide-react';
+import CTACard from '@/components/CTA/CTA';
 import {
   socialProofIcons,
   testimonials,
   meetYourTherapist,
   howItWorksSteps,
-  trustIndicators,
-} from "@/data/pageData";
-import ContactForm from "@/components/Contact/ContactForm";
+} from '@/data/pageData';
+import IconCircle from '@/components/IconCircle/IconCircle';
 
-const TherapyCard = dynamic(() => import("@/components/TherapyCard/TherapyCard"), {
-  loading: () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="animate-pulse bg-gray-200 rounded-lg h-64 border-2 border-black"></div>
-      ))}
-    </div>
-  ),
-});
+const TherapyCard = dynamic(
+  () => import('@/components/TherapyCard/TherapyCard'),
+  {
+    loading: () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse bg-gray-200 rounded-lg h-64 border-2 border-black"
+          ></div>
+        ))}
+      </div>
+    ),
+  }
+);
 
-const HowItWorksStep = dynamic(() => import("@/components/HowItWorksSteps/HowItWorksSteps"), {
-  loading: () => (
-    <div className="animate-pulse bg-gray-200 rounded-lg h-48 border-2 border-black"></div>
-  ),
-});
 
-const LeadMagnet = dynamic(() => import("@/components/LeadMagnet/LeadMagnet"), {
+
+const HowItWorksStep = dynamic(
+  () => import('@/components/HowItWorksSteps/HowItWorksSteps'),
+  {
+    loading: () => (
+      <div className="animate-pulse bg-gray-200 rounded-lg h-48 border-2 border-black"></div>
+    ),
+  }
+);
+
+const LeadMagnet = dynamic(() => import('@/components/LeadMagnet/LeadMagnet'), {
   loading: () => (
     <div className="animate-pulse bg-gray-200 rounded-lg h-96 border-2 border-black"></div>
   ),
 });
-
 
 // Animation variants
 const heroContainerVariants = {
@@ -108,21 +119,27 @@ export default function HomePageClient() {
   // Create array of refs for easy access in the map
   const stepRefs = [step0Ref, step1Ref, step2Ref, step3Ref];
 
-  const handleScroll = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const contactForm = document.getElementById("contact-form");
-    if (contactForm) {
-      contactForm.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
+const TRUST_INDICATORS = [
+  { text: 'Licensed in Georgia', icon: MapPinCheckInside },
+  { text: 'Secure Telehealth', icon: Video },
+  { text: 'Affirming Care', icon: Heart }
+] as const;
 
   const router = useRouter();
 
-  const handleResourcesClick = () => {
-    router.push('/guides');
+  const handleBook = () => {
+    router.push('/book/trauma');
+  };
+
+  const handleStepsScroll = (e: React.MouseEvent<HTMLButtonElement>) => {
+     e.preventDefault();
+    const contactForm = document.getElementById('how-it-works');
+    if (contactForm) {
+      contactForm.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
   };
 
   return (
@@ -138,50 +155,60 @@ export default function HomePageClient() {
             className="flex flex-col gap-4"
             variants={heroContainerVariants}
           >
-           <motion.div variants={heroItemVariants}>
-  <Image
-    src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
-    alt="Tst Logo"
-    width={600}
-    height={600}
-  />
-</motion.div>
+            <motion.div variants={heroItemVariants} className="pb-4 md:pb-0">
+              <Image
+                src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
+                alt="Tst Logo"
+                width={600}
+                height={600}
+              />
+            </motion.div>
             <motion.h1
-              className="text-5xl lg:text-6xl font-extrabold leading-tight"
+              className="text-4xl text-center md:text-left md:text-6xl font-extrabold leading-tight"
               variants={heroItemVariants}
             >
-              Therapy for when the world feels too much
+              Therapy that honors who you are
             </motion.h1>
-            <motion.p className="text-lg" variants={heroItemVariants}>
-              Trauma-informed therapy for neurodivergent, LGBTQIA+, and BIPOC adults in Georgia. Work with a therapist who gets it because they&apos;ve been there too.
+            <motion.p className="text-md md:text-lg text-center md:text-left" variants={heroItemVariants}>
+             Trauma‑informed, identity‑affirming virtual therapy for Georgia adults. Free 15‑minute consult. First full session is on us if it doesn’t feel right.
             </motion.p>
 
             <motion.div
-              className="flex flex-col md:flex-row flex-wrap gap-4 pt-4"
+              className="flex flex-col md:flex-row flex-wrap gap-4 pt-4 pb-4"
               variants={heroItemVariants}
             >
-              <Button onClick={handleScroll} className="bg-tst-yellow" id="book-a-call-btn">
-                Book a call
+              <Button
+                onClick={handleBook}
+                className="bg-tst-yellow"
+                id="book-a-call-btn"
+              >
+                Book Your Free 15-Minute Consult
+
               </Button>
-              <Button onClick={handleResourcesClick} className="bg-white" id="download-free-guides-btn">
-               Download Your Free Guides
+              <Button
+                onClick={handleStepsScroll}
+                className="bg-white"
+                id="download-free-guides-btn"
+              >
+                See How It Works
               </Button>
             </motion.div>
-<motion.div
-  className="flex flex-row gap-4 flex-wrap justify-center md:justify-start"
-  variants={heroItemVariants}
->
-  {trustIndicators.map((indicator) => (
-    <div key={indicator.id} className="flex items-center gap-3">
-      <CircleIcon
-        size="xs"
-        bgColor="bg-green-100"
-        iconUrl={indicator.iconUrl}
-      />
-      <span className="font-bold">{indicator.text}</span>
-    </div>
-  ))}
-</motion.div>
+            <motion.div
+              className="flex flex-row gap-4 flex-wrap justify-center md:justify-start"
+              variants={heroItemVariants}
+            >
+
+              {TRUST_INDICATORS.map((indicator, index) => (
+            <div key={index} className="flex items-center gap-3 ">
+              <IconCircle
+                icon={<indicator.icon className="w-4 h-4" />}
+                size="xs"
+                bgColor="bg-green-500"
+              />
+              <span className="font-medium ">{indicator.text}</span>
+            </div>
+          ))}
+            </motion.div>
             <motion.div
               className="pt-6 flex flex-col items-center text-center md:flex-row md:items-start md:text-left gap-4"
               variants={heroItemVariants}
@@ -199,8 +226,7 @@ export default function HomePageClient() {
                 ))}
               </div>
               <p className="text-sm font-medium">
-                <strong>More than 200+ people</strong> have taken the first
-                step.
+                <strong>Over 200 clients </strong> supported since 2018
                 <br />
                 You&apos;re not alone.
               </p>
@@ -247,9 +273,7 @@ export default function HomePageClient() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-          Each reflection is based on real things clients have shared,
-          thoughtfully paraphrased to honor both their meaning and their
-          privacy.
+          Reflections based on real client words, paraphrased with care for privacy.
         </motion.p>
       </Section>
 
@@ -261,10 +285,7 @@ export default function HomePageClient() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
           >
-
             <BelowTheFold />
-
-
           </motion.div>
         </Section>
       </div>
@@ -282,7 +303,7 @@ export default function HomePageClient() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
           >
-            <h2 className="text-5xl font-extrabold">
+            <h2 className="text-4xl md:text-5xl font-extrabold">
               Care that meets you where you are
             </h2>
           </motion.div>
@@ -323,18 +344,24 @@ export default function HomePageClient() {
                 </motion.p>
               ))}
               <motion.div variants={itemVariants} className="relative">
-  <div className="absolute left-0" style={{ marginLeft: '-22px' }}>
-    <HoverLink href="/about" className="group gap-2 font-bold text-lg text-tst-purple">
-      <span>Read my full bio</span>
-    </HoverLink>
-  </div>
-</motion.div>
+                <div
+                  className="absolute left-0"
+                  style={{ marginLeft: '-22px' }}
+                >
+                  <HoverLink
+                    href="/about"
+                    className="group gap-2 font-bold text-lg text-tst-purple"
+                  >
+                    <span>Read my full bio</span>
+                  </HoverLink>
+                </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         </Section>
       </div>
 
-      <div ref={howItWorksRef}>
+      <div ref={howItWorksRef} id="how-it-works">
         <Section minHeight="1000px">
           <motion.div
             className="text-center mb-12"
@@ -343,14 +370,17 @@ export default function HomePageClient() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-6xl font-extrabold">
+            <h2 className="text-4xl md:text-5xl font-extrabold">
               What working together looks like
             </h2>
           </motion.div>
           <div className="flex flex-col min-h-1000">
             {howItWorksSteps.map((step, index) => {
               const currentRef = stepRefs[index];
-              const nextStepInView = index < howItWorksSteps.length - 1 ? stepInViewStates[index + 1] : false;
+              const nextStepInView =
+                index < howItWorksSteps.length - 1
+                  ? stepInViewStates[index + 1]
+                  : false;
 
               return (
                 <div key={index} ref={currentRef}>
@@ -368,7 +398,7 @@ export default function HomePageClient() {
       </div>
 
       <Section>
-        <ContactForm id="contact-form"/>
+        <CTACard />
       </Section>
     </main>
   );

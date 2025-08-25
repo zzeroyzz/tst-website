@@ -13,14 +13,14 @@ export const SkeletonCard = ({
   hasImage = true,
   hasTags = true,
   hasAuthor = true,
-  className = ""
+  className = '',
 }: SkeletonCardProps) => {
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden ${className}`}>
+    <div
+      className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden ${className}`}
+    >
       {/* Image skeleton */}
-      {hasImage && (
-        <Skeleton className="h-48 w-full rounded-none" />
-      )}
+      {hasImage && <Skeleton className="h-48 w-full rounded-none" />}
 
       {/* Content skeleton */}
       <div className="p-6">

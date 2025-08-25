@@ -2,22 +2,37 @@
 
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
+import LogoOnly from '@/components/LogoOnly/LogoOnly';
 
 interface ConditionalLayoutProps {
   children: ReactNode;
 }
 
-export default function ConditionalLayout({ children }: ConditionalLayoutProps) {
+export default function ConditionalLayout({
+  children,
+}: ConditionalLayoutProps) {
   const pathname = usePathname();
 
-  // Check if we're on a questionnaire page
+  // Check page types
   const isQuestionnairePage = pathname?.startsWith('/questionnaire/');
   const isCancellationPage = pathname?.startsWith('/cancel-appointment/');
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isBookingPage = pathname?.startsWith('/book/');
+  
+  // For booking pages, show logo + main content + footer
+  if (isBookingPage) {
+    const childrenArray = Array.isArray(children) ? children : [children];
+    return (
+      <>
+        <LogoOnly />
+        {childrenArray[1]}
+        {childrenArray[2]}
+      </>
+    );
+  }
 
+  // For other special pages, only render main content (no nav/footer)
   if (isQuestionnairePage || isCancellationPage || isDashboard) {
-    // For questionnaire pages, only render the main content (children[1])
-    // children[0] = Nav, children[1] = main, children[2] = Footer
     const childrenArray = Array.isArray(children) ? children : [children];
     return <>{childrenArray[1]}</>;
   }

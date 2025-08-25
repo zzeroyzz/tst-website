@@ -42,7 +42,7 @@ export default function Page() {
         url: canonical,
         sameAs: [
           // add socials if you want them recognized
-          'https://www.instagram.com/toastedsesametherapy'
+          'https://www.instagram.com/toastedsesametherapy',
         ],
       },
       {
@@ -68,7 +68,11 @@ export default function Page() {
 
   return (
     <>
-      <Script id="home-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="home-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HomePageClient />
     </>
   );

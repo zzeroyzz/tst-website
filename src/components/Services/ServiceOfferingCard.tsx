@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./ServiceOfferingCard.module.css";
-import Image from "next/image";
+import React from 'react';
+import styles from './ServiceOfferingCard.module.css';
+import Image from 'next/image';
 
 interface ServiceOfferingCardProps {
   service: {
@@ -13,7 +13,9 @@ interface ServiceOfferingCardProps {
   };
 }
 
-const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) => {
+const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({
+  service,
+}) => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.shadow} />
@@ -22,17 +24,17 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
           <div className="flex flex-col gap-4">
             <h3 className="text-3xl font-bold">{service.title}</h3>
             <Image
-                src={service.imageUrl}
-                alt="services"
-                width={500}
-                height={500}
-                className="w-full h-auto object-contain md:hidden"
-              />
+              src={service.imageUrl}
+              alt="services"
+              width={500}
+              height={500}
+              className="w-full h-auto object-contain md:hidden"
+            />
             <p>{service.description}</p>
             <div>
               <h4 className="font-bold mb-2">Best for:</h4>
               <div className="flex flex-wrap gap-2">
-                {service.tags.map((tag) => (
+                {service.tags.map(tag => (
                   <div
                     key={tag}
                     className="bg-tst-yellow text-sm font-medium px-3 py-1 rounded-full border-2 border-black"
@@ -44,7 +46,12 @@ const ServiceOfferingCard: React.FC<ServiceOfferingCardProps> = ({ service }) =>
             </div>
           </div>
           <div className="hidden md:block">
-            <Image src={service.imageUrl} alt="services" width={500} height={500} />
+            <Image
+              src={service.imageUrl}
+              alt="services"
+              width={500}
+              height={500}
+            />
           </div>
         </div>
       </div>

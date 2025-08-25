@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./Input.module.css";
-import clsx from "clsx";
+import React from 'react';
+import styles from './Input.module.css';
+import clsx from 'clsx';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   wrapperClassName?: string;
