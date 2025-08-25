@@ -86,6 +86,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.85,
     },
+    // Booking pages - high priority for conversions
+    {
+      url: `${baseUrl}/book`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/book/affirming`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/book/nd`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/book/trauma`,
+      lastModified: nowIso,
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
     {
       url: `${baseUrl}/policy`,
       lastModified: nowIso,

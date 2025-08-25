@@ -5,13 +5,14 @@ import UnifiedBookingFlow from '@/components/TwoStepBooking/UnifiedBookingFlow';
 import AdditionalContent from './AdditionalContent';
 
 export const metadata: Metadata = {
-  title: 'Free Grounding Plan Session | Kay Therapy',
+  title: 'Free 15-Minute Consultation + Fit-or-Free Sessions | Kay Therapy',
   description:
-    'Free 15-minute grounding plan session with a licensed therapist in Georgia. Get personalized coping strategies that work for you.',
+    'Free 15-minute consultation with a licensed therapist in Georgia. After your consultation, book fit-or-free therapy sessions - if they\'re not a good fit, they\'re completely free. Get personalized coping strategies that work for you.',
   keywords: [
     'therapy',
     'free consultation',
-    'grounding techniques',
+    'fit-or-free session',
+    'risk-free therapy',
     'coping strategies',
     'mental health',
     'Atlanta therapist',
@@ -19,9 +20,9 @@ export const metadata: Metadata = {
     'stress management',
   ],
   openGraph: {
-    title: 'Free Grounding Plan Session',
+    title: 'Free 15-Minute Consultation + Fit-or-Free Sessions',
     description:
-      'Get personalized coping strategies in a free 15-minute session with a Georgia-licensed therapist.',
+      'Free 15-minute consultation plus fit-or-free therapy sessions with a Georgia-licensed therapist. If therapy sessions aren\'t a good fit, they\'re completely free.',
     type: 'website',
     locale: 'en_US',
   },
@@ -42,7 +43,7 @@ export default function BookingPage() {
           <UnifiedBookingFlow variant="trauma" />
         </div>
       </Section>
-      
+
       {/* Additional content below the fold */}
       <AdditionalContent />
     </div>
