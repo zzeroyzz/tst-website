@@ -20,7 +20,6 @@ import {
   meetYourTherapist,
   howItWorksSteps,
 } from '@/data/pageData';
-import ContactForm from '@/components/Contact/ContactForm';
 import IconCircle from '@/components/IconCircle/IconCircle';
 
 const TherapyCard = dynamic(

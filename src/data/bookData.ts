@@ -45,3 +45,39 @@ export const stepSection = {
   subtitle:
     'You don’t have to guess what comes next. From our first conversation to your first full session, every step is simple and supportive. Here’s how to get started:',
 };
+
+export const meetYourTherapistBook = {
+  title: 'Who You’ll Meet',
+  paragraphs: [
+    "Kay, MS, LPC (she/they)",
+    'Georgia-licensed. Trauma-informed care for neurodivergent, LGBTQIA+, and BIPOC adults.',
+    'Therapy that honors who you are.',
+  ],
+};
+
+export const testimonials = [
+  {
+    quote:
+      "I started to believe I was not broken. Just human.",
+    iconUrl:
+      'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-9.svg',
+    bgColor: 'bg-tst-yellow',
+    altText: 'Yellow decorative icon for testimonial.',
+  },
+  {
+    quote:
+      "I felt safe bringing in my real emotions. Messy, complicated, unfiltered.",
+    iconUrl:
+      'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-7.svg',
+    bgColor: 'bg-tst-green',
+    altText: 'Green decorative icon for testimonial.',
+  },
+  {
+    quote:
+      "I feel more grounded. More real. More me.",
+    iconUrl:
+      'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/sp-icon-6.svg',
+    bgColor: 'bg-tst-teal',
+    altText: 'Teal decorative icon for testimonial.',
+  },
+];

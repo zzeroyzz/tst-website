@@ -20,11 +20,14 @@ export const helpWithKeywords = [
   'Cultural Identity',
   'BIPOC Affirming',
   'Adoption',
-  ' Attention Deficit (ADHD)',
+  'Attention Deficit (ADHD)',
   'Autism Spectrum',
   'Racial Stress & Trauma',
   'Gender or Sexual Identity Exploration',
 ];
+
+// Focus areas for the therapy banner component
+export const therapyFocusAreas = helpWithKeywords;
 
 export const individualTherapyData = {
   title: 'One-on-One Support',
