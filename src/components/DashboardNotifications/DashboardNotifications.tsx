@@ -289,6 +289,7 @@ const DashboardNotifications: React.FC<DashboardNotificationsProps> = ({
       case 'questionnaire':
         return <CheckSquare className="w-4 h-4 text-green-500" />;
       case 'appointment':
+      case 'appointment_scheduled': // Handle both appointment types
         return <Calendar className="w-4 h-4 text-purple-500" />;
       case 'reminder_sent':
         return <Mail className="w-4 h-4 text-orange-500" />;

@@ -14,6 +14,8 @@ export const contactResolvers = {
       try {
         let query = supabase.from('contacts').select(`
             *,
+            user_id,
+            uuid,
             message_count,
             last_message_at,
             contact_status,
@@ -74,6 +76,8 @@ export const contactResolvers = {
           .select(
             `
             *,
+            user_id,
+            uuid,
             message_count,
             last_message_at,
             contact_status,
@@ -107,7 +111,9 @@ export const contactResolvers = {
           .single();
 
         if (existingContact) {
-          throw new GraphQLError('An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.');
+          throw new GraphQLError(
+            'An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.'
+          );
         }
 
         // If there's an error other than "no rows found", handle it
@@ -116,13 +122,11 @@ export const contactResolvers = {
           throw new GraphQLError('Failed to check existing contacts');
         }
 
-        // Remove questionnaire token generation
-
         const contactData = {
           name: input.name,
           email: input.email.toLowerCase(),
           phone_number: input.phoneNumber,
-          phone: input.phoneNumber, // For legacy compatibility
+          phone: input.phoneNumber, // legacy compatibility
           contact_status: 'ACTIVE',
           appointment_status: null,
           segments: input.segments || [],
@@ -135,13 +139,29 @@ export const contactResolvers = {
         const { data, error } = await supabase
           .from('contacts')
           .insert([contactData])
-          .select()
+          .select(`
+            id,
+            uuid,
+            name,
+            email,
+            phone_number,
+            contact_status,
+            segments,
+            crm_notes,
+            created_at,
+            updated_at,
+            last_message_at,
+            message_count,
+            custom_fields
+          `)
           .single();
 
         if (error) {
           // Handle unique constraint violations gracefully
           if (error.code === '23505') {
-            throw new GraphQLError('An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.');
+            throw new GraphQLError(
+              'An account with this email already exists. Please contact care@toastedsesametherapy.com directly for assistance.'
+            );
           }
           throw new GraphQLError(`Failed to create contact: ${error.message}`);
         }
@@ -149,7 +169,9 @@ export const contactResolvers = {
         // Send welcome email if requested
         if (input.sendWelcomeEmail) {
           try {
-            const emailTemplate = getContactConfirmationTemplate({ name: input.name });
+            const emailTemplate = getContactConfirmationTemplate({
+              name: input.name,
+            });
             await sendZapierEmailWithRetry({
               to: input.email,
               subject: 'Thanks for reaching out! Next steps inside 📝',
@@ -157,7 +179,7 @@ export const contactResolvers = {
             });
           } catch (emailError) {
             console.error('Failed to send welcome email:', emailError);
-            // Don't throw - contact creation succeeded, email is secondary
+            // don't throw – contact creation succeeded
           }
         }
 
@@ -168,6 +190,7 @@ export const contactResolvers = {
             title: 'New Contact Submission',
             message: `${input.name} submitted the contact form via GraphQL`,
             contact_id: data.id,
+            contact_uuid: data.uuid,
             contact_name: input.name,
             contact_email: input.email.toLowerCase(),
             read: false,
@@ -175,7 +198,7 @@ export const contactResolvers = {
           });
         } catch (notificationError) {
           console.error('Failed to create notification:', notificationError);
-          // Don't throw - contact creation succeeded, notification is secondary
+          // don't throw – contact creation succeeded
         }
 
         return data;
@@ -212,7 +235,21 @@ export const contactResolvers = {
           .from('contacts')
           .update(updateData)
           .eq('id', id)
-          .select()
+          .select(`
+            id,
+            uuid,
+            name,
+            email,
+            phone_number,
+            contact_status,
+            segments,
+            crm_notes,
+            created_at,
+            updated_at,
+            last_message_at,
+            message_count,
+            custom_fields
+          `)
           .single();
 
         if (error) {
@@ -277,7 +314,22 @@ export const contactResolvers = {
               updated_at: new Date().toISOString(),
             })
             .eq('id', existingContact.id)
-            .select()
+            .select(`
+              id,
+              uuid,
+              user_id,
+              name,
+              email,
+              phone_number,
+              contact_status,
+              segments,
+              crm_notes,
+              created_at,
+              updated_at,
+              last_message_at,
+              message_count,
+              custom_fields
+            `)
             .single();
 
           if (updateError) {
@@ -299,14 +351,28 @@ export const contactResolvers = {
             segments,
             crm_notes: notes || null,
             custom_fields: {},
-            questionnaire_completed: false,
             archived: false,
           };
 
           const { data: newContact, error: contactError } = await supabase
             .from('contacts')
             .insert([contactData])
-            .select()
+            .select(`
+              id,
+              uuid,
+              user_id,
+              name,
+              email,
+              phone_number,
+              contact_status,
+              segments,
+              crm_notes,
+              created_at,
+              updated_at,
+              last_message_at,
+              message_count,
+              custom_fields
+            `)
             .single();
 
           if (contactError) {
@@ -322,6 +388,7 @@ export const contactResolvers = {
         // Create appointment
         const appointmentData = {
           contact_id: contact.id,
+          contact_uuid: contact.uuid,
           scheduled_at: scheduledAt,
           status: 'SCHEDULED',
           time_zone: timeZone,
@@ -331,7 +398,9 @@ export const contactResolvers = {
         const { data: appointment, error: appointmentError } = await supabase
           .from('appointments')
           .insert([appointmentData])
-          .select()
+          .select(
+            'id, contact_id, contact_uuid, scheduled_at, status, time_zone, created_at, updated_at'
+          )
           .single();
 
         if (appointmentError) {
@@ -381,7 +450,7 @@ export const contactResolvers = {
 
             if (workflowResult.errors.length > 0) {
               messages.push(
-                ...workflowResult.errors.map(err => `SMS Error: ${err}`)
+                ...workflowResult.errors.map((err) => `SMS Error: ${err}`)
               );
             }
           } catch (smsError) {
@@ -395,10 +464,13 @@ export const contactResolvers = {
         // Create notification for dashboard
         await supabase.from('notifications').insert([
           {
-            type: 'appointment_scheduled',
+            type: 'appointment',
             title: 'New Consultation Scheduled',
-            message: `${name} scheduled a consultation for ${new Date(scheduledAt).toLocaleString()}`,
+            message: `${name} scheduled a consultation for ${new Date(
+              scheduledAt
+            ).toLocaleString()}`,
             contact_id: contact.id,
+            contact_uuid: contact.uuid,
             contact_name: name,
             contact_email: email,
             read: false,
@@ -456,7 +528,22 @@ export const contactResolvers = {
               updated_at: new Date().toISOString(),
             })
             .eq('id', existingContact.id)
-            .select()
+            .select(`
+              id,
+              uuid,
+              user_id,
+              name,
+              email,
+              phone_number,
+              contact_status,
+              segments,
+              crm_notes,
+              created_at,
+              updated_at,
+              last_message_at,
+              message_count,
+              custom_fields
+            `)
             .single();
 
           if (updateError) {
@@ -474,18 +561,32 @@ export const contactResolvers = {
             email: email.toLowerCase(),
             phone_number: phone,
             contact_status: 'PROSPECT',
-            appointment_status: null, // Explicitly set to null
-            segments,
+            appointment_status: null, // Will be updated after appointment creation
+            segments: [...(segments || []), 'new'], // Always add 'new' tag
             crm_notes: notes || null,
             custom_fields: {},
-            questionnaire_completed: false,
             archived: false,
           };
 
           const { data: newContact, error: contactError } = await supabase
             .from('contacts')
             .insert([contactData])
-            .select()
+            .select(`
+              id,
+              uuid,
+              user_id,
+              name,
+              email,
+              phone_number,
+              contact_status,
+              segments,
+              crm_notes,
+              created_at,
+              updated_at,
+              last_message_at,
+              message_count,
+              custom_fields
+            `)
             .single();
 
           if (contactError) {
@@ -501,6 +602,7 @@ export const contactResolvers = {
         // Create appointment
         const appointmentData = {
           contact_id: contact.id,
+          contact_uuid: contact.uuid,
           scheduled_at: appointmentDateTime,
           status: 'SCHEDULED',
           time_zone: timeZone,
@@ -510,7 +612,9 @@ export const contactResolvers = {
         const { data: appointment, error: appointmentError } = await supabase
           .from('appointments')
           .insert([appointmentData])
-          .select()
+          .select(
+            'id, contact_id, contact_uuid, scheduled_at, status, time_zone, created_at, updated_at'
+          )
           .single();
 
         if (appointmentError) {
@@ -535,7 +639,9 @@ export const contactResolvers = {
         }
 
         messages.push(
-          `Scheduled appointment for ${new Date(appointmentDateTime).toLocaleString()}`
+          `Scheduled appointment for ${new Date(
+            appointmentDateTime
+          ).toLocaleString()}`
         );
 
         let smsTriggered = false;
@@ -560,7 +666,7 @@ export const contactResolvers = {
 
             if (workflowResult.errors.length > 0) {
               messages.push(
-                ...workflowResult.errors.map(err => `SMS Error: ${err}`)
+                ...workflowResult.errors.map((err) => `SMS Error: ${err}`)
               );
             }
           } catch (smsError) {
@@ -574,10 +680,13 @@ export const contactResolvers = {
         // Create notification for dashboard
         await supabase.from('notifications').insert([
           {
-            type: 'appointment_scheduled',
+            type: 'appointment',
             title: 'New Consultation Scheduled',
-            message: `${name} scheduled a consultation for ${new Date(appointmentDateTime).toLocaleString()}`,
+            message: `${name} scheduled a consultation for ${new Date(
+              appointmentDateTime
+            ).toLocaleString()}`,
             contact_id: contact.id,
+            contact_uuid: contact.uuid,
             contact_name: name,
             contact_email: email,
             read: false,
@@ -600,16 +709,15 @@ export const contactResolvers = {
 
   Subscription: {
     contactUpdated: {
-      // Implementation would require a real-time subscription service
-      // For now, we'll leave this as a placeholder
+      // Placeholder – would require real-time subscriptions
       subscribe: async () => {
-        // Would integrate with Supabase real-time subscriptions
         throw new GraphQLError('Subscriptions not yet implemented');
       },
     },
   },
 
   Contact: {
+    user_id: (parent: any) => parent.user_id,
     contactStatus: (parent: any) => parent.contact_status || 'ACTIVE',
     phoneNumber: (parent: any) => parent.phone_number,
     crmNotes: (parent: any) => parent.crm_notes,
@@ -628,7 +736,7 @@ export const contactResolvers = {
         const { data, error } = await supabase
           .from('crm_messages')
           .select('*')
-          .eq('contact_id', parent.id)
+          .eq('contact_uuid', parent.uuid)
           .order('created_at', { ascending: false })
           .limit(limit);
 
@@ -650,7 +758,7 @@ export const contactResolvers = {
         const { data, error } = await supabase
           .from('crm_messages')
           .select('*')
-          .eq('contact_id', parent.id)
+          .eq('contact_uuid', parent.uuid)
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
@@ -674,7 +782,7 @@ export const contactResolvers = {
         const { count, error } = await supabase
           .from('crm_messages')
           .select('*', { count: 'exact', head: true })
-          .eq('contact_id', parent.id)
+          .eq('contact_uuid', parent.uuid)
           .eq('direction', 'OUTBOUND');
 
         if (error) {
@@ -694,7 +802,7 @@ export const contactResolvers = {
         const { count, error } = await supabase
           .from('crm_messages')
           .select('*', { count: 'exact', head: true })
-          .eq('contact_id', parent.id)
+          .eq('contact_uuid', parent.uuid)
           .eq('direction', 'INBOUND');
 
         if (error) {
@@ -722,7 +830,7 @@ export const contactResolvers = {
         const { data, error } = await supabase
           .from('contacts')
           .select('*')
-          .eq('id', parent.contact_id)
+          .eq('uuid', parent.contact_uuid)
           .single();
 
         if (error) {
