@@ -5,9 +5,9 @@ import UnifiedBookingFlow from '@/components/TwoStepBooking/UnifiedBookingFlow';
 import AdditionalContent from '../AdditionalContent';
 
 export const metadata: Metadata = {
-  title: 'Neurodivergent-Friendly Free Grounding Plan Session | Kay Therapy',
+  title: 'Neurodivergent-Friendly Free Consultation + Fit-or-Free Sessions | Kay Therapy',
   description:
-    'Free 15-minute grounding plan session designed specifically for neurodivergent adults. Get practical, sensory-aware coping strategies that work with your brain. Licensed therapist in Georgia.',
+    'Free 15-minute consultation designed specifically for neurodivergent adults. If your first session isn\'t a good fit, it\'s completely free. Get practical, sensory-aware coping strategies that work with your brain. Licensed therapist in Georgia.',
   keywords: [
     'neurodivergent therapy',
     'ADHD coping strategies',
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     'free consultation',
   ],
   openGraph: {
-    title: 'Neurodivergent-Friendly Free Grounding Plan Session',
+    title: 'Neurodivergent-Friendly Free Consultation + Fit-or-Free Sessions',
     description:
-      'Practical, sensory-aware coping strategies designed for neurodivergent brains. Free 15-minute session with Georgia-licensed therapist.',
+      'Practical, sensory-aware coping strategies designed for neurodivergent brains. Free 15-minute consultation with Georgia-licensed therapist, plus fit-or-free therapy sessions.',
     type: 'website',
     locale: 'en_US',
   },
@@ -44,7 +44,7 @@ export default function NeurodivergentBookingPage() {
           <UnifiedBookingFlow variant="nd" />
         </div>
       </Section>
-      
+
       {/* Additional content below the fold */}
       <AdditionalContent />
     </div>

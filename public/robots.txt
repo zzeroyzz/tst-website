@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# High priority pages for crawling
+Allow: /book
+Allow: /book/affirming  
+Allow: /book/nd
+Allow: /book/trauma
+Allow: /therapy-services
+Allow: /about
+Allow: /contact
+Allow: /mental-health-healing-blog
+Allow: /guides
+
+# Block admin/dashboard areas
+Disallow: /dashboard
+Disallow: /login
+Disallow: /reschedule
+Disallow: /cancel-appointment
+Disallow: /thank-you
+Disallow: /thank-you-reschedule
+
+# Block API endpoints
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://toastedsesametherapy.com/sitemap.xml

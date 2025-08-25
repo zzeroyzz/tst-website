@@ -5,9 +5,9 @@ import UnifiedBookingFlow from '@/components/TwoStepBooking/UnifiedBookingFlow';
 import AdditionalContent from '../AdditionalContent';
 
 export const metadata: Metadata = {
-  title: 'LGBTQIA-Affirming Free Grounding Plan Session | Kay Therapy',
+  title: 'LGBTQIA-Affirming Free Consultation + Fit-or-Free Sessions | Kay Therapy',
   description:
-    'Free 15-minute grounding plan session in a safe, LGBTQIA-affirming space. Mental health strategies that honor your identity. Licensed therapist in Georgia.',
+    'Free 15-minute consultation in a safe, LGBTQIA-affirming space. If your first session isn\'t a good fit, it\'s completely free. Mental health strategies that honor your identity. Licensed therapist in Georgia.',
   keywords: [
     'LGBTQIA therapy',
     'queer therapy',
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     'free consultation',
   ],
   openGraph: {
-    title: 'LGBTQIA-Affirming Free Grounding Plan Session',
+    title: 'LGBTQIA-Affirming Free Consultation + Fit-or-Free Sessions',
     description:
-      'A safe space where your identity is celebrated. Free 15-minute session with Georgia-licensed, LGBTQIA-affirming therapist.',
+      'A safe space where your identity is celebrated. Free 15-minute consultation with Georgia-licensed, LGBTQIA-affirming therapist, plus fit-or-free therapy sessions.',
     type: 'website',
     locale: 'en_US',
   },
@@ -46,7 +46,7 @@ export default function AffirmingBookingPage() {
           <UnifiedBookingFlow variant="affirming" />
         </div>
       </Section>
-      
+
       {/* Additional content below the fold */}
       <AdditionalContent />
     </div>
