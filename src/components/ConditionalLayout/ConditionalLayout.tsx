@@ -19,13 +19,14 @@ export default function ConditionalLayout({
   const isDashboard = pathname?.startsWith('/dashboard');
   const isBookingPage = pathname?.startsWith('/book/');
   
-  // For booking pages, show logo + main content only
+  // For booking pages, show logo + main content + footer
   if (isBookingPage) {
     const childrenArray = Array.isArray(children) ? children : [children];
     return (
       <>
         <LogoOnly />
         {childrenArray[1]}
+        {childrenArray[2]}
       </>
     );
   }

@@ -162,26 +162,6 @@
 
 /* Mobile styles */
 @media (max-width: 767px) {
-  .card_wrapper {
-    height: 400px; /* Smaller height for mobile */
-  }
-
-  /* Even smaller for short content steps on mobile */
-  .card_wrapper[id='step-01'] {
-    height: 400px !important;
-  }
-
-  .card_wrapper[id='step-02'] {
-    height: 400px !important;
-  }
-
-  .card_wrapper[id='step-03'] {
-    height: 355px !important;
-  }
-
-  .card_wrapper[id='step-04'] {
-    height: 415px !important;
-  }
   .image_wrapper {
     position: relative;
     width: 100%;
@@ -200,6 +180,6 @@
   }
 
   .number {
-    font-size: 3rem; /* Slightly smaller on mobile */
+    font-size: 3rem;
   }
 }

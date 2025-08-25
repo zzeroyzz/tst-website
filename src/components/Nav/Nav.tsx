@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import NavigationLink from '@/components/NavigationLink/NavigationLink';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -101,7 +101,7 @@ const Nav: React.FC = () => {
     <nav className="relative w-full max-w-7xl mx-auto min-h-100 p-1">
       <div className="flex items-center justify-between p-4">
         <div className="flex-shrink-0">
-          <Link href="/" className="font-extrabold text-3xl">
+          <NavigationLink href="/" className="font-extrabold text-3xl">
             <Image
               src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/TST-LOGO-WHITE.svg"
               alt="TST logo"
@@ -109,7 +109,7 @@ const Nav: React.FC = () => {
               height={10}
               className="mx-auto"
             />
-          </Link>
+          </NavigationLink>
         </div>
 
         <div className="hidden md:flex items-center space-x-8">

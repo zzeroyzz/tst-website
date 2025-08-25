@@ -1,0 +1,24 @@
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+
+/* Pause on hover for better UX */
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Responsive animation speed */
+@media (max-width: 768px) {
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
+}

@@ -1,15 +1,21 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import HoverLink from '@/components/HoverLink/HoverLink';
 import CookieSettings from '@/components/CookieSettings/CookieSettings';
 
 const Footer = () => {
+  const pathname = usePathname();
+  const isBookingPage = pathname?.startsWith('/book');
+
   return (
     <footer className="bg-tst-purple border-t-2 border-black">
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start mb-8">
+        <div className={`grid grid-cols-1 ${isBookingPage ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-8 items-start mb-8`}>
           {/* Logo Section - Takes up 2 columns on larger screens */}
           <div className="flex flex-col items-center md:items-start md:col-span-2">
             <Link href="/" className="mb-4">
@@ -27,58 +33,59 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div className="text-center md:text-left">
-            <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-3">
-              <li>
-                <HoverLink
-                  href="/therapy-services"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Therapy Services
-                </HoverLink>
-              </li>
-              <li>
-                <HoverLink
-                  href="/about"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  About Kay
-                </HoverLink>
-              </li>
-              <li>
-                <HoverLink
-                  href="/guides"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Grab Your Free Resources
-                </HoverLink>
-              </li>
+          {/* Quick Links - Hidden on booking pages */}
+          {!isBookingPage && (
+            <div className="text-center md:text-left">
+              <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
+              <ul className="space-y-3">
+                <li>
+                  <HoverLink
+                    href="/therapy-services"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    Therapy Services
+                  </HoverLink>
+                </li>
+                <li>
+                  <HoverLink
+                    href="/about"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    About Kay
+                  </HoverLink>
+                </li>
+                <li>
+                  <HoverLink
+                    href="/guides"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    Grab Your Free Resources
+                  </HoverLink>
+                </li>
 
-              <li>
-                <HoverLink
-                  href="/mental-health-healing-blog"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Toasted Insights Blog
-                </HoverLink>
-              </li>
-              <li>
-                <HoverLink
-                  href="/contact"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Contact
-                </HoverLink>
-              </li>
-            </ul>
-          </div>
+                <li>
+                  <HoverLink
+                    href="/mental-health-healing-blog"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    Toasted Insights Blog
+                  </HoverLink>
+                </li>
+                <li>
+                  <HoverLink
+                    href="/contact"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    Contact
+                  </HoverLink>
+                </li>
+              </ul>
+            </div>
+          )}
 
-          {/* Legal & Portal */}
           <div className="text-center md:text-right">
             <h3 className="text-white font-bold text-lg mb-4">
-              Legal & Portal
+              Legal
             </h3>
             <ul className="space-y-3 mb-6">
               <li>
@@ -97,14 +104,7 @@ const Footer = () => {
                   Practice Policy
                 </HoverLink>
               </li>
-              <li>
-                <HoverLink
-                  href="https://toastedsesametherapyllc.clientsecure.me/sign-in"
-                  className="text-white/90 hover:text-white transition-colors font-medium"
-                >
-                  Client Portal
-                </HoverLink>
-              </li>
+
             </ul>
           </div>
         </div>

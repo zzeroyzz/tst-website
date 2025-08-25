@@ -18,6 +18,7 @@ import {
   getDay,
   isSameDay,
   isAfter,
+  addDays,
 } from 'date-fns';
 import { fromZonedTime, toZonedTime, format as formatTz } from 'date-fns-tz';
 import Button from '@/components/Button/Button';
@@ -28,6 +29,7 @@ interface AppointmentRescheduleCalendarProps {
   isOpen: boolean;
   onClose: () => void;
   contactId: string | number;
+  contactUuid?: string; // Add UUID support
   contactName: string;
   contactEmail: string;
   currentAppointmentDate: Date; // UTC
@@ -91,7 +93,7 @@ const AVAILABILITY: Record<number, Array<{ start: string; end: string }>> = {
     { start: '18:00', end: '19:00' },
   ],
   4: [{ start: '11:00', end: '19:00' }],
-  5: [],
+  5: [{ start: '11:00', end: '18:45' }], // Friday 11am-6:45pm EST
   6: [],
   0: [],
 };
@@ -102,6 +104,7 @@ const AppointmentRescheduleCalendar: React.FC<
   isOpen,
   onClose,
   contactId,
+  contactUuid,
   contactName,
   contactEmail,
   currentAppointmentDate, // UTC
@@ -245,12 +248,43 @@ const AppointmentRescheduleCalendar: React.FC<
     const check = new Date(date);
     check.setHours(0, 0, 0, 0);
 
-    if (check < todayEastern) return false;
-
     const dow = getDay(check);
     const hasAvailability = AVAILABILITY[dow] && AVAILABILITY[dow].length > 0;
 
-    return hasAvailability;
+    if (!hasAvailability) return false;
+
+    // Get current appointment day of week
+    const currentAppointmentDay = getDay(currentAppointmentEastern);
+
+    // Allow same-day scheduling only for Thursday (4) and Friday (5) appointments
+    if (check.getTime() === todayEastern.getTime()) {
+      return (currentAppointmentDay === 4 || currentAppointmentDay === 5) && hasAvailability;
+    }
+
+    // Don't allow past dates
+    if (check < todayEastern) return false;
+
+    // Apply 3-day business day limit
+    let businessDaysAhead = 0;
+    let currentDate = new Date(todayEastern);
+    currentDate = addDays(currentDate, 1);
+
+    while (currentDate <= check) {
+      const currentDayOfWeek = getDay(currentDate);
+      if (currentDayOfWeek >= 1 && currentDayOfWeek <= 5) {
+        businessDaysAhead++;
+      }
+
+      if (businessDaysAhead > 3) return false;
+
+      if (isSameDay(currentDate, check)) {
+        return businessDaysAhead <= 3 && hasAvailability;
+      }
+
+      currentDate = addDays(currentDate, 1);
+    }
+
+    return false;
   };
 
   // Rebuild time slots when date or booked data changes
@@ -326,24 +360,24 @@ const AppointmentRescheduleCalendar: React.FC<
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg w-full max-w-sm sm:max-w-4xl max-h-[80vh] sm:max-h-[90vh] overflow-hidden">
           {/* Header */}
-          <div className="p-6 border-b-2 border-black bg-tst-yellow">
+          <div className="p-3 sm:p-6 border-b-2 border-black bg-tst-yellow">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-bold mb-1">
+                <h2 className="text-lg sm:text-xl font-bold mb-1">
                   Reschedule Appointment
                 </h2>
-                <p className="text-sm">
+                <p className="text-xs sm:text-sm">
                   <span className="font-medium">{contactName}</span> •{' '}
-                  {contactEmail}
+                  <span className="hidden sm:inline">{contactEmail}</span>
                 </p>
-                <p className="text-sm mt-1">
+                <p className="text-xs sm:text-sm mt-1">
                   <span className="font-medium">Current:</span>{' '}
                   {formatTz(
                     currentAppointmentEastern,
-                    "EEEE, MMMM d 'at' h:mm a zzz",
+                    "MMM d 'at' h:mm a",
                     { timeZone: EASTERN_TIMEZONE }
                   )}
                 </p>
@@ -359,9 +393,9 @@ const AppointmentRescheduleCalendar: React.FC<
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto max-h-[60vh]">
+          <div className="overflow-y-auto max-h-[50vh] sm:max-h-[75vh]">
             {/* Calendar */}
-            <div className="p-6 border-b-2 border-black">
+            <div className="p-3 sm:p-6 border-b-2 border-black">
               <div className="flex justify-between items-center mb-4">
                 <button
                   onClick={() => setCurrentDate(subMonths(currentDate, 1))}
@@ -369,7 +403,7 @@ const AppointmentRescheduleCalendar: React.FC<
                 >
                   <ChevronLeft size={20} />
                 </button>
-                <h3 className="text-lg font-bold">
+                <h3 className="text-base sm:text-lg font-bold">
                   {format(currentDate, 'MMMM yyyy')}
                 </h3>
                 <button
@@ -382,7 +416,7 @@ const AppointmentRescheduleCalendar: React.FC<
 
               <div className="grid grid-cols-7 gap-1 text-center">
                 {weekdays.map(d => (
-                  <div key={d} className="font-bold text-sm text-gray-500 py-2">
+                  <div key={d} className="font-bold text-xs sm:text-sm text-gray-500 py-1 sm:py-2">
                     {d}
                   </div>
                 ))}
@@ -397,7 +431,7 @@ const AppointmentRescheduleCalendar: React.FC<
                       onClick={() => handleDateClick(day)}
                       disabled={!selectable || loadingSlots}
                       className={`
-                        p-2 border rounded-md min-h-[50px]
+                        p-1 sm:p-2 border rounded-md min-h-[40px] sm:min-h-[50px]
                         flex items-center justify-center transition-all duration-200
                         ${!isSameMonth(day, monthStart) ? 'bg-gray-50 text-gray-400' : ''}
                         ${isToday(day) ? 'bg-tst-yellow border-2 border-black font-bold' : ''}
@@ -408,7 +442,7 @@ const AppointmentRescheduleCalendar: React.FC<
                         ${loadingSlots ? 'opacity-50' : ''}
                       `}
                     >
-                      <span className="text-base">{format(day, 'd')}</span>
+                      <span className="text-sm sm:text-base">{format(day, 'd')}</span>
                     </button>
                   );
                 })}
@@ -437,12 +471,12 @@ const AppointmentRescheduleCalendar: React.FC<
 
             {/* Time Slots */}
             {selectedDate && (
-              <div className="p-6">
-                <h4 className="font-bold mb-3 flex items-center gap-2">
-                  <Clock size={18} />
+              <div className="p-3 sm:p-6 overflow-scroll max-h-80 md:h-full">
+                <h4 className="font-bold mb-3 flex items-center gap-2 text-sm sm:text-base">
+                  <Clock size={16} className="sm:w-[18px] sm:h-[18px]" />
                   <span>
-                    Available times for {format(selectedDate, 'EEEE, MMM d')}{' '}
-                    (Eastern Time)
+                    Available times for {format(selectedDate, 'MMM d')}{' '}
+                    <span className="hidden sm:inline">(Eastern Time)</span>
                   </span>
                 </h4>
 
@@ -451,13 +485,13 @@ const AppointmentRescheduleCalendar: React.FC<
                     No available time slots for this date
                   </p>
                 ) : (
-                  <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 max-h-48 overflow-y-auto">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 max-h-24 sm:max-h-56 overflow-y-auto">
                     {timeSlots.map(slot => {
                       const isSelected = selectedTime === slot.time;
 
                       // Base styles
                       let cls =
-                        'p-3 rounded-lg border-2 font-medium text-sm transition-all duration-200';
+                        'p-2 sm:p-3 rounded-lg border-2 font-medium text-xs sm:text-sm transition-all duration-200';
 
                       if (isSelected) {
                         cls +=
@@ -499,22 +533,22 @@ const AppointmentRescheduleCalendar: React.FC<
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t-2 border-black bg-gray-50">
+          <div className="p-3 sm:p-6 border-t-2 border-black bg-gray-50">
             {selectedDate && selectedTime ? (
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-center sm:text-left">
-                  <p className="text-sm text-gray-600">
-                    New appointment time (Eastern):
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    New appointment time<span className="hidden sm:inline"> (Eastern)</span>:
                   </p>
-                  <p className="font-bold">
-                    {format(selectedDate, 'EEEE, MMMM d')} at {selectedTime}
+                  <p className="font-bold text-sm sm:text-base">
+                    {format(selectedDate, 'MMM d')} at {selectedTime}
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   <Button
                     onClick={handleClose}
                     disabled={confirming}
-                    className="bg-gray-200 hover:bg-gray-300 text-black"
+                    className="bg-gray-200 hover:bg-gray-300 text-black text-xs sm:text-sm px-3 sm:px-4 py-2"
                   >
                     Cancel
                   </Button>
@@ -522,22 +556,22 @@ const AppointmentRescheduleCalendar: React.FC<
                     onClick={handleConfirmReschedule}
                     disabled={confirming}
                     className={
-                      confirming ? 'bg-gray-300 cursor-wait' : 'bg-tst-green'
+                      confirming ? 'bg-gray-300 cursor-wait text-xs sm:text-sm px-3 sm:px-4 py-2' : 'bg-tst-green text-xs sm:text-sm px-3 sm:px-4 py-2'
                     }
                   >
-                    {confirming ? 'Rescheduling...' : 'Confirm Reschedule'}
+                    {confirming ? 'Rescheduling...' : 'Confirm'}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-xs sm:text-sm">
                   Select a new date and time for the appointment
                 </p>
                 <Button
                   onClick={handleClose}
                   disabled={confirming}
-                  className="bg-gray-200 hover:bg-gray-300 text-black"
+                  className="bg-gray-200 hover:bg-gray-300 text-black text-xs sm:text-sm px-3 sm:px-4 py-2"
                 >
                   Cancel
                 </Button>
