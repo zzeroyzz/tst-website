@@ -70,8 +70,8 @@ const MessagingInterface = () => {
     },
   });
 
-  const contacts = contactsData?.contactsWithMessages?.contacts || [];
-  const messages = (messagesData?.messages?.messages || []).slice().reverse(); // Reverse for chronological order
+  const contacts = (contactsData as any)?.contactsWithMessages?.contacts || [];
+  const messages = ((messagesData as any)?.messages?.messages || []).slice().reverse(); // Reverse for chronological order
 
   // Load conversation state when contact is selected
   useEffect(() => {
@@ -158,7 +158,7 @@ const MessagingInterface = () => {
         try {
           const updatedState = await processUserResponseClient(
             selectedContact.id,
-            messageContent,
+            messageContent || '',
             nextStepId
           );
           setConversationState(updatedState);

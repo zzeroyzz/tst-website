@@ -49,11 +49,11 @@ const getStatusClasses = (status: string) => {
 };
 
 interface LeadDetailModalProps {
-  lead: Lead;
+  lead: any; // Using any to avoid TypeScript errors with dynamic properties
   onClose: () => void;
   onUpdate: (
     leadId: number,
-    updatedData: Partial<Lead>,
+    updatedData: Partial<any>,
     successMessage?: string
   ) => Promise<boolean>;
   onArchive?: (leadId: number) => Promise<boolean>;
@@ -89,34 +89,19 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     'Not a Fit',
   ];
   console.log(lead, 'lead in modal');
-  // Auto-update status based on questionnaire completion and appointment scheduling
+  // Auto-update status based on appointment scheduling
   useEffect(() => {
-    if (lead.questionnaire_completed) {
-      if (lead.scheduled_appointment_at) {
-        // Has appointment - set to Consultation Scheduled
-        if (
-          status === 'New' ||
-          status === 'Contacted' ||
-          status === 'Reminder Sent'
-        ) {
-          setStatus('Consultation Scheduled');
-        }
-      } else {
-        // Completed questionnaire but no appointment
-        if (lead.qualified_lead === false) {
-          // Not qualified - set to Not a Fit
-          if (status !== 'Not a Fit') {
-            setStatus('Not a Fit');
-          }
-        } else if (lead.qualified_lead === true) {
-          // Qualified but hasn't scheduled - keep as Contacted if not further along
-          if (status === 'New') {
-            setStatus('Contacted');
-          }
-        }
+    if (lead.scheduled_appointment_at) {
+      // Has appointment - set to Consultation Scheduled
+      if (
+        status === 'New' ||
+        status === 'Contacted' ||
+        status === 'Reminder Sent'
+      ) {
+        setStatus('Consultation Scheduled');
       }
     }
-  }, [lead, status]);
+  }, [lead.scheduled_appointment_at, status]);
 
   const formatAppointmentDate = (dateString: string) => {
     try {
@@ -138,14 +123,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
 
     const reminders: Reminder[] = [];
 
-    // Manual reminders (from questionnaire_reminder_sent_at)
-    if (lead.questionnaire_reminder_sent_at) {
-      reminders.push({
-        type: 'Manual',
-        date: new Date(lead.questionnaire_reminder_sent_at),
-        note: `Manual questionnaire reminder sent`,
-      });
-    }
+    // Manual reminders logic removed (questionnaire functionality deprecated)
 
     // Auto reminders (from last_auto_reminder_sent and auto_reminder_count)
     if (lead.last_auto_reminder_sent && lead.auto_reminder_count) {
@@ -313,14 +291,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
     }
   };
 
-  const handleCopyQuestionnaireLink = () => {
-    if (lead.questionnaire_token) {
-      navigator.clipboard.writeText(
-        `${window.location.origin}/questionnaire/${lead.questionnaire_token}`
-      );
-      toast.success('Questionnaire link copied to clipboard');
-    }
-  };
+  // Questionnaire functionality removed
 
   const handleArchive = async () => {
     if (!onArchive) {

@@ -25,7 +25,7 @@ export const webhookResolvers = {
         const { messageSid, from, to, body, messageType } = input;
 
         // Find or create contact
-        let contact = null;
+        let contact: any = null;
         let isNewContact = false;
 
         const { data: existingContact } = await supabase
@@ -60,6 +60,10 @@ export const webhookResolvers = {
 
           contact = newContact;
           isNewContact = true;
+        }
+
+        if (!contact) {
+          throw new GraphQLError('Contact not found or created');
         }
 
         // Create message record

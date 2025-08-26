@@ -62,7 +62,7 @@ export async function trackMessageDelivery(
     const deliveryStatus: DeliveryStatus = {
       sid: statusData.sid,
       status: statusData.status,
-      errorCode: statusData.errorCode,
+      errorCode: statusData.errorCode ? String(statusData.errorCode) : undefined,
       errorMessage: statusData.errorMessage,
       dateCreated: statusData.dateCreated,
       dateSent: statusData.dateSent,
