@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
     const incomingMessage: IncomingMessage = parseIncomingMessage(bodyParams);
 
     console.log('Received Twilio webhook:', incomingMessage);
+    console.log('Raw webhook params:', bodyParams);
 
     // Handle different types of webhooks
     if (incomingMessage.messageStatus) {
@@ -90,6 +91,8 @@ async function handleMessageStatusUpdate(message: IncomingMessage) {
  */
 async function handleIncomingMessage(message: IncomingMessage) {
   try {
+    console.log('📥 Processing incoming message:', message);
+    
     // Find contact by phone number
     const { data: contact, error: contactError } = await supabase
       .from('contacts')
@@ -115,7 +118,6 @@ async function handleIncomingMessage(message: IncomingMessage) {
             phone_number: message.from,
             contact_status: 'ACTIVE',
             segments: ['Unknown'],
-            questionnaire_completed: false,
             archived: false,
             crm_notes: 'Auto-created from incoming message',
           },
@@ -145,9 +147,9 @@ async function handleIncomingMessage(message: IncomingMessage) {
     ]);
 
     if (messageError) {
-      console.error('Error storing incoming message:', messageError);
+      console.error('❌ Error storing incoming message:', messageError);
     } else {
-      console.log(`Stored incoming message from ${message.from}`);
+      console.log(`✅ Stored incoming message from ${message.from}: "${message.body}"`);
     }
 
     // Create notification for dashboard

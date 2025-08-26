@@ -1,4 +1,5 @@
 // src/app/api/schedule-consultation/route.ts
+//OLD DO NOT USE
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { format, toZonedTime } from 'date-fns-tz';
@@ -30,10 +31,10 @@ const sendEmail = async (to: string, subject: string, html: string) => {
 
   try {
     const resend = new Resend(RESEND_API_KEY);
-    
+
     // Split comma-separated emails
     const recipients = to.split(',').map(email => email.trim());
-    
+
     const result = await resend.emails.send({
       from: EMAIL_FROM,
       to: recipients,
@@ -99,8 +100,6 @@ export async function POST(request: NextRequest) {
         scheduling_preference: questionnaireData.schedulingPreference,
         payment_method: questionnaireData.paymentMethod,
         budget_works: questionnaireData.budgetWorks,
-        questionnaire_completed: true,
-        questionnaire_completed_at: new Date().toISOString(),
       }),
     };
 
@@ -178,6 +177,31 @@ export async function POST(request: NextRequest) {
           adminHtml
         ),
       ]);
+
+      // Create dashboard notification
+      try {
+        const contactName = name || `${contact.name} ${contact.last_name || ''}`.trim();
+        const contactEmail = email || contact.email;
+
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert({
+            type: 'appointment',
+            title: 'Appointment Scheduled',
+            message: `${contactName} scheduled a consultation for ${format(appointmentDateEastern, 'MMM d, yyyy', { timeZone: EASTERN_TIMEZONE })}`,
+            contact_id: contactId,
+            contact_name: contactName,
+            contact_email: contactEmail,
+            read: false,
+            created_at: new Date().toISOString(),
+          });
+
+        if (notificationError) {
+          console.error('Failed to create notification:', notificationError);
+        }
+      } catch (notificationError) {
+        console.error('Failed to create notification:', notificationError);
+      }
 
       return NextResponse.json({
         message: 'Appointment scheduled successfully',

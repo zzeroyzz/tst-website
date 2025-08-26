@@ -125,8 +125,8 @@ const scheduleAppointment = async (
       token: data.contactId, // Use contactId as token for now
       contactId: data.contactId,
       dateTime: data.appointmentDateTime.toISOString(),
-      name: data.contactId, // Will be populated from database
-      email: data.contactId, // Will be populated from database
+      name: data.name, // Will be populated from database
+      email: data.email, // Will be populated from database
     }),
   });
 

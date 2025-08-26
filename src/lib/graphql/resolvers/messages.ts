@@ -15,35 +15,74 @@ export const messageResolvers = {
       { supabase }: Context
     ) => {
       try {
-        const { data: messages, error: messagesError } = await supabase
-          .from('crm_messages')
-          .select('*')
-          .eq('contact_id', contactId)
-          .order('created_at', { ascending: false })
-          .range(offset, offset + limit - 1);
+        // First get the contact UUID if we're using contact ID
+        const { data: contact } = await supabase
+          .from('contacts')
+          .select('uuid')
+          .eq('id', contactId)
+          .single();
 
-        if (messagesError) {
-          throw new GraphQLError(
-            `Failed to fetch messages: ${messagesError.message}`
-          );
+        // Try to query by contact_uuid first, fall back to contact_id
+        let query = supabase.from('crm_messages').select('*');
+
+        // Check if contact_uuid column exists by trying to use it
+        try {
+          const { data: messages, error: messagesError } = await query
+            .eq('contact_uuid', contact?.uuid)
+            .order('created_at', { ascending: false })
+            .range(offset, offset + limit - 1);
+
+          if (messagesError && messagesError.code === '42703') {
+            // Column doesn't exist, fall back to contact_id
+            throw new Error('contact_uuid column does not exist');
+          }
+
+          if (messagesError) {
+            throw new GraphQLError(`Failed to fetch messages: ${messagesError.message}`);
+          }
+
+          const { count, error: countError } = await supabase
+            .from('crm_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('contact_uuid', contact?.uuid);
+
+          if (countError) {
+            throw new GraphQLError(`Failed to fetch message count: ${countError.message}`);
+          }
+
+          return {
+            messages: messages || [],
+            hasMore: offset + limit < (count || 0),
+            total: count || 0,
+          };
+        } catch (fallbackError) {
+          // Fall back to contact_id
+          const { data: messages, error: messagesError } = await supabase
+            .from('crm_messages')
+            .select('*')
+            .eq('contact_id', contactId)
+            .order('created_at', { ascending: false })
+            .range(offset, offset + limit - 1);
+
+          if (messagesError) {
+            throw new GraphQLError(`Failed to fetch messages: ${messagesError.message}`);
+          }
+
+          const { count, error: countError } = await supabase
+            .from('crm_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('contact_id', contactId);
+
+          if (countError) {
+            throw new GraphQLError(`Failed to fetch message count: ${countError.message}`);
+          }
+
+          return {
+            messages: messages || [],
+            hasMore: offset + limit < (count || 0),
+            total: count || 0,
+          };
         }
-
-        const { count, error: countError } = await supabase
-          .from('crm_messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('contact_id', contactId);
-
-        if (countError) {
-          throw new GraphQLError(
-            `Failed to fetch message count: ${countError.message}`
-          );
-        }
-
-        return {
-          messages: messages || [],
-          hasMore: offset + limit < (count || 0),
-          total: count || 0,
-        };
       } catch (error) {
         throw new GraphQLError(`Error fetching messages: ${error}`);
       }

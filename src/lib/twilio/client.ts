@@ -4,8 +4,9 @@ import twilio from 'twilio';
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
 
-if (!accountSid || !authToken || !twilioPhoneNumber) {
+if (!accountSid || !authToken || (!twilioPhoneNumber && !messagingServiceSid)) {
   console.warn(
     'Twilio credentials not configured. SMS/WhatsApp functionality will be disabled.'
   );
@@ -32,7 +33,7 @@ export async function sendSMS(
   to: string,
   body: string
 ): Promise<SendSMSResponse> {
-  if (!client || !twilioPhoneNumber) {
+  if (!client || (!twilioPhoneNumber && !messagingServiceSid)) {
     throw new Error('Twilio SMS not configured');
   }
 
@@ -40,11 +41,21 @@ export async function sendSMS(
     // Ensure phone number is in E.164 format
     const formattedTo = formatPhoneNumber(to);
 
-    const message = await client.messages.create({
+    // Use direct phone number instead of messaging service to avoid configuration issues
+    const messageOptions: any = {
       body,
-      from: twilioPhoneNumber,
       to: formattedTo,
-    });
+    };
+
+    if (twilioPhoneNumber) {
+      messageOptions.from = twilioPhoneNumber;
+    } else if (messagingServiceSid) {
+      messageOptions.messagingServiceSid = messagingServiceSid;
+    } else {
+      throw new Error('Neither Twilio phone number nor messaging service is configured');
+    }
+
+    const message = await client.messages.create(messageOptions);
 
     return {
       sid: message.sid,
@@ -63,7 +74,7 @@ export async function sendWhatsApp(
   to: string,
   body: string
 ): Promise<SendWhatsAppResponse> {
-  if (!client || !twilioPhoneNumber) {
+  if (!client || (!twilioPhoneNumber && !messagingServiceSid)) {
     throw new Error('Twilio WhatsApp not configured');
   }
 
@@ -71,11 +82,18 @@ export async function sendWhatsApp(
     // Ensure phone number is in E.164 format
     const formattedTo = formatPhoneNumber(to);
 
-    const message = await client.messages.create({
+    const messageOptions: any = {
       body,
-      from: `whatsapp:${twilioPhoneNumber}`,
       to: `whatsapp:${formattedTo}`,
-    });
+    };
+
+    if (messagingServiceSid) {
+      messageOptions.messagingServiceSid = messagingServiceSid;
+    } else {
+      messageOptions.from = `whatsapp:${twilioPhoneNumber}`;
+    }
+
+    const message = await client.messages.create(messageOptions);
 
     return {
       sid: message.sid,

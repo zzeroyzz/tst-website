@@ -100,3 +100,82 @@ export const UPDATE_MESSAGE_STATUS = gql`
     }
   }
 `;
+
+/**
+ * Update message status by Twilio SID (for webhook updates)
+ */
+export const UPDATE_MESSAGE_STATUS_WEBHOOK = gql`
+  mutation UpdateMessageStatus(
+    $messageSid: String!
+    $status: MessageStatus!
+    $errorMessage: String
+  ) {
+    updateMessageStatus(
+      messageSid: $messageSid
+      status: $status
+      errorMessage: $errorMessage
+    ) {
+      id
+      messageStatus
+      errorMessage
+      updatedAt
+      contact {
+        id
+        name
+      }
+    }
+  }
+`;
+
+/**
+ * Process incoming message via GraphQL with full audit
+ */
+export const PROCESS_INCOMING_MESSAGE = gql`
+  mutation ProcessIncomingMessage($input: ProcessIncomingMessageInput!) {
+    processIncomingMessage(input: $input) {
+      message {
+        id
+        content
+        direction
+        messageStatus
+        messageType
+        twilioSid
+        createdAt
+      }
+      contact {
+        id
+        name
+        email
+        phoneNumber
+        contactStatus
+      }
+      isNewContact
+      notificationCreated
+      errors
+    }
+  }
+`;
+
+/**
+ * Send message using template
+ */
+export const SEND_MESSAGE_FROM_TEMPLATE = gql`
+  mutation SendMessageFromTemplate($input: SendMessageFromTemplateInput!) {
+    sendMessage(input: $input) {
+      id
+      content
+      direction
+      messageStatus
+      messageType
+      createdAt
+      twilioSid
+      errorMessage
+      contact {
+        id
+        name
+        email
+        phoneNumber
+      }
+    }
+  }
+`;

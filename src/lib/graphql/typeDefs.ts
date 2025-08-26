@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type Query {
     contacts(filters: ContactFilters): [Contact!]!
     contact(id: ID!): Contact
+    contactsWithMessages(limit: Int = 50): ContactsWithMessagesResult!
     messages(
       contactId: ID!
       limit: Int = 50
@@ -50,6 +51,11 @@ export const typeDefs = gql`
     deleteNotification(id: ID!): Boolean!
     deleteNotifications(ids: [ID!]!): BulkNotificationResult!
     createNotification(input: CreateNotificationInput!): Notification!
+    processIncomingMessage(input: ProcessIncomingMessageInput!): ProcessIncomingMessageResult!
+    updateMessageStatus(id: ID, messageSid: String, status: MessageStatus!, errorMessage: String): Message!
+    processWebhookFallback(input: WebhookFallbackInput!): WebhookFallbackResult!
+    logWebhookMetrics(input: WebhookMetricsInput!): WebhookMetricsResult!
+    retryWebhookProcessing(webhookId: ID!, force: Boolean = false): WebhookRetryResult!
   }
 
   type Subscription {
@@ -68,7 +74,7 @@ export const typeDefs = gql`
     segments: [String!]!
     notes: String
     crmNotes: String
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
     lastMessageAt: String
     messageCount: Int!
@@ -85,6 +91,39 @@ export const typeDefs = gql`
     messagesReceived: Int!
   }
 
+  type ContactWithMessage {
+    id: ID!
+    uuid: ID
+    user_id: String!
+    name: String!
+    email: String!
+    phoneNumber: String
+    contactStatus: ContactStatus!
+    segments: [String!]!
+    notes: String
+    crmNotes: String
+    createdAt: String
+    updatedAt: String!
+    lastMessageAt: String
+    messageCount: Int!
+    customFields: JSON!
+    scheduledAppointmentAt: String
+    appointmentStatus: AppointmentStatus
+    status: String
+
+    # Messaging specific fields
+    lastMessage: String
+    unreadMessageCount: Int!
+    messagesSent: Int!
+    messagesReceived: Int!
+  }
+
+  type ContactsWithMessagesResult {
+    contacts: [ContactWithMessage!]!
+    hasMore: Boolean!
+    total: Int!
+  }
+
   type Message {
     id: ID!
     contactId: ID!
@@ -92,7 +131,7 @@ export const typeDefs = gql`
     direction: MessageDirection!
     messageStatus: MessageStatus!
     messageType: MessageType!
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
     twilioSid: String
     errorMessage: String
@@ -116,7 +155,7 @@ export const typeDefs = gql`
     category: TemplateCategory!
     variables: [String!]!
     isActive: Boolean!
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
 
     # Usage stats
@@ -129,7 +168,7 @@ export const typeDefs = gql`
     name: String!
     description: String
     color: String!
-    createdAt: String!
+    createdAt: String
 
     # Stats
     contactCount: Int!
@@ -143,7 +182,7 @@ export const typeDefs = gql`
     triggerConditions: JSON!
     actions: JSON!
     isActive: Boolean!
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
 
     # Stats
@@ -194,7 +233,7 @@ export const typeDefs = gql`
     contactName: String
     contactEmail: String
     read: Boolean!
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
 
     # Relations
@@ -220,7 +259,7 @@ export const typeDefs = gql`
     scheduledAt: String!
     status: AppointmentStatus!
     timeZone: String!
-    createdAt: String!
+    createdAt: String
     updatedAt: String!
     notes: String
 
@@ -269,13 +308,11 @@ export const typeDefs = gql`
     APPOINTMENT_REMINDER
     FOLLOW_UP
     WELCOME
-    QUESTIONNAIRE
     GENERAL
   }
 
   enum WorkflowTrigger {
     CONTACT_CREATED
-    QUESTIONNAIRE_COMPLETED
     APPOINTMENT_SCHEDULED
     APPOINTMENT_MISSED
     DAYS_SINCE_CONTACT
@@ -401,6 +438,64 @@ export const typeDefs = gql`
     contactId: ID
     contactName: String
     contactEmail: String
+  }
+
+  input ProcessIncomingMessageInput {
+    messageSid: String!
+    from: String!
+    to: String!
+    body: String!
+    messageStatus: String!
+  }
+
+  type ProcessIncomingMessageResult {
+    message: Message
+    contact: Contact
+    isNewContact: Boolean!
+    notificationCreated: Boolean!
+    errors: [String!]!
+  }
+
+  input WebhookFallbackInput {
+    messageSid: String!
+    from: String!
+    to: String!
+    body: String!
+    messageStatus: String!
+    retryCount: Int = 0
+  }
+
+  type WebhookFallbackResult {
+    success: Boolean!
+    processedVia: String!
+    operationType: String!
+    messageId: ID
+    contactId: ID
+    requiresManualReview: Boolean!
+    retryCount: Int!
+    errors: [String!]!
+  }
+
+  input WebhookMetricsInput {
+    operation: String!
+    processingTime: Float!
+    strategy: String!
+    success: Boolean!
+    errorMessage: String
+  }
+
+  type WebhookMetricsResult {
+    success: Boolean!
+    metricsId: ID
+    processingTime: Float!
+    strategy: String!
+  }
+
+  type WebhookRetryResult {
+    success: Boolean!
+    result: WebhookFallbackResult
+    errors: [String!]!
+    retryCount: Int!
   }
 
   # Custom scalar for JSON data

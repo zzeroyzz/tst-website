@@ -1,6 +1,7 @@
 type Query {
   contacts(filters: ContactFilters): [Contact!]!
   contact(id: ID!): Contact
+  contactsWithMessages(limit: Int = 50): ContactsWithMessagesResult!
   messages(contactId: ID!, limit: Int = 50, offset: Int = 0): MessageConnection!
   messageTemplates(category: TemplateCategory): [MessageTemplate!]!
   messageStats: MessageStats!
@@ -47,11 +48,10 @@ type Contact {
   updatedAt: String!
   lastMessageAt: String
   messageCount: Int!
+  unreadMessageCount: Int!
   customFields: JSON!
 
   # Integration with existing lead system
-  questionnaireCompleted: Boolean!
-  questionnaireCompletedAt: String
   scheduledAppointmentAt: String
   appointmentStatus: AppointmentStatus
   status: String # Legacy status field
@@ -78,6 +78,18 @@ type Message {
   # Relations
   contact: Contact!
   template: MessageTemplate
+}
+
+type MessageConnection {
+  messages: [Message!]!
+  hasMore: Boolean!
+  total: Int!
+}
+
+type ContactsWithMessagesResult {
+  contacts: [Contact!]!
+  hasMore: Boolean!
+  total: Int!
 }
 
 type MessageTemplate {
@@ -223,7 +235,6 @@ enum TemplateCategory {
   APPOINTMENT_REMINDER
   FOLLOW_UP
   WELCOME
-  QUESTIONNAIRE
   GENERAL
 }
 
@@ -276,7 +287,6 @@ input UpdateContactInput {
   segments: [String!]
   notes: String
   appointmentStatus: AppointmentStatus
-  questionnaireCompleted: Boolean
   customFields: [CustomFieldInput!]
 }
 
@@ -316,7 +326,6 @@ input TemplateVariableInput {
 
 enum WorkflowTrigger {
   CONTACT_CREATED
-  QUESTIONNAIRE_COMPLETED
   APPOINTMENT_SCHEDULED
   APPOINTMENT_MISSED
   DAYS_SINCE_CONTACT
@@ -333,7 +342,6 @@ input ContactFilters {
   status: ContactStatus
   segments: [String!]
   hasMessages: Boolean
-  questionnaireCompleted: Boolean
   appointmentStatus: AppointmentStatus
   search: String
   createdAfter: String
