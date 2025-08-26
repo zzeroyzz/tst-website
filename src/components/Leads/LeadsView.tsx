@@ -506,21 +506,9 @@ const LeadsView = () => {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            {lead.questionnaire_completed ? (
-                              <span className="px-2 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800">
-                                Completed
-                              </span>
-                            ) : (
-                              <span className="px-2 py-1 text-xs font-bold rounded-full bg-orange-100 text-orange-800">
-                                Pending
-                              </span>
-                            )}
-                            {!lead.questionnaire_completed &&
-                              lead.questionnaire_reminder_sent_at && (
-                                <span className="text-xs text-gray-500">
-                                  (Reminder sent)
-                                </span>
-                              )}
+                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                              N/A
+                            </span>
                           </div>
                         </td>
                         <td className="p-4">
@@ -629,30 +617,11 @@ const LeadsView = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {lead.questionnaire_completed ? (
-                        <div className="flex items-center gap-1">
-                          <CheckCircle size={16} className="text-green-600" />
-                          <span className="text-xs font-medium text-green-800">
-                            Questionnaire Done
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          {lead.questionnaire_reminder_sent_at ? (
-                            <AlertCircle
-                              size={16}
-                              className="text-orange-600"
-                            />
-                          ) : (
-                            <Clock size={16} className="text-orange-600" />
-                          )}
-                          <span className="text-xs font-medium text-orange-800">
-                            {lead.questionnaire_reminder_sent_at
-                              ? 'Reminder Sent'
-                              : 'Pending'}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-medium text-blue-600">
+                          N/A
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

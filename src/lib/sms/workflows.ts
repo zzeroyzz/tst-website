@@ -225,18 +225,12 @@ export async function executeNewLeadSMSWorkflow(
       errors.push('Welcome template not found');
     }
 
-    // Schedule questionnaire reminder (if appointment is more than 1 hour away)
+    // Schedule appointment reminders
     if (context.appointmentDateTime) {
       const appointmentTime = new Date(context.appointmentDateTime);
       const now = new Date();
       const hoursUntilAppointment =
         (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-
-      if (hoursUntilAppointment > 2) {
-        // Schedule questionnaire reminder for 1 hour from now
-        await scheduleDelayedSMS(context, 'Questionnaire Reminder', 60);
-        messages.push('Questionnaire reminder scheduled');
-      }
 
       // Schedule appointment reminders
       if (hoursUntilAppointment > 24) {

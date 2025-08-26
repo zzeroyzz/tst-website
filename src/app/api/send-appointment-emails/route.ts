@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 import {
   getAppointmentConfirmationTemplate,
   getAppointmentNotificationTemplate,
@@ -25,6 +26,12 @@ const PUBLIC_BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   '';
 
+// Server-side Supabase client for notification creation
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 interface BookingEmailRequest {
   type: 'APPOINTMENT_BOOKED';
   clientName: string;
@@ -35,6 +42,8 @@ interface BookingEmailRequest {
   appointmentDateTime: string;
   variant: 'nd' | 'affirming' | 'trauma';
   uuid?: string; // ONLY token we will use
+  contactId?: string; // For notification creation
+  contactUuid?: string; // For notification creation
 }
 
 async function sendEmail(
@@ -72,8 +81,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       clientPhone,
       appointmentDate,
       appointmentTime,
+      appointmentDateTime,
       variant,
       uuid, // THE cancel token
+      contactId,
+      contactUuid,
     } = body;
 
     if (!type || !clientName || !clientEmail || !appointmentDate || !appointmentTime || !variant) {
@@ -148,6 +160,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         error: msg,
         notificationData
       });
+    }
+
+    // Create notification for dashboard if admin email was sent and contact info provided
+    if (results.adminEmailSent && contactId && contactUuid) {
+      try {
+        await supabase.from('notifications').insert([
+          {
+            type: 'appointment',
+            title: 'New Consultation Scheduled',
+            message: `${clientName} scheduled a consultation for ${appointmentDate} at ${appointmentTime}`,
+            contact_id: contactId,
+            contact_uuid: contactUuid,
+            contact_name: clientName,
+            contact_email: clientEmail,
+            read: false,
+          },
+        ]);
+      } catch (notificationError) {
+        console.error('❌ Notification creation failed:', notificationError);
+        results.errors.push('Failed to create dashboard notification');
+      }
     }
 
     const ok = results.clientEmailSent || results.adminEmailSent;

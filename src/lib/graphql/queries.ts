@@ -25,7 +25,6 @@ export const GET_CONTACTS = gql`
       createdAt
       lastMessageAt
       messageCount
-      questionnaireCompleted
       scheduledAppointmentAt
       appointmentStatus
       messagesSent
@@ -56,8 +55,6 @@ export const GET_CONTACT = gql`
       lastMessageAt
       messageCount
       customFields
-      questionnaireCompleted
-      questionnaireCompletedAt
       scheduledAppointmentAt
       appointmentStatus
       status

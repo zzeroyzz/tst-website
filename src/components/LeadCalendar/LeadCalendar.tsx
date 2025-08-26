@@ -26,7 +26,7 @@ import { ChevronLeft, ChevronRight, Clock, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface LeadCalendarProps {
-  onSchedule?: (dateTime: Date) => Promise<void>;
+  onSchedule: (dateTime: Date) => Promise<void>;
   contactId?: string;
   contactName?: string;
   contactEmail?: string;
@@ -39,12 +39,6 @@ interface TimeSlot {
   dateTime: Date;
 }
 
-interface ScheduleAppointmentData {
-  contactId: string;
-  appointmentDateTime: Date;
-  status: 'scheduled';
-  notes?: string;
-}
 
 interface BookedSlot {
   startTime: string; // ISO string
@@ -112,31 +106,6 @@ const fetchBookedAppointments = async (
   }
 };
 
-// API function to schedule appointment
-const scheduleAppointment = async (
-  data: ScheduleAppointmentData
-): Promise<void> => {
-  const response = await fetch('/api/schedule-consultation', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: data.contactId, // Use contactId as token for now
-      contactId: data.contactId,
-      dateTime: data.appointmentDateTime.toISOString(),
-      name: data.contactId, // Will be populated from database
-      email: data.contactId, // Will be populated from database
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to schedule appointment');
-  }
-
-  return response.json();
-};
 
 const LeadCalendar: React.FC<LeadCalendarProps> = ({
   onSchedule,
@@ -392,22 +361,12 @@ const LeadCalendar: React.FC<LeadCalendarProps> = ({
     setConfirming(true);
 
     try {
-      // Call parent's onSchedule callback directly if provided
+      // Call parent's onSchedule callback
       if (onSchedule) {
         // selectedSlot.dateTime is already in UTC from generateTimeSlots
         await onSchedule(selectedSlot.dateTime);
-      } else if (contactId) {
-        // Fallback to direct API call if no callback provided
-        await scheduleAppointment({
-          contactId,
-          appointmentDateTime: selectedSlot.dateTime,
-          status: 'scheduled',
-          notes: isRescheduling
-            ? 'Appointment rescheduled'
-            : 'Initial appointment scheduled',
-        });
       } else {
-        throw new Error('No contact ID or callback provided');
+        throw new Error('No onSchedule callback provided');
       }
 
       setScheduled(true);

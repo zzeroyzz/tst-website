@@ -59,9 +59,6 @@ Cypress.Commands.add('mockQuestionnaireAPI', () => {
     statusCode: 200,
     body: { message: 'Updated successfully' },
   }).as('submitQuestionnaire');
-  cy.intercept('POST', '/api/schedule-consultation', {
-    fixture: 'schedule-consultation-success.json',
-  }).as('scheduleConsultation');
   cy.intercept('POST', '/api/appointment/booked-slots', {
     fixture: 'booked-slots-success.json',
   }).as('getBookedSlots');

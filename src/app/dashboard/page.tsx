@@ -21,6 +21,8 @@ import {
   Download,
   House,
   MessageCircle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -39,11 +41,45 @@ const DashboardPage = () => {
   const [activeView, setActiveView] = useState('Dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [localReadNotifications, setLocalReadNotifications] = useState<
     Set<string>
   >(new Set());
   const supabase = createClientComponentClient();
   const router = useRouter();
+
+  // Load saved active view and sidebar state from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedView = localStorage.getItem('dashboardActiveView');
+      if (savedView) {
+        setActiveView(savedView);
+      }
+      const savedSidebarState = localStorage.getItem('sidebarCollapsed');
+      if (savedSidebarState) {
+        setIsSidebarCollapsed(JSON.parse(savedSidebarState));
+      }
+    } catch (error) {
+      console.error('Error loading saved state from localStorage:', error);
+    }
+  }, []);
+
+  // Save active view and sidebar state to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('dashboardActiveView', activeView);
+    } catch (error) {
+      console.error('Error saving view to localStorage:', error);
+    }
+  }, [activeView]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
+    } catch (error) {
+      console.error('Error saving sidebar state to localStorage:', error);
+    }
+  }, [isSidebarCollapsed]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -313,10 +349,26 @@ const DashboardPage = () => {
 
   const SidebarContent = ({ isMobile = false }) => (
     <div className={`${isMobile ? 'h-full' : ''} flex flex-col`}>
-      <div className="flex items-center justify-between mb-10">
-        <div className="font-bold text-2xl">Admin Panel</div>
-        {/* Only show notifications on desktop sidebar, not mobile sidebar */}
+      <div className={`flex items-center mb-10 ${!isMobile && isSidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+        <div className={`font-bold text-2xl ${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+          Admin Panel
+        </div>
+        {/* Collapse button for desktop only */}
         {!isMobile && (
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+          </button>
+        )}
+        {/* Only show notifications on desktop sidebar, not mobile sidebar */}
+        {!isMobile && !isSidebarCollapsed && (
           <DashboardNotifications
             user={user}
             onNotificationClick={handleNotificationClick}
@@ -335,18 +387,20 @@ const DashboardPage = () => {
                     : 'hover:bg-gray-100'
                 }`}
               >
-                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-                {item.name}
+                <item.icon className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  {item.name}
+                </span>
               </button>
             </li>
           ))}
         </ul>
 
         {/* Divider */}
-        <div className="my-6 border-t border-gray-200"></div>
+        <div className={`my-6 border-t border-gray-200 ${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}></div>
 
         {/* Main Site Navigation */}
-        <div className="mb-4">
+        <div className={`mb-4 ${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
             Main Site
           </h3>
@@ -357,8 +411,10 @@ const DashboardPage = () => {
                 className="flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
                 onClick={() => isMobile && setIsMobileMenuOpen(false)}
               >
-                <House className="mr-3 h-5 w-5 flex-shrink-0" />
-                Home
+                <House className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  Home
+                </span>
               </Link>
             </li>
             <li className="mb-2">
@@ -367,8 +423,10 @@ const DashboardPage = () => {
                 className="flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
                 onClick={() => isMobile && setIsMobileMenuOpen(false)}
               >
-                <Heart className="mr-3 h-5 w-5 flex-shrink-0" />
-                Therapy Services
+                <Heart className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  Therapy Services
+                </span>
               </Link>
             </li>
             <li className="mb-2">
@@ -377,8 +435,10 @@ const DashboardPage = () => {
                 className="flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
                 onClick={() => isMobile && setIsMobileMenuOpen(false)}
               >
-                <User className="mr-3 h-5 w-5 flex-shrink-0" />
-                About
+                <User className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  About
+                </span>
               </Link>
             </li>
             <li className="mb-2">
@@ -387,8 +447,10 @@ const DashboardPage = () => {
                 className="flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
                 onClick={() => isMobile && setIsMobileMenuOpen(false)}
               >
-                <BookOpen className="mr-3 h-5 w-5 flex-shrink-0" />
-                Toasted Insights Blog
+                <BookOpen className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  Toasted Insights Blog
+                </span>
               </Link>
             </li>
             <li className="mb-2">
@@ -397,8 +459,10 @@ const DashboardPage = () => {
                 className="flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
                 onClick={() => isMobile && setIsMobileMenuOpen(false)}
               >
-                <Download className="mr-3 h-5 w-5 flex-shrink-0" />
-                Free Guides
+                <Download className={`h-5 w-5 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+                <span className={`${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>
+                  Free Guides
+                </span>
               </Link>
             </li>
           </ul>
@@ -409,8 +473,8 @@ const DashboardPage = () => {
           onClick={handleLogout}
           className="w-full flex items-center p-3 rounded-lg transition-colors hover:bg-gray-100 text-left"
         >
-          <LogOut className="mr-3 h-5 w-5 text-red-500 flex-shrink-0" />
-          <span className="text-red-500">Logout</span>
+          <LogOut className={`h-5 w-5 text-red-500 flex-shrink-0 ${!isMobile && isSidebarCollapsed ? '' : 'mr-3'}`} />
+          <span className={`text-red-500 ${!isMobile && isSidebarCollapsed ? 'hidden' : ''}`}>Logout</span>
         </button>
       </div>
     </div>
@@ -461,7 +525,9 @@ const DashboardPage = () => {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-shrink-0 bg-white border-r p-4 flex-col">
+      <aside className={`hidden md:flex flex-shrink-0 bg-white border-r p-4 flex-col transition-all duration-300 ${
+        isSidebarCollapsed ? 'w-20' : 'w-64'
+      }`}>
         <SidebarContent />
       </aside>
 

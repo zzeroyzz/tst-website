@@ -27,7 +27,6 @@ interface Contact {
   createdAt: string;
   lastMessageAt?: string;
   messageCount: number;
-  questionnaireCompleted: boolean;
   appointmentStatus?: string;
   scheduledAppointmentAt?: string;
   messagesSent: number;
@@ -59,7 +58,6 @@ const ContactsManager = () => {
       segments: ['New Lead'],
       createdAt: new Date().toISOString(),
       messageCount: 3,
-      questionnaireCompleted: false,
       appointmentStatus: 'SCHEDULED',
       scheduledAppointmentAt: new Date().toISOString(),
       messagesSent: 2,
@@ -79,7 +77,6 @@ const ContactsManager = () => {
       segments: ['Existing Client'],
       createdAt: new Date().toISOString(),
       messageCount: 8,
-      questionnaireCompleted: true,
       messagesSent: 5,
       messagesReceived: 3,
     },

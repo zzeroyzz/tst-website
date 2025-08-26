@@ -17,7 +17,6 @@ export const GET_CONTACTS = gql`
       createdAt
       lastMessageAt
       messageCount
-      questionnaireCompleted
       scheduledAppointmentAt
       appointmentStatus
       messagesSent
@@ -51,8 +50,6 @@ export const GET_CONTACT = gql`
       lastMessageAt
       messageCount
       customFields
-      questionnaireCompleted
-      questionnaireCompletedAt
       scheduledAppointmentAt
       appointmentStatus
       status
@@ -89,6 +86,37 @@ export const GET_CONTACT_SEGMENTS = gql`
       color
       createdAt
       contactCount
+    }
+  }
+`;
+
+/**
+ * Get all contacts with their recent message information for CRM messaging interface
+ */
+export const GET_CONTACTS_WITH_MESSAGES = gql`
+  query GetContactsWithMessages($limit: Int) {
+    contactsWithMessages(limit: $limit) {
+      contacts {
+        id
+        name
+        email
+        phoneNumber
+        contactStatus
+        segments
+        notes
+        crmNotes
+        createdAt
+        lastMessageAt
+        messageCount
+        unreadMessageCount
+        scheduledAppointmentAt
+        appointmentStatus
+        messagesSent
+        messagesReceived
+        lastMessage
+      }
+      hasMore
+      total
     }
   }
 `;

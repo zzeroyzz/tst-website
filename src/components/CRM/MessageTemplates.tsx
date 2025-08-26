@@ -29,16 +29,6 @@ const MessageTemplates = () => {
     },
     {
       id: '2',
-      name: 'Questionnaire Reminder',
-      content:
-        'Hi {{name}}! Before our consultation, please fill out this questionnaire: {{questionnaire_link}}',
-      category: 'QUESTIONNAIRE',
-      variables: ['name', 'questionnaire_link'],
-      usageCount: 18,
-      lastUsed: '1 week ago',
-    },
-    {
-      id: '3',
       name: 'Appointment Reminder - 24h',
       content:
         'Hi {{name}}! Just a friendly reminder that your consultation is tomorrow at {{appointment_time}}.',
@@ -56,8 +46,6 @@ const MessageTemplates = () => {
     switch (category) {
       case 'WELCOME':
         return 'bg-green-100 text-green-800';
-      case 'QUESTIONNAIRE':
-        return 'bg-blue-100 text-blue-800';
       case 'APPOINTMENT_REMINDER':
         return 'bg-yellow-100 text-yellow-800';
       case 'FOLLOW_UP':
@@ -104,7 +92,7 @@ const MessageTemplates = () => {
         {templates.map(template => (
           <div
             key={template.id}
-            className="bg-white border-2 border-black rounded-lg shadow-brutalist p-6"
+            className="bg-white border-2 border-black rounded-lg shadow-brutalist p-6 h-100"
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-3">

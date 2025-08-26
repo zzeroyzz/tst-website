@@ -98,6 +98,84 @@ export const contactResolvers = {
         throw new GraphQLError(`Error fetching contact: ${error}`);
       }
     },
+
+    contactsWithMessages: async (_: any, { limit = 50 }: any, { supabase }: Context) => {
+      try {
+        let query = supabase.from('contacts').select(`
+            *,
+            user_id,
+            uuid,
+            message_count,
+            last_message_at,
+            contact_status,
+            segments,
+            crm_notes,
+            custom_fields
+          `);
+
+        // Get all contacts first, we'll sort them after adding last message info
+        // Note: We need to get more than the limit to properly sort by last message
+
+        const { data, error } = await query;
+
+        if (error) {
+          throw new GraphQLError(`Failed to fetch contacts with messages: ${error.message}`);
+        }
+
+        // Get last message content for each contact
+        const contactsWithLastMessage = await Promise.all(
+          (data || []).map(async (contact) => {
+            let lastMessage = null;
+            try {
+              // Always try contact_id first since that's what we're currently using for messages
+              const { data: messageData, error: messageError } = await supabase
+                .from('crm_messages')
+                .select('content')
+                .eq('contact_id', contact.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+              if (!messageError && messageData) {
+                lastMessage = messageData.content;
+              }
+            } catch (error) {
+              // No messages found, leave as null
+            }
+            
+            return {
+              ...contact,
+              lastMessage,
+              unreadMessageCount: 0, // TODO: implement read status tracking
+            };
+          })
+        );
+
+        // Sort contacts: those with messages (by last_message_at desc) first, then others by created_at desc
+        const sortedContacts = contactsWithLastMessage.sort((a, b) => {
+          // If both have lastMessageAt, sort by it (newest first)
+          if (a.last_message_at && b.last_message_at) {
+            return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
+          }
+          // If only one has lastMessageAt, it goes first
+          if (a.last_message_at && !b.last_message_at) return -1;
+          if (!a.last_message_at && b.last_message_at) return 1;
+          // If neither has messages, sort by created_at (newest first)
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+
+        // Apply limit after sorting
+        const limitedContacts = sortedContacts.slice(0, limit);
+
+        return {
+          contacts: limitedContacts,
+          hasMore: sortedContacts.length > limit,
+          total: sortedContacts.length,
+        };
+      } catch (error) {
+        throw new GraphQLError(`Error fetching contacts with messages: ${error}`);
+      }
+    },
   },
 
   Mutation: {
@@ -685,21 +763,56 @@ export const contactResolvers = {
           }
         }
 
-        // Create notification for dashboard
-        await supabase.from('notifications').insert([
-          {
-            type: 'appointment',
-            title: 'New Consultation Scheduled',
-            message: `${name} scheduled a consultation for ${new Date(
-              appointmentDateTime
-            ).toLocaleString()}`,
-            contact_id: contact.id,
-            contact_uuid: contact.uuid,
-            contact_name: name,
-            contact_email: email,
-            read: false,
-          },
-        ]);
+        // Send appointment emails (client confirmation + admin notification)
+        try {
+          const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-appointment-emails`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'APPOINTMENT_BOOKED',
+              clientName: name,
+              clientEmail: email,
+              clientPhone: phone,
+              appointmentDate: new Date(appointmentDateTime).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              }),
+              appointmentTime: new Date(appointmentDateTime).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: timeZone,
+              }),
+              appointmentDateTime,
+              variant: segments.includes('nd Booking Lead') ? 'nd' : segments.includes('affirming Booking Lead') ? 'affirming' : 'trauma',
+              uuid: contact.uuid, // Use contact UUID for cancellation
+              contactId: contact.id, // For notification creation
+              contactUuid: contact.uuid, // For notification creation
+            }),
+          });
+
+          if (emailResponse.ok) {
+            const emailResult = await emailResponse.json();
+            if (emailResult.clientEmailSent) {
+              messages.push('Client confirmation email sent');
+            }
+            if (emailResult.adminEmailSent) {
+              messages.push('Admin notification email sent');
+            }
+            if (emailResult.errors?.length > 0) {
+              messages.push(...emailResult.errors.map((err: string) => `Email error: ${err}`));
+            }
+          } else {
+            messages.push('Email sending failed - but appointment was created successfully');
+          }
+        } catch (emailError) {
+          console.error('Error sending appointment emails:', emailError);
+          messages.push('Email sending failed - but appointment was created successfully');
+        }
 
         return {
           contact,

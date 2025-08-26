@@ -20,10 +20,6 @@ export interface Lead {
   appointment_notes?: string;
   last_appointment_update?: string;
   appointment_cancel_token?: string;
-  questionnaire_completed?: boolean;
-  questionnaire_completed_at?: string;
-  questionnaire_reminder_sent_at?: string;
-  questionnaire_token?: string;
   archived?: boolean;
   last_auto_reminder_sent: string | null;
   auto_reminder_count: number;

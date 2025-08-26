@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, MessageCircle, Settings, BarChart3, Plus } from 'lucide-react';
 import ContactsManager from './ContactsManager';
 import MessagingInterface from './MessagingInterface';
@@ -12,6 +12,27 @@ type CRMTab = 'contacts' | 'messaging' | 'templates' | 'analytics';
 
 const CRMView = () => {
   const [activeTab, setActiveTab] = useState<CRMTab>('contacts');
+
+  // Load saved active tab from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedTab = localStorage.getItem('crmActiveTab');
+      if (savedTab && ['contacts', 'messaging', 'templates', 'analytics'].includes(savedTab)) {
+        setActiveTab(savedTab as CRMTab);
+      }
+    } catch (error) {
+      console.error('Error loading saved CRM tab from localStorage:', error);
+    }
+  }, []);
+
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('crmActiveTab', activeTab);
+    } catch (error) {
+      console.error('Error saving CRM tab to localStorage:', error);
+    }
+  }, [activeTab]);
 
   const tabs = [
     { id: 'contacts' as CRMTab, name: 'Contacts', icon: Users },
