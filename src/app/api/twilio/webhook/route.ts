@@ -98,14 +98,17 @@ async function handleIncomingMessage(message: IncomingMessage) {
     console.log('📥 Processing incoming message:', message);
     
     // Find contact by phone number
+    console.log('🔍 DEBUG: Looking for contact with phone:', message.from);
     const { data: contact, error: contactError } = await supabase
       .from('contacts')
-      .select('id, name, email')
+      .select('id, name, email, phone_number')
       .eq('phone_number', message.from)
       .single();
 
+    console.log('🔍 DEBUG: Contact query result:', { contact, error: contactError });
+    
     if (contactError && contactError.code !== 'PGRST116') {
-      console.error('Error finding contact:', contactError);
+      console.error('❌ Error finding contact:', contactError);
       return;
     }
 
@@ -113,6 +116,7 @@ async function handleIncomingMessage(message: IncomingMessage) {
 
     // If contact not found, create a new one
     if (!contact) {
+      console.log('🔍 DEBUG: Contact not found, creating new contact for:', message.from);
       const { data: newContact, error: createError } = await supabase
         .from('contacts')
         .insert([
@@ -129,26 +133,32 @@ async function handleIncomingMessage(message: IncomingMessage) {
         .select('id')
         .single();
 
+      console.log('🔍 DEBUG: Contact creation result:', { newContact, error: createError });
+
       if (createError) {
-        console.error('Error creating contact:', createError);
+        console.error('❌ Error creating contact:', createError);
         return;
       }
 
       contactId = newContact.id;
-      console.log(`Created new contact ${contactId} for phone ${message.from}`);
+      console.log(`✅ Created new contact ${contactId} for phone ${message.from}`);
     }
 
     // Store the incoming message
-    const { error: messageError } = await supabase.from('crm_messages').insert([
-      {
-        contact_id: contactId,
-        content: message.body,
-        direction: 'INBOUND',
-        message_status: 'RECEIVED',
-        message_type: message.messageType.toUpperCase(),
-        twilio_sid: message.messageSid,
-      },
-    ]);
+    console.log('🔍 DEBUG: Storing message with contactId:', contactId);
+    const messageData = {
+      contact_id: contactId,
+      content: message.body,
+      direction: 'INBOUND',
+      message_status: 'RECEIVED',
+      message_type: message.messageType.toUpperCase(),
+      twilio_sid: message.messageSid,
+    };
+    console.log('🔍 DEBUG: Message data to insert:', messageData);
+
+    const { error: messageError, data: insertedMessage } = await supabase.from('crm_messages').insert([messageData]).select();
+
+    console.log('🔍 DEBUG: Message insert result:', { error: messageError, data: insertedMessage });
 
     if (messageError) {
       console.error('❌ Error storing incoming message:', messageError);
