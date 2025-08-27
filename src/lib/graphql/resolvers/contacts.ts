@@ -516,34 +516,28 @@ export const contactResolvers = {
 
         let smsTriggered = false;
 
-        // Trigger SMS workflow if enabled and phone number provided
+        // Send simple welcome SMS if enabled and phone number provided
         if (triggerSMSWorkflow && phoneNumber) {
           try {
-            const { executeNewLeadSMSWorkflow } = await import(
-              '@/lib/sms/workflows'
-            );
+            const { sendWelcomeSMS } = await import('@/lib/sms/simple-workflows');
 
-            const workflowResult = await executeNewLeadSMSWorkflow({
+            const smsResult = await sendWelcomeSMS({
               contactId: contact.id,
               contactName: name,
-              contactEmail: email,
               phoneNumber: phoneNumber,
+              contactUuid: contact.uuid,
               appointmentDateTime: scheduledAt,
             });
 
-            smsTriggered = workflowResult.success;
-            messages.push(...workflowResult.messages);
-
-            if (workflowResult.errors.length > 0) {
-              messages.push(
-                ...workflowResult.errors.map((err) => `SMS Error: ${err}`)
-              );
+            smsTriggered = smsResult.success;
+            if (smsResult.success) {
+              messages.push('Welcome SMS sent successfully');
+            } else {
+              messages.push(`SMS Error: ${smsResult.error}`);
             }
           } catch (smsError) {
-            console.error('Error executing SMS workflow:', smsError);
-            messages.push(
-              `SMS workflow failed: ${(smsError as Error).message}`
-            );
+            console.error('Error sending welcome SMS:', smsError);
+            messages.push(`SMS failed: ${(smsError as Error).message}`);
           }
         }
 
@@ -732,34 +726,28 @@ export const contactResolvers = {
 
         let smsTriggered = false;
 
-        // Trigger SMS workflow if enabled and phone number provided
+        // Send simple welcome SMS if enabled and phone number provided
         if (triggerSMSWorkflow && phone) {
           try {
-            const { executeNewLeadSMSWorkflow } = await import(
-              '@/lib/sms/workflows'
-            );
+            const { sendWelcomeSMS } = await import('@/lib/sms/simple-workflows');
 
-            const workflowResult = await executeNewLeadSMSWorkflow({
+            const smsResult = await sendWelcomeSMS({
               contactId: contact.id,
               contactName: name,
-              contactEmail: email,
               phoneNumber: phone,
+              contactUuid: contact.uuid,
               appointmentDateTime,
             });
 
-            smsTriggered = workflowResult.success;
-            messages.push(...workflowResult.messages);
-
-            if (workflowResult.errors.length > 0) {
-              messages.push(
-                ...workflowResult.errors.map((err) => `SMS Error: ${err}`)
-              );
+            smsTriggered = smsResult.success;
+            if (smsResult.success) {
+              messages.push('Welcome SMS sent successfully');
+            } else {
+              messages.push(`SMS Error: ${smsResult.error}`);
             }
           } catch (smsError) {
-            console.error('Error executing SMS workflow:', smsError);
-            messages.push(
-              `SMS workflow failed: ${(smsError as Error).message}`
-            );
+            console.error('Error sending welcome SMS:', smsError);
+            messages.push(`SMS failed: ${(smsError as Error).message}`);
           }
         }
 

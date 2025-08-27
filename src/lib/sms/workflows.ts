@@ -32,7 +32,7 @@ export const DEFAULT_SMS_TEMPLATES: Omit<SMSTemplate, 'id'>[] = [
   {
     name: 'Welcome - New Consultation',
     content:
-      "Hi {{name}}! Thanks for scheduling your consultation with Toasted Sesame Therapy. We're looking forward to our session on {{appointment_date}} at {{appointment_time}}. You'll receive a confirmation email shortly with all the details.",
+      "Hi {{name}}! Thanks for scheduling your consultation with Toasted Sesame Therapy. We're looking forward to our session on {{appointment_date}} at {{appointment_time}}. You'll receive a confirmation email shortly with all the details.\n\nReply STOP to opt out.",
     category: 'WELCOME',
     variables: ['name', 'appointment_date', 'appointment_time'],
     delayMinutes: 0,
@@ -40,7 +40,7 @@ export const DEFAULT_SMS_TEMPLATES: Omit<SMSTemplate, 'id'>[] = [
   {
     name: 'Questionnaire Reminder',
     content:
-      'Hi {{name}}! Before our consultation on {{appointment_date}}, please fill out this brief questionnaire to help us make the most of our time together: {{questionnaire_link}}',
+      'Hi {{name}}! Before our consultation on {{appointment_date}}, please fill out this brief questionnaire to help us make the most of our time together: {{questionnaire_link}}\n\nReply STOP to opt out.',
     category: 'QUESTIONNAIRE',
     variables: ['name', 'appointment_date', 'questionnaire_link'],
     delayMinutes: 60, // 1 hour after initial contact
@@ -48,7 +48,7 @@ export const DEFAULT_SMS_TEMPLATES: Omit<SMSTemplate, 'id'>[] = [
   {
     name: 'Appointment Reminder - 24h',
     content:
-      "Hi {{name}}! Just a friendly reminder that your consultation with Toasted Sesame Therapy is tomorrow at {{appointment_time}}. We're excited to connect with you! The video call link is in your confirmation email.",
+      "Hi {{name}}! Just a friendly reminder that your consultation with Toasted Sesame Therapy is tomorrow at {{appointment_time}}. We're excited to connect with you! The video call link is in your confirmation email.\n\nReply STOP to opt out.",
     category: 'APPOINTMENT_REMINDER',
     variables: ['name', 'appointment_time'],
     delayMinutes: 1440, // 24 hours
@@ -56,7 +56,7 @@ export const DEFAULT_SMS_TEMPLATES: Omit<SMSTemplate, 'id'>[] = [
   {
     name: 'Appointment Reminder - 2h',
     content:
-      "Hi {{name}}! Your consultation starts in 2 hours at {{appointment_time}}. Here's your video call link: {{meeting_link}}. Looking forward to speaking with you!",
+      "Hi {{name}}! Your consultation starts in 2 hours at {{appointment_time}}. Here's your video call link: {{meeting_link}}. Looking forward to speaking with you!\n\nReply STOP to opt out.",
     category: 'APPOINTMENT_REMINDER',
     variables: ['name', 'appointment_time', 'meeting_link'],
     delayMinutes: 120, // 2 hours
@@ -64,7 +64,7 @@ export const DEFAULT_SMS_TEMPLATES: Omit<SMSTemplate, 'id'>[] = [
   {
     name: 'Post-Consultation Follow-up',
     content:
-      "Hi {{name}}! Thank you for your consultation today. If you'd like to move forward with therapy, please reply to this message or call us. We're here to support your journey!",
+      "Hi {{name}}! Thank you for your consultation today. If you'd like to move forward with therapy, please reply to this message or call us. We're here to support your journey!\n\nReply STOP to opt out.",
     category: 'FOLLOW_UP',
     variables: ['name'],
     delayMinutes: 60, // 1 hour after appointment

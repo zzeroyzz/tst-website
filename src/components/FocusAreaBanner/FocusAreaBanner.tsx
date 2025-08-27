@@ -16,7 +16,7 @@ const FocusAreaBanner: React.FC<FocusAreaBannerProps> = ({
     <div className={`relative overflow-hidden py-6 ${className}`}>
       {/* Centered heading */}
       <h2 className="font-extrabold text-3xl md:text-4xl text-center mb-6">
-        Our Specialities:
+        Our Practice&apos;s Specialities
       </h2>
 
       <div className={`flex whitespace-nowrap ${styles.marquee}`}>

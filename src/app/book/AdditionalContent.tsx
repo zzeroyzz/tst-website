@@ -4,11 +4,11 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Section from '@/components/Section/Section';
 import FAQ from '@/components/FAQ/FAQ';
-import { 
-  generalBookingFaqs, 
-  affirmingBookingFaqs, 
-  neurodivergentBookingFaqs, 
-  traumaBookingFaqs 
+import {
+  generalBookingFaqs,
+  affirmingBookingFaqs,
+  neurodivergentBookingFaqs,
+  traumaBookingFaqs
 } from '@/data/bookingFaqData';
 import {
   howFitFreeWorksSteps,
@@ -22,14 +22,15 @@ import FocusAreaBanner from '@/components/FocusAreaBanner/FocusAreaBanner';
 import TestimonialCardBooking from '@/components/TestimonialCardBooking/TestimonialCardBooking';
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
+import Highlight from '@/components/Highlight/Highlight';
 interface AdditionalContentProps {
   variant?: 'trauma' | 'affirming' | 'nd';
   pageUrl?: string;
 }
 
-const AdditionalContent: React.FC<AdditionalContentProps> = ({ 
-  variant = 'trauma', 
-  pageUrl = '/book' 
+const AdditionalContent: React.FC<AdditionalContentProps> = ({
+  variant = 'trauma',
+  pageUrl = '/book'
 }) => {
   // Create individual refs for each step (copied exactly from HomePageClient)
   const step0Ref = useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
 
   // Create array of refs for easy access in the map
   const stepRefs = [step0Ref, step1Ref, step2Ref, step3Ref];
-  
+
   // Select FAQs based on variant
   const getFaqsForVariant = () => {
     const baseFaqs = generalBookingFaqs;
@@ -142,7 +143,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         </motion.div>
       </Section>
       {/* Benefits Section */}
-      <Section className="bg-tst-yellow py-20 border-t-2 border-black">
+      <Section className="py-20">
         <motion.div
           className="text-center"
           initial="hidden"
@@ -161,8 +162,11 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
               variants={itemVariants}
               className="text-lg text-gray-700 mb-16 font-medium"
             >
-              {stepSection.subtitle}
+              {stepSection.subtitleTop}
             </motion.p>
+            <motion.h3 variants={itemVariants} className="text-xl text-gray-700 font-bold">
+              {stepSection.subtitleBottom}
+            </motion.h3>
           </div>
           <div className="flex flex-col min-h-1000">
             {howFitFreeWorksSteps.map((step, index) => {
@@ -189,9 +193,16 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         <Section>
   {/* Heading */}
   <div className="text-center space-y-2">
-    <h2 className="text-3xl md:text-5xl font-extrabold">
+    {/* <h2 className="text-3xl md:text-5xl font-extrabold">
       What our clients say
-    </h2>
+    </h2> */}
+     <p className="text-5xl lg:text-6xl font-bold text-center w-full">
+            Over{' '}
+            <Highlight color="#FFD666">
+              200
+            </Highlight>{' '}
+           clients <br/> supported since 2018
+          </p>
   </div>
 
   {/* Testimonials */}
@@ -218,7 +229,9 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
       Reflections paraphrased for privacy
     </p>
   </div>
-
+    <Section>
+      {/* Practice Mission */}
+    </Section>
   {/* Booking CTA card */}
   <div className="max-w-4xl mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8">
     <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
@@ -238,8 +251,8 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
   </div>
 </Section>
       </Section>
-      <Section className="bg-tst-teal border-t-2 border-black">
-        <FAQ 
+      <Section>
+        <FAQ
           customFaqs={getFaqsForVariant()}
           pageUrl={pageUrl}
           className="py-8"

@@ -42,9 +42,10 @@ export const howFitFreeWorksSteps = [
 
 export const stepSection = {
   title: 'A Different Kind of Therapy Experience',
-  subtitle:
-    'You don’t have to guess what comes next. From our first conversation to your first full session, every step is simple and supportive. Here’s how to get started:',
-};
+  subtitleTop:
+    'You don’t have to guess what comes next. From our first conversation to your first full session, every step is simple and supportive.',
+  subtitleBottom: 'Here’s how to get started',
+}
 
 export const meetYourTherapistBook = {
   title: 'Who You’ll Meet',

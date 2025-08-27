@@ -15,7 +15,7 @@ export const generalBookingFaqs = [
   },
   {
     question: "How quickly can I get scheduled?",
-    answer: "I typically have availability within 1-2 weeks. After booking your consultation, you'll receive a confirmation email with next steps."
+    answer: "As soon as tomorrow. After booking your consultation, you'll receive a confirmation email with next steps."
   },
   {
     question: "Are sessions covered by insurance?",

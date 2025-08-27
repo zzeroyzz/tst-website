@@ -20,6 +20,9 @@ import { GET_CONTACTS_WITH_MESSAGES } from '@/lib/graphql/queries/contacts';
 import { GET_MESSAGES } from '@/lib/graphql/queries/messages';
 import { SEND_MESSAGE } from '@/lib/graphql/mutations/messages';
 import { getQuickResponseButtonsClient, getConversationStateClient, processUserResponseClient, type QuickResponseButton } from '@/lib/conversations/flow-manager-client';
+import { analyzeMessageForResponse, saveConversationResponse } from '@/lib/conversations/response-tracker';
+import ScriptBubbles from './ScriptBubbles';
+import ConversationHistory from './ConversationHistory';
 
 // MessagingInterface component with real backend integration
 const MessagingInterface = () => {
@@ -55,14 +58,23 @@ const MessagingInterface = () => {
     },
     skip: !selectedContact,
     fetchPolicy: 'cache-and-network', // Always fetch fresh data
+    pollInterval: 3000, // Poll every 3 seconds for new messages
+    notifyOnNetworkStatusChange: false,
   });
 
   // Mutation for sending messages
   const [sendMessage, { loading: sendingMessage }] = useMutation(SEND_MESSAGE, {
-    onCompleted: (data) => {
+    onCompleted: async (data) => {
       console.log('✅ Mutation completed, refetching data...', data);
-      refetchMessages();
-      refetchContacts(); // This should update the contact order
+      // Force refetch both messages and contacts immediately
+      await Promise.all([
+        refetchMessages(),
+        refetchContacts()
+      ]);
+      // Additional refetch after a short delay to catch any delayed updates
+      setTimeout(() => {
+        refetchMessages();
+      }, 1000);
     },
     onError: (error) => {
       console.error('❌ GraphQL Error sending message:', error);
@@ -73,12 +85,60 @@ const MessagingInterface = () => {
   const contacts = (contactsData as any)?.contactsWithMessages?.contacts || [];
   const messages = ((messagesData as any)?.messages?.messages || []).slice().reverse(); // Reverse for chronological order
 
+  // Track message count to detect new inbound messages
+  const [lastMessageCount, setLastMessageCount] = useState(0);
+
   // Load conversation state when contact is selected
   useEffect(() => {
     if (selectedContact) {
       loadConversationState(selectedContact.id);
+      setLastMessageCount(messages.length); // Reset message count for new contact
     }
   }, [selectedContact]);
+
+  // Detect new inbound messages and save conversation responses
+  useEffect(() => {
+    if (!selectedContact || messages.length <= lastMessageCount) return;
+
+    // Check if we have a new inbound message
+    const newMessages = messages.slice(lastMessageCount);
+    const newInboundMessage = newMessages.find(m => m.direction === 'INBOUND');
+
+    if (newInboundMessage) {
+      // Find the last outbound message before this inbound message
+      const sortedMessages = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const lastOutboundMessage = sortedMessages.find(m =>
+        m.direction === 'OUTBOUND' &&
+        new Date(m.createdAt) < new Date(newInboundMessage.createdAt)
+      );
+
+      if (lastOutboundMessage) {
+        const responseData = analyzeMessageForResponse(
+          lastOutboundMessage.content,
+          newInboundMessage.content
+        );
+
+        if (responseData) {
+          console.log('🔄 Saving conversation response:', responseData);
+          saveConversationResponse(
+            selectedContact.id,
+            responseData.questionId,
+            responseData.question,
+            responseData.response,
+            responseData.responseValue
+          ).then(result => {
+            if (result.success) {
+              console.log('✅ Conversation response saved successfully');
+            } else {
+              console.error('❌ Failed to save conversation response:', result.error);
+            }
+          });
+        }
+      }
+    }
+
+    setLastMessageCount(messages.length);
+  }, [messages, lastMessageCount, selectedContact]);
 
   const loadConversationState = async (contactId: string) => {
     try {
@@ -233,7 +293,7 @@ const MessagingInterface = () => {
   };
 
   return (
-    <div className="max-h-90 flex border-2 border-black rounded-lg overflow-hidden">
+    <div className="flex border-2 border-black rounded-lg overflow-hidden">
       {/* Contact List */}
       <div className="w-1/3 border-r-2 border-black bg-gray-50">
         <div className="p-4 border-b-2 border-black bg-white">
@@ -332,7 +392,7 @@ const MessagingInterface = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="max-h-90 flex-1 overflow-y-auto p-4 space-y-4">
               {messagesLoading ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader className="h-6 w-6 animate-spin text-gray-400" />
@@ -377,16 +437,38 @@ const MessagingInterface = () => {
               )}
             </div>
 
+            {/* Conversation History */}
+            {selectedContact && (
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <ConversationHistory contact={selectedContact} />
+              </div>
+            )}
+
+            {/* Script Bubbles */}
+            {selectedContact?.phoneNumber && (
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <ScriptBubbles
+                  contactId={selectedContact.id}
+                  phoneNumber={selectedContact.phoneNumber}
+                  messages={messages}
+                  contact={selectedContact}
+                  onSendMessage={(message) => {
+                    setNewMessage(message);
+                  }}
+                />
+              </div>
+            )}
+
             {/* Message Input */}
             <div className="p-4 border-t-2 border-black bg-white">
-              <div className="flex gap-2">
+              <div className="w-full flex gap-2">
                 <Input
                   type="text"
                   placeholder="Type your message..."
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                  className="flex-1"
+                  className="flex-1 w-full"
                   disabled={sendingMessage}
                 />
                 <Button

@@ -10,9 +10,6 @@ import {
   Mail,
   Phone,
   Calendar,
-  CheckCircle,
-  Clock,
-  AlertCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { LeadsViewSkeleton } from '@/components/skeleton';
@@ -31,7 +28,7 @@ const getDisplayStatus = (lead: any): string => {
   if (lead.appointment_status === 'CANCELLED' || lead.appointment_status === 'NO_SHOW') {
     return 'Not a Fit';
   }
-  
+
   // Check segments for status
   if (lead.segments?.includes('new')) {
     return 'New';
@@ -42,12 +39,12 @@ const getDisplayStatus = (lead: any): string => {
   if (lead.segments?.includes('reminder_sent')) {
     return 'Reminder Sent';
   }
-  
+
   // Default status based on contact_status
   if (lead.contact_status === 'PROSPECT') {
     return 'New';
   }
-  
+
   return 'New'; // Default fallback
 };
 
@@ -445,7 +442,6 @@ const LeadsView = () => {
                   <th className="p-4 font-bold">Name</th>
                   <th className="p-4 font-bold">Contact</th>
                   <th className="p-4 font-bold">Submitted</th>
-                  <th className="p-4 font-bold">Questionnaire</th>
                   <th className="p-4 font-bold">Status</th>
                 </tr>
               </thead>
@@ -504,13 +500,7 @@ const LeadsView = () => {
                         <td className="p-4">
                           {format(new Date(lead.created_at), 'PPP')}
                         </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                              N/A
-                            </span>
-                          </div>
-                        </td>
+
                         <td className="p-4">
                           <span
                             className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusClasses(leadStatus)}`}

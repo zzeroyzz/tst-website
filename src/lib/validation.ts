@@ -51,10 +51,28 @@ export const isValidPhoneNumber = (phone: string): boolean => {
 };
 
 /**
- * Gets clean phone number (digits only) from formatted phone
+ * Gets clean phone number with +1 prefix for US numbers
  */
 export const getCleanPhoneNumber = (phone: string): string => {
-  return phone.replace(/\D/g, '');
+  const digits = phone.replace(/\D/g, '');
+  
+  // If already has +1 prefix, return as is
+  if (phone.startsWith('+1')) {
+    return phone;
+  }
+  
+  // Add +1 prefix for US numbers
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+  
+  // If 11 digits starting with 1, format as +1XXXXXXXXXX
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+  
+  // For other cases, return with +1 prefix
+  return `+1${digits}`;
 };
 
 /**

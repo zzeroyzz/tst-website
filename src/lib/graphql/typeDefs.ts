@@ -16,6 +16,9 @@ export const typeDefs = gql`
     workflows: [Workflow!]!
     notifications(limit: Int = 50, unreadOnly: Boolean = false): [Notification!]!
     unreadNotificationCount: Int!
+    contactAppointments(contactId: ID!): [Appointment!]!
+    upcomingAppointments: [Appointment!]!
+    bookedSlots(startDate: String!, endDate: String!): [BookedSlot!]!
   }
 
   type Mutation {
@@ -56,6 +59,8 @@ export const typeDefs = gql`
     processWebhookFallback(input: WebhookFallbackInput!): WebhookFallbackResult!
     logWebhookMetrics(input: WebhookMetricsInput!): WebhookMetricsResult!
     retryWebhookProcessing(webhookId: ID!, force: Boolean = false): WebhookRetryResult!
+    rescheduleAppointment(id: ID!, newScheduledAt: String!, timeZone: String!): Appointment!
+    cancelAppointment(id: ID!, reason: String): Appointment!
   }
 
   type Subscription {
@@ -265,6 +270,11 @@ export const typeDefs = gql`
 
     # Relations
     contact: Contact!
+  }
+
+  type BookedSlot {
+    scheduledAt: String!
+    timeZone: String!
   }
 
   # Enums

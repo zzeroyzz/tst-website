@@ -7,6 +7,7 @@ import LeadCalendar from '@/components/LeadCalendar/LeadCalendar';
 
 import { apolloClient } from '@/lib/apollo/client';
 import { CREATE_CONTACT_WITH_APPOINTMENT } from '@/lib/graphql/mutations';
+import { getCleanPhoneNumber, formatPhoneNumber } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
 interface CalendarContactFormProps {
@@ -30,7 +31,19 @@ const CalendarContactForm: React.FC<CalendarContactFormProps> = ({
   const [result, setResult] = useState<any>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === 'phone') {
+      const formattedValue = formatPhoneNumber(value);
+      if (formattedValue === 'INVALID_COUNTRY_CODE') {
+        setError('Only US phone numbers are supported. Please remove international country codes except +1.');
+        return;
+      }
+      setFormData({ ...formData, [name]: formattedValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    
     if (error) setError(null);
   };
 
@@ -57,7 +70,7 @@ const CalendarContactForm: React.FC<CalendarContactFormProps> = ({
         variables: {
           name: formData.name,
           email: formData.email,
-          phoneNumber: formData.phone,
+          phoneNumber: getCleanPhoneNumber(formData.phone),
           scheduledAt: dateTime.toISOString(),
           timeZone: formData.timezone,
         },
