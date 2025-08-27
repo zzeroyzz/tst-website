@@ -7,6 +7,7 @@ import { workflowResolvers } from './workflows';
 import { statsResolvers } from './stats';
 import { notificationResolvers } from './notifications';
 import { webhookResolvers } from './webhooks';
+// import { appointmentResolvers } from './appointments'; // Now handled by API routes
 
 // Custom JSON scalar
 const JSONScalar = new GraphQLScalarType({
@@ -52,6 +53,7 @@ export const resolvers = {
     ...workflowResolvers.Query,
     ...statsResolvers.Query,
     ...notificationResolvers.Query,
+    // ...appointmentResolvers.Query, // Now handled by API routes
   },
 
   Mutation: {
@@ -62,6 +64,7 @@ export const resolvers = {
     ...workflowResolvers.Mutation,
     ...notificationResolvers.Mutation,
     ...webhookResolvers.Mutation,
+    // ...appointmentResolvers.Mutation, // Now handled by API routes
   },
 
   Subscription: {

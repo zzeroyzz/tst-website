@@ -19,15 +19,15 @@ export {
   UPDATE_MESSAGE_STATUS,
 } from './messages';
 
-// Appointment Mutations
-export {
-  CREATE_APPOINTMENT,
-  UPDATE_APPOINTMENT,
-  CANCEL_APPOINTMENT,
-  RESCHEDULE_APPOINTMENT,
-  COMPLETE_APPOINTMENT,
-  MARK_NO_SHOW,
-} from './appointments';
+// Appointment Mutations (using existing API routes instead)
+// export {
+//   CREATE_APPOINTMENT,
+//   UPDATE_APPOINTMENT,
+//   CANCEL_APPOINTMENT,
+//   RESCHEDULE_APPOINTMENT,
+//   COMPLETE_APPOINTMENT,
+//   MARK_NO_SHOW,
+// } from './appointments';
 
 // Segment Mutations
 export {
