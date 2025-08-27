@@ -13,38 +13,37 @@ const supabase = createClient(
 );
 
 export async function POST(request: NextRequest) {
+  console.log('🚨 WEBHOOK HIT - Starting processing');
   try {
     // Get the raw body for signature validation
     const body = await request.text();
     const params = new URLSearchParams(body);
     const bodyParams = Object.fromEntries(params.entries());
 
-    // Validate webhook signature for security
-    const signature = request.headers.get('x-twilio-signature');
-    const url = request.url;
-
-    // Temporarily disable signature validation for debugging
-    console.log('🔧 DEBUG: Webhook signature validation temporarily disabled');
-    if (false && signature && !validateWebhookSignature(signature, url, bodyParams)) {
-      console.error('Invalid Twilio webhook signature');
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
+    console.log('🚨 RAW BODY:', body);
+    console.log('🚨 PARSED PARAMS:', bodyParams);
 
     // Parse the incoming message
     const incomingMessage: IncomingMessage = parseIncomingMessage(bodyParams);
 
-    console.log('🔍 DEBUG: Raw webhook params:', bodyParams);
-    console.log('🔍 DEBUG: Parsed incoming message:', incomingMessage);
-    console.log('🔍 DEBUG: Message has body?', !!incomingMessage.body);
-    console.log('🔍 DEBUG: Message has status?', !!incomingMessage.messageStatus);
+    console.log('🚨 PARSED MESSAGE:', incomingMessage);
+    console.log('🚨 HAS BODY?', !!incomingMessage.body);
+    console.log('🚨 HAS STATUS?', !!incomingMessage.messageStatus);
+    console.log('🚨 MESSAGE STATUS VALUE:', JSON.stringify(incomingMessage.messageStatus));
 
     // Handle different types of webhooks
-    if (incomingMessage.messageStatus) {
+    if (incomingMessage.messageStatus && incomingMessage.messageStatus.trim() !== '') {
       // This is a status update for an outbound message
+      console.log('🚨 ROUTING TO: handleMessageStatusUpdate');
       await handleMessageStatusUpdate(incomingMessage);
-    } else if (incomingMessage.body) {
+    } else if (incomingMessage.body && incomingMessage.body.trim() !== '') {
       // This is an incoming message
+      console.log('🚨 ROUTING TO: handleIncomingMessage');
       await handleIncomingMessage(incomingMessage);
+    } else {
+      console.log('🚨 NO ROUTING - Neither valid body nor status found');
+      console.log('🚨 Body value:', JSON.stringify(incomingMessage.body));
+      console.log('🚨 Status value:', JSON.stringify(incomingMessage.messageStatus));
     }
 
     // Return TwiML response (empty for now)
@@ -94,18 +93,17 @@ async function handleMessageStatusUpdate(message: IncomingMessage) {
  * Handle incoming messages from contacts
  */
 async function handleIncomingMessage(message: IncomingMessage) {
+  console.log('🚨 HANDLEINCOMINGMESSAGE CALLED WITH:', message);
   try {
-    console.log('📥 Processing incoming message:', message);
-    
     // Find contact by phone number
-    console.log('🔍 DEBUG: Looking for contact with phone:', message.from);
+    console.log('🚨 LOOKING FOR CONTACT WITH PHONE:', message.from);
     const { data: contact, error: contactError } = await supabase
       .from('contacts')
       .select('id, name, email, phone_number')
       .eq('phone_number', message.from)
       .single();
 
-    console.log('🔍 DEBUG: Contact query result:', { contact, error: contactError });
+    console.log('🚨 CONTACT QUERY RESULT:', { contact, error: contactError });
     
     if (contactError && contactError.code !== 'PGRST116') {
       console.error('❌ Error finding contact:', contactError);
@@ -145,7 +143,7 @@ async function handleIncomingMessage(message: IncomingMessage) {
     }
 
     // Store the incoming message
-    console.log('🔍 DEBUG: Storing message with contactId:', contactId);
+    console.log('🚨 ABOUT TO STORE MESSAGE WITH CONTACT ID:', contactId);
     const messageData = {
       contact_id: contactId,
       content: message.body,
@@ -154,16 +152,19 @@ async function handleIncomingMessage(message: IncomingMessage) {
       message_type: message.messageType.toUpperCase(),
       twilio_sid: message.messageSid,
     };
-    console.log('🔍 DEBUG: Message data to insert:', messageData);
+    console.log('🚨 MESSAGE DATA TO INSERT:', messageData);
 
+    console.log('🚨 CALLING SUPABASE INSERT...');
     const { error: messageError, data: insertedMessage } = await supabase.from('crm_messages').insert([messageData]).select();
 
-    console.log('🔍 DEBUG: Message insert result:', { error: messageError, data: insertedMessage });
+    console.log('🚨 SUPABASE INSERT COMPLETE - ERROR:', messageError);
+    console.log('🚨 SUPABASE INSERT COMPLETE - DATA:', insertedMessage);
 
     if (messageError) {
-      console.error('❌ Error storing incoming message:', messageError);
+      console.error('🚨 CRITICAL MESSAGE INSERT FAILED:', messageError);
+      throw new Error(`Failed to insert message: ${JSON.stringify(messageError)}`);
     } else {
-      console.log(`✅ Stored incoming message from ${message.from}: "${message.body}"`);
+      console.log('🚨 SUCCESS: Message inserted:', insertedMessage);
     }
 
     // Create notification for dashboard
