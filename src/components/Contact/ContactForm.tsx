@@ -8,6 +8,7 @@ import Button from '@/components/Button/Button';
 import FAQ from '@/components/FAQ/FAQ';
 import Input from '@/components/Input/Input';
 import { CREATE_CONTACT, CREATE_NOTIFICATION } from '@/lib/graphql/mutations';
+import { getCleanPhoneNumber, formatPhoneNumber } from '@/lib/validation';
 
 interface ContactFormProps {
   isContactPage?: boolean;
@@ -39,7 +40,19 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
   const [createNotification] = useMutation(CREATE_NOTIFICATION);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === 'phone') {
+      const formattedValue = formatPhoneNumber(value);
+      if (formattedValue === 'INVALID_COUNTRY_CODE') {
+        setError('Only US phone numbers are supported. Please remove international country codes except +1.');
+        return;
+      }
+      setFormData({ ...formData, [name]: formattedValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    
     // Clear error when user starts typing
     if (error) setError(null);
     if (contactExists) setContactExists(false);
@@ -59,7 +72,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isContactPage = false }) => {
           input: {
             name: formData.name,
             email: formData.email.toLowerCase(),
-            phoneNumber: formData.phone,
+            phoneNumber: getCleanPhoneNumber(formData.phone),
             segments: ['Contact Form Lead'],
             crmNotes: `Contact form submission on ${new Date().toLocaleDateString()}`,
             customFields: {

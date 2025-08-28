@@ -7,6 +7,7 @@ export const GET_CONTACTS = gql`
   query GetContacts($filters: ContactFilters) {
     contacts(filters: $filters) {
       id
+      uuid
       name
       email
       phoneNumber
@@ -38,6 +39,7 @@ export const GET_CONTACT = gql`
   query GetContact($id: ID!) {
     contact(id: $id) {
       id
+      uuid
       name
       email
       phoneNumber
@@ -98,6 +100,7 @@ export const GET_CONTACTS_WITH_MESSAGES = gql`
     contactsWithMessages(limit: $limit) {
       contacts {
         id
+        uuid
         name
         email
         phoneNumber

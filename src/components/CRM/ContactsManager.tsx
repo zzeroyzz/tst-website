@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -16,6 +16,7 @@ import {
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
 import toast from 'react-hot-toast';
+import { createClient } from '@supabase/supabase-js';
 
 interface Contact {
   id: string;
@@ -38,7 +39,15 @@ interface Contact {
   };
 }
 
+// Create Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 const ContactsManager = () => {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -47,40 +56,65 @@ const ContactsManager = () => {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
 
-  // Mock data for now - replace with actual GraphQL queries when fixed
-  const contacts: Contact[] = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      phoneNumber: '+1234567890',
-      contactStatus: 'PROSPECT',
-      segments: ['New Lead'],
-      createdAt: new Date().toISOString(),
-      messageCount: 3,
-      appointmentStatus: 'SCHEDULED',
-      scheduledAppointmentAt: new Date().toISOString(),
-      messagesSent: 2,
-      messagesReceived: 1,
-      lastMessage: {
-        content: 'Looking forward to our consultation!',
-        direction: 'INBOUND',
-        createdAt: new Date().toISOString(),
-      },
-    },
-    {
-      id: '2',
-      name: 'Michael Chen',
-      email: 'michael@example.com',
-      phoneNumber: '+1987654321',
-      contactStatus: 'ACTIVE',
-      segments: ['Existing Client'],
-      createdAt: new Date().toISOString(),
-      messageCount: 8,
-      messagesSent: 5,
-      messagesReceived: 3,
-    },
-  ];
+  // Fetch real contacts from database
+  const fetchContacts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('contacts')
+        .select(`
+          id,
+          name,
+          email,
+          phone_number,
+          contact_status,
+          segments,
+          created_at,
+          last_message_at,
+          message_count,
+          appointment_status,
+          scheduled_appointment_at,
+          archived
+        `)
+        .eq('archived', false)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching contacts:', error);
+        toast.error('Failed to load contacts');
+        return;
+      }
+
+      // Transform data to match interface
+      const transformedContacts: Contact[] = data.map((contact: any) => ({
+        id: contact.id.toString(),
+        name: contact.name || 'Unknown',
+        email: contact.email || '',
+        phoneNumber: contact.phone_number || '',
+        contactStatus: contact.contact_status || 'ACTIVE',
+        segments: contact.segments || [],
+        createdAt: contact.created_at,
+        lastMessageAt: contact.last_message_at,
+        messageCount: contact.message_count || 0,
+        appointmentStatus: contact.appointment_status,
+        scheduledAppointmentAt: contact.scheduled_appointment_at,
+        messagesSent: 0, // TODO: Calculate from crm_messages
+        messagesReceived: 0, // TODO: Calculate from crm_messages
+      }));
+
+      setContacts(transformedContacts);
+    } catch (error) {
+      console.error('Error fetching contacts:', error);
+      toast.error('Failed to load contacts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch contacts on component mount
+  useEffect(() => {
+    fetchContacts();
+  }, []);
 
   const handleDeleteContact = async (contactId: string) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
@@ -135,6 +169,17 @@ const ContactsManager = () => {
     return matchesSearch && matchesStatus;
   });
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+          <p className="mt-2 text-gray-600">Loading contacts...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header and Controls */}
@@ -156,9 +201,9 @@ const ContactsManager = () => {
           <select
             value={selectedStatus}
             onChange={e => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+            className="border-2 border-black rounded-lg px-3 py-2 bg-white min-w-0"
           >
-            <option value="">All Statuses</option>
+            <option value="">All Status</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
             <option value="PROSPECT">Prospect</option>
@@ -192,10 +237,7 @@ const ContactsManager = () => {
         <div className="bg-white border-2 border-black rounded-lg p-4 shadow-brutalistSm">
           <h3 className="text-sm font-medium text-gray-500">Prospects</h3>
           <p className="text-2xl font-bold text-blue-600">
-            {
-              filteredContacts.filter(c => c.contactStatus === 'PROSPECT')
-                .length
-            }
+            {filteredContacts.filter(c => c.contactStatus === 'PROSPECT').length}
           </p>
         </div>
         <div className="bg-white border-2 border-black rounded-lg p-4 shadow-brutalistSm">
@@ -219,16 +261,16 @@ const ContactsManager = () => {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Appointment
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Messages
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Activity
+                  Appointment
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Created
+                </th>
+                <th className="relative px-6 py-3">
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
@@ -237,9 +279,9 @@ const ContactsManager = () => {
                 <tr key={contact.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-tst-purple flex items-center justify-center">
-                          <span className="text-sm font-medium text-white">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-700">
                             {contact.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -262,86 +304,35 @@ const ContactsManager = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(contact.contactStatus)}`}
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        contact.contactStatus
+                      )}`}
                     >
                       {contact.contactStatus}
                     </span>
-                    {contact.segments.length > 0 && (
-                      <div className="mt-1">
-                        {contact.segments.slice(0, 2).map((segment, index) => (
-                          <span
-                            key={index}
-                            className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-1"
-                          >
-                            {segment}
-                          </span>
-                        ))}
-                        {contact.segments.length > 2 && (
-                          <span className="text-xs text-gray-500">
-                            +{contact.segments.length - 2} more
-                          </span>
-                        )}
-                      </div>
-                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {contact.appointmentStatus ? (
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 text-blue-500 mr-2" />
-                        <div>
-                          <div
-                            className={`text-xs font-medium ${
-                              contact.appointmentStatus === 'SCHEDULED'
-                                ? 'text-green-600'
-                                : contact.appointmentStatus === 'COMPLETED'
-                                  ? 'text-blue-600'
-                                  : 'text-gray-600'
-                            }`}
-                          >
-                            {contact.appointmentStatus}
-                          </div>
-                          {contact.scheduledAppointmentAt && (
-                            <div className="text-xs text-gray-500">
-                              {formatDate(contact.scheduledAppointmentAt)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">No appointment</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center">
-                        <MessageCircle className="w-4 h-4 text-blue-500 mr-1" />
-                        <span>{contact.messagesSent}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <MessageCircle className="w-4 h-4 text-green-500 mr-1 transform scale-x-[-1]" />
-                        <span>{contact.messagesReceived}</span>
-                      </div>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <MessageCircle className="w-4 h-4 text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-900">
+                        {contact.messageCount}
+                      </span>
                     </div>
-                    {contact.lastMessage && (
-                      <div className="text-xs text-gray-500 mt-1 truncate max-w-xs">
-                        {contact.lastMessage.content}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {contact.appointmentStatus && (
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900">
+                          {contact.appointmentStatus}
+                        </span>
                       </div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {contact.lastMessageAt ? (
-                      <div>
-                        <div>{formatDate(contact.lastMessageAt)}</div>
-                        <div className="text-xs">Message</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div>{formatDate(contact.createdAt)}</div>
-                        <div className="text-xs">Created</div>
-                      </div>
-                    )}
+                    {formatDate(contact.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="relative">
                       <button
                         onClick={() =>
@@ -349,34 +340,35 @@ const ContactsManager = () => {
                             showDropdown === contact.id ? null : contact.id
                           )
                         }
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="text-gray-400 hover:text-gray-600 p-2"
                       >
                         <MoreVertical className="w-4 h-4" />
                       </button>
-
                       {showDropdown === contact.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-brutalistLg z-10">
-                          <button
-                            onClick={() => handleViewContact(contact)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center"
-                          >
-                            <Mail className="w-4 h-4 mr-2" />
-                            View Details
-                          </button>
-                          <button
-                            onClick={() => handleEditContact(contact)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center"
-                          >
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit Contact
-                          </button>
-                          <button
-                            onClick={() => handleDeleteContact(contact.id)}
-                            className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex items-center"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </button>
+                        <div className="absolute right-0 top-8 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                          <div className="py-1">
+                            <button
+                              onClick={() => handleViewContact(contact)}
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                            >
+                              <Users className="w-4 h-4 mr-2" />
+                              View Details
+                            </button>
+                            <button
+                              onClick={() => handleEditContact(contact)}
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                            >
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit Contact
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContact(contact.id)}
+                              className="flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete Contact
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -454,10 +446,10 @@ const ContactsManager = () => {
       )}
 
       {showDetailModal && selectedContact && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg border-2 border-black max-w-md">
             <h3 className="text-lg font-bold mb-4">Contact Details</h3>
-            <div className="space-y-2">
+            <div className="space-y-2 mb-4">
               <p>
                 <strong>Name:</strong> {selectedContact.name}
               </p>
@@ -465,7 +457,7 @@ const ContactsManager = () => {
                 <strong>Email:</strong> {selectedContact.email}
               </p>
               <p>
-                <strong>Phone:</strong> {selectedContact.phoneNumber || 'None'}
+                <strong>Phone:</strong> {selectedContact.phoneNumber || 'N/A'}
               </p>
               <p>
                 <strong>Status:</strong> {selectedContact.contactStatus}

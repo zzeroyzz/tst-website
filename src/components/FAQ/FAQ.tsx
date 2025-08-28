@@ -13,7 +13,7 @@ interface FAQProps {
 
 const FAQ = ({ pageUrl = '', customFaqs, className = '' }: FAQProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
+
   // Use custom FAQs if provided, otherwise use default faqData
   const faqs = customFaqs || faqData;
 
@@ -46,7 +46,7 @@ const FAQ = ({ pageUrl = '', customFaqs, className = '' }: FAQProps) => {
           __html: JSON.stringify(faqSchema),
         }}
       />
-      
+
       <div className={`w-full max-w-4xl mx-auto ${className}`} id="faq">
         <h2 className="text-5xl font-extrabold text-center mb-8">
           Answers to common questions

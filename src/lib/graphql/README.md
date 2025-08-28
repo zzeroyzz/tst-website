@@ -51,7 +51,7 @@ const { data: contact } = useQuery(GET_CONTACT, {
 |------|-------------|---------------|
 | `contacts.ts` | Contact CRUD operations | `CREATE_CONTACT`, `UPDATE_CONTACT`, `DELETE_CONTACT` |
 | `messages.ts` | Message operations | `SEND_MESSAGE`, `CREATE_MESSAGE_TEMPLATE` |
-| `appointments.ts` | Appointment management | `CREATE_APPOINTMENT`, `CANCEL_APPOINTMENT` |
+| ~~`appointments.ts`~~ | ~~Appointment mutations~~ | **Note: Now handled by `/api/appointment/` routes with Resend emails** |
 | `segments.ts` | Contact segmentation | `CREATE_CONTACT_SEGMENT`, `UPDATE_CONTACT_SEGMENT` |
 | `workflows.ts` | Workflow automation | `CREATE_WORKFLOW`, `EXECUTE_WORKFLOW` |
 | `notifications.ts` | Notification management | `MARK_NOTIFICATION_READ`, `DELETE_NOTIFICATION` |

@@ -63,7 +63,7 @@ const CookieConsent: React.FC = () => {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
-        className="fixed bottom-0 left-0 right-0 z-50 p-3 md:p-4"
+        className="max-h-100 md:max-w-500 fixed bottom-0 right-0 z-50 p-3 md:p-4"
       >
         <div className="max-w-4xl mx-auto">
           <div className="relative">
@@ -134,7 +134,7 @@ const CookieConsent: React.FC = () => {
                   </div>
 
                   {/* Buttons - more compact spacing */}
-                  <div className="flex flex-col gap-2 md:flex-row md:gap-2 md:justify-end items-center">
+                  <div className="flex flex-col gap-2 md:flex-row md:gap-2 md:justify-start items-center px-8">
                     <div className="flex gap-2 justify-center md:justify-end">
                       <Button
                         onClick={handleRejectAll}

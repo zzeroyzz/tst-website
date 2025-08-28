@@ -49,3 +49,20 @@ export const GET_BOOKED_SLOTS = gql`
     }
   }
 `;
+
+/**
+ * Get appointments for a specific contact
+ */
+export const GET_CONTACT_APPOINTMENTS = gql`
+  query GetContactAppointments($contactId: ID!) {
+    contactAppointments(contactId: $contactId) {
+      id
+      scheduledAt
+      status
+      timeZone
+      notes
+      createdAt
+      updatedAt
+    }
+  }
+`;
