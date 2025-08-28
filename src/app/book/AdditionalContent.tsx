@@ -8,7 +8,7 @@ import {
   generalBookingFaqs,
   affirmingBookingFaqs,
   neurodivergentBookingFaqs,
-  traumaBookingFaqs
+  traumaBookingFaqs,
 } from '@/data/bookingFaqData';
 import {
   howFitFreeWorksSteps,
@@ -23,6 +23,9 @@ import TestimonialCardBooking from '@/components/TestimonialCardBooking/Testimon
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
 import Highlight from '@/components/Highlight/Highlight';
+import Image from 'next/image';
+import CountUp from '@/components/CountUp/CountUp';
+
 interface AdditionalContentProps {
   variant?: 'trauma' | 'affirming' | 'nd';
   pageUrl?: string;
@@ -30,7 +33,7 @@ interface AdditionalContentProps {
 
 const AdditionalContent: React.FC<AdditionalContentProps> = ({
   variant = 'trauma',
-  pageUrl = '/book'
+  pageUrl = '/book',
 }) => {
   // Create individual refs for each step (copied exactly from HomePageClient)
   const step0Ref = useRef<HTMLDivElement>(null);
@@ -88,7 +91,6 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
   };
   return (
     <div className="lg:overflow-y-auto">
-      {/* Hero Section */}
       <Section minHeight="400px">
         <motion.div
           className="grid md:grid-cols-2 gap-12 md:gap-16 items-center min-h-400"
@@ -97,12 +99,12 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-           <motion.h2
-              className="text-4xl md:hidden font-extrabold text-center "
-              variants={itemVariants}
-            >
-              {meetYourTherapistBook.title}
-            </motion.h2>
+          <motion.h2
+            className="text-4xl md:hidden font-extrabold text-center "
+            variants={itemVariants}
+          >
+            {meetYourTherapistBook.title}
+          </motion.h2>
           <div className="flex justify-center">
             <ProfileImage width={400} height={400} />
           </div>
@@ -118,7 +120,11 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
               {meetYourTherapistBook.title}
             </motion.h2>
             {meetYourTherapistBook.paragraphs.map((text, index) => (
-              <motion.p key={index} className="text-lg md:text-xl" variants={itemVariants}>
+              <motion.p
+                key={index}
+                className="text-lg md:text-xl"
+                variants={itemVariants}
+              >
                 {text}
               </motion.p>
             ))}
@@ -142,7 +148,6 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           <FocusAreaBanner focusAreas={therapyFocusAreas} />
         </motion.div>
       </Section>
-      {/* Benefits Section */}
       <Section className="py-20">
         <motion.div
           className="text-center"
@@ -164,7 +169,10 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
             >
               {stepSection.subtitleTop}
             </motion.p>
-            <motion.h3 variants={itemVariants} className="text-xl text-gray-700 font-bold">
+            <motion.h3
+              variants={itemVariants}
+              className="text-xl text-gray-700 font-bold"
+            >
               {stepSection.subtitleBottom}
             </motion.h3>
           </div>
@@ -190,67 +198,97 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           </div>
         </motion.div>
         {/* Testimonials in horizontal row */}
-        <Section>
-  {/* Heading */}
-  <div className="text-center space-y-2">
-    {/* <h2 className="text-3xl md:text-5xl font-extrabold">
-      What our clients say
-    </h2> */}
-     <p className="text-5xl lg:text-6xl font-bold text-center w-full">
-            Over{' '}
-            <Highlight color="#FFD666">
-              200
-            </Highlight>{' '}
-           clients <br/> supported since 2018
+      </Section>
+      <Section>
+
+<CountUp/>
+        {/* Testimonials */}
+        <div className="flex flex-col sm:flex-row gap-6 mt-10">
+          {testimonials.map((testimonial, index) => (
+            <motion.div key={index} variants={itemVariants} className="flex-1">
+              <TestimonialCardBooking
+                quote={testimonial.quote}
+                iconUrl={testimonial.iconUrl}
+                bgColor={testimonial.bgColor}
+                altText={testimonial.altText}
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Privacy note */}
+        <div className="text-center mt-8">
+          <p className="italic text-gray-600 text-sm md:text-base">
+            Reflections paraphrased for privacy
           </p>
-  </div>
+        </div>
+      </Section>
+      <Section>
+        <div className="h-120 mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8 overflow-hidden">
+          <div className="grid md:grid-cols-2 md:gap-8 items-center h-full">
+            <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:max-w-600 md:pl-4">
+              <div className="flex flex-col items-center md:items-start mb-2 md:mb-10">
+                <Image
+                  src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/logo/tst-logo-long-baseline.svg"
+                  alt="Tst Logo"
+                  width={500}
+                  height={500}
+                  className="mb-4 md:mb-10"
+                />
 
-  {/* Testimonials */}
-  <div className="flex flex-col sm:flex-row gap-6 mt-10">
-    {testimonials.map((testimonial, index) => (
-      <motion.div
-        key={index}
-        variants={itemVariants}
-        className="flex-1"
-      >
-        <TestimonialCardBooking
-          quote={testimonial.quote}
-          iconUrl={testimonial.iconUrl}
-          bgColor={testimonial.bgColor}
-          altText={testimonial.altText}
-        />
-      </motion.div>
-    ))}
-  </div>
+                <div>
+                  <div className="max-w-9 bg-tst-teal text-xs font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist">
+                    <p className="text-sm font-medium">Our mission</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-xl md:text-5xl font-bold mt-4 leading-none">
+                    A space where every <br />
+                    part of you belongs
+                  </h3>
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+                    Everyone deserves care that feels grounded, affirming, and
+                    free of judgment. In this space, your story is honored with
+                    compassion and curiosity, so healing can unfold in ways that
+                    truly fit your life.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-  {/* Privacy note */}
-  <div className="text-center mt-8">
-    <p className="italic text-gray-600 text-sm md:text-base">
-      Reflections paraphrased for privacy
-    </p>
-  </div>
-    <Section>
-      {/* Practice Mission */}
-    </Section>
-  {/* Booking CTA card */}
-  <div className="max-w-4xl mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8">
-    <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+            <div>
+              <Image
+                src="https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/cho-cloud-hero-bean.webp"
+                alt="Therapy illustration"
+                width={600}
+                height={600}
+                className="w-full h-auto max-w-xl mx-auto"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      </Section>
+     <Section className="bg-tst-green border-t-2 border-b-2 border-black flex flex-col items-center justify-center">
+  <h2 className="text-4xl md:text-6xl font-bold mb-8 text-center mt-10">
+    Ready to start feeling better?
+  </h2>
+  <div className="max-w-4xl w-full p-6 bg-white rounded-lg shadow-brutalistLg border-2 border-black text-center">
+    <h2 className="text-2xl md:text-3xl font-bold mb-4">
       Pick a time → Quick intake → Free consult.
     </h2>
-    <h3 className="text-lg mb-8 text-center">
-      First full session guaranteed, no charge if you choose not to move forward.
+    <h3 className="text-lg mb-8">
+      First full session guaranteed, no charge if you choose not to move
+      forward.
     </h3>
-    <div className="flex justify-center">
-      <Button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="bg-tst-purple"
-      >
-        Return to booking your 15-min consult
-      </Button>
-    </div>
+    <Button
+      onClick={() => window.scrollTo({ top: 650, behavior: 'smooth' })}
+      className="bg-tst-purple w-full sm:w-auto mx-auto"
+    >
+      Book Your Free 15-min Consult
+    </Button>
   </div>
 </Section>
-      </Section>
       <Section>
         <FAQ
           customFaqs={getFaqsForVariant()}
