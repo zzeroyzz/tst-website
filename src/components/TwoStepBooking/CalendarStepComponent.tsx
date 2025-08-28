@@ -342,7 +342,7 @@ const CalendarStepComponent: React.FC<CalendarStepComponentProps> = ({
               No available time slots for this date
             </p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto mb-6  max-h-300 md:max-h-full">
               {timeSlots.map(slot => (
                 <div key={slot.time} className="relative">
                   <button
