@@ -31,42 +31,42 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
   });
   const [isDevMode, setIsDevMode] = useState(false);
   const [lastSentMessageId, setLastSentMessageId] = useState<string | null>(null);
-  
+
   // GraphQL hooks for appointment management
   const { data: appointmentsData } = useQuery(GET_CONTACT_APPOINTMENTS, {
     variables: { contactId },
     skip: !contactId,
   });
-  
+
   // Determine which templates to show based on conversation state
   useEffect(() => {
     // Get the most recent messages (reverse chronological order)
     const sortedMessages = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const lastInboundMessage = sortedMessages.find(m => m.direction === 'INBOUND')?.content?.toLowerCase() || '';
     const lastOutboundMessage = sortedMessages.find(m => m.direction === 'OUTBOUND')?.content || '';
-    
+
     // Check if we have new messages
     const hasNewMessages = messages.length > lastMessageCount;
     if (hasNewMessages) {
       setLastMessageCount(messages.length);
       console.log('🔄 ScriptBubbles - New messages detected, updating templates');
     }
-    
+
     console.log('ScriptBubbles - Messages updated:', {
       totalMessages: messages.length,
       hasNew: hasNewMessages,
       lastInbound: lastInboundMessage,
       lastOutbound: lastOutboundMessage.substring(0, 50) + '...'
     });
-    
+
     // Determine conversation flow based on last messages
     let templatesToShow: typeof fitFreeTemplate = [];
-    
+
     // Check if we're waiting for a response - if the last message is OUTBOUND and no INBOUND response after it
     const lastOutboundTime = sortedMessages.find(m => m.direction === 'OUTBOUND')?.createdAt;
     const lastInboundTime = sortedMessages.find(m => m.direction === 'INBOUND')?.createdAt;
     const isWaitingForResponse = lastOutboundTime && (!lastInboundTime || new Date(lastOutboundTime) > new Date(lastInboundTime));
-    
+
     console.log('Conversation state:', {
       isWaitingForResponse,
       lastOutboundTime,
@@ -79,7 +79,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
         wouldMatch: lastOutboundMessage.includes("get you in sooner") && !isWaitingForResponse
       }
     });
-    
+
     // If no messages yet, show confirmation (the true beginning)
     if (messages.length === 0) {
       templatesToShow = [fitFreeTemplate.find(t => t.id === '1')!]; // Confirmation
@@ -153,7 +153,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
       // Map response numbers to focus labels (handle multiple selections)
       const focusMap: Record<string, string> = {
         '1': 'anxiety',
-        '2': 'trauma', 
+        '2': 'trauma',
         '3': 'burnout',
         '4': 'self-esteem',
         '5': 'relationships',
@@ -163,22 +163,22 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
         '9': 'stress',
         '0': 'other concerns'
       };
-      
+
       const selectedFocus: string[] = [];
       for (const digit of ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']) {
         if (lastInboundMessage.includes(digit)) {
           selectedFocus.push(focusMap[digit]);
         }
       }
-      
+
       const focusLabel = selectedFocus.length > 0 ? selectedFocus.join(', ') : 'your main concerns';
-      
+
       // Update the focus acknowledgement template with the correct label
-      const focusAckTemplate = { 
+      const focusAckTemplate = {
         ...fitFreeTemplate.find(t => t.id === '6')!,
         content: fitFreeTemplate.find(t => t.id === '6')!.content.replace('{{focus_label}}', focusLabel)
       };
-      
+
       templatesToShow = [
         focusAckTemplate, // Focus acknowledgement with replaced variable
         fitFreeTemplate.find(t => t.id === '7')!  // Pull-forward offer
@@ -191,33 +191,33 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     // If they responded to pull-forward offer
     else if (lastOutboundMessage.includes("get you in sooner") && !isWaitingForResponse) {
       console.log('🎯 Pull-forward response detected:', lastInboundMessage);
-      
+
       // Show immediate response templates based on the response
       if (lastInboundMessage.includes('1') || lastInboundMessage.includes('2')) {
         // Show "moving" confirmation immediately
         const moveTemplate = {
           ...fitFreeTemplate.find(t => t.id === '7b')!,
-          content: lastInboundMessage.includes('1') 
+          content: lastInboundMessage.includes('1')
             ? `You're moved to ${availableSlots.today?.displayTime || 'earlier today'}. Calendar updated.`
             : `You're moved to ${availableSlots.tomorrow?.displayTime || 'tomorrow'}. Calendar updated.`
         };
         templatesToShow = [moveTemplate];
-        
+
         // Handle the actual appointment rescheduling in the background
         handlePullForwardResponse(lastInboundMessage);
-        
+
       } else if (lastInboundMessage.includes('3')) {
         // Show "keep time" confirmation
-        const currentTime = contact?.scheduledAppointmentAt ? 
+        const currentTime = contact?.scheduledAppointmentAt ?
           new Date(contact.scheduledAppointmentAt).toLocaleDateString('en-US', {
             weekday: 'long',
-            month: 'long', 
+            month: 'long',
             day: 'numeric',
             hour: 'numeric',
             minute: '2-digit',
             timeZoneName: 'short',
           }) : 'your scheduled time';
-          
+
         const keepTemplate = {
           ...fitFreeTemplate.find(t => t.id === '7c')!,
           content: `Locked for ${currentTime}. Any reason you think you might miss it?`
@@ -241,14 +241,14 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     // Default fallback - show common templates
     else {
       console.log('🤔 No specific flow matched, using fallback');
-      
+
       // Only show fallback templates if we haven't sent recent messages
       const recentMessage = messages.length > 0 && messages.some(m => {
         const messageTime = new Date(m.createdAt);
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         return messageTime > fiveMinutesAgo && m.direction === 'OUTBOUND';
       });
-      
+
       if (recentMessage) {
         console.log('🚫 Recent message sent, not showing fallback templates');
         templatesToShow = [];
@@ -260,15 +260,15 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
         ].filter(Boolean);
       }
     }
-    
+
     setCurrentTemplates(templatesToShow.filter(Boolean));
-    
+
     // Load available appointment slots if we're about to show pull-forward offer
     if (templatesToShow.some(t => t.id === '7')) {
       loadAvailableSlots();
     }
   }, [messages]);
-  
+
   // Load available appointment slots
   const loadAvailableSlots = async () => {
     try {
@@ -283,16 +283,16 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
 
   const handleRestartFlow = () => {
     console.log('🔄 Restarting conversation flow from the beginning (confirmation)');
-    
+
     // Force show the confirmation template (ID: 1) - the true beginning
     const confirmationTemplate = fitFreeTemplate.find(t => t.id === '1');
     if (confirmationTemplate) {
       setCurrentTemplates([confirmationTemplate]);
     }
-    
+
     // Reset message tracking
     setLastMessageCount(0);
-    
+
     // Clear available slots
     setAvailableSlots({ today: null, tomorrow: null });
   };
@@ -300,7 +300,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
   // Handle pull-forward appointment rescheduling using existing API routes
   const handlePullForwardResponse = async (response: string) => {
     console.log('🚀 handlePullForwardResponse called with:', response);
-    
+
     if (!contact?.uuid) {
       console.error('No contact UUID found for rescheduling');
       return;
@@ -309,7 +309,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     try {
       let newDateTime: string;
       let displayTime: string;
-      
+
       if (response.includes('1') && availableSlots.today) {
         // Move to today
         console.log('📅 Rescheduling to today:', availableSlots.today);
@@ -324,7 +324,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
         console.error('Invalid response or no available slot for:', response);
         return;
       }
-      
+
       // Use existing API route for rescheduling
       const rescheduleResponse = await fetch('/api/appointment/reschedule', {
         method: 'POST',
@@ -336,15 +336,15 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
           newDateTime: newDateTime
         }),
       });
-      
+
       const result = await rescheduleResponse.json();
-      
+
       if (!rescheduleResponse.ok) {
         throw new Error(result.message || 'Failed to reschedule appointment');
       }
-      
+
       console.log('✅ Appointment rescheduled successfully via API:', result);
-      
+
       // Update the template with actual time - use simple confirmation message as requested
       const updatedTemplate = {
         ...fitFreeTemplate.find(t => t.id === '7b')!,
@@ -375,7 +375,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
 
     try {
       console.log('❌ Cancelling appointment via API for UUID:', contact.uuid);
-      
+
       // Use existing API route for cancellation
       const cancelResponse = await fetch('/api/appointment/cancel', {
         method: 'POST',
@@ -386,25 +386,25 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
           uuid: contact.uuid
         }),
       });
-      
+
       const result = await cancelResponse.json();
-      
+
       if (!cancelResponse.ok) {
         throw new Error(result.message || 'Failed to cancel appointment');
       }
-      
+
       console.log('✅ Appointment cancelled successfully via API:', result);
-      
+
       // Show the cancel confirmation template
       const updatedTemplate = {
         ...fitFreeTemplate.find(t => t.id === '21')!,
         content: fitFreeTemplate.find(t => t.id === '21')!.content.replace(
-          '{{contact_uuid}}', 
+          '{{contact_uuid}}',
           contact.uuid || ''
         )
       };
       setCurrentTemplates([updatedTemplate]);
-      
+
     } catch (error) {
       console.error('Error cancelling appointment:', error);
       // Show error template
@@ -423,22 +423,42 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     // Check if we already sent a message with this content recently
     const messageId = `${template.id}-${Date.now()}`;
     const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-    
+
     if (lastSentMessageId && Date.now() - parseInt(lastSentMessageId.split('-')[1] || '0') < 60000) {
       console.log('🚫 Preventing duplicate send - message sent too recently');
       return;
     }
-    
+
     let message = template.content;
-    
+
+    // Get actual appointment time if available
+    const getAppointmentTime = () => {
+      const currentAppointments = (appointmentsData as any)?.contactAppointments || [];
+      const scheduledAppointment = currentAppointments.find(apt => apt.status === 'SCHEDULED');
+
+      if (scheduledAppointment?.scheduledAt) {
+        const appointmentDate = new Date(scheduledAppointment.scheduledAt);
+        return appointmentDate.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: 'America/New_York',
+          timeZoneName: 'short',
+        });
+      }
+      return 'your scheduled time';
+    };
+
     // Replace common variables with defaults (and real appointment slots)
     const variables: Record<string, string> = {
       client_name: contact?.name || 'there',
-      day_time_et: 'your scheduled time',
-      time_et: 'your scheduled time', 
+      day_time_et: getAppointmentTime(),
+      time_et: getAppointmentTime(),
       contact_uuid: contact?.uuid || '',
-      ref_a: 'Psychology Today',
-      ref_b: 'OpenCounseling.com',
+      ref_a: 'https://inclusivetherapists.com',
+      ref_b: 'https://openpathcollective.org',
       ref_open_path: 'https://openpathcollective.org',
       ref_inclusive: 'https://inclusivetherapists.com',
       fireweed_link: 'https://fireweedcollective.org/crisis-toolkit',
@@ -447,7 +467,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
       slot_tomorrow: availableSlots.tomorrow ? `at ${availableSlots.tomorrow.displayTime}` : '(no slots available)',
       new_time_et: 'the new time',
     };
-    
+
     // Replace template variables
     Object.entries(variables).forEach(([key, value]) => {
       const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
@@ -462,7 +482,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     // Check what we're waiting for
     const sortedMessages = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const lastOutbound = sortedMessages.find(m => m.direction === 'OUTBOUND')?.content || '';
-    
+
     let waitingMessage = "Waiting for customer response...";
     if (lastOutbound.includes("Are you in Georgia?")) {
       waitingMessage = "Waiting for response to Georgia question (1 = Yes, 2 = No)";
@@ -475,7 +495,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     } else if (lastOutbound.includes("get you in sooner")) {
       waitingMessage = "Waiting for response to pull-forward offer (1 = Today, 2 = Tomorrow, 3 = Keep time)";
     }
-    
+
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
         <div className="flex items-center gap-2 text-yellow-700">
@@ -512,7 +532,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
           )}
         </div>
       </div>
-      
+
       <div className="space-y-3">
         {currentTemplates.map((template) => (
           <div key={template.id} className="bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-300 transition-colors">
@@ -547,14 +567,14 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
           </div>
         ))}
       </div>
-      
+
       <div className="mt-3 text-xs text-blue-600 bg-blue-100 rounded p-2">
         💡 Scripts automatically update based on customer responses in the conversation flow
         {messages.length > lastMessageCount && (
           <span className="ml-2 text-green-600 font-medium">🔄 Updating...</span>
         )}
       </div>
-      
+
       {/* Dev Panel */}
       {isDevMode && (
         <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded">
