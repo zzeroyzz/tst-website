@@ -101,6 +101,10 @@ module.exports = {
         brutalistLg: '6px 6px 0 #000',
       },
       height: {
+        50:'50px',
+        80:'80px',
+        90:'90px',
+        95:'95px',
         14:"14rem",
         96: '24rem',
         100: '28rem',
@@ -108,8 +112,7 @@ module.exports = {
         120: '32rem',
       },
       maxHeight: {
-        100:'100px',
-        110:'110px',
+        50:'50px',
         150:'150px',
         200:'200px',
         250:'250px',

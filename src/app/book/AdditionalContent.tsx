@@ -22,9 +22,9 @@ import FocusAreaBanner from '@/components/FocusAreaBanner/FocusAreaBanner';
 import TestimonialCardBooking from '@/components/TestimonialCardBooking/TestimonialCardBooking';
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
-import Highlight from '@/components/Highlight/Highlight';
 import Image from 'next/image';
 import CountUp from '@/components/CountUp/CountUp';
+import MiniHowItWorks from '@/components/MiniHowItWorks/MiniHowItWorks';
 
 interface AdditionalContentProps {
   variant?: 'trauma' | 'affirming' | 'nd';
@@ -199,9 +199,12 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         </motion.div>
         {/* Testimonials in horizontal row */}
       </Section>
-      <Section>
-
-<CountUp/>
+      {/* Mini How It Works - Superbill Process */}
+      <Section className="py-20">
+        <MiniHowItWorks />
+        <div className="mt-16">
+          <CountUp />
+        </div>
         {/* Testimonials */}
         <div className="flex flex-col sm:flex-row gap-6 mt-10">
           {testimonials.map((testimonial, index) => (
@@ -223,7 +226,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           </p>
         </div>
       </Section>
-      <Section>
+      <Section className="py-20">
         <div className="h-120 mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8 overflow-hidden">
           <div className="grid md:grid-cols-2 md:gap-8 items-center h-full">
             <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:max-w-600 md:pl-4">

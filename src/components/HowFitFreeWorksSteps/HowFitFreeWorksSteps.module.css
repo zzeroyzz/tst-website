@@ -19,7 +19,7 @@
   top: 50%;
   width: 100%;
   background-color: #c5a1ff;
-  transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1) 400ms;
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1) 400ms;
   height: 0;
   z-index: 1;
 }
