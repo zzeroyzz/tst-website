@@ -226,7 +226,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           </p>
         </div>
       </Section>
-      <Section>
+      <Section className="py-20">
         <div className="h-120 mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8 overflow-hidden">
           <div className="grid md:grid-cols-2 md:gap-8 items-center h-full">
             <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:max-w-600 md:pl-4">

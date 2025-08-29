@@ -118,7 +118,6 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
         },
       });
       (st as any).__miniHowItWorks = true;
-      gsap.config({ autoRound: true });
     } else {
       // MOBILE: sticky only; ST just drives progress/snap
       const st = ScrollTrigger.create({
