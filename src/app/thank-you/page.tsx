@@ -1,19 +1,37 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import type { Metadata } from 'next';
 import Section from '@/components/Section/Section';
 import Button from '@/components/Button/Button';
 import { CheckCircle, Calendar, Clock, Mail } from 'lucide-react';
 import Link from 'next/link';
+import Confetti from 'react-confetti';
 
-export const metadata: Metadata = {
-  title: 'Thank You - Consultation Booked | Toasted Sesame Therapy',
-  description: 'Your free 15-minute consultation has been booked successfully. Check your email for confirmation details.',
-  robots: 'noindex, nofollow',
+const useWindowSize = () => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const handleResize = () =>
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return size;
 };
 
 export default function ThankYouPage() {
+  const { width, height } = useWindowSize();
   return (
     <Section className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Confetti
+        width={width}
+        height={height}
+        recycle={false}
+        numberOfPieces={500}
+        tweenDuration={8000}
+        style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999 }}
+      />
       <div className="w-full max-w-2xl">
         <div className="bg-white rounded-xl border-2 border-black shadow-brutalistLg overflow-hidden text-center">
           {/* Header */}
