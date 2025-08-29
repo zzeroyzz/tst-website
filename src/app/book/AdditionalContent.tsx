@@ -22,9 +22,9 @@ import FocusAreaBanner from '@/components/FocusAreaBanner/FocusAreaBanner';
 import TestimonialCardBooking from '@/components/TestimonialCardBooking/TestimonialCardBooking';
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
-import Highlight from '@/components/Highlight/Highlight';
 import Image from 'next/image';
 import CountUp from '@/components/CountUp/CountUp';
+import MiniHowItWorks from '@/components/MiniHowItWorks/MiniHowItWorks';
 
 interface AdditionalContentProps {
   variant?: 'trauma' | 'affirming' | 'nd';
@@ -199,9 +199,12 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         </motion.div>
         {/* Testimonials in horizontal row */}
       </Section>
-      <Section>
-
-<CountUp/>
+      {/* Mini How It Works - Superbill Process */}
+      <Section className="py-20">
+        <MiniHowItWorks />
+        <div className="mt-16">
+          <CountUp />
+        </div>
         {/* Testimonials */}
         <div className="flex flex-col sm:flex-row gap-6 mt-10">
           {testimonials.map((testimonial, index) => (

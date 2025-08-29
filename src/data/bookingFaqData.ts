@@ -19,7 +19,7 @@ export const generalBookingFaqs = [
   },
   {
     question: "Are sessions covered by insurance?",
-    answer: "I can provide a superbill for potential insurance reimbursement, but I'm not in-network with insurance providers. Sessions are $150 for 50 minutes, due at time of service."
+    answer: "I’m not in-network with insurance providers. Sessions are $150 for 50 minutes, due at the time of service. If you’d like to use your out-of-network benefits, I provide a superbill, which is a detailed receipt you can submit to your insurance. Reimbursement varies by plan, but we make the superbill process simple so you have everything you need to try."
   }
 ];
 
