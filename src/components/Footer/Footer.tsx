@@ -79,6 +79,14 @@ const Footer = () => {
                     Contact
                   </HoverLink>
                 </li>
+                <li>
+                  <HoverLink
+                    href="/business-queries"
+                    className="text-white/90 hover:text-white transition-colors font-medium"
+                  >
+                    Business Queries
+                  </HoverLink>
+                </li>
               </ul>
             </div>
           )}
