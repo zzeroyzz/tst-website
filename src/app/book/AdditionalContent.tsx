@@ -14,11 +14,13 @@ import {
   howFitFreeWorksSteps,
   stepSection,
   meetYourTherapistBook,
+  meetYourTherapistTrauma,
+  meetYourTherapistND,
+  therapyFocusAreas,
 } from '@/data/bookData';
-import { therapyFocusAreas } from '@/data/servicesPageData';
 import HowFitFreeWorksSteps from '@/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps';
 import ProfileImage from '@/components/ProfileImage/ProfileImage';
-import FocusAreaBanner from '@/components/FocusAreaBanner/FocusAreaBanner';
+import FallingPillsBookingPage from '@/components/FallingPills/FallingPillsBookingPage';
 import TestimonialCardBooking from '@/components/TestimonialCardBooking/TestimonialCardBooking';
 import { testimonials } from '@/data/bookData';
 import Button from '@/components/Button/Button';
@@ -66,6 +68,19 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         return [...baseFaqs, ...traumaBookingFaqs];
     }
   };
+
+  // Select therapist intro based on variant
+  const getTherapistIntroForVariant = () => {
+    switch (variant) {
+      case 'nd':
+        return meetYourTherapistND;
+      case 'trauma':
+        return meetYourTherapistTrauma;
+      case 'affirming':
+      default:
+        return meetYourTherapistBook;
+    }
+  };
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -100,10 +115,10 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           viewport={{ once: true, amount: 0.2 }}
         >
           <motion.h2
-            className="text-4xl md:hidden font-extrabold text-center "
+            className="text-4xl md:hidden font-extrabold text-center leading-tight"
             variants={itemVariants}
           >
-            {meetYourTherapistBook.title}
+            {getTherapistIntroForVariant().title}
           </motion.h2>
           <div className="flex justify-center">
             <ProfileImage width={400} height={400} />
@@ -114,20 +129,32 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
             variants={containerVariants}
           >
             <motion.h2
-              className="hidden md:block md:text-6xl font-extrabold"
+              className="hidden md:block md:text-6xl font-extrabold leading-tight"
               variants={itemVariants}
             >
-              {meetYourTherapistBook.title}
+              {getTherapistIntroForVariant().title}
             </motion.h2>
-            {meetYourTherapistBook.paragraphs.map((text, index) => (
+            {getTherapistIntroForVariant().paragraphs.map((text, index) => (
               <motion.p
                 key={index}
-                className="text-lg md:text-xl"
+                className={`text-lg md:text-xl ${
+                  index === 0
+                    ? "inline-block bg-tst-green px-4 py-2 rounded-full border-2 border-black shadow-brutalist font-bold w-fit max-w-xs"
+                    : ""
+                }`}
                 variants={itemVariants}
               >
                 {text}
               </motion.p>
             ))}
+            {getTherapistIntroForVariant().quote && (
+              <motion.blockquote
+                className="text-xl md:text-2xl font-medium italic text-gray-800 border-l-4 border-tst-teal pl-6 mt-6"
+                variants={itemVariants}
+              >
+                "{getTherapistIntroForVariant().quote}"
+              </motion.blockquote>
+            )}
             <motion.div variants={itemVariants} className="relative">
               <div
                 className="absolute left-0"
@@ -139,13 +166,26 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
 
         {/* Focus Areas Banner */}
         <motion.div
-          className="mt-20"
+          className="mt-16 mb-8 text-center"
           variants={itemVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.1 }}
         >
-          <FocusAreaBanner focusAreas={therapyFocusAreas} />
+          <h3 className="text-2xl md:text-3xl font-bold mb-4">
+            My areas of focus
+          </h3>
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+            I specialize in creating affirming spaces for folks navigating these experiences
+          </p>
+        </motion.div>
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          <FallingPillsBookingPage />
         </motion.div>
       </Section>
       <Section className="py-20">

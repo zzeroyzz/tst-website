@@ -12,18 +12,18 @@ export const helpWithKeywords = [
   'Self-Esteem Issues',
   'Relationship Challenges',
   'Life Transitions',
-  'Identity Exploration',
   'Neurodivergence Support',
   'Stress Management',
-  'Polyamory & Non-Monogamy',
+  'Non-Monogamy',
   'LGBTQ+ Affirming',
   'Cultural Identity',
   'BIPOC Affirming',
   'Adoption',
-  'Attention Deficit (ADHD)',
+  'ADHD',
+  'Depression',
   'Autism Spectrum',
   'Racial Stress & Trauma',
-  'Gender or Sexual Identity Exploration',
+  'Identity Exploration',
 ];
 
 // Focus areas for the therapy banner component

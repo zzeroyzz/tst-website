@@ -48,12 +48,33 @@ export const stepSection = {
 }
 
 export const meetYourTherapistBook = {
-  title: 'Who You’ll Meet',
+  title: `Your Guide on This Journey`,
   paragraphs: [
     "Kay, MS, LPC (she/they)",
     'Georgia-licensed. Trauma-informed care for neurodivergent, LGBTQIA+, and BIPOC adults.',
     'Therapy that honors who you are.',
   ],
+  quote: undefined,
+};
+
+export const meetYourTherapistTrauma = {
+  title: `Your Guide on This Journey`,
+  paragraphs: [
+    "Kay, MS, LPC (she/they)",
+    'Georgia-licensed. Specialized in trauma-informed care for LGBTQ+, BIPOC, and neurodivergent adults navigating complex trauma, CPTSD, and healing from difficult life experiences.',
+    'Therapy that creates safety for your healing journey.',
+  ],
+  quote: "Healing isn't about forgetting your past, it's about reclaiming your story.",
+};
+
+export const meetYourTherapistND = {
+  title: `Your Guide on This Journey`,
+  paragraphs: [
+    "Kay, MS, LPC (she/they)",
+    'Georgia-licensed. Specialized in neurodivergent-affirming care for LGBTQ+, BIPOC, autistic adults, ADHDers, and those exploring their neurotype.',
+    'Therapy that celebrates how your brain works.',
+  ],
+  quote: "Your brain isn't broken, it's just wired beautifully different.",
 };
 
 export const testimonials = [
@@ -82,3 +103,25 @@ export const testimonials = [
     altText: 'Teal decorative icon for testimonial.',
   },
 ];
+
+export const therapyFocusAreas = [
+  'Burnout & Exhaustion',
+  'Self-Esteem Issues',
+  'Relationship Challenges',
+   'Trauma & CPTSD',
+  'Life Transitions',
+  'Identity Exploration',
+  'Neurodivergence Support',
+  'Stress Management',
+  'Anxiety & Overwhelm',
+  'Polyamory & Non-Monogamy',
+  'Attention Deficit (ADHD)',
+  'LGBTQ+ Affirming',
+  'Cultural Identity',
+  'BIPOC Affirming',
+  'Adoption',
+  'Autism Spectrum',
+  'Racial Stress & Trauma',
+  'Gender or Sexual Identity Exploration',
+];
+
