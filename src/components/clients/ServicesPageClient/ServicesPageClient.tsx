@@ -7,7 +7,7 @@ import Section from '@/components/Section/Section';
 import Button from '@/components/Button/Button';
 import FAQ from '@/components/FAQ/FAQ';
 import ServiceOfferingCard from '@/components/Services/ServiceOfferingCard';
-import FallingPills from '@/components/FallingPills/FallingPills';
+import FallingPillsBookingPage from '@/components/FallingPills/FallingPillsBookingPage';
 import AnimatedImage from '@/components/AnimatedImage/AnimatedImage';
 import CTACard from '@/components/CTA/CTA';
 
@@ -70,7 +70,7 @@ const ServicesPageClient = () => {
             className="w-full max-w-5xl mx-auto mt-10 px-4"
             variants={itemVariants}
           >
-            <FallingPills />
+            <FallingPillsBookingPage />
           </motion.div>
         </motion.div>
       </Section>

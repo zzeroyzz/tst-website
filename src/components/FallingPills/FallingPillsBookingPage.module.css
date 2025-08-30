@@ -1,0 +1,85 @@
+/* src/components/FallingPills.module.css */
+.container {
+  width: 100%;
+}
+
+.title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem; /* 24px */
+}
+
+.pills_wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem; /* 16px */
+  perspective: 800px;
+}
+
+/* Mobile reduced visual density */
+@media (max-width: 768px) {
+  .pills_wrapper {
+    gap: 0.5rem;
+  }
+  
+  .pill {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.pill_wrapper {
+  position: relative;
+  opacity: 0;
+  transform: translateY(-100px) rotateX(-80deg);
+  animation: fall 0.8s cubic-bezier(0.6, -0.28, 0.74, 1.55) forwards;
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border-radius: 8px;
+  transform: translate(4px, 4px);
+  transition: transform 150ms ease-in-out;
+}
+
+.pill {
+  position: relative;
+  background-color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid black;
+  transition: transform 150ms ease-in-out;
+}
+
+@keyframes fall {
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+/* The "push in" animation */
+.pill_wrapper:hover .pill {
+  transform: translate(2px, 2px);
+}
+.pill_wrapper:hover .shadow {
+  transform: translate(2px, 2px);
+}
+
+.pill_wrapper:active .pill,
+.pill_wrapper:active .shadow {
+  transform: translate(0, 0);
+}
