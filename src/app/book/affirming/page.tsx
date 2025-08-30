@@ -2,5 +2,5 @@
 import { redirect } from 'next/navigation';
 
 export default function AffirmingBookingPage() {
-  redirect('/book');
+  redirect('/book/trauma');
 }
