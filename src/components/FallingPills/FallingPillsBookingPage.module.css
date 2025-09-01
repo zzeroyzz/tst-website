@@ -23,12 +23,12 @@
   .pills_wrapper {
     gap: 0.5rem;
   }
-  
+
   .pill {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
   }
-  
+
   .title {
     font-size: 1.25rem;
     margin-bottom: 1rem;
@@ -82,4 +82,9 @@
 .pill_wrapper:active .pill,
 .pill_wrapper:active .shadow {
   transform: translate(0, 0);
+}
+
+/* Yellow variant for specific pills */
+.pillYellow {
+  background-color: #C5A1FF; /* TST yellow color */
 }

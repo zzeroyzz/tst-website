@@ -1,16 +1,17 @@
 'use client';
 
 import React from 'react';
-import { MapPinCheckInside, Video, Brain, Heart, Rainbow } from 'lucide-react';
+import { MapPinCheckInside, Video, Brain, Heart, Rainbow, ReceiptText } from 'lucide-react';
 import IconCircle from '@/components/IconCircle/IconCircle';
 import { motion, Variants } from 'framer-motion';
+import Button from "@/components/Button/Button";
 
 interface BookingPageHeaderProps {
   variant: 'nd' | 'affirming' | 'trauma';
 }
 
 const TRUST_INDICATORS = [
-  { text: 'Licensed in Georgia', icon: MapPinCheckInside },
+  { text: 'Superbill Provided', icon: ReceiptText },
   { text: 'Secure Telehealth', icon: Video },
   { text: 'Affirming Care', icon: Heart },
 ] as const;
@@ -57,12 +58,18 @@ const BookingPageHeader: React.FC<BookingPageHeaderProps> = ({ variant }) => {
     <div className="space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6">
-        <div
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 shadow-brutalist ${content.color}`}
-        >
-          {content.icon}
-          <span className="font-medium">Fit or Free Session</span>
-        </div>
+
+
+          <Button
+          className={`font-medium rounded-full ${content.color}`}
+          variant="rounded-full"
+          onClick={() => window.scrollTo({ top: 2500, behavior: 'smooth' })}
+          >
+            <span className="flex items-center gap-2">
+              {content.icon}
+              <span>See How Fit-or-Free Works</span>
+            </span>
+          </Button>
 
         <motion.h1
           className="text-4xl md:text-5xl font-extrabold leading-tight"
@@ -75,9 +82,8 @@ const BookingPageHeader: React.FC<BookingPageHeaderProps> = ({ variant }) => {
           className="text-md md:text-xl text-gray-600 max-w-3xl mx-auto"
           variants={itemVariants}
         >
-          Virtual therapy for Georgia adults with a licensed therapist.{' '}
-          <span className="font-bold"> Free 15‑minute consult. </span> First full
-          session is on us if it doesn’t feel right.
+          Licensed virtual therapy for Georgia adults.
+          <span className="font-bold"> Free 15‑minute consult.</span>  <br/> <span className="font-bold">Your first full session is free if it’s not a fit.</span>  <br/>Book below with <span className="font-bold">zero risk.</span>
         </motion.h3>
       </div>
 
