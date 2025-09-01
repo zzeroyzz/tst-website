@@ -7,6 +7,7 @@ interface SectionProps {
   padding?: 'default' | 'small' | 'large' | 'none';
   paddingTop?: 'default' | 'small' | 'large' | 'none';
   paddingBottom?: 'default' | 'small' | 'large' | 'none';
+  id?: string;
 }
 
 const Section: React.FC<SectionProps> = ({
@@ -16,6 +17,7 @@ const Section: React.FC<SectionProps> = ({
   padding,
   paddingTop,
   paddingBottom,
+  id,
 }) => {
   // Define padding classes based on variant
   const getPaddingClasses = () => {
@@ -72,7 +74,7 @@ const Section: React.FC<SectionProps> = ({
   const style = minHeight ? { minHeight } : undefined;
 
   return (
-    <section className={sectionClasses} style={style}>
+    <section className={sectionClasses} style={style} id={id}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-500">
         {children}
       </div>

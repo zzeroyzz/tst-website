@@ -63,7 +63,12 @@ const BookingPageHeader: React.FC<BookingPageHeaderProps> = ({ variant }) => {
           <Button
           className={`font-medium rounded-full ${content.color}`}
           variant="rounded-full"
-          onClick={() => window.scrollTo({ top: 2450, behavior: 'smooth' })}
+          onClick={() => {
+            const element = document.getElementById('fit-free-works-section');
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }}
           >
             <span className="flex items-center gap-2">
               {content.icon}
