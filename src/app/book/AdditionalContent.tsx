@@ -187,7 +187,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           <FallingPillsBookingPage />
         </motion.div>
       </Section>
-      <Section padding="none" paddingTop="large" paddingBottom="none">
+      <Section padding="none" paddingTop="large" paddingBottom="none" id="fit-free-works-section">
         <div className="text-center">
           <div className="max-w-4xl mx-auto px-4 mb-20">
             <h2 

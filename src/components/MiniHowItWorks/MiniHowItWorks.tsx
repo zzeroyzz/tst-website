@@ -122,23 +122,30 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
       // MOBILE: sticky only; ST just drives progress/snap
       const st = ScrollTrigger.create({
         trigger: container,
-        start: 'top center',
+        start: 'top 80%',
         end: `+=${SCROLL_DISTANCE}`,
         scrub: true,
         pin: false,
         snap: {
           snapTo: (val) => {
-            // Ensure we can always snap to step 1 (progress 0)
-            if (val < 0.1) return 0;
+            // Give more room for step 1 - only snap to next steps if we're clearly past step 1
+            if (val < 0.15) return 0;
             return createSnap(val);
           },
-          duration: 0.6,
+          duration: 0.8,
           ease: 'power2.out',
+          delay: 0.2,
         },
         onUpdate: (self) => {
-          // Ensure step 1 is shown at the beginning
+          // More conservative step calculation to favor step 1
           const progress = Math.max(0, self.progress);
-          const idx = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
+          // Add threshold to stay on step 1 longer
+          let idx;
+          if (progress < 0.12) {
+            idx = 1;
+          } else {
+            idx = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
+          }
           setActiveStep(idx);
         },
       });
