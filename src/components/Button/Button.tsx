@@ -10,6 +10,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   wrapperClassName?: string;
   disabled?: boolean;
+  variant?: 'default' | 'rounded-full';
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -19,15 +20,19 @@ const Button: React.FC<ButtonProps> = ({
   type = 'button',
   wrapperClassName = '',
   disabled = false,
+  variant = 'default',
   id,
 }) => {
+  const shadowClass = variant === 'rounded-full' ? styles.shadowRounded : styles.shadow;
+  const buttonClass = variant === 'rounded-full' ? styles.buttonRounded : styles.button;
+
   return (
     <div className={clsx(styles.wrapper, wrapperClassName)}>
-      <div className={styles.shadow} />
+      <div className={shadowClass} />
       <button
         type={type}
         onClick={onClick}
-        className={clsx(styles.button, className)}
+        className={clsx(buttonClass, className)}
         disabled={disabled}
         id={id}
       >

@@ -32,7 +32,7 @@ export const howFitFreeWorksSteps = [
   {
     number: '04',
     title: 'Start With Confidence',
-    description:'If you’d like to continue, I’ll set up your portal and we’ll choose a time for your first full session. Sessions are $150. Your first full session is guaranteed with no charge if you don’t continue.',
+    description:'If you’d like to move forward, I’ll set up your portal and schedule your first full session. Sessions are $150, and your first one is covered by the Fit-or-Free guarantee, no charge if you decide not to continue.',
     imageUrl:
       'https://pvbdrbaquwivhylsmagn.supabase.co/storage/v1/object/public/tst-assets/website%20assets/step_4_v2.webp',
     imageAlt: 'Illustration of a cloud character at a laptop',
@@ -41,10 +41,10 @@ export const howFitFreeWorksSteps = [
 ];
 
 export const stepSection = {
-  title: 'A Different Kind of Therapy Experience',
+  title: 'How to get started with your <br/>Fit-or-Free session',
   subtitleTop:
-    'You don’t have to guess what comes next. From our first conversation to your first full session, every step is simple and supportive.',
-  subtitleBottom: 'Here’s how to get started',
+    `No more wasted time or money trying therapists who don't click. <br/>If it's not a fit, you don't pay.`,
+  subtitleBottom: `Here's how to get started`,
 }
 
 export const meetYourTherapistBook = {
@@ -61,7 +61,7 @@ export const meetYourTherapistTrauma = {
   title: `Your Guide on This Journey`,
   paragraphs: [
     "Kay, MS, LPC (she/they)",
-    'Georgia-licensed. Specialized in trauma-informed care for LGBTQ+, BIPOC, and neurodivergent adults navigating complex trauma, CPTSD, and healing from difficult life experiences.',
+    'Georgia-licensed. Specialized in <strong>trauma-informed</strong> care for <strong>LGBTQ+, BIPOC, and neurodivergent</strong> adults navigating <strong>complex trauma, CPTSD, and healing from difficult life experiences</strong>.',
     'Therapy that creates safety for your healing journey.',
   ],
   quote: "Healing isn't about forgetting your past, it's about reclaiming your story.",

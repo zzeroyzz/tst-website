@@ -6,15 +6,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Step { id: number; title: string }
+interface Step { id: number; title: string; description?: string }
 interface MiniHowItWorksProps { steps?: Step[]; className?: string }
 
 const defaultSteps: Step[] = [
-  { id: 1, title: 'Book consult' },
-  { id: 2, title: 'Attend session' },
-  { id: 3, title: 'We send your superbill' },
-  { id: 4, title: `You submit to your insurer's portal` },
-  { id: 5, title: 'Reimbursement (varies by plan)' },
+  { id: 1, title: 'First session is Fit-or-Free', description: `If it doesn't feel right, you don't pay, no superbill needed.` },
+  { id: 2, title: `If it's a fit, sessions are $150`, description: 'Paid sessions are eligible for a superbill.' },
+  { id: 3, title: 'We send your superbill', description: 'You can receive one after each session or monthly.' },
+  { id: 4, title: `You submit to your insurer's portal`, description: 'Most plans have an out-of-network submission process.' },
+  { id: 5, title: 'Reimbursement (varies by plan)', description: 'Coverage depends on your out-of-network benefits.' },
 ];
 
 // Tweak these to taste
@@ -60,7 +60,7 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
 
     // cleanup any previous triggers from this component
     ScrollTrigger.getAll().forEach(st => {
-      if ((st as any).__miniHowItWorks) st.kill();
+      if ((st as ScrollTrigger & { __miniHowItWorks?: boolean }).__miniHowItWorks) st.kill();
     });
 
     const n = steps.length;
@@ -104,7 +104,7 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
           // Calculate fade opacity based on handoff zone
           const totalProgress = self.progress; // 0 to 1 across entire trigger
           const stepProgress = SCROLL_DISTANCE / (SCROLL_DISTANCE + HANDOFF); // ~0.83
-          
+
           if (totalProgress > stepProgress) {
             // In handoff zone - fade out
             const handoffProgress = (totalProgress - stepProgress) / (1 - stepProgress);
@@ -117,31 +117,37 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
           gsap.set(pinEl, { x: 0, y: 0, force3D: false });
         },
       });
-      (st as any).__miniHowItWorks = true;
+      (st as ScrollTrigger & { __miniHowItWorks?: boolean }).__miniHowItWorks = true;
     } else {
       // MOBILE: sticky only; ST just drives progress/snap
       const st = ScrollTrigger.create({
         trigger: container,
-        start: 'top top',
+        start: 'top center',
         end: `+=${SCROLL_DISTANCE}`,
         scrub: true,
         pin: false,
         snap: {
-          snapTo: createSnap,
+          snapTo: (val) => {
+            // Ensure we can always snap to step 1 (progress 0)
+            if (val < 0.1) return 0;
+            return createSnap(val);
+          },
           duration: 0.6,
           ease: 'power2.out',
         },
         onUpdate: (self) => {
-          const idx = Math.min(n, Math.max(1, Math.round(self.progress * (n - 1)) + 1));
+          // Ensure step 1 is shown at the beginning
+          const progress = Math.max(0, self.progress);
+          const idx = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
           setActiveStep(idx);
         },
       });
-      (st as any).__miniHowItWorks = true;
+      (st as ScrollTrigger & { __miniHowItWorks?: boolean }).__miniHowItWorks = true;
     }
 
     return () => {
       ScrollTrigger.getAll().forEach(st => {
-        if ((st as any).__miniHowItWorks) st.kill();
+        if ((st as ScrollTrigger & { __miniHowItWorks?: boolean }).__miniHowItWorks) st.kill();
       });
     };
   }, [steps.length, prm, isDesktop]);
@@ -166,10 +172,17 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
         <ol className="max-w-3xl mx-auto px-4 space-y-6">
           {steps.map((s) => (
             <li key={s.id} className="flex items-start gap-4">
-              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-black bg-white shadow-brutalist font-bold">
+              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-black bg-white shadow-brutalist font-bold flex-shrink-0">
                 {s.id}
               </span>
-              <span className="text-lg md:text-xl">{s.title}</span>
+              <div className="flex-1">
+                <h3 className="text-lg md:text-xl font-bold mb-1">{s.title}</h3>
+                {s.description && (
+                  <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                    {s.description}
+                  </p>
+                )}
+              </div>
             </li>
           ))}
         </ol>
@@ -188,7 +201,7 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
         <div
           ref={pinRef}
           className={`flex flex-col items-center justify-center overflow-hidden ${isDesktop ? '' : 'sticky top-0'}`}
-          style={{ 
+          style={{
             height: VIEW_HEIGHT,
             opacity: isDesktop ? fadeOpacity : 1,
             transition: isDesktop ? 'none' : 'opacity 0.3s ease-out'
@@ -215,14 +228,23 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
                     >
                       {step.id}
                     </div>
-                    <div className="h-24 flex items-center justify-center">
+                    <div className="min-h-24 flex flex-col items-center justify-center">
                       <h3
-                        className={`text-xl md:text-2xl leading-snug transition-opacity duration-150
+                        className={`text-lg md:text-xl leading-snug transition-opacity duration-150 mb-2
                         ${isStepCurrent(step.id) ? 'font-bold text-black' : 'font-medium text-gray-700'}`}
                         style={{ opacity: isStepActive(step.id) ? 1 : 0.4 }}
                       >
                         {step.title}
                       </h3>
+                      {step.description && (
+                        <p
+                          className={`text-sm leading-snug transition-opacity duration-150 text-center
+                          ${isStepCurrent(step.id) ? 'text-gray-700' : 'text-gray-500'}`}
+                          style={{ opacity: isStepActive(step.id) ? 1 : 0.3 }}
+                        >
+                          {step.description}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -249,10 +271,15 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
               >
                 {activeStep}
               </div>
-              <h3 className="text-xl leading-snug font-bold text-black">
+              <h3 className="text-xl leading-snug font-bold text-black mb-2">
                 {steps[activeStep - 1]?.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-2">
+              {steps[activeStep - 1]?.description && (
+                <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                  {steps[activeStep - 1].description}
+                </p>
+              )}
+              <p className="text-sm text-gray-500">
                 Step {activeStep} of {steps.length}
               </p>
             </div>

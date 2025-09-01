@@ -16,7 +16,6 @@ import {
   meetYourTherapistBook,
   meetYourTherapistTrauma,
   meetYourTherapistND,
-  therapyFocusAreas,
 } from '@/data/bookData';
 import HowFitFreeWorksSteps from '@/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps';
 import ProfileImage from '@/components/ProfileImage/ProfileImage';
@@ -129,7 +128,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
             variants={containerVariants}
           >
             <motion.h2
-              className="hidden md:block md:text-6xl font-extrabold leading-tight"
+              className="hidden md:block md:text-5xl font-extrabold leading-tight"
               variants={itemVariants}
             >
               {getTherapistIntroForVariant().title}
@@ -139,17 +138,16 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
                 key={index}
                 className={`text-lg md:text-xl ${
                   index === 0
-                    ? 'inline-block bg-tst-green px-4 py-2 rounded-full border-2 border-black shadow-brutalist font-bold w-fit max-w-xs'
-                    : ''
+                    ? 'text-center md:text-left inline-block bg-tst-green px-4 py-2 rounded-full border-2 border-black shadow-brutalist font-bold w-fit max-w-17 mx-auto md:mx-0'
+                    : 'text-center md:text-left'
                 }`}
                 variants={itemVariants}
-              >
-                {text}
-              </motion.p>
+                dangerouslySetInnerHTML={{ __html: text }}
+              />
             ))}
             {getTherapistIntroForVariant().quote && (
               <motion.blockquote
-                className="text-xl md:text-2xl font-medium italic text-gray-800 border-l-4 border-tst-teal pl-6 mt-6"
+                className="text-lg md:text-xl font-medium italic text-gray-800 border-l-4 border-tst-teal pl-6 mt-6"
                 variants={itemVariants}
               >
                 "{getTherapistIntroForVariant().quote}"
@@ -189,15 +187,17 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           <FallingPillsBookingPage />
         </motion.div>
       </Section>
-      <Section className="py-20">
+      <Section padding="none" paddingTop="large" paddingBottom="none">
         <div className="text-center">
           <div className="max-w-4xl mx-auto px-4 mb-20">
-            <h2 className="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900">
-              {stepSection.title}
-            </h2>
-            <p className="text-lg text-gray-700 mb-16 font-medium">
-              {stepSection.subtitleTop}
-            </p>
+            <h2 
+              className="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900"
+              dangerouslySetInnerHTML={{ __html: stepSection.title }}
+            />
+            <p 
+              className="text-lg text-gray-700 mb-16 font-medium"
+              dangerouslySetInnerHTML={{ __html: stepSection.subtitleTop }}
+            />
             <h3 className="text-xl text-gray-700 font-bold">
               {stepSection.subtitleBottom}
             </h3>
@@ -226,7 +226,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         {/* Testimonials in horizontal row */}
       </Section>
       {/* Mini How It Works - Superbill Process */}
-      <Section className="py-20">
+      <Section padding="none">
         <MiniHowItWorks />
         <div className="mt-16">
           <CountUp />
@@ -252,7 +252,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           </p>
         </div>
       </Section>
-      <Section className="py-20">
+      <Section paddingBottom="large">
         <div className="h-120 mx-auto mt-24 bg-white rounded-lg shadow-brutalistLg border-2 border-black p-8 overflow-hidden">
           <div className="grid md:grid-cols-2 md:gap-8 items-center h-full">
             <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:max-w-600 md:pl-4">
@@ -271,7 +271,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xl md:text-5xl font-bold mt-4 leading-none">
+                  <h3 className="text-2xl md:text-5xl font-bold mt-4 leading-none">
                     A space where every <br />
                     part of you belongs
                   </h3>
