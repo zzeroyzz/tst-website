@@ -139,8 +139,8 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
                 key={index}
                 className={`text-lg md:text-xl ${
                   index === 0
-                    ? "inline-block bg-tst-green px-4 py-2 rounded-full border-2 border-black shadow-brutalist font-bold w-fit max-w-xs"
-                    : ""
+                    ? 'inline-block bg-tst-green px-4 py-2 rounded-full border-2 border-black shadow-brutalist font-bold w-fit max-w-xs'
+                    : ''
                 }`}
                 variants={itemVariants}
               >
@@ -176,7 +176,8 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
             My areas of focus
           </h3>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-            I specialize in creating affirming spaces for folks navigating these experiences
+            I specialize in creating affirming spaces for folks navigating these
+            experiences
           </p>
         </motion.div>
         <motion.div
@@ -189,32 +190,17 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
         </motion.div>
       </Section>
       <Section className="py-20">
-        <motion.div
-          className="text-center"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={containerVariants}
-        >
+        <div className="text-center">
           <div className="max-w-4xl mx-auto px-4 mb-20">
-            <motion.h2
-              variants={itemVariants}
-              className="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900"
-            >
+            <h2 className="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900">
               {stepSection.title}
-            </motion.h2>
-            <motion.p
-              variants={itemVariants}
-              className="text-lg text-gray-700 mb-16 font-medium"
-            >
+            </h2>
+            <p className="text-lg text-gray-700 mb-16 font-medium">
               {stepSection.subtitleTop}
-            </motion.p>
-            <motion.h3
-              variants={itemVariants}
-              className="text-xl text-gray-700 font-bold"
-            >
+            </p>
+            <h3 className="text-xl text-gray-700 font-bold">
               {stepSection.subtitleBottom}
-            </motion.h3>
+            </h3>
           </div>
           <div className="flex flex-col min-h-1000">
             {howFitFreeWorksSteps.map((step, index) => {
@@ -236,7 +222,7 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
               );
             })}
           </div>
-        </motion.div>
+        </div>
         {/* Testimonials in horizontal row */}
       </Section>
       {/* Mini How It Works - Superbill Process */}
@@ -312,26 +298,26 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
           </div>
         </div>
       </Section>
-     <Section className="bg-tst-green border-t-2 border-b-2 border-black flex flex-col items-center justify-center">
-  <h2 className="text-4xl md:text-6xl font-bold mb-8 text-center mt-10">
-    Ready to start feeling better?
-  </h2>
-  <div className="max-w-4xl w-full p-6 bg-white rounded-lg shadow-brutalistLg border-2 border-black text-center">
-    <h2 className="text-2xl md:text-3xl font-bold mb-4">
-      Pick a time → Quick intake → Free consult.
-    </h2>
-    <h3 className="text-lg mb-8">
-      First full session guaranteed, no charge if you choose not to move
-      forward.
-    </h3>
-    <Button
-      onClick={() => window.scrollTo({ top: 650, behavior: 'smooth' })}
-      className="bg-tst-purple w-full sm:w-auto mx-auto"
-    >
-      Book Your Free 15-min Consult
-    </Button>
-  </div>
-</Section>
+      <Section className="bg-tst-green border-t-2 border-b-2 border-black flex flex-col items-center justify-center">
+        <h2 className="text-4xl md:text-6xl font-bold mb-8 text-center mt-10">
+          Ready to start feeling better?
+        </h2>
+        <div className="max-w-4xl w-full p-6 bg-white rounded-lg shadow-brutalistLg border-2 border-black text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Pick a time → Quick intake → Free consult.
+          </h2>
+          <h3 className="text-lg mb-8">
+            First full session guaranteed, no charge if you choose not to move
+            forward.
+          </h3>
+          <Button
+            onClick={() => window.scrollTo({ top: 650, behavior: 'smooth' })}
+            className="bg-tst-purple w-full sm:w-auto mx-auto"
+          >
+            Book Your Free 15-min Consult
+          </Button>
+        </div>
+      </Section>
       <Section>
         <FAQ
           customFaqs={getFaqsForVariant()}
