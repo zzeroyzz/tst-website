@@ -26,6 +26,7 @@ import Button from '@/components/Button/Button';
 import Image from 'next/image';
 import CountUp from '@/components/CountUp/CountUp';
 import MiniHowItWorks from '@/components/MiniHowItWorks/MiniHowItWorks';
+import { MoonStar } from 'lucide-react';
 
 interface AdditionalContentProps {
   variant?: 'trauma' | 'affirming' | 'nd';
@@ -190,11 +191,11 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
       <Section padding="none" paddingTop="large" paddingBottom="none" id="fit-free-works-section">
         <div className="text-center">
           <div className="max-w-4xl mx-auto px-4 mb-20">
-            <h2 
+            <h2
               className="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900"
               dangerouslySetInnerHTML={{ __html: stepSection.title }}
             />
-            <p 
+            <p
               className="text-lg text-gray-700 mb-16 font-medium"
               dangerouslySetInnerHTML={{ __html: stepSection.subtitleTop }}
             />
@@ -266,9 +267,13 @@ const AdditionalContent: React.FC<AdditionalContentProps> = ({
                 />
 
                 <div>
-                  <div className="max-w-9 bg-tst-teal text-xs font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist">
-                    <p className="text-sm font-medium">Our mission</p>
+                  <div className="max-w-12 bg-tst-teal text-xs font-medium px-3 py-1 rounded-full border-2 border-black shadow-brutalist">
+                    <span className="flex items-center justify-center gap-2 text-sm md:text-base font-medium">
+    <MoonStar />
+    <span>Our mission</span>
+  </span>
                   </div>
+
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-2xl md:text-5xl font-bold mt-4 leading-none">
