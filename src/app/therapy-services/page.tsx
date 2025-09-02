@@ -8,35 +8,37 @@ import { ourApproachData } from '@/data/servicesPageData';
 const canonical = 'https://toastedsesametherapy.com/therapy-services';
 
 export const metadata: Metadata = {
-  title: 'Therapy Services in Atlanta, GA | Trauma-Informed & LGBTQIA+ Affirming',
+  title: 'Our Therapy Services | Trauma-Informed & Neurodivergent-Affirming Care in Georgia',
   description:
-    'Comprehensive therapy services in Atlanta and across Georgia. Specializing in trauma therapy, LGBTQIA+ affirming care, neurodivergent support, and Asian American mental health. Virtual sessions available statewide.',
+    'Our comprehensive virtual therapy services across Georgia specialize in trauma therapy, LGBTQIA+ affirming care, neurodivergent support, and identity-centered mental health. Licensed therapist offering secure telehealth sessions.',
   keywords: [
-    'therapy services Atlanta',
-    'trauma therapy Georgia', 
-    'LGBTQIA+ therapy Atlanta',
+    'therapy services Georgia',
+    'trauma therapy virtual',
+    'LGBTQIA+ therapy telehealth',
     'neurodivergent therapy services',
-    'Asian American therapy Atlanta',
+    'identity-centered therapy',
     'complex trauma therapy',
     'virtual therapy Georgia',
-    'individual therapy Atlanta',
+    'individual therapy telehealth',
     'affirming therapy services',
-    'identity-centered therapy'
+    'CPTSD therapy Georgia',
+    'autism therapy support',
+    'ADHD therapy services'
   ].join(', '),
   alternates: { canonical },
   openGraph: {
     url: canonical,
-    title: 'Therapy Services in Atlanta, GA | Trauma-Informed & LGBTQIA+ Affirming',
+    title: 'Our Therapy Services | Trauma-Informed & Neurodivergent-Affirming Care',
     description:
-      'Comprehensive trauma-informed, identity-centered therapy services for adults in Atlanta and across Georgia via telehealth.',
+      'Our comprehensive trauma-informed, identity-centered therapy services for adults across Georgia via secure telehealth. Specializing in neurodivergent, LGBTQIA+, and BIPOC affirming care.',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Therapy Services in Atlanta, GA | Trauma-Informed Care',
+    title: 'Our Therapy Services | Trauma-Informed & Neurodivergent-Affirming Care',
     description:
-      'Trauma-informed, LGBTQIA+ affirming therapy services for adults in Atlanta and across Georgia.',
+      'Our trauma-informed, LGBTQIA+ and neurodivergent-affirming therapy services for adults across Georgia via secure telehealth.',
   },
   robots: {
     index: true,

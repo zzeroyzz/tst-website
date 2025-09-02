@@ -5,7 +5,7 @@ import UnifiedBookingFlow from '@/components/TwoStepBooking/UnifiedBookingFlow';
 import AdditionalContent from '../AdditionalContent';
 
 export const metadata: Metadata = {
-  title: 'Neurodivergent-Friendly Free Consultation + Fit-or-Free Sessions | Kay Therapy',
+  title: 'Fit-or-Free Sessions',
   description:
     'Free 15-minute consultation designed specifically for neurodivergent adults. If your first session isn\'t a good fit, it\'s completely free. Get practical, sensory-aware coping strategies that work with your brain. Licensed therapist in Georgia.',
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'free consultation',
   ],
   openGraph: {
-    title: 'Neurodivergent-Friendly Free Consultation + Fit-or-Free Sessions',
+    title: 'Fit-or-Free Sessions',
     description:
       'Practical, sensory-aware coping strategies designed for neurodivergent brains. Free 15-minute consultation with Georgia-licensed therapist, plus fit-or-free therapy sessions.',
     type: 'website',
