@@ -32,10 +32,7 @@
   flex-direction: column;
 }
 
-/* The hover animation */
-.wrapper:hover .card {
-  transform: translate(8px, 8px);
-}
+/* Removed hover effect for non-interactive symptom cards */
 
 .wrapper:active .card {
   transform: translate(0, 0);

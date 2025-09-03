@@ -27,12 +27,7 @@
   transition: transform 150ms ease-in-out;
 }
 
-.wrapper:hover .pill {
-  transform: translate(2px, 2px);
-}
-.wrapper:hover .shadow {
-  transform: translate(2px, 2px);
-}
+/* Removed hover effects for non-interactive elements */
 
 .wrapper:active .pill,
 .wrapper:active .shadow {

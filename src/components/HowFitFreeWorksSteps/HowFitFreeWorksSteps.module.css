@@ -140,9 +140,7 @@
   color: #c5a1ff;
 }
 
-.card_wrapper:hover .card {
-  transform: translate(12px, 12px);
-}
+/* Removed hover effect for non-interactive step card */
 
 /* Desktop specific styles */
 /* @media (min-width: 768px) {
