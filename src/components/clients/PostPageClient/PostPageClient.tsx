@@ -103,7 +103,7 @@ const PostPageClient: React.FC = () => {
           .eq('type', postData.type) // Same type first
           .neq('id', postData.id)
           .order('sent_at', { ascending: false })
-          .limit(2);
+          .limit(3);
 
         // If user is not authenticated, only show visible posts in suggestions
         if (!isAuthenticated) {
@@ -209,12 +209,12 @@ const PostPageClient: React.FC = () => {
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 mb-12 font-medium">
-              <span className="mx-3">›</span>
+
               <Link
                 href="/mental-health-healing-blog"
                 className="hover:text-gray-700 transition-colors"
               >
-                Back to posts
+                Posts
               </Link>
               <span className="mx-3">›</span>
               <span className="text-gray-900 truncate">{post.title}</span>
