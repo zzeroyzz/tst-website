@@ -54,13 +54,7 @@
   }
 }
 
-/* The "push in" animation */
-.pill_wrapper:hover .pill {
-  transform: translate(2px, 2px);
-}
-.pill_wrapper:hover .shadow {
-  transform: translate(2px, 2px);
-}
+/* Removed hover effects for non-interactive elements */
 
 .pill_wrapper:active .pill,
 .pill_wrapper:active .shadow {

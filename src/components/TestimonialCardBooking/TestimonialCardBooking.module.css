@@ -33,9 +33,7 @@
   overflow: hidden;
 }
 
-.card_wrapper:hover .card {
-  transform: translate(8px, 8px);
-}
+/* Removed hover effect for non-interactive testimonial card */
 
 /* Content discipline (avoid clipping) */
 .card > * {
