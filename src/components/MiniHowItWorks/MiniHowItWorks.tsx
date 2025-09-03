@@ -264,7 +264,7 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
              w-full max-w-[1100px] mx-auto overflow-visible
              px-4 md:px-16 py-6 md:py-8"
               style={{
-  height: isDesktop ? CARD_HEIGHT : CARD_HEIGHT_MOBILE,
+  minHeight: isDesktop ? CARD_HEIGHT : CARD_HEIGHT_MOBILE,
   opacity: fadeOpacity,
 }}
             >
@@ -287,18 +287,18 @@ const MiniHowItWorks: React.FC<MiniHowItWorksProps> = ({
 
               {/* Desktop row */}
               <div className="hidden md:block w-full">
-                <div className="flex items-center justify-center gap-8 px-8">
+                <div className="flex flex-wrap items-center justify-center gap-8 px-8">
                   {steps.map((step, idx) => (
                     <React.Fragment key={step.id}>
                       <div
-                        className="w-48 text-center flex-shrink-0"
+                        className="w-48 text-center flex-shrink-0 flex flex-col items-center"
                         role="listitem"
                         aria-current={
                           isStepCurrent(step.id) ? 'step' : undefined
                         }
                       >
                         <div
-                          className={`inline-flex items-center justify-center w-20 h-20 rounded-full border-4 border-black mb-4 md:mb-6 text-3xl font-bold transition-[background-color,box-shadow] duration-200
+                          className={`flex items-center justify-center w-20 h-20 rounded-full border-4 border-black mb-4 md:mb-6 text-3xl font-bold transition-[background-color,box-shadow] duration-200
                           ${isStepCurrent(step.id) ? 'bg-tst-yellow shadow-brutalistLg' : 'bg-white shadow-brutalist'}`}
                         >
                           {step.id}
