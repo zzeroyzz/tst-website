@@ -33,16 +33,4 @@ export interface Contact {
   last_appointment_update?: string;
 }
 
-export interface CreateContactData {
-  name: string;
-  last_name: string;
-  email: string;
-  phone_number?: string;
-  company?: string;
-  position?: string;
-  source?: string;
-  status?: Contact['status'];
-  notes?: string;
-  tags?: string[];
-}
 

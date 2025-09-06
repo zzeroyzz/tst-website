@@ -104,24 +104,4 @@ export const testimonials = [
   },
 ];
 
-export const therapyFocusAreas = [
-  'Burnout & Exhaustion',
-  'Self-Esteem Issues',
-  'Relationship Challenges',
-   'Trauma & CPTSD',
-  'Life Transitions',
-  'Identity Exploration',
-  'Neurodivergence Support',
-  'Stress Management',
-  'Anxiety & Overwhelm',
-  'Polyamory & Non-Monogamy',
-  'Attention Deficit (ADHD)',
-  'LGBTQ+ Affirming',
-  'Cultural Identity',
-  'BIPOC Affirming',
-  'Adoption',
-  'Autism Spectrum',
-  'Racial Stress & Trauma',
-  'Gender or Sexual Identity Exploration',
-];
 
