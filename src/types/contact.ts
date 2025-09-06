@@ -46,15 +46,3 @@ export interface CreateContactData {
   tags?: string[];
 }
 
-export interface UpdateContactData extends Partial<CreateContactData> {
-  scheduled_appointment_at?: string | null;
-  appointment_status?: Contact['appointment_status'];
-  appointment_notes?: string | null;
-}
-
-export interface ScheduleAppointmentData {
-  contactId: string;
-  appointmentDateTime: Date;
-  status: 'scheduled';
-  notes?: string;
-}
