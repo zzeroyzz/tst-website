@@ -26,8 +26,6 @@ export const helpWithKeywords = [
   'Identity Exploration',
 ];
 
-// Focus areas for the therapy banner component
-export const therapyFocusAreas = helpWithKeywords;
 
 export const individualTherapyData = {
   title: 'One-on-One Support',
