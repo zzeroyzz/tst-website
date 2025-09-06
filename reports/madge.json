@@ -1,0 +1,893 @@
+{
+  ".next/types/app/api/contact/appointments/route.ts": [
+    "src/app/api/contact/appointments/route.ts"
+  ],
+  ".next/types/app/api/dashboard/notifications/route.ts": [
+    "src/app/api/dashboard/notifications/route.ts"
+  ],
+  ".next/types/app/dashboard/page.ts": [
+    "src/app/dashboard/page.tsx"
+  ],
+  ".next/types/app/layout.ts": [
+    "src/app/layout.tsx"
+  ],
+  ".next/types/cache-life.d.ts": [],
+  "codegen.ts": [],
+  "cypress.config.ts": [],
+  "cypress/e2e/booking-flow.cy.ts": [],
+  "cypress/e2e/contact.cy.ts": [],
+  "cypress/e2e/graphql-debug.cy.ts": [],
+  "cypress/support/commands.ts": [],
+  "cypress/support/e2e.ts": [
+    "cypress/support/commands.ts"
+  ],
+  "middleware.ts": [],
+  "next-env.d.ts": [],
+  "next.config.ts": [],
+  "public/assets/Somatic-Animation.json": [],
+  "public/assets/TT-Animation.json": [],
+  "public/assets/Tired.json": [],
+  "public/assets/Trauma.json": [],
+  "public/assets/identity.json": [],
+  "public/assets/neuro.json": [],
+  "src/__tests__/integration/contact-flow.test.tsx": [
+    "src/__tests__/test-utils.tsx",
+    "src/components/clients/ContactPageClient/ContactPageClient.tsx"
+  ],
+  "src/__tests__/test-utils.tsx": [],
+  "src/app/about/page.tsx": [
+    "src/components/clients/AboutPageClient/AboutPageClient.tsx"
+  ],
+  "src/app/api/appointment/available-slots/route.ts": [],
+  "src/app/api/appointment/booked-slots/route.ts": [],
+  "src/app/api/appointment/cancel-link/[uuid]/route.ts": [],
+  "src/app/api/appointment/cancel/route.ts": [
+    "src/lib/appointment-email-templates.ts"
+  ],
+  "src/app/api/appointment/cleanup-past/route.ts": [],
+  "src/app/api/appointment/reschedule/route.ts": [
+    "src/lib/appointment-email-templates.ts"
+  ],
+  "src/app/api/appointment/status/route.ts": [],
+  "src/app/api/business-query/route.ts": [],
+  "src/app/api/contact/appointments/route.ts": [],
+  "src/app/api/contact/cancel-appointment/route.ts": [],
+  "src/app/api/contact/route.test.ts": [],
+  "src/app/api/conversation/respond/route.ts": [
+    "src/lib/conversations/flow-manager-server.ts"
+  ],
+  "src/app/api/conversation/save-response/route.ts": [],
+  "src/app/api/conversation/state/route.ts": [
+    "src/lib/conversations/flow-manager-server.ts"
+  ],
+  "src/app/api/cron/cleanup-appointments/route.ts": [],
+  "src/app/api/cron/process-workflows/route.ts": [
+    "src/lib/twilio/workflow-triggers.ts"
+  ],
+  "src/app/api/dashboard/notifications/route.ts": [],
+  "src/app/api/graphql/route.ts": [
+    "src/lib/graphql/resolvers/index.ts",
+    "src/lib/graphql/typeDefs.ts"
+  ],
+  "src/app/api/lead/cancel/[leadId]/route.ts": [],
+  "src/app/api/leads/send-reminder/route.ts": [
+    "src/lib/custom-email-templates.ts",
+    "src/lib/email-sender.ts"
+  ],
+  "src/app/api/newsletter/preview/route.ts": [
+    "src/lib/email-template.ts"
+  ],
+  "src/app/api/newsletter/send/route.ts": [
+    "src/lib/email-template.ts"
+  ],
+  "src/app/api/newsletter/subscribe/route.test.ts": [],
+  "src/app/api/newsletter/subscribe/route.ts": [
+    "src/lib/custom-email-templates.ts",
+    "src/lib/email-sender.ts"
+  ],
+  "src/app/api/posts/[slug]/like/route.ts": [],
+  "src/app/api/posts/[slug]/view/route.ts": [],
+  "src/app/api/send-appointment-emails/route.ts": [
+    "src/lib/appointment-email-templates.ts"
+  ],
+  "src/app/api/test-twilio-integration/route.ts": [
+    "src/lib/conversations/flow-manager-server.ts",
+    "src/lib/conversations/flow-manager.ts",
+    "src/lib/sms/workflows.ts",
+    "src/lib/twilio/client.ts",
+    "src/lib/twilio/delivery-tracking.ts",
+    "src/lib/twilio/webhook-processor.ts",
+    "src/lib/twilio/workflow-triggers.ts"
+  ],
+  "src/app/api/twilio/webhook/route.ts": [],
+  "src/app/api/upload/image/route.ts": [],
+  "src/app/book/AdditionalContent.test.tsx": [
+    "src/app/book/AdditionalContent.tsx"
+  ],
+  "src/app/book/AdditionalContent.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CountUp/CountUp.tsx",
+    "src/components/FAQ/FAQ.tsx",
+    "src/components/FallingPills/FallingPillsBookingPage.tsx",
+    "src/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps.tsx",
+    "src/components/MiniHowItWorks/MiniHowItWorks.tsx",
+    "src/components/ProfileImage/ProfileImage.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/TestimonialCardBooking/TestimonialCardBooking.tsx",
+    "src/data/bookData.ts",
+    "src/data/bookingFaqData.ts"
+  ],
+  "src/app/book/affirming/page.tsx": [],
+  "src/app/book/nd/page.tsx": [
+    "src/app/book/AdditionalContent.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/TwoStepBooking/UnifiedBookingFlow.tsx"
+  ],
+  "src/app/book/page.tsx": [],
+  "src/app/book/trauma/page.tsx": [
+    "src/app/book/AdditionalContent.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/TwoStepBooking/UnifiedBookingFlow.tsx"
+  ],
+  "src/app/business-queries/page.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/lib/validation.ts"
+  ],
+  "src/app/cancel-appointment/[uuid]/page.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Section/Section.tsx"
+  ],
+  "src/app/contact/contact.test.tsx": [
+    "src/app/contact/page.tsx"
+  ],
+  "src/app/contact/page.tsx": [],
+  "src/app/dashboard/blog/[id]/page.tsx": [
+    "src/components/Blog/BlogEditor.tsx"
+  ],
+  "src/app/dashboard/blog/create/page.tsx": [
+    "src/components/Blog/BlogEditor.tsx"
+  ],
+  "src/app/dashboard/blog/page.tsx": [
+    "src/components/Blog/BlogView.tsx"
+  ],
+  "src/app/dashboard/newsletter/[id]/page.tsx": [
+    "src/components/Newsletter/NewsletterEditor.tsx",
+    "src/types/index.ts"
+  ],
+  "src/app/dashboard/page.tsx": [
+    "src/components/AppointmentsDashboard/AppointmentsDashboard.tsx",
+    "src/components/Blog/BlogView.tsx",
+    "src/components/CRM/CRMView.tsx",
+    "src/components/DashboardNotifications/DashboardNotifications.tsx",
+    "src/components/DashboardView/DashboardView.tsx",
+    "src/components/KanbanBoard/KanbanBoard.tsx",
+    "src/components/Leads/LeadsView.tsx",
+    "src/components/Newsletter/NewsletterView.tsx",
+    "src/components/skeleton/index.ts"
+  ],
+  "src/app/globals.css": [],
+  "src/app/guides/page.tsx": [
+    "src/components/clients/GuidesPageClient/GuidesPageClient.tsx"
+  ],
+  "src/app/layout.tsx": [
+    "src/app/globals.css",
+    "src/components/ConditionalLayout/ConditionalLayout.tsx",
+    "src/components/CookieConsent/CookieConsent.tsx",
+    "src/components/Footer/Footer.tsx",
+    "src/components/Nav/Nav.tsx",
+    "src/components/NavigationLoadingIndicator/NavigationLoadingIndicator.tsx",
+    "src/components/clients/ToasterClient/ToasterClient.tsx",
+    "src/contexts/NavigationContext.tsx",
+    "src/lib/apollo/client.tsx"
+  ],
+  "src/app/login/page.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/Section/Section.tsx"
+  ],
+  "src/app/mental-health-healing-blog/page.tsx": [
+    "src/components/clients/BlogPageClient/BlogPageClient.tsx"
+  ],
+  "src/app/not-found.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/app/page.tsx": [
+    "src/components/clients/HomePageClient/HomePageClient.tsx"
+  ],
+  "src/app/policy/page.tsx": [
+    "src/components/clients/PolicyPageClient/PolicyPageClient.tsx"
+  ],
+  "src/app/posts/[slug]/page.tsx": [
+    "src/components/clients/PostPageClient/PostPageClient.tsx"
+  ],
+  "src/app/reschedule/[uuid]/page.tsx": [
+    "src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx",
+    "src/components/Section/Section.tsx"
+  ],
+  "src/app/reschedule/[uuid]/reschedule.test.tsx": [
+    "src/app/reschedule/[uuid]/page.tsx"
+  ],
+  "src/app/robots.ts": [],
+  "src/app/sitemap.ts": [],
+  "src/app/thank-you-reschedule/page.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Section/Section.tsx"
+  ],
+  "src/app/thank-you/page.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Section/Section.tsx"
+  ],
+  "src/app/thank-you/thank-you.test.tsx": [
+    "src/app/thank-you/page.tsx"
+  ],
+  "src/app/therapy-services/page.tsx": [
+    "src/components/clients/ServicesPageClient/ServicesPageClient.tsx",
+    "src/data/faqData.ts",
+    "src/data/servicesPageData.ts"
+  ],
+  "src/app/toasty-tidbits-archives/page.tsx": [],
+  "src/components/AnimatedCheckbox/AnimatedCheckbox.module.css": [],
+  "src/components/AnimatedCheckbox/AnimatedCheckbox.tsx": [
+    "src/components/AnimatedCheckbox/AnimatedCheckbox.module.css"
+  ],
+  "src/components/AnimatedImage/AnimatedImage.module.css": [],
+  "src/components/AnimatedImage/AnimatedImage.tsx": [
+    "src/components/AnimatedImage/AnimatedImage.module.css",
+    "src/components/LottiePlayer/LottiePlayer.tsx"
+  ],
+  "src/components/AppointmentCancelModal/AppointmentCancelModal.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.test.tsx": [
+    "src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx"
+  ],
+  "src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/AppointmentsDashboard/AppointmentsDashboard.tsx": [
+    "src/components/AppointmentCancelModal/AppointmentCancelModal.tsx",
+    "src/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar.tsx",
+    "src/components/Button/Button.tsx",
+    "src/components/LeadDetailModal/LeadDetailModal.tsx",
+    "src/hooks/useAppointments.ts",
+    "src/types/contact.ts",
+    "src/utils/appointmentHelpers.ts"
+  ],
+  "src/components/BelowTheFold/BelowTheFold.module.css": [],
+  "src/components/BelowTheFold/BelowTheFold.tsx": [
+    "src/components/BelowTheFold/BelowTheFold.module.css",
+    "src/components/Button/Button.tsx",
+    "src/data/belowTheFoldData.ts"
+  ],
+  "src/components/Blog/BlogDetailModal.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/types/index.ts"
+  ],
+  "src/components/Blog/BlogEditor.tsx": [
+    "src/components/Blog/BlogPreviewModal.tsx",
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/data/tagData.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/Blog/BlogPreviewModal.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CircleIcon/CircleIcon.tsx"
+  ],
+  "src/components/Blog/BlogView.tsx": [
+    "src/components/Blog/BlogDetailModal.tsx",
+    "src/components/Button/Button.tsx",
+    "src/components/skeleton/index.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/Breadcrumb/Breadcrumb.tsx": [],
+  "src/components/Button/Button.module.css": [],
+  "src/components/Button/Button.tsx": [
+    "src/components/Button/Button.module.css"
+  ],
+  "src/components/CRM/CRMAnalytics.tsx": [],
+  "src/components/CRM/CRMView.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CRM/CRMAnalytics.tsx",
+    "src/components/CRM/ContactsManager.tsx",
+    "src/components/CRM/MessageTemplates.tsx",
+    "src/components/CRM/MessagingInterface.tsx"
+  ],
+  "src/components/CRM/ContactsManager.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx"
+  ],
+  "src/components/CRM/ConversationHistory.tsx": [],
+  "src/components/CRM/MessageTemplates.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx"
+  ],
+  "src/components/CRM/MessagingInterface.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CRM/ConversationHistory.tsx",
+    "src/components/CRM/ScriptBubbles.tsx",
+    "src/components/Input/Input.tsx",
+    "src/lib/conversations/flow-manager-client.ts",
+    "src/lib/conversations/response-tracker.ts",
+    "src/lib/graphql/mutations/messages.ts",
+    "src/lib/graphql/queries/contacts.ts",
+    "src/lib/graphql/queries/messages.ts"
+  ],
+  "src/components/CRM/ScriptBubbles.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/data/fitFreeTemplateData.ts",
+    "src/lib/appointments/availability.ts",
+    "src/lib/graphql/queries/appointments.ts"
+  ],
+  "src/components/CTA/CTA.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/CircleIcon/CircleIcon.module.css": [],
+  "src/components/CircleIcon/CircleIcon.tsx": [
+    "src/components/CircleIcon/CircleIcon.module.css"
+  ],
+  "src/components/ConditionalLayout/ConditionalLayout.test.tsx": [
+    "src/components/ConditionalLayout/ConditionalLayout.tsx"
+  ],
+  "src/components/ConditionalLayout/ConditionalLayout.tsx": [
+    "src/components/LogoOnly/LogoOnly.tsx"
+  ],
+  "src/components/Contact/CalendarContactForm.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/LeadCalendar/LeadCalendar.tsx",
+    "src/lib/apollo/client.tsx",
+    "src/lib/graphql/mutations/index.ts",
+    "src/lib/validation.ts"
+  ],
+  "src/components/Contact/ContactForm.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/FAQ/FAQ.tsx",
+    "src/components/Input/Input.tsx",
+    "src/lib/graphql/mutations/index.ts",
+    "src/lib/validation.ts"
+  ],
+  "src/components/Contact/__tests__/ContactForm.test.tsx": [
+    "src/components/Contact/ContactForm.tsx"
+  ],
+  "src/components/Contact/modules/ContactForm.module.css": [],
+  "src/components/ContactInfo/ContactInfo.tsx": [],
+  "src/components/CookieConsent/CookieConsent.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/CookiePreferences/CookiePreferences.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/CookieSettings/CookieSettings.tsx": [
+    "src/components/CookiePreferences/CookiePreferences.tsx"
+  ],
+  "src/components/CountUp/CountUp.tsx": [],
+  "src/components/DashboardNotifications/DashboardNotifications.module.css": [],
+  "src/components/DashboardNotifications/DashboardNotifications.tsx": [
+    "src/components/DashboardNotifications/DashboardNotifications.module.css"
+  ],
+  "src/components/DashboardView/DashboardView.tsx": [
+    "src/components/skeleton/index.ts"
+  ],
+  "src/components/FAQ/AccordionItem.module.css": [],
+  "src/components/FAQ/AccordionItem.tsx": [
+    "src/components/FAQ/AccordionItem.module.css"
+  ],
+  "src/components/FAQ/FAQ.tsx": [
+    "src/components/FAQ/AccordionItem.tsx",
+    "src/data/faqData.ts"
+  ],
+  "src/components/FallingPills/FallingPills.module.css": [],
+  "src/components/FallingPills/FallingPills.tsx": [
+    "src/components/FallingPills/FallingPills.module.css",
+    "src/data/servicesPageData.ts"
+  ],
+  "src/components/FallingPills/FallingPillsBookingPage.module.css": [],
+  "src/components/FallingPills/FallingPillsBookingPage.tsx": [
+    "src/components/FallingPills/FallingPillsBookingPage.module.css",
+    "src/data/servicesPageData.ts"
+  ],
+  "src/components/FocusAreaBanner/FocusAreaBanner.module.css": [],
+  "src/components/FocusAreaBanner/FocusAreaBanner.test.tsx": [
+    "src/components/FocusAreaBanner/FocusAreaBanner.tsx"
+  ],
+  "src/components/FocusAreaBanner/FocusAreaBanner.tsx": [
+    "src/components/FocusAreaBanner/FocusAreaBanner.module.css"
+  ],
+  "src/components/FocusAreaBanner/index.ts": [
+    "src/components/FocusAreaBanner/FocusAreaBanner.tsx"
+  ],
+  "src/components/Footer/Footer.test.tsx": [
+    "src/components/Footer/Footer.tsx"
+  ],
+  "src/components/Footer/Footer.tsx": [
+    "src/components/CookieSettings/CookieSettings.tsx",
+    "src/components/HoverLink/HoverLink.tsx"
+  ],
+  "src/components/Highlight/Highlight.tsx": [],
+  "src/components/HoverLink/HoverLink.module.css": [],
+  "src/components/HoverLink/HoverLink.tsx": [
+    "src/components/HoverLink/HoverLink.module.css",
+    "src/components/NavigationLink/NavigationLink.tsx"
+  ],
+  "src/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps.module.css": [],
+  "src/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps.tsx": [
+    "src/components/HowFitFreeWorksSteps/HowFitFreeWorksSteps.module.css"
+  ],
+  "src/components/HowItWorksSteps/HowItWorksSteps.module.css": [],
+  "src/components/HowItWorksSteps/HowItWorksSteps.tsx": [
+    "src/components/HowItWorksSteps/HowItWorksSteps.module.css"
+  ],
+  "src/components/IconCircle/IconCircle.module.css": [],
+  "src/components/IconCircle/IconCircle.tsx": [
+    "src/components/IconCircle/IconCircle.module.css"
+  ],
+  "src/components/Input/Input.module.css": [],
+  "src/components/Input/Input.tsx": [
+    "src/components/Input/Input.module.css"
+  ],
+  "src/components/KanbanBoard/KanbanBoard.tsx": [
+    "src/components/skeleton/index.ts"
+  ],
+  "src/components/KeywordPill/KeywordPill.module.css": [],
+  "src/components/KeywordPill/KeywordPill.tsx": [
+    "src/components/KeywordPill/KeywordPill.module.css"
+  ],
+  "src/components/LeadCalendar/LeadCalendar.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/LeadDetailModal/LeadDetailModal.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/types/lead.ts"
+  ],
+  "src/components/LeadMagnet/LeadMagnet.module.css": [],
+  "src/components/LeadMagnet/LeadMagnet.tsx": [
+    "src/components/LeadMagnet/LeadMagnet.module.css",
+    "src/components/Section/Section.tsx",
+    "src/data/leadData.ts"
+  ],
+  "src/components/Leads/LeadsView.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/LeadDetailModal/LeadDetailModal.tsx",
+    "src/components/skeleton/index.ts",
+    "src/types/lead.ts"
+  ],
+  "src/components/Leads/__tests__/LeadsView.test.tsx": [
+    "src/__tests__/test-utils.tsx",
+    "src/components/Leads/LeadsView.tsx"
+  ],
+  "src/components/LoadingIndicator/LoadingIndicator.tsx": [],
+  "src/components/LogoOnly/LogoOnly.tsx": [],
+  "src/components/LottiePlayer/LottiePlayer.tsx": [],
+  "src/components/MiniHowItWorks/MiniHowItWorks.tsx": [],
+  "src/components/MiniHowItWorks/MiniHowItWorksDemo.tsx": [
+    "src/components/MiniHowItWorks/MiniHowItWorks.tsx"
+  ],
+  "src/components/MobileMenu/MobileMenu.tsx": [],
+  "src/components/Nav/Nav.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/HoverLink/HoverLink.tsx",
+    "src/components/MobileMenu/MobileMenu.tsx",
+    "src/components/NavigationLink/NavigationLink.tsx"
+  ],
+  "src/components/NavigationLink/NavigationLink.tsx": [
+    "src/contexts/NavigationContext.tsx"
+  ],
+  "src/components/NavigationLoadingIndicator/NavigationLoadingIndicator.tsx": [
+    "src/components/LoadingIndicator/LoadingIndicator.tsx",
+    "src/contexts/NavigationContext.tsx"
+  ],
+  "src/components/Newsletter/NewsletterEditor.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/Newsletter/NewsletterPreviewModal.tsx",
+    "src/data/tagData.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/Newsletter/NewsletterPreviewModal.tsx": [
+    "src/components/Button/Button.tsx"
+  ],
+  "src/components/Newsletter/NewsletterView.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/skeleton/index.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/Newsletter/__tests__/NewsletterEditor.test.tsx": [
+    "src/__tests__/test-utils.tsx",
+    "src/components/Newsletter/NewsletterEditor.tsx"
+  ],
+  "src/components/PostStats/PostStats.tsx": [
+    "src/hooks/usePostInteractions.ts"
+  ],
+  "src/components/PostStats/__tests__/PostStats.test.tsx": [
+    "src/components/PostStats/PostStats.tsx"
+  ],
+  "src/components/ProfileImage/ProfileImage.tsx": [],
+  "src/components/ResourceCard/ResourceCard.module.css": [],
+  "src/components/ResourceCard/ResourceCard.tsx": [
+    "src/components/ResourceCard/ResourceCard.module.css"
+  ],
+  "src/components/Section/Section.tsx": [],
+  "src/components/Services/ServiceOfferingCard.module.css": [],
+  "src/components/Services/ServiceOfferingCard.tsx": [
+    "src/components/Services/ServiceOfferingCard.module.css"
+  ],
+  "src/components/SubscribeModal/SubscribeModal.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/LottiePlayer/LottiePlayer.tsx",
+    "src/data/animations.ts"
+  ],
+  "src/components/TestimonialCard/TestimonialCard.tsx": [
+    "src/components/CircleIcon/CircleIcon.tsx"
+  ],
+  "src/components/TestimonialCardBooking/TestimonialCardBooking.module.css": [],
+  "src/components/TestimonialCardBooking/TestimonialCardBooking.tsx": [
+    "src/components/CircleIcon/CircleIcon.tsx",
+    "src/components/TestimonialCardBooking/TestimonialCardBooking.module.css"
+  ],
+  "src/components/TherapyCard/TherapyCard.module.css": [],
+  "src/components/TherapyCard/TherapyCard.tsx": [
+    "src/components/LottiePlayer/LottiePlayer.tsx",
+    "src/components/TherapyCard/TherapyCard.module.css",
+    "src/data/therapyCardData.ts"
+  ],
+  "src/components/TwoStepBooking/BookingDetailsForm.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/hooks/useBookingSubmission.ts"
+  ],
+  "src/components/TwoStepBooking/BookingPageHeader.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/IconCircle/IconCircle.tsx"
+  ],
+  "src/components/TwoStepBooking/CalendarStepComponent.tsx": [],
+  "src/components/TwoStepBooking/ContactFormStepComponent.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/TwoStepBooking/TwoStepBooking.tsx",
+    "src/lib/graphql/mutations/index.ts"
+  ],
+  "src/components/TwoStepBooking/TwoStepBooking.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/TwoStepBooking/CalendarStepComponent.tsx",
+    "src/components/TwoStepBooking/ContactFormStepComponent.tsx"
+  ],
+  "src/components/TwoStepBooking/UnifiedBookingFlow.tsx": [
+    "src/components/TwoStepBooking/BookingDetailsForm.tsx",
+    "src/components/TwoStepBooking/BookingPageHeader.tsx",
+    "src/components/TwoStepBooking/CalendarStepComponent.tsx"
+  ],
+  "src/components/WallOfLove/WallOfLove.module.css": [],
+  "src/components/WallOfLove/WallOfLove.tsx": [
+    "src/components/WallOfLove/WallOfLove.module.css",
+    "src/components/WallOfLove/WallOfLoveCard.tsx",
+    "src/data/wallOfLoveData.ts"
+  ],
+  "src/components/WallOfLove/WallOfLoveCard.module.css": [],
+  "src/components/WallOfLove/WallOfLoveCard.tsx": [
+    "src/components/WallOfLove/WallOfLoveCard.module.css"
+  ],
+  "src/components/clients/AboutPageClient/AboutPageClient.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CTA/CTA.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/LottiePlayer/LottiePlayer.tsx",
+    "src/components/ProfileImage/ProfileImage.tsx",
+    "src/data/aboutData.ts",
+    "src/data/animations.ts",
+    "src/data/resourceData.ts"
+  ],
+  "src/components/clients/BlogPageClient/BlogPageClient.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/ResourceCard/ResourceCard.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/SubscribeModal/SubscribeModal.tsx",
+    "src/components/skeleton/index.ts",
+    "src/data/tagData.ts",
+    "src/hooks/useSubscribeModalTrigger.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/clients/BookingPageClient/BookingPageClient.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/LeadCalendar/LeadCalendar.tsx",
+    "src/lib/graphql/mutations/index.ts"
+  ],
+  "src/components/clients/ContactPageClient/ContactPageClient.tsx": [
+    "src/components/CircleIcon/CircleIcon.tsx",
+    "src/components/Contact/ContactForm.tsx",
+    "src/components/Contact/modules/ContactForm.module.css",
+    "src/components/FAQ/FAQ.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/TherapyCard/TherapyCard.module.css",
+    "src/data/contactData.ts"
+  ],
+  "src/components/clients/GuidesPageClient/GuidesPageClient.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/Highlight/Highlight.tsx",
+    "src/components/Input/Input.tsx",
+    "src/components/LottiePlayer/LottiePlayer.tsx",
+    "src/components/ResourceCard/ResourceCard.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/WallOfLove/WallOfLove.tsx",
+    "src/components/skeleton/index.ts",
+    "src/data/animations.ts",
+    "src/data/resourceData.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/clients/HomePageClient/HomePageClient.tsx": [
+    "src/components/BelowTheFold/BelowTheFold.tsx",
+    "src/components/Button/Button.tsx",
+    "src/components/CTA/CTA.tsx",
+    "src/components/CircleIcon/CircleIcon.tsx",
+    "src/components/HoverLink/HoverLink.tsx",
+    "src/components/HowItWorksSteps/HowItWorksSteps.tsx",
+    "src/components/IconCircle/IconCircle.tsx",
+    "src/components/LeadMagnet/LeadMagnet.tsx",
+    "src/components/ProfileImage/ProfileImage.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/TestimonialCard/TestimonialCard.tsx",
+    "src/components/TherapyCard/TherapyCard.tsx",
+    "src/data/pageData.ts"
+  ],
+  "src/components/clients/PolicyPageClient/PolicyPageClient.tsx": [
+    "src/components/Section/Section.tsx",
+    "src/data/policyData.ts"
+  ],
+  "src/components/clients/PostPageClient/PostPageClient.module.css": [],
+  "src/components/clients/PostPageClient/PostPageClient.tsx": [
+    "src/components/Button/Button.tsx",
+    "src/components/CircleIcon/CircleIcon.tsx",
+    "src/components/PostStats/PostStats.tsx",
+    "src/components/ResourceCard/ResourceCard.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/SubscribeModal/SubscribeModal.tsx",
+    "src/components/clients/PostPageClient/PostPageClient.module.css",
+    "src/components/skeleton/index.ts",
+    "src/hooks/useSubscribeModalTrigger.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/clients/ServicesPageClient/ServicesPageClient.tsx": [
+    "src/components/AnimatedImage/AnimatedImage.tsx",
+    "src/components/Button/Button.tsx",
+    "src/components/CTA/CTA.tsx",
+    "src/components/FAQ/FAQ.tsx",
+    "src/components/FallingPills/FallingPillsBookingPage.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/Services/ServiceOfferingCard.tsx",
+    "src/data/servicesPageData.ts"
+  ],
+  "src/components/clients/ToasterClient/ToasterClient.tsx": [],
+  "src/components/clients/ToastyTidbitsArchivePageClient/ToastyTidbitsArchivePageClient.tsx": [
+    "src/components/ResourceCard/ResourceCard.tsx",
+    "src/components/Section/Section.tsx",
+    "src/components/SubscribeModal/SubscribeModal.tsx",
+    "src/components/skeleton/index.ts",
+    "src/data/tagData.ts",
+    "src/hooks/useSubscribeModalTrigger.ts",
+    "src/types/index.ts"
+  ],
+  "src/components/skeleton/DashboardSkeleton.tsx": [],
+  "src/components/skeleton/DashboardViewSkeleton.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/KanbanBoardSkeleton.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/LeadsViewSkeleton.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/NewsletterArchiveSkeleton.tsx": [
+    "src/components/Section/Section.tsx",
+    "src/components/skeleton/SkeletonBase.tsx",
+    "src/components/skeleton/index.ts"
+  ],
+  "src/components/skeleton/NewsletterViewSkeleton.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/SinglePostSkeleton.tsx": [
+    "src/components/Section/Section.tsx",
+    "src/components/skeleton/index.ts"
+  ],
+  "src/components/skeleton/SkeletonAvatar.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/SkeletonBase.tsx": [
+    "src/lib/utils.ts"
+  ],
+  "src/components/skeleton/SkeletonBreadcrumb.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/SkeletonButton.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/SkeletonCard.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/SkeletonHeader.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx",
+    "src/components/skeleton/index.ts"
+  ],
+  "src/components/skeleton/SkeletonText.tsx": [
+    "src/components/skeleton/SkeletonBase.tsx"
+  ],
+  "src/components/skeleton/index.ts": [
+    "src/components/skeleton/DashboardSkeleton.tsx",
+    "src/components/skeleton/DashboardViewSkeleton.tsx",
+    "src/components/skeleton/KanbanBoardSkeleton.tsx",
+    "src/components/skeleton/LeadsViewSkeleton.tsx",
+    "src/components/skeleton/NewsletterArchiveSkeleton.tsx",
+    "src/components/skeleton/NewsletterViewSkeleton.tsx",
+    "src/components/skeleton/SinglePostSkeleton.tsx",
+    "src/components/skeleton/SkeletonAvatar.tsx",
+    "src/components/skeleton/SkeletonBase.tsx",
+    "src/components/skeleton/SkeletonBreadcrumb.tsx",
+    "src/components/skeleton/SkeletonButton.tsx",
+    "src/components/skeleton/SkeletonCard.tsx",
+    "src/components/skeleton/SkeletonHeader.tsx",
+    "src/components/skeleton/SkeletonText.tsx"
+  ],
+  "src/contexts/NavigationContext.tsx": [],
+  "src/data/aboutData.ts": [],
+  "src/data/animations.ts": [],
+  "src/data/belowTheFoldData.ts": [],
+  "src/data/bookData.ts": [],
+  "src/data/bookingFaqData.ts": [],
+  "src/data/contactData.ts": [],
+  "src/data/faqData.ts": [],
+  "src/data/fitFreeTemplateData.ts": [],
+  "src/data/leadData.ts": [],
+  "src/data/pageData.ts": [],
+  "src/data/policyData.ts": [],
+  "src/data/questionaireData.ts": [],
+  "src/data/resourceData.ts": [],
+  "src/data/servicesPageData.ts": [
+    "src/data/animations.ts"
+  ],
+  "src/data/tagData.ts": [],
+  "src/data/therapyCardData.ts": [
+    "src/data/animations.ts"
+  ],
+  "src/data/wallOfLoveData.ts": [],
+  "src/hooks/useAnimationData.ts": [
+    "public/assets/Somatic-Animation.json",
+    "public/assets/TT-Animation.json",
+    "public/assets/Tired.json",
+    "public/assets/Trauma.json",
+    "public/assets/identity.json",
+    "public/assets/neuro.json"
+  ],
+  "src/hooks/useAppointments.ts": [
+    "src/types/contact.ts"
+  ],
+  "src/hooks/useBookingSubmission.ts": [
+    "src/lib/graphql/mutations/index.ts",
+    "src/lib/validation.ts"
+  ],
+  "src/hooks/useInterceptCalendlyAnalytics.ts": [],
+  "src/hooks/usePostInteractions.ts": [],
+  "src/hooks/useSubscribeModalTrigger.ts": [],
+  "src/lib/__tests__/custom-email-templates.test.ts": [
+    "src/lib/custom-email-templates.ts"
+  ],
+  "src/lib/__tests__/email-template.test.ts": [
+    "src/lib/email-template.ts"
+  ],
+  "src/lib/analytics.ts": [],
+  "src/lib/apollo/client.tsx": [],
+  "src/lib/apollo/provider.tsx": [
+    "src/lib/apollo/client.tsx"
+  ],
+  "src/lib/appointment-email-templates.ts": [],
+  "src/lib/appointments/availability.ts": [],
+  "src/lib/conversations/flow-manager-client.ts": [
+    "src/lib/conversations/flow-manager.ts"
+  ],
+  "src/lib/conversations/flow-manager-server.ts": [
+    "src/lib/conversations/flow-manager.ts"
+  ],
+  "src/lib/conversations/flow-manager.ts": [
+    "src/data/fitFreeTemplateData.ts"
+  ],
+  "src/lib/conversations/response-tracker.ts": [],
+  "src/lib/custom-email-templates.ts": [],
+  "src/lib/email-sender.ts": [],
+  "src/lib/email-template.ts": [],
+  "src/lib/graphql/direct-resolvers.ts": [
+    "src/lib/graphql/resolvers/contacts.ts",
+    "src/lib/graphql/resolvers/notifications.ts"
+  ],
+  "src/lib/graphql/mutations/contacts.ts": [],
+  "src/lib/graphql/mutations/index.ts": [
+    "src/lib/graphql/mutations/contacts.ts",
+    "src/lib/graphql/mutations/messages.ts",
+    "src/lib/graphql/mutations/notifications.ts",
+    "src/lib/graphql/mutations/segments.ts",
+    "src/lib/graphql/mutations/webhooks.ts",
+    "src/lib/graphql/mutations/workflows.ts"
+  ],
+  "src/lib/graphql/mutations/messages.ts": [],
+  "src/lib/graphql/mutations/notifications.ts": [],
+  "src/lib/graphql/mutations/segments.ts": [],
+  "src/lib/graphql/mutations/webhooks.ts": [],
+  "src/lib/graphql/mutations/workflows.ts": [],
+  "src/lib/graphql/queries.ts": [],
+  "src/lib/graphql/queries/appointments.ts": [],
+  "src/lib/graphql/queries/contacts.ts": [],
+  "src/lib/graphql/queries/dashboard.ts": [],
+  "src/lib/graphql/queries/index.ts": [
+    "src/lib/graphql/queries/appointments.ts",
+    "src/lib/graphql/queries/contacts.ts",
+    "src/lib/graphql/queries/dashboard.ts",
+    "src/lib/graphql/queries/messages.ts",
+    "src/lib/graphql/queries/notifications.ts",
+    "src/lib/graphql/queries/workflows.ts"
+  ],
+  "src/lib/graphql/queries/messages.ts": [],
+  "src/lib/graphql/queries/notifications.ts": [],
+  "src/lib/graphql/queries/workflows.ts": [],
+  "src/lib/graphql/resolvers/__tests__/contacts.test.ts": [
+    "src/lib/graphql/resolvers/contacts.ts"
+  ],
+  "src/lib/graphql/resolvers/contacts.ts": [
+    "src/lib/custom-email-templates.ts",
+    "src/lib/sms/simple-workflows.ts"
+  ],
+  "src/lib/graphql/resolvers/index.ts": [
+    "src/lib/graphql/resolvers/contacts.ts",
+    "src/lib/graphql/resolvers/messages.ts",
+    "src/lib/graphql/resolvers/notifications.ts",
+    "src/lib/graphql/resolvers/segments.ts",
+    "src/lib/graphql/resolvers/stats.ts",
+    "src/lib/graphql/resolvers/templates.ts",
+    "src/lib/graphql/resolvers/webhooks.ts",
+    "src/lib/graphql/resolvers/workflows.ts"
+  ],
+  "src/lib/graphql/resolvers/messages.ts": [
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/graphql/resolvers/notifications.ts": [],
+  "src/lib/graphql/resolvers/segments.ts": [],
+  "src/lib/graphql/resolvers/stats.ts": [],
+  "src/lib/graphql/resolvers/templates.ts": [],
+  "src/lib/graphql/resolvers/webhooks.ts": [
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/graphql/resolvers/workflows.ts": [],
+  "src/lib/graphql/typeDefs.ts": [],
+  "src/lib/sms/simple-workflows.ts": [
+    "src/lib/appointment-email-templates.ts",
+    "src/lib/email-sender.ts",
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/sms/workflows.ts": [
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/twilio/client.ts": [],
+  "src/lib/twilio/delivery-tracking.ts": [
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/twilio/webhook-processor.ts": [
+    "src/lib/apollo/client.tsx",
+    "src/lib/graphql/mutations/index.ts",
+    "src/lib/twilio/client.ts"
+  ],
+  "src/lib/twilio/workflow-triggers.ts": [
+    "src/lib/conversations/flow-manager-server.ts",
+    "src/lib/sms/workflows.ts",
+    "src/lib/twilio/client.ts",
+    "src/lib/twilio/delivery-tracking.ts"
+  ],
+  "src/lib/utils.ts": [],
+  "src/lib/validation.ts": [],
+  "src/types/contact.ts": [],
+  "src/types/dotlottie-player.d.ts": [],
+  "src/types/global.d.ts": [],
+  "src/types/index.ts": [],
+  "src/types/lead.ts": [],
+  "src/types/notification.ts": [],
+  "src/utils/appointmentHelpers.ts": [],
+  "src/utils/dateUtils.ts": []
+}
