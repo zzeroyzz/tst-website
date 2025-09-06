@@ -1,0 +1,193 @@
+{
+  "$schema": "https://example.com/tst/freezefile.schema.json",
+  "generated_at": "2025-01-09T12:00:00Z",
+  "critical_flows": [
+    {
+      "name": "Book consultation",
+      "paths": ["/book/trauma", "/book/nd", "/book/affirming", "/book"],
+      "apis": ["/api/appointment/available-slots", "/api/graphql", "/api/send-appointment-emails"],
+      "data": ["contacts", "appointments", "notifications"],
+      "notifications": ["email:Resend", "sms:Twilio"],
+      "tests": ["tests/smoke/book.spec.ts"]
+    },
+    {
+      "name": "Reschedule appointment",
+      "paths": ["/reschedule/[uuid]", "/thank-you-reschedule"],
+      "apis": ["/api/appointment/reschedule", "/api/appointment/available-slots"],
+      "data": ["appointments", "contacts"],
+      "notifications": ["email:Resend", "sms:Twilio"],
+      "tests": ["tests/smoke/reschedule.spec.ts"]
+    },
+    {
+      "name": "Cancel appointment",
+      "paths": ["/cancel-appointment/[uuid]"],
+      "apis": ["/api/appointment/cancel", "/api/appointment/cancel-link/[uuid]"],
+      "data": ["appointments", "contacts"],
+      "notifications": ["email:Resend", "sms:Twilio"],
+      "tests": ["tests/smoke/cancel.spec.ts"]
+    },
+    {
+      "name": "CRM qualification",
+      "paths": ["/dashboard", "/dashboard/crm"],
+      "apis": ["/api/graphql", "/api/dashboard/notifications", "/api/leads/send-reminder"],
+      "data": ["contacts", "notifications", "conversations"],
+      "notifications": ["sms:Twilio", "dashboard:realtime"],
+      "tests": ["tests/smoke/crm.spec.ts"]
+    },
+    {
+      "name": "Newsletter → Blog",
+      "paths": ["/dashboard/newsletter/[id]", "/dashboard/blog", "/mental-health-healing-blog", "/posts/[slug]"],
+      "apis": ["/api/newsletter/send", "/api/posts/[slug]/view", "/api/posts/[slug]/like"],
+      "data": ["newsletters", "posts", "subscriptions"],
+      "notifications": ["email:Mailchimp"],
+      "tests": ["tests/smoke/newsletter_to_blog.spec.ts"]
+    },
+    {
+      "name": "Contact form submission",
+      "paths": ["/contact", "/business-queries"],
+      "apis": ["/api/graphql", "/api/business-query"],
+      "data": ["contacts", "conversations"],
+      "notifications": ["email:Resend"],
+      "tests": ["tests/smoke/contact.spec.ts"]
+    },
+    {
+      "name": "SMS conversation processing",
+      "paths": ["/api/twilio/webhook"],
+      "apis": ["/api/twilio/webhook", "/api/conversation/respond"],
+      "data": ["conversations", "contacts", "message_templates"],
+      "notifications": ["sms:Twilio"],
+      "tests": ["tests/smoke/sms_webhook.spec.ts"]
+    }
+  ],
+  "do_not_touch": [
+    "src/app/book/**",
+    "src/api/appointment/**",
+    "src/api/twilio/**",
+    "src/api/graphql/**",
+    "src/components/UnifiedBookingFlow/**",
+    "src/components/CalendarStepComponent/**",
+    "src/components/BookingDetailsForm/**",
+    "src/lib/custom-email-templates.ts",
+    "src/lib/twilio/**",
+    "src/lib/graphql/**",
+    "src/lib/sms/**",
+    "middleware.ts",
+    "src/app/dashboard/**",
+    "src/components/Dashboard*/**",
+    "src/components/CRM/**",
+    "src/components/Leads/**",
+    "src/components/Newsletter/**",
+    "src/components/Blog/**",
+    "src/app/reschedule/**",
+    "src/app/cancel-appointment/**",
+    "src/api/cron/**",
+    "src/api/newsletter/**",
+    "src/api/send-appointment-emails/**"
+  ],
+  "env_contract": [
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN", 
+    "TWILIO_MESSAGING_SERVICE_SID",
+    "TWILIO_PHONE_NUMBER",
+    "RESEND_API_KEY",
+    "RESEND_FROM",
+    "NEXT_PUBLIC_SITE_URL",
+    "CRON_SECRET",
+    "MAILCHIMP_API_KEY",
+    "MAILCHIMP_SERVER_PREFIX",
+    "MAILCHIMP_AUDIENCE_ID",
+    "CLAUDE_API_KEY"
+  ],
+  "database_tables": [
+    "contacts",
+    "appointments", 
+    "notifications",
+    "posts",
+    "newsletters",
+    "conversations",
+    "message_templates",
+    "subscriptions"
+  ],
+  "external_services": {
+    "supabase": {
+      "purpose": "Primary database, auth, storage",
+      "criticality": "CRITICAL",
+      "endpoints": ["Database operations", "Authentication", "File storage", "Realtime"]
+    },
+    "resend": {
+      "purpose": "Transactional email delivery",
+      "criticality": "CRITICAL", 
+      "endpoints": ["Email sending", "Delivery tracking"]
+    },
+    "twilio": {
+      "purpose": "SMS communications",
+      "criticality": "HIGH",
+      "endpoints": ["SMS sending", "Webhook processing", "Delivery status"]
+    },
+    "mailchimp": {
+      "purpose": "Newsletter campaigns",
+      "criticality": "MEDIUM",
+      "endpoints": ["Campaign management", "Subscriber management"]
+    },
+    "vercel": {
+      "purpose": "Hosting and cron jobs",
+      "criticality": "CRITICAL",
+      "endpoints": ["Application hosting", "Serverless functions", "Cron scheduling"]
+    }
+  },
+  "automation_workflows": [
+    {
+      "name": "Appointment reminder sequence",
+      "trigger": "24h and 2h before appointment",
+      "actions": ["SMS reminder", "Email reminder", "Database status update"],
+      "dependencies": ["Twilio", "Resend", "Supabase", "Cron jobs"]
+    },
+    {
+      "name": "Questionnaire follow-up",
+      "trigger": "7 days after contact form submission",
+      "actions": ["SMS reminder", "Status update", "CRM notification"],
+      "dependencies": ["Twilio", "Supabase", "Cron jobs"]
+    },
+    {
+      "name": "Appointment cleanup",
+      "trigger": "Every 2 hours",
+      "actions": ["Archive past appointments", "Update contact status", "Trigger follow-ups"],
+      "dependencies": ["Supabase", "Cron jobs"]
+    },
+    {
+      "name": "Newsletter to blog promotion",
+      "trigger": "Newsletter publication",
+      "actions": ["Create blog post", "Send email campaign", "Update subscriber list"],
+      "dependencies": ["Mailchimp", "Supabase"]
+    }
+  ],
+  "security_boundaries": [
+    {
+      "boundary": "Authentication middleware",
+      "file": "middleware.ts",
+      "protects": ["/dashboard/*", "Protected API routes"],
+      "mechanism": "Supabase session validation"
+    },
+    {
+      "boundary": "API route authorization", 
+      "files": ["All /api routes"],
+      "protects": ["Database operations", "External service calls"],
+      "mechanism": "Service role key validation"
+    },
+    {
+      "boundary": "Webhook security",
+      "files": ["/api/twilio/webhook/route.ts"],
+      "protects": ["Incoming webhook processing"],
+      "mechanism": "Cryptographic signature validation"
+    },
+    {
+      "boundary": "Cron job authorization",
+      "files": ["/api/cron/*"],
+      "protects": ["Automated workflow execution"],
+      "mechanism": "Secret token validation"
+    }
+  ]
+}

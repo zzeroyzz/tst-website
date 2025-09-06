@@ -1,0 +1,228 @@
+GET_DB_PASSWORD.md:41:export SUPABASE_DB_PASSWORD='your-password-here'
+GET_DB_PASSWORD.md:44:supabase link --project-ref pvbdrbaquwivhylsmagn --password "$SUPABASE_DB_PASSWORD"
+SUPABASE_CLI_SETUP.md:87:NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_CLI_SETUP.md:88:SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_CLI_SETUP.md:94:NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+SUPABASE_CLI_SETUP.md:95:SUPABASE_SERVICE_ROLE_KEY=your_local_service_role_key
+SUPABASE_SETUP.md:10:   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+SUPABASE_SETUP.md:11:   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+apply-migrations.js:14:const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+apply-migrations.js:15:const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+apply-migrations.js:17:if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+apply-migrations.js:19:  console.error('   NEXT_PUBLIC_SUPABASE_URL:', SUPABASE_URL ? '✓' : '❌');
+apply-migrations.js:20:  console.error('   SUPABASE_SERVICE_ROLE_KEY:', SERVICE_ROLE_KEY ? '✓' : '❌');
+apply-migrations.js:28:    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec_sql`, {
+apply-migrations.js:40:      const sqlResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/sql`, {
+apply-migrations.js:66:  console.log(`📡 Target: ${SUPABASE_URL}`);
+jest.setup.js:63:  createClientComponentClient: jest.fn(),
+jest.setup.js:67:process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+jest.setup.js:68:process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+next.config.ts:29:        hostname: `${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}.supabase.co`,
+src/app/api/appointment/available-slots/route.ts:2:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/available-slots/route.ts:4:const supabase = createClient(
+src/app/api/appointment/available-slots/route.ts:5:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/available-slots/route.ts:6:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/appointment/booked-slots/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/booked-slots/route.ts:5:const supabase = createClient(
+src/app/api/appointment/booked-slots/route.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/booked-slots/route.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/appointment/cancel-link/[uuid]/route.ts:2:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/cancel-link/[uuid]/route.ts:4:const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+src/app/api/appointment/cancel-link/[uuid]/route.ts:5:const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!; // server-only
+src/app/api/appointment/cancel-link/[uuid]/route.ts:9:  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+src/app/api/appointment/cancel/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/cancel/route.ts:8:const supabase = createClient(
+src/app/api/appointment/cancel/route.ts:9:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/cancel/route.ts:10:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/appointment/cancel/route.ts:67:      const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+src/app/api/appointment/cancel/route.ts:71:      if (!RESEND_API_KEY) {
+src/app/api/appointment/cancel/route.ts:72:        console.warn('RESEND_API_KEY not configured; skipping emails.');
+src/app/api/appointment/cancel/route.ts:74:        const resend = new Resend(RESEND_API_KEY);
+src/app/api/appointment/cleanup-past/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/cleanup-past/route.ts:5:const supabase = createClient(
+src/app/api/appointment/cleanup-past/route.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/cleanup-past/route.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/appointment/reschedule/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/reschedule/route.ts:8:const supabase = createClient(
+src/app/api/appointment/reschedule/route.ts:9:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/reschedule/route.ts:10:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/appointment/reschedule/route.ts:14:const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+src/app/api/appointment/reschedule/route.ts:41:    if (!RESEND_API_KEY) {
+src/app/api/appointment/reschedule/route.ts:42:      return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+src/app/api/appointment/reschedule/route.ts:194:    const resend = new Resend(RESEND_API_KEY);
+src/app/api/appointment/status/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/appointment/status/route.ts:5:const supabase = createClient(
+src/app/api/appointment/status/route.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/appointment/status/route.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/business-query/route.ts:9:const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+src/app/api/business-query/route.ts:60:    if (!RESEND_API_KEY) {
+src/app/api/business-query/route.ts:61:      console.error('❌ RESEND_API_KEY not configured');
+src/app/api/business-query/route.ts:62:      return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+src/app/api/business-query/route.ts:72:    const resend = new Resend(RESEND_API_KEY);
+src/app/api/contact/appointments/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/contact/appointments/route.ts:5:const supabase = createClient(
+src/app/api/contact/appointments/route.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/contact/appointments/route.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/contact/cancel-appointment/route.ts:4:import { createClient } from '@supabase/supabase-js';
+src/app/api/contact/cancel-appointment/route.ts:6:const supabase = createClient(
+src/app/api/contact/cancel-appointment/route.ts:7:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/contact/cancel-appointment/route.ts:8:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/contact/route.ts.deprecated:6:import { createClient } from '@supabase/supabase-js';
+src/app/api/contact/route.ts.deprecated:10:const supabase = createClient(
+src/app/api/contact/route.ts.deprecated:11:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/contact/route.ts.deprecated:12:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/conversation/save-response/route.ts:2:import { createClient } from '@supabase/supabase-js';
+src/app/api/conversation/save-response/route.ts:4:const supabase = createClient(
+src/app/api/conversation/save-response/route.ts:5:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/conversation/save-response/route.ts:6:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/dashboard/notifications/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/dashboard/notifications/route.ts:5:const supabase = createClient(
+src/app/api/dashboard/notifications/route.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/dashboard/notifications/route.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/graphql/route.ts:6:import { createClient } from '@supabase/supabase-js';
+src/app/api/graphql/route.ts:22:    const supabase = createClient(
+src/app/api/graphql/route.ts:23:      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/graphql/route.ts:24:      process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/lead/cancel/[leadId]/route.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/api/lead/cancel/[leadId]/route.ts:7:const supabase = createClient(
+src/app/api/lead/cancel/[leadId]/route.ts:8:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/lead/cancel/[leadId]/route.ts:9:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/lead/cancel/[leadId]/route.ts:16:  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+src/app/api/lead/cancel/[leadId]/route.ts:17:  if (!RESEND_API_KEY) return;
+src/app/api/lead/cancel/[leadId]/route.ts:59:    const resend = new Resend(RESEND_API_KEY);
+src/app/api/lead/cancel/[leadId]/route.ts:152:    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+src/app/api/lead/cancel/[leadId]/route.ts:153:    if (RESEND_API_KEY) {
+src/app/api/lead/cancel/[leadId]/route.ts:193:        const resend = new Resend(RESEND_API_KEY);
+src/app/api/leads/send-reminder/route.ts:4:import { createClient } from '@supabase/supabase-js';
+src/app/api/leads/send-reminder/route.ts:9:const supabase = createClient(
+src/app/api/leads/send-reminder/route.ts:10:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/leads/send-reminder/route.ts:11:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/newsletter/preview/route.ts:4:import { createClient } from '@supabase/supabase-js';
+src/app/api/newsletter/preview/route.ts:8:const supabase = createClient(
+src/app/api/newsletter/preview/route.ts:9:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/newsletter/preview/route.ts:10:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/newsletter/send/route.ts:4:import { createClient } from '@supabase/supabase-js';
+src/app/api/newsletter/send/route.ts:9:const supabase = createClient(
+src/app/api/newsletter/send/route.ts:10:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/newsletter/send/route.ts:11:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/posts/[slug]/like/route.ts:2:import { createClient } from '@supabase/supabase-js';
+src/app/api/posts/[slug]/like/route.ts:6:const supabase = createClient(
+src/app/api/posts/[slug]/like/route.ts:7:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/posts/[slug]/like/route.ts:8:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/posts/[slug]/view/route.ts:2:import { createClient } from '@supabase/supabase-js';
+src/app/api/posts/[slug]/view/route.ts:6:const supabase = createClient(
+src/app/api/posts/[slug]/view/route.ts:7:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/posts/[slug]/view/route.ts:8:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/send-appointment-emails/route.ts:8:import { createClient } from '@supabase/supabase-js';
+src/app/api/send-appointment-emails/route.ts:16:const RESEND_API_KEY = process.env.RESEND_API_KEY!;
+src/app/api/send-appointment-emails/route.ts:30:const supabase = createClient(
+src/app/api/send-appointment-emails/route.ts:31:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/send-appointment-emails/route.ts:32:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/send-appointment-emails/route.ts:70:    if (!RESEND_API_KEY) {
+src/app/api/send-appointment-emails/route.ts:71:      console.error('❌ RESEND_API_KEY not configured');
+src/app/api/send-appointment-emails/route.ts:72:      return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+src/app/api/send-appointment-emails/route.ts:111:    const resend = new Resend(RESEND_API_KEY);
+src/app/api/test-twilio-integration/route.ts:14:import { createClient } from '@supabase/supabase-js';
+src/app/api/test-twilio-integration/route.ts:17:const supabase = createClient(
+src/app/api/test-twilio-integration/route.ts:18:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/test-twilio-integration/route.ts:19:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/api/twilio/webhook/route.ts:6:import { createClient } from '@supabase/supabase-js';
+src/app/api/twilio/webhook/route.ts:41:    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+src/app/api/twilio/webhook/route.ts:42:    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+src/app/api/twilio/webhook/route.ts:47:    const supabase = createClient(url, key, { auth: { persistSession: false } });
+src/app/api/upload/image/route.ts:4:import { createClient } from '@supabase/supabase-js';
+src/app/api/upload/image/route.ts:7:const supabaseAdmin = createClient(
+src/app/api/upload/image/route.ts:8:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/api/upload/image/route.ts:9:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/dashboard/blog/[id]/page.tsx:2:import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+src/app/dashboard/blog/[id]/page.tsx:15:  const supabase = createServerComponentClient({ cookies });
+src/app/dashboard/newsletter/[id]/page.tsx:5:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/app/dashboard/newsletter/[id]/page.tsx:14:  const supabase = createClientComponentClient();
+src/app/dashboard/page.tsx:6:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/app/dashboard/page.tsx:48:  const supabase = createClientComponentClient();
+src/app/login/page.tsx:5:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/app/login/page.tsx:17:  const supabase = createClientComponentClient();
+src/app/posts/[slug]/page.tsx:2:import { createClient } from '@supabase/supabase-js';
+src/app/posts/[slug]/page.tsx:23:  const supabase = createClient(
+src/app/posts/[slug]/page.tsx:24:    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/app/posts/[slug]/page.tsx:25:    process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/app/sitemap.ts:3:import { createClient } from '@supabase/supabase-js';
+src/app/sitemap.ts:18:  const supabase = createClient(
+src/app/sitemap.ts:19:    process.env.SUPABASE_URL!,
+src/app/sitemap.ts:20:    process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/components/AppointmentsDashboard/AppointmentsDashboard.tsx:18:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/AppointmentsDashboard/AppointmentsDashboard.tsx:242:  const supabase = createClientComponentClient();
+src/components/Blog/BlogEditor.tsx:8:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Blog/BlogEditor.tsx:45:  const supabase = createClientComponentClient();
+src/components/Blog/BlogView.tsx:6:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Blog/BlogView.tsx:22:  const supabase = createClientComponentClient();
+src/components/CRM/ContactsManager.tsx:19:import { createClient } from '@supabase/supabase-js';
+src/components/CRM/ContactsManager.tsx:43:const supabase = createClient(
+src/components/CRM/ContactsManager.tsx:44:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/components/CRM/ContactsManager.tsx:45:  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+src/components/DashboardNotifications/DashboardNotifications.tsx:8:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/DashboardNotifications/DashboardNotifications.tsx:32:  const supabase = createClientComponentClient();
+src/components/DashboardView/DashboardView.tsx:5:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/DashboardView/DashboardView.tsx:151:  const supabase = createClientComponentClient();
+src/components/KanbanBoard/KanbanBoard.tsx:10:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/KanbanBoard/KanbanBoard.tsx:142:  const supabase = createClientComponentClient();
+src/components/Leads/LeadsView.tsx:6:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Leads/LeadsView.tsx:196:  const supabase = createClientComponentClient();
+src/components/Leads/__tests__/LeadsView.test.tsx:10:  createClientComponentClient: jest.fn(() => mockSupabaseClient),
+src/components/Nav/Nav.tsx:11:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Nav/Nav.tsx:78:  const supabase = createClientComponentClient();
+src/components/Newsletter/NewsletterEditor.tsx:8:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Newsletter/NewsletterEditor.tsx:46:  const supabase = createClientComponentClient();
+src/components/Newsletter/NewsletterView.tsx:7:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/Newsletter/NewsletterView.tsx:89:  const supabase = createClientComponentClient();
+src/components/Newsletter/__tests__/NewsletterEditor.test.tsx:51:      createClientComponentClient,
+src/components/Newsletter/__tests__/NewsletterEditor.test.tsx:53:    createClientComponentClient.mockReturnValue(mockSupabaseClient);
+src/components/clients/BlogPageClient/BlogPageClient.tsx:6:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/clients/BlogPageClient/BlogPageClient.tsx:39:  const supabase = createClientComponentClient();
+src/components/clients/GuidesPageClient/GuidesPageClient.tsx:6:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/clients/GuidesPageClient/GuidesPageClient.tsx:24:  const [supabase] = useState(() => createClientComponentClient());
+src/components/clients/PostPageClient/PostPageClient.tsx:7:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/clients/PostPageClient/PostPageClient.tsx:35:  const [supabase] = useState(() => createClientComponentClient());
+src/components/clients/ToastyTidbitsArchivePageClient/ToastyTidbitsArchivePageClient.tsx:5:import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+src/components/clients/ToastyTidbitsArchivePageClient/ToastyTidbitsArchivePageClient.tsx:28:  const supabase = createClientComponentClient();
+src/lib/conversations/flow-manager-server.ts:6:import { createClient } from '@supabase/supabase-js';
+src/lib/conversations/flow-manager-server.ts:15:const supabase = createClient(
+src/lib/conversations/flow-manager-server.ts:16:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/conversations/flow-manager-server.ts:17:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/graphql/direct-resolvers.ts:6:import { createClient } from '@supabase/supabase-js';
+src/lib/graphql/direct-resolvers.ts:11:const supabase = createClient(
+src/lib/graphql/direct-resolvers.ts:12:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/graphql/direct-resolvers.ts:13:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/graphql/resolvers/contacts.ts:250:            const RESEND_API_KEY = process.env.RESEND_API_KEY;
+src/lib/graphql/resolvers/contacts.ts:251:            if (RESEND_API_KEY) {
+src/lib/graphql/resolvers/contacts.ts:252:              const resend = new Resend(RESEND_API_KEY);
+src/lib/graphql/resolvers/webhooks.ts:2:import { createClient } from '@supabase/supabase-js';
+src/lib/graphql/resolvers/webhooks.ts:12:const supabaseAdmin = createClient(
+src/lib/graphql/resolvers/webhooks.ts:13:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/graphql/resolvers/webhooks.ts:14:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/sms/simple-workflows.ts:4:import { createClient } from '@supabase/supabase-js';
+src/lib/sms/simple-workflows.ts:58:      const supabase = createClient(
+src/lib/sms/simple-workflows.ts:59:        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/sms/simple-workflows.ts:60:        process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/sms/workflows.ts:2:import { createClient } from '@supabase/supabase-js';
+src/lib/sms/workflows.ts:5:const supabase = createClient(
+src/lib/sms/workflows.ts:6:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/sms/workflows.ts:7:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/twilio/client.ts:4:const accountSid = process.env.TWILIO_ACCOUNT_SID;
+src/lib/twilio/client.ts:5:const authToken = process.env.TWILIO_AUTH_TOKEN;
+src/lib/twilio/client.ts:6:const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+src/lib/twilio/client.ts:7:const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+src/lib/twilio/delivery-tracking.ts:6:import { createClient } from '@supabase/supabase-js';
+src/lib/twilio/delivery-tracking.ts:10:const supabase = createClient(
+src/lib/twilio/delivery-tracking.ts:11:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/twilio/delivery-tracking.ts:12:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/twilio/webhook-processor.ts:6:import { createClient } from '@supabase/supabase-js';
+src/lib/twilio/webhook-processor.ts:12:const supabase = createClient(
+src/lib/twilio/webhook-processor.ts:13:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/twilio/webhook-processor.ts:14:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+src/lib/twilio/workflow-triggers.ts:6:import { createClient } from '@supabase/supabase-js';
+src/lib/twilio/workflow-triggers.ts:13:const supabase = createClient(
+src/lib/twilio/workflow-triggers.ts:14:  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+src/lib/twilio/workflow-triggers.ts:15:  process.env.SUPABASE_SERVICE_ROLE_KEY!
+supabase/config.toml:226:auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
+supabase/config.toml:258:secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"

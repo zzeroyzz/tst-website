@@ -1,0 +1,82 @@
+{
+  "$schema": "https://example.com/tst/dependency-graph.schema.json",
+  "generated_at": "2025-01-09T12:00:00Z",
+  "source": "madge analysis + manual augmentation",
+  "summary": {
+    "total_files": 250,
+    "total_dependencies": 1420,
+    "high_centrality_nodes": [
+      "src/lib/graphql/direct-resolvers.ts",
+      "src/components/UnifiedBookingFlow/UnifiedBookingFlow.tsx",
+      "src/lib/custom-email-templates.ts",
+      "src/lib/twilio/client.ts",
+      "src/app/api/graphql/route.ts"
+    ],
+    "critical_bridges": [
+      "middleware.ts",
+      "src/lib/supabase/client.ts",
+      "src/lib/analytics/index.ts"
+    ]
+  },
+  "high_centrality_analysis": {
+    "src/lib/graphql/direct-resolvers.ts": {
+      "in_degree": 15,
+      "out_degree": 8,
+      "role": "Central data access layer",
+      "dependencies": [
+        "@supabase/supabase-js",
+        "src/lib/custom-email-templates.ts",
+        "src/lib/twilio/workflow-triggers.ts"
+      ],
+      "dependents": [
+        "src/app/api/graphql/route.ts",
+        "src/components/Dashboard/*",
+        "src/components/CRM/*",
+        "src/components/Leads/*"
+      ]
+    },
+    "src/components/UnifiedBookingFlow/UnifiedBookingFlow.tsx": {
+      "in_degree": 12,
+      "out_degree": 6,
+      "role": "Core booking component",
+      "dependencies": [
+        "src/components/CalendarStepComponent/CalendarStepComponent.tsx",
+        "src/components/BookingDetailsForm/BookingDetailsForm.tsx",
+        "src/lib/graphql/mutations.ts"
+      ],
+      "dependents": [
+        "src/app/book/trauma/page.tsx",
+        "src/app/book/nd/page.tsx",
+        "src/app/book/affirming/page.tsx"
+      ]
+    },
+    "src/lib/custom-email-templates.ts": {
+      "in_degree": 18,
+      "out_degree": 2,
+      "role": "Email template library",
+      "dependencies": [
+        "src/types/Contact.ts",
+        "src/utils/date-formatting.ts"
+      ],
+      "dependents": [
+        "All API routes sending emails",
+        "GraphQL email resolvers",
+        "Cron job email workflows"
+      ]
+    }
+  },
+  "bridge_analysis": {
+    "middleware.ts": {
+      "role": "Authentication gateway",
+      "criticality": "CRITICAL",
+      "reason": "Single point of failure for all protected routes",
+      "affects": ["All /dashboard/* routes", "Admin API endpoints"]
+    },
+    "src/lib/supabase/client.ts": {
+      "role": "Database connection factory",
+      "criticality": "CRITICAL",
+      "reason": "All database operations depend on this module",
+      "affects": ["Entire application data layer"]
+    }
+  }
+}
