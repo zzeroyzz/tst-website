@@ -25,8 +25,7 @@ jest.mock('../../FAQ/FAQ.tsx', () => {
 
 // Mock the analytics functions
 jest.mock('@/lib/analytics', () => ({
-  trackContactFormConversion: jest.fn(),
-  trackFormSubmission: jest.fn(),
+  trackEvent: jest.fn(),
 }));
 
 describe('ContactForm', () => {
