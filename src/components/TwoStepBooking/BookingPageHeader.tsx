@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapPinCheckInside, Video, Brain, Heart, Rainbow, ReceiptText } from 'lucide-react';
+import { CircleCheck, Video, Brain, Heart, Rainbow, ReceiptText } from 'lucide-react';
 import IconCircle from '@/components/IconCircle/IconCircle';
 import { motion, Variants } from 'framer-motion';
 import Button from "@/components/Button/Button";
@@ -12,6 +12,7 @@ interface BookingPageHeaderProps {
 
 const TRUST_INDICATORS = [
   { text: 'Superbill Provided', icon: ReceiptText },
+  { text: 'HSA/FSA Eligible', icon: CircleCheck },
   { text: 'Secure Telehealth', icon: Video },
   { text: 'Affirming Care', icon: Heart },
 ] as const;
@@ -41,7 +42,7 @@ const getVariantContent = (variant: BookingPageHeaderProps['variant']) => {
       return {
         headline: (
           <>
-            When life feels heavy,<br />here’s a calm place to land
+            When life feels heavy,<br className="hidden sm:block" /> here&apos;s a calm place to land
           </>
         ),
         icon: <Heart className="w-6 h-6" />,
@@ -77,32 +78,30 @@ const BookingPageHeader: React.FC<BookingPageHeaderProps> = ({ variant }) => {
           </Button>
 
         <motion.h1
-          className="text-4xl md:text-5xl font-extrabold leading-tight"
+          className="text-3xl md:text-5xl font-extrabold leading-tight px-4"
           variants={itemVariants}
         >
           {content.headline}
         </motion.h1>
-
         <motion.h3
-          className="text-md md:text-xl text-gray-600 max-w-3xl mx-auto"
+          className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4 leading-relaxed"
           variants={itemVariants}
         >
           Licensed virtual therapy for Georgia adults.
-          <span className="font-bold"> Free 15‑minute consult.</span>  <br/> <span className="font-bold">Your first full session is free if it’s not a fit.</span>  <br/>Book below with <span className="font-bold">zero risk.</span>
+          <span className="font-bold"> Free 15‑minute consult.</span>
+          <br className=" sm:block" />
+          <span className="font-bold">Your first full session is  <br className=" md:hidden" />free if it's not a fit.</span>
+          <br className=" sm:block" />
+          Book below with <span className="font-bold">zero risk.</span>
         </motion.h3>
       </div>
 
       {/* Trust Strip */}
-      <div className="flex flex-wrap gap-2 items-center justify-center">
+      <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-2 md:items-center md:justify-center">
         {TRUST_INDICATORS.map((indicator, index) => (
           <div
             key={index}
-            className={[
-              // On mobile: first badge spans full row & is centered.
-              index === 0 ? 'col-span-2 justify-self-center' : '',
-              'md:col-span-1',
-              'flex items-center gap-3',
-            ].join(' ')}
+            className="flex flex-col items-center justify-center gap-2 md:flex-row md:gap-3"
           >
             <IconCircle
               icon={<indicator.icon className="w-4 h-4 sm:w-5 sm:h-5" />}
