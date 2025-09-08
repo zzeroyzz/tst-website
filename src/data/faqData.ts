@@ -2,7 +2,7 @@ export const faqData = [
   {
     question: 'What is the cost per session, and do you accept insurance?',
     answer:
-      'Sessions are $150 for 50 minutes. I can provide a superbill if you’d like to request reimbursement through your insurance plan. I am not in-network with any insurance companies. Payment is due at the time of service.',
+      'Sessions are $150 for 50 minutes, due at the time of service. I’m not in-network with insurance providers, but I can provide a superbill for possible reimbursement. Therapy is also generally eligible for HSA/FSA funds (check with your provider for details).',
   },
   {
     question: 'What should I know about sessions?',
@@ -11,8 +11,7 @@ export const faqData = [
   },
   {
     question: 'How do I get started?',
-    answer:
-      'Start by booking a free 15 minute consult using the calendar above. After you book, our Care Team will text you a few quick questions to help us prepare. From there, we’ll meet for your consult and, if you’d like to continue, you can schedule your first full session.',
+    answer:`Start by booking a free 15 minute consult using the calendar above. After you book, our Care Team will text you a few quick questions to help us prepare. From there, we'll meet for your consult and, if you'd like to continue, you can schedule your first full session. And if your first session isn't a fit, it is free.`,
   },
   {
     question: 'Who do you work best with?',
