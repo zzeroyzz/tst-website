@@ -18,6 +18,7 @@ import { toZonedTime, format as formatTz } from 'date-fns-tz';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Contact } from '@/types/contact';
 import Button from '@/components/Button/Button';
+import { AppointmentsSkeleton } from '@/components/skeleton';
 import AppointmentRescheduleCalendar from '@/components/AppointmentRescheduleCalendar/AppointmentRescheduleCalendar';
 import AppointmentCancelModal from '@/components/AppointmentCancelModal/AppointmentCancelModal';
 import LeadDetailModal from '@/components/LeadDetailModal/LeadDetailModal';
@@ -214,7 +215,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
 
 const AppointmentsDashboard: React.FC = () => {
   const { appointments, loading, error, refreshAppointments } = useAppointments();
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past'>(
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'today' | 'past' | 'cancelled' | 'completed'>(
     'upcoming'
   );
 
@@ -413,22 +414,22 @@ const AppointmentsDashboard: React.FC = () => {
     );
     switch (filter) {
       case 'upcoming':
-        return status === 'upcoming';
+        return status === 'upcoming'; // This now properly excludes cancelled/completed
       case 'today':
         return status === 'today';
       case 'past':
         return status === 'past';
+      case 'cancelled':
+        return status === 'cancelled';
+      case 'completed':
+        return status === 'completed';
       default:
         return true;
     }
   });
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading appointments...</div>
-      </div>
-    );
+    return <AppointmentsSkeleton count={6} showStats={true} showFilters={true} />;
   }
 
   if (error) {
@@ -467,6 +468,8 @@ const AppointmentsDashboard: React.FC = () => {
           { key: 'upcoming', label: 'Upcoming' },
           { key: 'today', label: 'Today' },
           { key: 'past', label: 'Past' },
+          { key: 'completed', label: 'Completed' },
+          { key: 'cancelled', label: 'Cancelled' },
         ].map(({ key, label }) => (
           <Button
             key={key}
@@ -481,7 +484,7 @@ const AppointmentsDashboard: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
           { label: 'Total', count: appointments.length, color: 'bg-blue-100' },
           {
@@ -514,6 +517,13 @@ const AppointmentsDashboard: React.FC = () => {
               c => c.appointment_status === 'COMPLETED'
             ).length,
             color: 'bg-purple-100',
+          },
+          {
+            label: 'Cancelled',
+            count: appointments.filter(
+              c => c.appointment_status === 'CANCELLED'
+            ).length,
+            color: 'bg-red-100',
           },
         ].map((stat, index) => (
           <div

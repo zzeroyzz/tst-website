@@ -101,7 +101,7 @@ export const contactResolvers = {
 
     contactsWithMessages: async (_: any, { limit = 50 }: any, { supabase }: Context) => {
       try {
-        let query = supabase.from('contacts').select(`
+        const query = supabase.from('contacts').select(`
             *,
             user_id,
             uuid,
@@ -541,21 +541,7 @@ export const contactResolvers = {
           }
         }
 
-        // Create notification for dashboard
-        await supabase.from('notifications').insert([
-          {
-            type: 'appointment',
-            title: 'New Consultation Scheduled',
-            message: `${name} scheduled a consultation for ${new Date(
-              scheduledAt
-            ).toLocaleString()}`,
-            contact_id: contact.id,
-            contact_uuid: contact.uuid,
-            contact_name: name,
-            contact_email: email,
-            read: false,
-          },
-        ]);
+        // Note: Notification is created in the send-appointment-emails API to avoid duplicates
 
         return {
           contact,

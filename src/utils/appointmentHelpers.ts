@@ -26,8 +26,11 @@ export const getAppointmentStatus = (
   const date = new Date(appointmentDate);
   const now = new Date();
 
-  if (status === 'cancelled' || status === 'completed') {
-    return status as 'cancelled' | 'completed';
+  // Normalize status to lowercase for comparison
+  const normalizedStatus = status?.toLowerCase();
+
+  if (normalizedStatus === 'cancelled' || normalizedStatus === 'completed') {
+    return normalizedStatus as 'cancelled' | 'completed';
   }
 
   if (isToday(date)) {

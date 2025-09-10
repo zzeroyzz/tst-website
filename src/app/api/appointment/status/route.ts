@@ -9,18 +9,23 @@ const supabase = createClient(
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { contactId, status } = await request.json();
+    const { contactId, uuid, status } = await request.json();
 
-    if (!contactId || !status) {
+    // Accept either contactId or uuid for backward compatibility
+    const identifier = contactId || uuid;
+    
+    if (!identifier || !status) {
       return NextResponse.json(
-        { message: 'Contact ID and status are required' },
+        { message: 'Contact ID or UUID and status are required' },
         { status: 400 }
       );
     }
 
-    // Validate status
+    // Validate status (normalize to uppercase for database)
     const validStatuses = ['scheduled', 'completed', 'cancelled', 'no-show'];
-    if (!validStatuses.includes(status)) {
+    const normalizedStatus = status.toLowerCase();
+    
+    if (!validStatuses.includes(normalizedStatus)) {
       return NextResponse.json(
         {
           message:
@@ -30,19 +35,24 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // Determine which field to use for lookup (UUID preferred if available)
+    const isUuid = typeof identifier === 'string' && identifier.includes('-');
+    const lookupField = isUuid ? 'uuid' : 'id';
+    const dbStatus = normalizedStatus.toUpperCase(); // Database expects uppercase
+    
     // Update the appointment status
     const { data, error } = await supabase
       .from('contacts')
       .update({
-        appointment_status: status,
-        last_appointment_update: new Date().toISOString(),
+        appointment_status: dbStatus,
+        updated_at: new Date().toISOString(),
         // Add completion note if marking as completed
         appointment_notes:
-          status === 'completed'
+          normalizedStatus === 'completed'
             ? 'Appointment completed - marked by admin'
             : undefined,
       })
-      .eq('id', contactId)
+      .eq(lookupField, identifier)
       .select();
 
     if (error) {
@@ -58,7 +68,7 @@ export async function PATCH(request: NextRequest) {
 
     if (!data || data.length === 0) {
       return NextResponse.json(
-        { message: 'Contact not found' },
+        { message: `Contact not found with ${lookupField}: ${identifier}` },
         { status: 404 }
       );
     }

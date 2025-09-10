@@ -162,25 +162,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Create notification for dashboard if admin email was sent and contact info provided
-    if (results.adminEmailSent && contactId && contactUuid) {
+    // Create notification for dashboard regardless of email success (if contact info provided)
+    if (contactId && contactUuid) {
       try {
         await supabase.from('notifications').insert([
           {
-            type: 'appointment',
+            type: 'appointment_scheduled',
             title: 'New Consultation Scheduled',
             message: `${clientName} scheduled a consultation for ${appointmentDate} at ${appointmentTime}`,
             contact_id: contactId,
-            contact_uuid: contactUuid,
             contact_name: clientName,
             contact_email: clientEmail,
             read: false,
           },
         ]);
+        console.log('✅ Dashboard notification created for appointment');
       } catch (notificationError) {
         console.error('❌ Notification creation failed:', notificationError);
         results.errors.push('Failed to create dashboard notification');
       }
+    } else {
+      console.warn('⚠️ No contactId/contactUuid provided - skipping notification creation');
     }
 
     const ok = results.clientEmailSent || results.adminEmailSent;
