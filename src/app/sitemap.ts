@@ -56,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 1.0,
     },
+    // Main navigation pages in desired order
     {
       url: `${baseUrl}/about`,
       lastModified: nowIso,
@@ -69,16 +70,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/contact`,
-      lastModified: nowIso,
-      changeFrequency: 'yearly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/guides`,
+      url: `${baseUrl}/book`,
       lastModified: nowIso,
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/mental-health-healing-blog`,
@@ -86,13 +81,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.85,
     },
-    // Booking pages - high priority for conversions
     {
-      url: `${baseUrl}/book`,
+      url: `${baseUrl}/guides`,
       lastModified: nowIso,
       changeFrequency: 'monthly',
-      priority: 0.95,
+      priority: 0.8,
     },
+    // Additional booking pages
     {
       url: `${baseUrl}/book/nd`,
       lastModified: nowIso,
@@ -104,6 +99,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: nowIso,
       changeFrequency: 'monthly',
       priority: 0.9,
+    },
+    // Secondary pages
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: nowIso,
+      changeFrequency: 'yearly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/policy`,
