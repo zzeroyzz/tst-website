@@ -12,6 +12,14 @@ import {
   MessageCircle,
   Loader,
   Zap,
+  MoreVertical,
+  Archive,
+  Trash2,
+  Eye,
+  X,
+  Mail,
+  Calendar,
+  User,
 } from 'lucide-react';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
@@ -32,6 +40,9 @@ const MessagingInterface = () => {
   const [quickResponseButtons, setQuickResponseButtons] = useState<QuickResponseButton[]>([]);
   const [conversationState, setConversationState] = useState<any>(null);
   const [showQuickResponses, setShowQuickResponses] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [modalContact, setModalContact] = useState<any>(null);
 
   // Query for contacts with recent messages
   const {
@@ -292,6 +303,53 @@ const MessagingInterface = () => {
     }
   };
 
+  // Handle archive contact
+  const handleArchiveContact = async (contactId: string, contactName: string) => {
+    try {
+      // TODO: Implement archive functionality
+      console.log('Archiving contact:', contactId);
+      toast.success(`${contactName} archived`);
+      setActiveDropdown(null);
+      refetchContacts();
+    } catch (error) {
+      console.error('Error archiving contact:', error);
+      toast.error('Failed to archive contact');
+    }
+  };
+
+  // Handle remove/hide contact
+  const handleRemoveContact = async (contactId: string, contactName: string) => {
+    try {
+      // TODO: Implement remove/hide functionality
+      console.log('Removing contact from inbox:', contactId);
+      toast.success(`${contactName} removed from inbox`);
+      setActiveDropdown(null);
+      refetchContacts();
+    } catch (error) {
+      console.error('Error removing contact:', error);
+      toast.error('Failed to remove contact');
+    }
+  };
+
+  // Handle view contact info
+  const handleViewContactInfo = (contact: any) => {
+    console.log('Viewing contact info:', contact);
+    setModalContact(contact);
+    setShowContactModal(true);
+    setActiveDropdown(null);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (activeDropdown && !(event.target as Element).closest('.dropdown-menu')) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeDropdown]);
+
   return (
     <div className="flex border-2 border-black rounded-lg overflow-hidden">
       {/* Contact List */}
@@ -312,7 +370,7 @@ const MessagingInterface = () => {
 </div>
         </div>
 
-        <div className="overflow-y-auto h-96 overflow-scroll">
+        <div className="overflow-y-auto h-96">
           {contactsLoading ? (
             <div className="flex items-center justify-center p-8">
               <Loader className="h-6 w-6 animate-spin text-gray-400" />
@@ -330,13 +388,16 @@ const MessagingInterface = () => {
             filteredContacts.map((contact: any) => (
               <div
                 key={contact.id}
-                onClick={() => setSelectedContact(contact)}
-                className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                data-contact-id={contact.id}
+                className={`p-4 border-b border-gray-200 hover:bg-gray-100 relative ${
                   selectedContact?.id === contact.id ? 'bg-tst-purple' : ''
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
+                  <div
+                    className="flex-1 cursor-pointer"
+                    onClick={() => setSelectedContact(contact)}
+                  >
                     <div className="flex items-center gap-2">
                       <h4 className="font-medium text-sm">{contact.name}</h4>
                       {contact.unreadMessageCount > 0 && (
@@ -349,13 +410,64 @@ const MessagingInterface = () => {
                       <Phone className="h-3 w-3" />
                       {contact.phoneNumber}
                     </p>
-                    <p className="text-sm text-gray-600 truncate mt-2">
+                    <p className="text-sm text-gray-600 truncate mt-2 max-w-9">
                       {contact.lastMessage || 'No messages yet'}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-400">
-                    {contact.lastMessageAt ? formatTimestamp(contact.lastMessageAt) : ''}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-xs text-gray-400">
+                      {contact.lastMessageAt ? formatTimestamp(contact.lastMessageAt) : ''}
+                    </span>
+                    <div className="relative dropdown-menu">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveDropdown(activeDropdown === contact.id ? null : contact.id);
+                        }}
+                        className="p-1 rounded bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+                      >
+                        <MoreVertical size={14} />
+                      </Button>
+
+                      {activeDropdown === contact.id && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border-2 border-black rounded-lg shadow-brutalistLg min-w-[160px] overflow-hidden"
+                             style={{ zIndex: 9999 }}>
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewContactInfo(contact);
+                            }}
+                            className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
+                          >
+                            <Eye size={16} />
+                            View Contact
+                          </div>
+                          <div className="border-t border-gray-200"></div>
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleArchiveContact(contact.id, contact.name);
+                            }}
+                            className="w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer text-sm font-medium transition-colors hover:bg-tst-purple"
+                          >
+                            <Archive size={16} />
+                            Archive
+                          </div>
+                          <div className="border-t border-gray-200"></div>
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveContact(contact.id, contact.name);
+                            }}
+                            className="w-full px-4 py-3 text-left flex items-center gap-3 text-red-600 hover:bg-tst-red cursor-pointer text-sm font-medium transition-colors"
+                          >
+                            <Trash2 size={16} />
+                            Remove from Inbox
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))
@@ -559,6 +671,230 @@ const MessagingInterface = () => {
           </div>
         )}
       </div>
+
+      {/* Contact Info Modal - Similar to LeadDetailModal */}
+      {showContactModal && modalContact && (
+        <div className="fixed inset-0 flex justify-center items-center z-[10000] bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-96 flex flex-col border-2 border-black overflow-hidden">
+            {/* Header - Fixed */}
+            <div className="flex-shrink-0 flex justify-between bg-white border-b border-gray-200 p-4 sm:p-6 relative">
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                    <h2 className="text-lg sm:text-xl font-bold truncate">
+                      {modalContact.name}
+                    </h2>
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full self-start flex-shrink-0 ${
+                        modalContact.contactStatus === 'ACTIVE'
+                          ? 'bg-green-100 text-green-700'
+                          : modalContact.contactStatus === 'CLIENT'
+                            ? 'bg-purple-100 text-purple-700'
+                            : modalContact.contactStatus === 'PROSPECT'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {modalContact.contactStatus?.toLowerCase() || 'unknown'}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <Mail size={14} />
+                      <span className="break-all">{modalContact.email}</span>
+                    </div>
+                    {modalContact.phoneNumber && (
+                      <div className="flex items-center gap-1">
+                        <Phone size={14} />
+                        <a
+                          href={`tel:${modalContact.phoneNumber}`}
+                          className="hover:underline underline-offset-2"
+                        >
+                          {modalContact.phoneNumber}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  {modalContact.createdAt && (
+                    <div className="mt-1">
+                      <strong>Contact Created: </strong>
+                      <span className="text-gray-600">
+                        {new Date(modalContact.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Close button */}
+              <Button
+                onClick={() => {
+                  setShowContactModal(false);
+                  setModalContact(null);
+                }}
+                className="bg-tst-red text-white"
+              >
+                <X size={16} />
+              </Button>
+            </div>
+
+            {/* Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Left Column - Message Info */}
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <h3 className="font-bold text-sm mb-2 text-blue-800 flex items-center gap-2">
+                        <MessageCircle size={16} />
+                        Message History
+                      </h3>
+                      <div className="space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Total Messages:</span>
+                          <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
+                            {modalContact.messageCount || 0}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Messages Sent:</span>
+                          <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
+                            {modalContact.messagesSent || 0}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Messages Received:</span>
+                          <span className="px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium">
+                            {modalContact.messagesReceived || 0}
+                          </span>
+                        </div>
+                        {modalContact.lastMessageAt && (
+                          <div>
+                            <span className="font-medium">Last Message:</span>
+                            <p className="text-gray-600 mt-1">{formatTimestamp(modalContact.lastMessageAt)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {modalContact.segments && modalContact.segments.length > 0 && (
+                      <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                        <h3 className="font-bold text-sm mb-2 text-purple-800">
+                          Contact Segments
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {modalContact.segments.map((segment: string) => (
+                            <span
+                              key={segment}
+                              className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full"
+                            >
+                              {segment}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column - Additional Info */}
+                  <div className="space-y-4">
+                    {modalContact.scheduledAppointmentAt && (
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <h3 className="font-bold text-sm mb-2 text-green-800 flex items-center gap-2">
+                          <Calendar size={16} />
+                          Appointment Information
+                        </h3>
+                        <div className="space-y-1 text-xs">
+                          <p>
+                            <strong>Scheduled:</strong>
+                            <br />
+                            {new Date(modalContact.scheduledAppointmentAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                          {modalContact.appointmentStatus && (
+                            <p className="flex items-center gap-2">
+                              <strong>Status:</strong>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  modalContact.appointmentStatus === 'SCHEDULED'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : modalContact.appointmentStatus === 'COMPLETED'
+                                      ? 'bg-green-100 text-green-800'
+                                      : modalContact.appointmentStatus === 'CANCELLED'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                {modalContact.appointmentStatus}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
+                        <User size={16} />
+                        Contact Details
+                      </h3>
+                      <div className="space-y-2 text-xs">
+                        {modalContact.crmNotes && (
+                          <div>
+                            <strong>Notes:</strong>
+                            <p className="text-gray-600 mt-1 whitespace-pre-wrap">
+                              {modalContact.crmNotes}
+                            </p>
+                          </div>
+                        )}
+                        {modalContact.customFields && Object.keys(modalContact.customFields).length > 0 && (
+                          <div>
+                            <strong>Custom Fields:</strong>
+                            <div className="mt-1 space-y-1">
+                              {Object.entries(modalContact.customFields).map(([key, value]) => (
+                                <div key={key} className="flex justify-between">
+                                  <span className="font-medium">{key}:</span>
+                                  <span className="text-gray-600">{String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 sm:p-4">
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => {
+                    setShowContactModal(false);
+                    setModalContact(null);
+                  }}
+                  className="bg-gray-200 text-black border-2 border-black"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

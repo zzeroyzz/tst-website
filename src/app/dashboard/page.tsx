@@ -7,7 +7,6 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
-  CheckSquare,
   Newspaper,
   Users,
   Calendar,
@@ -27,7 +26,6 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { DashboardSkeleton } from '@/components/skeleton';
-import KanbanBoard from '@/components/KanbanBoard/KanbanBoard';
 import LeadsView from '@/components/Leads/LeadsView';
 import NewsletterView from '@/components/Newsletter/NewsletterView';
 import DashboardView from '@/components/DashboardView/DashboardView';
@@ -289,7 +287,7 @@ const DashboardPage = () => {
       notification.type === 'questionnaire'
     ) {
       setActiveView('Leads');
-    } else if (notification.type === 'appointment') {
+    } else if (notification.type === 'appointment' || notification.type === 'appointment_scheduled') {
       setActiveView('Appointments');
     } else if (
       notification.type === 'reminder_sent' ||
@@ -315,8 +313,6 @@ const DashboardPage = () => {
 
   const renderView = () => {
     switch (activeView) {
-      case 'Tasks':
-        return <KanbanBoard />;
       case 'Newsletter':
         return <NewsletterView />;
       case 'Blogs':
@@ -339,7 +335,6 @@ const DashboardPage = () => {
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Tasks', icon: CheckSquare },
     { name: 'Newsletter', icon: Mail },
     { name: 'Blogs', icon: Newspaper },
     { name: 'Leads', icon: Users },

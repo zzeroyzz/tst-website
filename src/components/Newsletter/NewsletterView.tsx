@@ -203,10 +203,10 @@ const NewsletterView = () => {
 
         {/* Desktop Table View */}
         <div className="hidden lg:block bg-white border-2 border-black rounded-lg shadow-brutalistLg overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="max-h-450 overflow-auto">
             <table className="w-full text-left">
-              <thead className="border-b-2 border-black bg-gray-50">
-                <tr>
+              <thead className="sticky top-0 z-50 bg-white shadow-sm">
+                <tr className="border-b-2 border-black">
                   <th className="p-4 font-bold">Title</th>
                   <th className="p-4 font-bold">Tags</th>
                   <th className="p-4 font-bold">Date</th>
@@ -249,7 +249,7 @@ const NewsletterView = () => {
                       </span>
                     </td>
                     <td className="p-4 relative">
-                      <div className="wrapper relative">
+                      <div className="wrapper relative z-10">
                         <div className="shadow"></div>
                         <Button
                           onClick={e => handleDeleteClick(e, post)}

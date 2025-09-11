@@ -23,7 +23,7 @@ export const messageResolvers = {
           .single();
 
         // Try to query by contact_uuid first, fall back to contact_id
-        let query = supabase.from('crm_messages').select('*');
+        const query = supabase.from('crm_messages').select('*');
 
         // Check if contact_uuid column exists by trying to use it
         try {
@@ -108,7 +108,7 @@ export const messageResolvers = {
         }
 
         let content = input.content;
-        let templateId = input.templateId;
+        const templateId = input.templateId;
 
         // If using a template, process variables
         if (input.templateId) {

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let updatedContacts: any[] = [];
+    const updatedContacts: any[] = [];
     if (contactsToUpdate && contactsToUpdate.length > 0) {
       // Update each contact with proper note concatenation
       for (const contact of contactsToUpdate) {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let updatedLeads: any[] = [];
+    const updatedLeads: any[] = [];
     if (leadsToUpdate && leadsToUpdate.length > 0) {
       // Update each lead with proper note concatenation
       for (const lead of leadsToUpdate) {
