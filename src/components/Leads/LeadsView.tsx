@@ -75,6 +75,8 @@ const AddLeadModal = ({ onClose, onAdd }) => {
     phone: '',
     notes: '',
   });
+  const [hasAppointment, setHasAppointment] = useState(false);
+  const [appointmentDateTime, setAppointmentDateTime] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
   const handleSubmit = async e => {
@@ -86,8 +88,28 @@ const AddLeadModal = ({ onClose, onAdd }) => {
       return;
     }
 
+    // Validate appointment date if appointment is set
+    if (hasAppointment && !appointmentDateTime.trim()) {
+      toast.error('Please select an appointment date and time');
+      return;
+    }
+
+    // Validate appointment is in the future
+    if (hasAppointment && appointmentDateTime) {
+      const appointmentDate = new Date(appointmentDateTime);
+      const now = new Date();
+      if (appointmentDate <= now) {
+        toast.error('Appointment must be in the future');
+        return;
+      }
+    }
+
     setIsAdding(true);
-    const success = await onAdd(formData);
+    const success = await onAdd({
+      ...formData,
+      hasAppointment,
+      appointmentDateTime: hasAppointment ? appointmentDateTime : null,
+    });
     setIsAdding(false);
 
     if (success) {
@@ -104,12 +126,12 @@ const AddLeadModal = ({ onClose, onAdd }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md p-6">
+      <div className="bg-white rounded-lg border-2 border-black shadow-brutalistLg w-full max-w-md max-h-screen overflow-y-auto p-4 sm:p-6">
         <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-bold">Add New Lead</h3>
+          <h3 className="text-lg sm:text-xl font-bold">Add New Lead</h3>
           <Button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-500 transition-colors"
+            className="bg-tst-red"
             disabled={isAdding}
           >
             ×
@@ -163,17 +185,66 @@ const AddLeadModal = ({ onClose, onAdd }) => {
             />
           </div>
 
-          <div className="flex gap-3 justify-end pt-4">
+          {/* Appointment Section */}
+          <div className="border-t pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+              <label className="font-bold">Appointment Scheduled</label>
+              <button
+                type="button"
+                onClick={() => {
+                  setHasAppointment(!hasAppointment);
+                  if (hasAppointment) {
+                    setAppointmentDateTime('');
+                  }
+                }}
+                className={`relative inline-flex border-2 border-black h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tst-purple ${
+                  hasAppointment ? 'bg-green-500' : 'bg-gray-300'
+                }`}
+                disabled={isAdding}
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform border-2 border-black rounded-full bg-white shadow-lg transition-transform ${
+                    hasAppointment ? 'translate-x-8' : 'translate-x-1'
+                  }`}
+                />
+                {/* "Yes" label when enabled */}
+                <span className={`absolute text-xs font-semibold transition-opacity ${
+                  hasAppointment ? 'opacity-100' : 'opacity-0'
+                } right-2 text-white`}>
+
+                </span>
+              </button>
+            </div>
+
+            {hasAppointment && (
+              <div>
+                <label className="font-bold block mb-1">Appointment Date & Time *</label>
+                <input
+                  type="datetime-local"
+                  value={appointmentDateTime}
+                  onChange={(e) => setAppointmentDateTime(e.target.value)}
+                  className="w-full p-2 border-2 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-tst-purple"
+                  required={hasAppointment}
+                  min={new Date().toISOString().slice(0, 16)} // Prevent past dates
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Select when this lead's consultation is scheduled
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4">
             <Button
               onClick={onClose}
-              className="bg-gray-200"
+              className="bg-gray-200 w-full sm:w-auto"
               disabled={isAdding}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-tst-purple text-black"
+              className="bg-tst-purple text-black w-full sm:w-auto"
               disabled={isAdding}
             >
               {isAdding ? 'Adding...' : 'Add Lead'}
@@ -248,18 +319,17 @@ const LeadsView = () => {
     const addToast = toast.loading('Adding new lead...');
 
     try {
-      // Generate a unique questionnaire token (UUID)
-      const questionnaireToken = crypto.randomUUID();
-
-      // Create new lead data with default values including questionnaire token
+      // Create new lead data with default values
       const newLeadData = {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim() || null,
+        phone_number: formData.phone.trim() || null,
         notes: formData.notes.trim() || null,
         status: 'New',
-        questionnaire_completed: false,
-        questionnaire_token: questionnaireToken, // Add the questionnaire token
+        appointment_status: formData.hasAppointment ? 'SCHEDULED' : null,
+        scheduled_appointment_at: formData.hasAppointment && formData.appointmentDateTime
+          ? new Date(formData.appointmentDateTime).toISOString()
+          : null,
         created_at: new Date().toISOString(),
       };
 
@@ -277,7 +347,10 @@ const LeadsView = () => {
       setLeads(prev => [data, ...prev]);
 
       toast.dismiss(addToast);
-      toast.success('Lead added successfully with questionnaire link!');
+      const successMessage = formData.hasAppointment
+        ? 'Lead added successfully with scheduled appointment!'
+        : 'Lead added successfully!';
+      toast.success(successMessage);
       return true;
     } catch (error: any) {
       toast.error(`Failed to add lead: ${error.message}`, { id: addToast });
@@ -494,7 +567,7 @@ const LeadsView = () => {
                         <td className="p-4">
                           <div>{lead.email}</div>
                           <div className="text-sm text-gray-500">
-                            {lead.phone}
+                            {lead.phone_number}
                           </div>
                         </td>
                         <td className="p-4">
@@ -588,13 +661,13 @@ const LeadsView = () => {
                       <Mail size={16} className="text-gray-500 flex-shrink-0" />
                       <span className="break-all">{lead.email}</span>
                     </div>
-                    {lead.phone && (
+                    {lead.phone_number && (
                       <div className="flex items-center gap-2 text-sm">
                         <Phone
                           size={16}
                           className="text-gray-500 flex-shrink-0"
                         />
-                        <span>{lead.phone}</span>
+                        <span>{lead.phone_number}</span>
                       </div>
                     )}
                   </div>
