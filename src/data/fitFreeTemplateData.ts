@@ -4,8 +4,29 @@ export const fitFreeTemplate = [
     name: 'Confirmation',
     category: 'WELCOME',
     content:
-      "Hi {{client_name}}, this is Kato with the Toasted Sesame Care Team.\n\nYou're set for:\n{{day_time_et}}\n\nIf you need to reschedule or cancel tap:\nhttps://toastedsesametherapy.com/reschedule/{{contact_uuid}}\n\nReply HELP for support. Reply STOP to opt out.\n\nQuick 3 Qs to prep for your consultation, OK to text here?",
+      "Hi {{client_name}}, this is Kato with the Toasted Sesame Care Team.\n\nYou're set for:\n{{day_time_et}}\n\nIf you need to reschedule or cancel tap:\nhttps://toastedsesametherapy.com/reschedule/{{contact_uuid}}\n\nReply HELP for support. Reply STOP to opt out.\n\n1 = Confirm appointment\n2 = Reschedule\n3 = Cancel",
     variables: ['client_name', 'day_time_et', 'contact_uuid'],
+  },
+  {
+    id: '1b',
+    name: 'Confirmation - Awesome Transition',
+    category: 'WELCOME',
+    content: "Awesome. There are 3 quick questions that I need to ask you to prepare for your consultation. Are you located in GA?\n1 = Yes\n2 = No",
+    variables: [],
+  },
+  {
+    id: '1c',
+    name: 'Confirmation - Reschedule Response',
+    category: 'WELCOME',
+    content: "You can reschedule anytime here: https://toastedsesametherapy.com/reschedule/{{contact_uuid}}",
+    variables: ['contact_uuid'],
+  },
+  {
+    id: '1d',
+    name: 'Confirmation - Cancel Response',
+    category: 'WELCOME',
+    content: "Your appointment has been cancelled. You can rebook anytime here: https://toastedsesametherapy.com/reschedule/{{contact_uuid}}",
+    variables: ['contact_uuid'],
   },
   {
     id: '2',

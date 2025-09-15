@@ -86,20 +86,45 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     if (messages.length === 0) {
       templatesToShow = [fitFreeTemplate.find(t => t.id === '1')!]; // Confirmation
     }
-    // If we just sent the confirmation and waiting for response, wait for customer to respond
-    else if (lastOutboundMessage.includes("Quick 3 Qs to prep") && isWaitingForResponse) {
-      console.log('🔄 After confirmation, waiting for customer response');
+    // If we just sent the confirmation menu and waiting for response, wait for customer to respond
+    else if (lastOutboundMessage.includes("1 = Confirm appointment") && isWaitingForResponse) {
+      console.log('🔄 After confirmation menu, waiting for customer response');
       templatesToShow = []; // Wait for their response before showing next template
     }
-    // If customer responded to confirmation, show Georgia question
-    else if (lastOutboundMessage.includes("Quick 3 Qs to prep") && !isWaitingForResponse && lastInboundMessage) {
-      console.log('✅ Customer responded to confirmation, showing Georgia question');
-      templatesToShow = [fitFreeTemplate.find(t => t.id === '2')!]; // State question
+    // If customer responded to confirmation menu
+    else if (lastOutboundMessage.includes("1 = Confirm appointment") && !isWaitingForResponse && lastInboundMessage) {
+      console.log('✅ Customer responded to confirmation menu, handling response:', lastInboundMessage);
+      
+      if (lastInboundMessage.includes('1')) {
+        // They confirmed - show transition message with Georgia question
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1b')!]; // Awesome transition
+      } else if (lastInboundMessage.includes('2')) {
+        // They want to reschedule - show reschedule link
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1c')!]; // Reschedule response
+      } else if (lastInboundMessage.includes('3')) {
+        // They want to cancel - show cancel link
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1d')!]; // Cancel response
+      } else {
+        // Invalid response - show confirmation menu again
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1')!]; // Confirmation
+      }
     }
-    // If we already sent the confirmation recently, don't show it again
-    else if (lastOutboundMessage.includes("Quick 3 Qs to prep") && !isWaitingForResponse && !lastInboundMessage) {
-      console.log('⚠️ Confirmation already sent recently, waiting for response');
-      templatesToShow = []; // Don't show templates, wait for response
+    // If we sent the transition message and waiting for response to Georgia question
+    else if (lastOutboundMessage.includes("Are you located in GA?") && isWaitingForResponse) {
+      console.log('🔄 After Georgia question, waiting for customer response');
+      templatesToShow = []; // Wait for their response before showing next template
+    }
+    // If customer responded to Georgia question, continue with normal flow
+    else if (lastOutboundMessage.includes("Are you located in GA?") && !isWaitingForResponse && lastInboundMessage) {
+      console.log('✅ Customer responded to Georgia question, continuing normal flow');
+      
+      if (lastInboundMessage.includes('2')) {
+        // Not in Georgia - show referrals
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '2b')!]; // Not in state referrals
+      } else {
+        // In Georgia - continue to fit-or-free offer
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '3')!]; // Fit-or-free offer
+      }
     }
     // If we asked "Are you in Georgia?" and they haven't responded yet, wait
     else if (lastOutboundMessage.includes("Are you in Georgia?") && isWaitingForResponse) {
@@ -532,7 +557,34 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
                 }}
                 className="bg-green-200 text-green-800 px-2 py-1 text-xs"
               >
-                📝 Confirmation (Start)
+                📝 Confirmation Menu
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1b');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-blue-200 text-blue-800 px-2 py-1 text-xs"
+              >
+                ✅ Awesome Transition
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1c');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-yellow-200 text-yellow-800 px-2 py-1 text-xs"
+              >
+                🔄 Reschedule Link
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1d');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-red-200 text-red-800 px-2 py-1 text-xs"
+              >
+                ❌ Cancel Link
               </Button>
               <Button
                 onClick={() => {
@@ -541,7 +593,7 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
                 }}
                 className="bg-orange-200 text-orange-800 px-2 py-1 text-xs"
               >
-                🌎 Georgia Question
+                🌎 Georgia Question (Old)
               </Button>
               <Button
                 onClick={() => {
