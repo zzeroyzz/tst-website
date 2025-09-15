@@ -1,5 +1,5 @@
 import { sendSMS } from '@/lib/twilio/client';
-import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { sendCustomEmailWithRetry } from '@/lib/resend-email-sender';
 import { getAppointmentRescheduleTemplate, getAppointmentCancellationTemplate } from '@/lib/appointment-email-templates';
 import { createClient } from '@supabase/supabase-js';
 
@@ -19,7 +19,7 @@ export interface SMSContext {
 export async function sendWelcomeSMS(context: SMSContext): Promise<{ success: boolean; error?: string }> {
   try {
     // Use the exact template from fitFreeTemplateData ID: 1
-    let message = "Hi {{client_name}}—this is Kato with the Toasted Sesame Care Team.\n\nYou're set for:\n{{day_time_et}}\n\nIf you need to reschedule or cancel tap:\nhttps://toastedsesametherapy.com/reschedule/{{contact_uuid}}\n\nReply HELP for support. Reply STOP to opt out.\n\nQuick 3 Qs to prep for your consultation, OK to text here?";
+    let message = "Hi {{client_name}}, this is Kato with the Toasted Sesame Care Team.\n\nYou're set for:\n{{day_time_et}}\n\nIf you need to reschedule or cancel tap:\nhttps://toastedsesametherapy.com/reschedule/{{contact_uuid}}\n\nReply HELP for support. Reply STOP to opt out.\n\n1 = Confirm appointment\n2 = Reschedule\n3 = Cancel";
 
     console.log('🚀 sendWelcomeSMS called with:', JSON.stringify(context, null, 2));
 
@@ -51,7 +51,7 @@ export async function sendWelcomeSMS(context: SMSContext): Promise<{ success: bo
     }
 
     console.log('📱 Final SMS message:', message);
-    const result = await sendSMS(context.phoneNumber, message);
+    await sendSMS(context.phoneNumber, message);
 
     // Save the outbound SMS to the database so it appears in MessagingInterface
     try {
@@ -59,7 +59,7 @@ export async function sendWelcomeSMS(context: SMSContext): Promise<{ success: bo
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       );
-      
+
       const { error: dbError } = await supabase
         .from('crm_messages')
         .insert({
@@ -68,7 +68,7 @@ export async function sendWelcomeSMS(context: SMSContext): Promise<{ success: bo
           direction: 'OUTBOUND',
           message_status: 'SENT',
           message_type: 'SMS',
-          twilio_sid: result.sid || null,
+          twilio_sid: null,
         });
 
       if (dbError) {
@@ -111,10 +111,10 @@ export async function sendRescheduleSMS(context: SMSContext): Promise<{ success:
 
     // Send SMS
     const message = `Hi ${context.contactName}! Your appointment has been rescheduled to ${dayTime}. We'll see you then! Reply HELP for support. Reply STOP to opt out.`;
-    const result = await sendSMS(context.phoneNumber, message);
+    await sendSMS(context.phoneNumber, message);
 
     // Send email if email address is provided
-    if (context.contactEmail && process.env.MAILCHIMP_RESCHEDULE_LIST_ID) {
+    if (context.contactEmail) {
       try {
         const oldDate = context.oldAppointmentDateTime ? new Date(context.oldAppointmentDateTime) : new Date();
         const emailTemplate = getAppointmentRescheduleTemplate({
@@ -123,7 +123,7 @@ export async function sendRescheduleSMS(context: SMSContext): Promise<{ success:
           oldAppointmentTime: oldDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }),
           newAppointmentDate: appointmentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
           newAppointmentTime: appointmentDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }),
-          googleMeetLink: 'https://meet.google.com/your-meeting-link', // TODO: Get actual meet link
+          googleMeetLink: process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/orb-dugk-cab',
           cancelUrl: context.contactUuid ? `https://toastedsesametherapy.com/reschedule/${context.contactUuid}` : undefined
         });
 
@@ -132,8 +132,6 @@ export async function sendRescheduleSMS(context: SMSContext): Promise<{ success:
           recipientName: context.contactName,
           subject: 'Your appointment has been rescheduled',
           htmlContent: emailTemplate,
-          listId: process.env.MAILCHIMP_RESCHEDULE_LIST_ID,
-          campaignTitle: `Reschedule Confirmation - ${context.contactName}`,
         });
       } catch (emailError) {
         console.error('Error sending reschedule email:', emailError);
@@ -162,10 +160,10 @@ export async function sendCancellationSMS(context: SMSContext): Promise<{ succes
 
     // Send SMS
     const message = `Hi ${context.contactName}! Your appointment has been cancelled. You can reschedule anytime here: ${rescheduleLink}. Reply HELP for support. Reply STOP to opt out.`;
-    const result = await sendSMS(context.phoneNumber, message);
+    await sendSMS(context.phoneNumber, message);
 
     // Send email if email address is provided
-    if (context.contactEmail && context.appointmentDateTime && process.env.MAILCHIMP_CANCELLATION_LIST_ID) {
+    if (context.contactEmail && context.appointmentDateTime) {
       try {
         const appointmentDate = new Date(context.appointmentDateTime);
         const emailTemplate = getAppointmentCancellationTemplate({
@@ -180,8 +178,6 @@ export async function sendCancellationSMS(context: SMSContext): Promise<{ succes
           recipientName: context.contactName,
           subject: 'Your appointment has been cancelled',
           htmlContent: emailTemplate,
-          listId: process.env.MAILCHIMP_CANCELLATION_LIST_ID,
-          campaignTitle: `Cancellation Confirmation - ${context.contactName}`,
         });
       } catch (emailError) {
         console.error('Error sending cancellation email:', emailError);

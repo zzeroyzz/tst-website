@@ -2,11 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Send, Clock, ArrowRight, RotateCcw } from 'lucide-react';
-import { useQuery } from '@apollo/client/react';
 import Button from '@/components/Button/Button';
 import { fitFreeTemplate } from '@/data/fitFreeTemplateData';
 import { getAvailableSlotsClient, type AvailableSlot } from '@/lib/appointments/availability';
-import { GET_CONTACT_APPOINTMENTS } from '@/lib/graphql/queries/appointments';
 
 interface ScriptBubblesProps {
   contactId: string;
@@ -30,13 +28,17 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     tomorrow: null
   });
   const [isDevMode, setIsDevMode] = useState(false);
-  const [lastSentMessageId, setLastSentMessageId] = useState<string | null>(null);
 
-  // GraphQL hooks for appointment management
-  const { data: appointmentsData } = useQuery(GET_CONTACT_APPOINTMENTS, {
-    variables: { contactId },
-    skip: !contactId,
-  });
+  // Log contact data for debugging
+  useEffect(() => {
+    console.log('📊 ScriptBubbles - Contact state:', {
+      contactId,
+      contact,
+      hasScheduledAppointment: !!contact?.scheduledAppointmentAt,
+      appointmentStatus: contact?.appointmentStatus,
+      scheduledAppointmentAt: contact?.scheduledAppointmentAt
+    });
+  }, [contactId, contact]);
 
   // Determine which templates to show based on conversation state
   useEffect(() => {
@@ -84,26 +86,44 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     if (messages.length === 0) {
       templatesToShow = [fitFreeTemplate.find(t => t.id === '1')!]; // Confirmation
     }
-    // If we just sent the confirmation and waiting for response, show state question
-    else if (lastOutboundMessage.includes("Quick 3 Qs to prep") && isWaitingForResponse) {
-      console.log('🔄 After confirmation, showing Georgia question');
-      templatesToShow = [fitFreeTemplate.find(t => t.id === '2')!]; // State question
+    // If we just sent the confirmation menu and waiting for response, wait for customer to respond
+    else if (lastOutboundMessage.includes("1 = Confirm appointment") && isWaitingForResponse) {
+      console.log('🔄 After confirmation menu, waiting for customer response');
+      templatesToShow = []; // Wait for their response before showing next template
     }
-    // If we already sent the confirmation recently, don't show it again
-    else if (lastOutboundMessage.includes("Quick 3 Qs to prep") && !isWaitingForResponse && !lastInboundMessage) {
-      console.log('⚠️ Confirmation already sent recently, waiting for response');
-      templatesToShow = []; // Don't show templates, wait for response
+    // If customer responded to confirmation menu
+    else if (lastOutboundMessage.includes("1 = Confirm appointment") && !isWaitingForResponse && lastInboundMessage) {
+      console.log('✅ Customer responded to confirmation menu, handling response:', lastInboundMessage);
+      
+      if (lastInboundMessage.includes('1')) {
+        // They confirmed - show transition message with Georgia question
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1b')!]; // Awesome transition
+      } else if (lastInboundMessage.includes('2')) {
+        // They want to reschedule - show reschedule link
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1c')!]; // Reschedule response
+      } else if (lastInboundMessage.includes('3')) {
+        // They want to cancel - show cancel link
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1d')!]; // Cancel response
+      } else {
+        // Invalid response - show confirmation menu again
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1')!]; // Confirmation
+      }
     }
-    // If we asked "Are you in Georgia?" and they haven't responded yet, wait
-    else if (lastOutboundMessage.includes("Are you in Georgia?") && isWaitingForResponse) {
-      templatesToShow = []; // Wait for their response
+    // If we sent the transition message and waiting for response to Georgia question
+    else if (lastOutboundMessage.includes("Are you located in GA?") && isWaitingForResponse) {
+      console.log('🔄 After Georgia question, waiting for customer response');
+      templatesToShow = []; // Wait for their response before showing next template
     }
-    // If they responded to "Are you in Georgia?"
-    else if (lastOutboundMessage.includes("Are you in Georgia?") && !isWaitingForResponse) {
-      if (lastInboundMessage.includes('1') || lastInboundMessage.includes('yes')) {
-        templatesToShow = [fitFreeTemplate.find(t => t.id === '3')!]; // Fit-or-Free offer
-      } else if (lastInboundMessage.includes('2') || lastInboundMessage.includes('no')) {
-        templatesToShow = [fitFreeTemplate.find(t => t.id === '2b')!]; // Not in state - referrals
+    // If customer responded to Georgia question, continue with normal flow
+    else if (lastOutboundMessage.includes("Are you located in GA?") && !isWaitingForResponse && lastInboundMessage) {
+      console.log('✅ Customer responded to Georgia question, continuing normal flow');
+      
+      if (lastInboundMessage.includes('2')) {
+        // Not in Georgia - show referrals
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1ba')!]; // Not in state referrals
+      } else {
+        // In Georgia - continue to fit-or-free offer
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '3')!]; // Fit-or-free offer
       }
     }
     // If we asked "Fit or Free" and they haven't responded yet, wait
@@ -420,25 +440,23 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
   };
 
   const handleSendScript = (template: typeof fitFreeTemplate[0]) => {
-    // Check if we already sent a message with this content recently
-    const messageId = `${template.id}-${Date.now()}`;
-    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-
-    if (lastSentMessageId && Date.now() - parseInt(lastSentMessageId.split('-')[1] || '0') < 60000) {
-      console.log('🚫 Preventing duplicate send - message sent too recently');
-      return;
-    }
 
     let message = template.content;
 
     // Get actual appointment time if available
     const getAppointmentTime = () => {
-      const currentAppointments = (appointmentsData as any)?.contactAppointments || [];
-      const scheduledAppointment = currentAppointments.find(apt => apt.status === 'SCHEDULED');
-
-      if (scheduledAppointment?.scheduledAt) {
-        const appointmentDate = new Date(scheduledAppointment.scheduledAt);
-        return appointmentDate.toLocaleDateString('en-US', {
+      console.log('🔍 getAppointmentTime - contact data:', {
+        scheduledAppointmentAt: contact?.scheduledAppointmentAt,
+        appointmentStatus: contact?.appointmentStatus
+      });
+      
+      // Use the scheduledAppointmentAt from the contact directly
+      if (contact?.scheduledAppointmentAt) {
+        const appointmentDate = new Date(contact.scheduledAppointmentAt);
+        console.log('🕐 Appointment date object:', appointmentDate);
+        console.log('🕐 Raw scheduledAppointmentAt value:', contact.scheduledAppointmentAt);
+        
+        const formattedTime = appointmentDate.toLocaleDateString('en-US', {
           weekday: 'long',
           month: 'long',
           day: 'numeric',
@@ -447,7 +465,12 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
           timeZone: 'America/New_York',
           timeZoneName: 'short',
         });
+        
+        console.log('✅ Formatted appointment time:', formattedTime);
+        return formattedTime;
       }
+      
+      console.log('⚠️ No scheduledAppointmentAt found on contact, using fallback');
       return 'your scheduled time';
     };
 
@@ -475,7 +498,6 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     });
 
     onSendMessage(message);
-    setLastSentMessageId(messageId);
   };
 
   if (currentTemplates.length === 0) {
@@ -484,8 +506,10 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     const lastOutbound = sortedMessages.find(m => m.direction === 'OUTBOUND')?.content || '';
 
     let waitingMessage = "Waiting for customer response...";
-    if (lastOutbound.includes("Are you in Georgia?")) {
+    if (lastOutbound.includes("Are you located in GA?")) {
       waitingMessage = "Waiting for response to Georgia question (1 = Yes, 2 = No)";
+    } else if (lastOutbound.includes("1 = Confirm appointment")) {
+      waitingMessage = "Waiting for confirmation response (1 = Confirm, 2 = Reschedule, 3 = Cancel)";
     } else if (lastOutbound.includes("Fit or Free first session")) {
       waitingMessage = "Waiting for response to Fit-or-Free offer (1 = Yes, 2 = No)";
     } else if (lastOutbound.includes("$150 private pay")) {
@@ -498,10 +522,111 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
 
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-        <div className="flex items-center gap-2 text-yellow-700">
-          <Clock className="w-4 h-4 animate-pulse" />
-          <span className="text-sm font-medium">{waitingMessage}</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-yellow-700">
+            <Clock className="w-4 h-4 animate-pulse" />
+            <span className="text-sm font-medium">{waitingMessage}</span>
+          </div>
+          <Button
+            onClick={() => setIsDevMode(!isDevMode)}
+            className="bg-gray-500 text-white px-2 py-1 text-xs"
+          >
+            {isDevMode ? 'Hide Dev' : 'Dev Mode'}
+          </Button>
         </div>
+        
+        {/* Dev Panel - Available even when waiting */}
+        {isDevMode && (
+          <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded">
+            <h4 className="text-xs font-semibold text-orange-800 mb-2">🛠️ Dev Tools - Override Waiting State</h4>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-green-200 text-green-800 px-2 py-1 text-xs"
+              >
+                📝 Confirmation Menu
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1b');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-blue-200 text-blue-800 px-2 py-1 text-xs"
+              >
+                ✅ Awesome Transition
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1c');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-yellow-200 text-yellow-800 px-2 py-1 text-xs"
+              >
+                🔄 Reschedule Link
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1d');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-red-200 text-red-800 px-2 py-1 text-xs"
+              >
+                ❌ Cancel Link
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '1ba');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-orange-200 text-orange-800 px-2 py-1 text-xs"
+              >
+                🚫 GA Referrals
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '3');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-orange-200 text-orange-800 px-2 py-1 text-xs"
+              >
+                💰 Fit-or-Free Offer
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '5');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-orange-200 text-orange-800 px-2 py-1 text-xs"
+              >
+                📋 Focus Areas
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '7');
+                  if (template) {
+                    setCurrentTemplates([template]);
+                    loadAvailableSlots();
+                  }
+                }}
+                className="bg-purple-200 text-purple-800 px-2 py-1 text-xs"
+              >
+                ⏰ Pull Forward
+              </Button>
+              <Button
+                onClick={() => {
+                  const template = fitFreeTemplate.find(t => t.id === '8');
+                  if (template) setCurrentTemplates([template]);
+                }}
+                className="bg-red-200 text-red-800 px-2 py-1 text-xs"
+              >
+                ❌ Cancel Appointment
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
