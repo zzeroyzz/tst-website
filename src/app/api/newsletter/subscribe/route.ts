@@ -1,11 +1,7 @@
-// src/app/api/newsletter/subscribe/route.ts - Updated
+// src/app/api/newsletter/subscribe/route.ts - Updated to use Resend
 import { NextResponse } from 'next/server';
-import { sendCustomEmailWithRetry } from '@/lib/email-sender';
+import { sendCustomEmailWithRetry, addSubscriberToAudience, updateSubscriberInAudience } from '@/lib/resend-email-sender';
 import { getWelcomeEmailTemplate } from '@/lib/custom-email-templates';
-
-const mailchimpApiKey = process.env.MAILCHIMP_API_KEY;
-const mailchimpServerPrefix = process.env.MAILCHIMP_SERVER_PREFIX;
-const mailchimpAudienceId = process.env.MAILCHIMP_NEWSLETTER_AUDIENCE_ID;
 
 export async function POST(request: Request) {
   try {
@@ -25,50 +21,35 @@ export async function POST(request: Request) {
     const FNAME = nameParts[0] || '';
     const LNAME = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
-    // 1. Add to Mailchimp audience (for analytics, NO automation)
-    const mailchimpUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members`;
-    const mailchimpData = {
-      email_address: email.toLowerCase().trim(),
-      status: 'subscribed',
-      merge_fields: { FNAME, LNAME },
-      tags: ['newsletter-signup-v2'], // Keep for tracking, but turn OFF automation
+    // 1. Add to Resend audience
+    const subscriberData = {
+      email: email.toLowerCase().trim(),
+      firstName: FNAME,
+      lastName: LNAME,
+      unsubscribed: false,
     };
 
-    const response = await fetch(mailchimpUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `apikey ${mailchimpApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(mailchimpData),
-    });
+    let subscriberResult = await addSubscriberToAudience(subscriberData);
 
-    const responseData = await response.json();
-
-    // Handle existing subscriber
-    if (!response.ok && responseData.title === 'Member Exists') {
-      // Update existing subscriber
-      const subscriberHash = Buffer.from(email.toLowerCase())
-        .toString('base64')
-        .replace(/=/g, '');
-      const updateUrl = `https://${mailchimpServerPrefix}.api.mailchimp.com/3.0/lists/${mailchimpAudienceId}/members/${subscriberHash}`;
-
-      await fetch(updateUrl, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `apikey ${mailchimpApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: 'subscribed',
-          merge_fields: { FNAME, LNAME },
-        }),
+    // If subscriber already exists, try to update instead
+    if (!subscriberResult.success && (
+      subscriberResult.error?.includes('already exists') || 
+      subscriberResult.error?.includes('Contact already exists') ||
+      subscriberResult.error?.includes('already exists in the audience')
+    )) {
+      // Contact already exists, attempting to update
+      subscriberResult = await updateSubscriberInAudience(email.toLowerCase().trim(), {
+        firstName: FNAME,
+        lastName: LNAME,
+        unsubscribed: false,
       });
-    } else if (!response.ok) {
-      console.error('Mailchimp API Error:', responseData);
+    }
+
+    if (!subscriberResult.success) {
+      console.error('Resend API Error:', subscriberResult.error);
       return NextResponse.json(
         {
-          error: `Subscription failed: ${responseData.detail || responseData.title}`,
+          error: `Subscription failed: ${subscriberResult.error}`,
         },
         { status: 400 }
       );
@@ -85,8 +66,6 @@ export async function POST(request: Request) {
       recipientName: FNAME,
       subject: 'Welcome! Your free guides are here ☁️',
       htmlContent: welcomeHtml,
-      listId: mailchimpAudienceId!,
-      campaignTitle: `New Subscriber Email - ${emailUsername || 'subscriber'} - ${new Date().toISOString()}`,
     });
 
     if (!emailResult.success) {

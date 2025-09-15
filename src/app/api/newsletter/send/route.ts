@@ -1,20 +1,15 @@
-// src/app/api/newsletter/send/route.ts
+// src/app/api/newsletter/send/route.ts - Updated to use Resend
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import mailchimp from '@mailchimp/mailchimp_marketing';
 import { marked } from 'marked';
 import { getEmailHtml } from '@/lib/email-template';
+import { sendNewsletterToAudience } from '@/lib/resend-email-sender';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_SERVER_PREFIX,
-});
 
 marked.setOptions({
   breaks: true,
@@ -72,51 +67,32 @@ export async function POST(request: Request) {
 
     const finalHtml = getEmailHtml(emailData);
 
-    // 4. Create and send Mailchimp campaign
-    const campaignResponse = await mailchimp.campaigns.create({
-      type: 'regular',
-      recipients: { list_id: process.env.MAILCHIMP_NEWSLETTER_AUDIENCE_ID! },
-      settings: {
-        subject_line: savedPost.subject,
-        title: `Toasty Tidbits: ${savedPost.title}`,
-        from_name: 'Kay from Toasted Sesame',
-        reply_to: 'care@toastedsesametherapy.com',
-      },
-    });
+    // 4. Send newsletter using Resend
+    const newsletterResult = await sendNewsletterToAudience(
+      savedPost.subject,
+      finalHtml,
+      'Kay from Toasted Sesame',
+      'care@toastedsesametherapy.com'
+    );
 
-    // Type guard to check if the response has an id property
-    if (
-      !campaignResponse ||
-      typeof campaignResponse !== 'object' ||
-      !('id' in campaignResponse)
-    ) {
-      throw new Error(
-        'Failed to create campaign: Invalid response from Mailchimp'
-      );
+    if (!newsletterResult.success) {
+      throw new Error(`Failed to send newsletter: ${newsletterResult.error}`);
     }
 
-    const campaign = campaignResponse as { id: string };
-
-    await mailchimp.campaigns.setContent(campaign.id, { html: finalHtml });
-    await mailchimp.campaigns.send(campaign.id);
-
-    // Return campaign ID, post ID, and slug for proper redirection
+    // Return email ID, post ID, and slug for proper redirection
     return NextResponse.json({
-      message: 'Campaign sent successfully!',
-      campaignId: campaign.id,
+      message: 'Newsletter sent successfully!',
+      emailId: newsletterResult.emailId,
       postId: savedPost.id,
       slug: savedPost.slug, // Include the slug for redirection to public post page
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error('API Error:', error.response?.body || error.message);
-    const errorMessage =
-      error.response?.body?.detail ||
-      error.message ||
-      'An unexpected error occurred.';
+    console.error('API Error:', error.message);
+    const errorMessage = error.message || 'An unexpected error occurred.';
     return NextResponse.json(
-      { error: `Mailchimp API Error: ${errorMessage}` },
+      { error: `Newsletter API Error: ${errorMessage}` },
       { status: 500 }
     );
   }
