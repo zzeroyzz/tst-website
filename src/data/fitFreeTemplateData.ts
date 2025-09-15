@@ -29,15 +29,7 @@ export const fitFreeTemplate = [
     variables: ['contact_uuid'],
   },
   {
-    id: '2',
-    name: 'Qualification - State',
-    category: 'INTAKE',
-    content: "Are you in Georgia?\n1 = Yes\n2 = No",
-    variables: [],
-  },
-  // If no, send referrals and end flow
-  {
-    id: '2b',
+    id: '1ba',
     name: 'Not In State - Referrals',
     category: 'INTAKE',
     content: "Unfortunately we can only see clients that are located in GA. Here are a few referrals that may help: {{ref_a}}, {{ref_b}}. Wishing you the best.",

@@ -120,22 +120,10 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
       
       if (lastInboundMessage.includes('2')) {
         // Not in Georgia - show referrals
-        templatesToShow = [fitFreeTemplate.find(t => t.id === '2b')!]; // Not in state referrals
+        templatesToShow = [fitFreeTemplate.find(t => t.id === '1ba')!]; // Not in state referrals
       } else {
         // In Georgia - continue to fit-or-free offer
         templatesToShow = [fitFreeTemplate.find(t => t.id === '3')!]; // Fit-or-free offer
-      }
-    }
-    // If we asked "Are you in Georgia?" and they haven't responded yet, wait
-    else if (lastOutboundMessage.includes("Are you in Georgia?") && isWaitingForResponse) {
-      templatesToShow = []; // Wait for their response
-    }
-    // If they responded to "Are you in Georgia?"
-    else if (lastOutboundMessage.includes("Are you in Georgia?") && !isWaitingForResponse) {
-      if (lastInboundMessage.includes('1') || lastInboundMessage.includes('yes')) {
-        templatesToShow = [fitFreeTemplate.find(t => t.id === '3')!]; // Fit-or-Free offer
-      } else if (lastInboundMessage.includes('2') || lastInboundMessage.includes('no')) {
-        templatesToShow = [fitFreeTemplate.find(t => t.id === '2b')!]; // Not in state - referrals
       }
     }
     // If we asked "Fit or Free" and they haven't responded yet, wait
@@ -518,8 +506,10 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
     const lastOutbound = sortedMessages.find(m => m.direction === 'OUTBOUND')?.content || '';
 
     let waitingMessage = "Waiting for customer response...";
-    if (lastOutbound.includes("Are you in Georgia?")) {
+    if (lastOutbound.includes("Are you located in GA?")) {
       waitingMessage = "Waiting for response to Georgia question (1 = Yes, 2 = No)";
+    } else if (lastOutbound.includes("1 = Confirm appointment")) {
+      waitingMessage = "Waiting for confirmation response (1 = Confirm, 2 = Reschedule, 3 = Cancel)";
     } else if (lastOutbound.includes("Fit or Free first session")) {
       waitingMessage = "Waiting for response to Fit-or-Free offer (1 = Yes, 2 = No)";
     } else if (lastOutbound.includes("$150 private pay")) {
@@ -588,12 +578,12 @@ const ScriptBubbles: React.FC<ScriptBubblesProps> = ({
               </Button>
               <Button
                 onClick={() => {
-                  const template = fitFreeTemplate.find(t => t.id === '2');
+                  const template = fitFreeTemplate.find(t => t.id === '1ba');
                   if (template) setCurrentTemplates([template]);
                 }}
                 className="bg-orange-200 text-orange-800 px-2 py-1 text-xs"
               >
-                🌎 Georgia Question (Old)
+                🚫 GA Referrals
               </Button>
               <Button
                 onClick={() => {
