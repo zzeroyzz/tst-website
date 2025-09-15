@@ -384,11 +384,11 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
               </div>
             </div>
           </div>
-
+<div>
           {/* Close button - positioned absolutely in top right */}
           <Button onClick={onClose} className="bg-tst-red text-white">
-            <X size={16} />
-          </Button>
+           x
+          </Button></div>
         </div>
 
         {/* Content - Scrollable */}
